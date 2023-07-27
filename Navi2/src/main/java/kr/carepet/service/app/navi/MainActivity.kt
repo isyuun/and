@@ -1,7 +1,7 @@
 package kr.carepet.service.app.navi
 
-import kr.carepet.app.AppCompatActivity
 import android.os.Bundle
+import kr.carepet.app.AppCompatActivity
 
 open class MainActivity : AppCompatActivity() {
 

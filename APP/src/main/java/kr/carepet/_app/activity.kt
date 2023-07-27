@@ -2,7 +2,7 @@ package kr.carepet._app
 
 import android.os.Bundle
 import android.os.PersistableBundle
-import kr.carepet.util.log
+import kr.carepet.util.Log
 
 open class activity : android.app.Activity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
@@ -21,6 +21,6 @@ open class activity : android.app.Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        log.i(__CLASSNAME__, "${getMethodName()}${savedInstanceState},${persistentState}")
+        Log.i(__CLASSNAME__, "${getMethodName()}${savedInstanceState},${persistentState}")
     }
 }

@@ -13,7 +13,7 @@ import com.google.android.material.snackbar.Snackbar
 import kr.carepet.app.AppCompatActivity
 import kr.carepet.test.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+open class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding

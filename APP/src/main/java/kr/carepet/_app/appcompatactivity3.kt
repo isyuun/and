@@ -5,7 +5,7 @@ import android.os.PersistableBundle
 import android.view.View
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
-import kr.carepet.util.log
+import kr.carepet.util.Log
 
 open class appcompatactivity3 : appcompatactivity2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
@@ -14,7 +14,7 @@ open class appcompatactivity3 : appcompatactivity2() {
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        log.i(__CLASSNAME__, "${toString()}:${getMethodName()}${savedInstanceState},${persistentState}")
+        Log.i(__CLASSNAME__, "${toString()}:${getMethodName()}${savedInstanceState},${persistentState}")
         root = findViewById<View>(android.R.id.content).rootView
         root = window.decorView.findViewById(android.R.id.content)
     }

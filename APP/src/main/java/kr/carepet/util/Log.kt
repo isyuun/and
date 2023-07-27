@@ -1,6 +1,6 @@
 package kr.carepet.util
 
-class log {
+class Log {
     companion object {
         const val ASSERT = 7
         const val DEBUG = 3

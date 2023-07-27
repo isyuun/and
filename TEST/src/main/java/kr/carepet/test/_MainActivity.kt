@@ -1,4 +1,4 @@
-package kr.carepet.service.app.navi
+package kr.carepet.test
 
 import android.os.Bundle
 import kr.carepet.util.Log
