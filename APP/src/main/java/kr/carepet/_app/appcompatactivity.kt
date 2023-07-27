@@ -7,11 +7,12 @@ open class appcompatactivity : androidx.appcompat.app.AppCompatActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     protected open fun getMethodName(): String? {
-        val className = Thread.currentThread().stackTrace[3].className
-        val methodName = Thread.currentThread().stackTrace[3].methodName
+        val stack = Thread.currentThread().stackTrace[3]
+        val className = stack.className
+        val methodName = stack.methodName
         val path = "${className}.${methodName}"
-        val file = Thread.currentThread().stackTrace[3].fileName
-        val line = Thread.currentThread().stackTrace[3].lineNumber
+        val file = stack.fileName
+        val line = stack.lineNumber
         return "${path}(${file}:${line}) "
     }
 
