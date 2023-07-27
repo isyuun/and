@@ -7,8 +7,8 @@ class _MainActivity : MainActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i(__CLASSNAME__, "${getMethodName()}")
         super.onCreate(savedInstanceState)
-        Log.w(__CLASSNAME__, "${getMethodName()}")
         setContentView(0)       //IY:test-일부러.죽여봄
     }
 }

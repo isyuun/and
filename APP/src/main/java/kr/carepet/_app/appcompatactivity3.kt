@@ -14,7 +14,6 @@ open class appcompatactivity3 : appcompatactivity2() {
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        Log.i(__CLASSNAME__, "${toString()}:${getMethodName()}${savedInstanceState},${persistentState}")
         root = findViewById<View>(android.R.id.content).rootView
         root = window.decorView.findViewById(android.R.id.content)
     }
