@@ -2,4 +2,4 @@ package kr.carepet.app
 
 import kr.carepet._app._appcompatactivity
 
-class AppCompatActivity : _appcompatactivity()
+open class AppCompatActivity : _appcompatactivity()

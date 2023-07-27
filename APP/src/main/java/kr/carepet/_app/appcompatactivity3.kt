@@ -29,7 +29,7 @@ open class appcompatactivity3 : appcompatactivity2() {
 
     private lateinit var snackbar: Snackbar
 
-    fun snack(text: CharSequence, duration: Int) {
+    fun snack(text: CharSequence, duration: Int = Snackbar.LENGTH_LONG) {
         snackbar = Snackbar.make(root, text, duration)
         snackbar.show()
     }
