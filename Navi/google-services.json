@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "769919076545",
+    "project_id": "carepet-test",
+    "storage_bucket": "carepet-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:769919076545:android:cf85a7aff52173b3ca6c40",
+        "android_client_info": {
+          "package_name": "kr.carepet.service.app.navi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "769919076545-hptvp8n3a2m4pc0ms0ibhcov36fn3gpd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kr.carepet.service.app.navi",
+            "certificate_hash": "215758442d61433cb222b310ffae36c4e54ead8a"
+          }
+        },
+        {
+          "client_id": "769919076545-in2q2q6aofad29hadu2ghg1k32o6bpge.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbIIvhEwCc7mKfrGAV5VOmp8MMMO874X8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "769919076545-in2q2q6aofad29hadu2ghg1k32o6bpge.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
