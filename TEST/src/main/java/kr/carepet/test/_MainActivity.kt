@@ -3,7 +3,7 @@ package kr.carepet.test
 import android.os.Bundle
 import kr.carepet.util.Log
 
-class _MainActivity : MainActivity() {
+class _MainActivity : MainActivity2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onCreate(savedInstanceState: Bundle?) {

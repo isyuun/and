@@ -12,13 +12,16 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kr.carepet.app.AppCompatActivity
 import kr.carepet.test.databinding.ActivityMainBinding
+import kr.carepet.util.Log
 
 open class MainActivity : AppCompatActivity() {
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i(__CLASSNAME__, "${getMethodName()}")
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
