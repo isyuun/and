@@ -1,19 +1,17 @@
 package kr.carepet._app
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.View
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
-import kr.carepet.util.Log
 
 open class appcompatactivity3 : appcompatactivity2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private lateinit var root: View
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         root = findViewById<View>(android.R.id.content).rootView
         root = window.decorView.findViewById(android.R.id.content)
     }

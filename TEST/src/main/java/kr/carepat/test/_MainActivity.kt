@@ -1,3 +1,3 @@
-package kr.carepet.service.app.navi
+package kr.carepat.test
 
 class _MainActivity : MainActivity2()

@@ -1,31 +1,25 @@
 /*
  * Copyright (c) 2023. CarePat All right reserved.
- * This software is the proprietary information of Kyobo Book.
+ * This software is the proprietary information of CarePet Co.,Ltd.
  *
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 7. 28.   description...
+ *  isyuun@care-pet.kr             2023. 7. 31.   description...
  */
 
-package kr.carepet.service.app.navi
+package kr.carepat.test
 
 import android.os.Bundle
+import kr.carepet.app.AppCompatActivity
 import kr.carepet.util.Log
 
-/**
- * @Project     : carepet-android
- * @FileName    : MainActivity2.kt
- * @Date        : 2023. 07. 28.
- * @author      : isyuun@care-pet.kr
- * @description : 카피라잇/파일주석/메서드주석
- */
-open class MainActivity2 : MainActivity() {
+open class MainActivity : AppCompatActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i(__CLASSNAME__, "${getMethodName()}")
         super.onCreate(savedInstanceState)
-        //setContentView(0)       //IY:test-일부러.죽여봄
+        setContentView(R.layout.activity_main)
     }
 }

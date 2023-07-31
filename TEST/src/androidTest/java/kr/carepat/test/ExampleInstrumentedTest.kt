@@ -1,4 +1,14 @@
-package kr.carepet.service.app.navi
+/*
+ * Copyright (c) 2023. CarePat All right reserved.
+ * This software is the proprietary information of CarePet Co.,Ltd.
+ *
+ *  Revision History
+ *  Author                         Date          Description
+ *  --------------------------     ----------    ----------------------------------------
+ *  isyuun@care-pet.kr             2023. 7. 31.   description...
+ */
+
+package kr.carepat.test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -17,6 +27,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("kr.carepet.service.app.navi", appContext.packageName)
+        assertEquals("kr.carepat.test", appContext.packageName)
     }
 }
