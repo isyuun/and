@@ -14,14 +14,33 @@
     <string name="login_sub_title">마켓 둘러보기 ></string>
     <string name="login_esay_login">간편하게 로그인하기</string>
     <string name="login_signup">회원가입</string>
-    <string name="login_email">이메일로 로그인</string>
+    <string name="login_email">로그인</string>
 
     <!-- 네이버 client   -->
     <string name="naver_client">J_pbuqdm8q9u37YZOMFI</string>
     <string name="naver_secret_client">gOYGlN__Wh</string>
 
+    <!-- 구글 FCM -->
+    <string name="default_notification_channel_id" translatable="false">fcm_carepet_default_channel</string>
+    <string name="default_notification_channel_name" translatable="true">Weather</string>
+    <string name="fcm_message">FCM Message</string>
+    <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
+    <string name="subscribe_to_weather">Subscribe To Weather</string>
+    <string name="log_token">Log Token</string>
+    <string name="msg_subscribed">Subscribed to weather topic</string>
+    <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+
+    <!-- Mapbox Public Token (Secret Token은 gradle.properties)-->
+    <string name="mapbox_access_token">pk.eyJ1IjoiZGFsYW5kcm9pZCIsImEiOiJjbGs3d3pkNXMwODdnM2VxbmNjOXM2MnJpIn0.Re3CGOsIzCAdMmuLFwVolw</string>
+
 
     <string name="timer_pause">Pause</string>
     <string name="timer_start">Start</string>
     <string name="timer_stop">Stop</string>
+    <string name="login_change_pw">비밀번호 재설정</string>
+    <string name="cp_tv_title">비밀번호 변경</string>
+    <string name="cp_password">Password</string>
+    <string name="cp_password_check">Password Check</string>
+    <string name="cp_cancel">취소</string>
+    <string name="cp_confirm">확인</string>
 </resources>

@@ -2,9 +2,7 @@ package kr.carepet.service.app.navi.singleton
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import java.time.LocalDate
 
 object MySharedPreference {
@@ -33,5 +31,13 @@ object MySharedPreference {
         val today = LocalDate.now().toString()
         sharedPreferences.edit().putBoolean(today, true).apply()
         Log.d("today","성공")
+    }
+
+    fun setFcmToken(fcmToken:String){
+        sharedPreferences.edit().putString("FcmToken", fcmToken).apply()
+    }
+
+    fun getFcmToken():String{
+        return sharedPreferences.getString("FcmToken","").toString()
     }
 }

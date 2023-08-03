@@ -30,7 +30,19 @@
         android:paddingRight="16dp"
         android:paddingLeft="16dp"/>
 
+
     <!--  밑에서부터 화면배치  -->
+
+    <TextView
+        android:id="@+id/login_change_pw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_change_pw"
+        android:layout_above="@+id/login_tv_easy_login"
+        android:layout_centerHorizontal="true"
+        android:textColor="#001891"
+        android:layout_marginBottom="45dp"/>
+
     <TextView
         android:id="@+id/login_tv_signup"
         android:layout_width="match_parent"
@@ -41,10 +53,10 @@
         android:background="@drawable/bg_login_tv"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:layout_marginLeft="80dp"
-        android:layout_marginRight="80dp"
-        android:layout_marginBottom="40dp"
-        android:layout_alignParentBottom="true"/>
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:layout_marginBottom="80dp"
+        android:layout_above="@+id/login_tv_easy_login"/>
 
     <LinearLayout
         android:id="@+id/login_layout_email"
@@ -53,8 +65,8 @@
         android:orientation="horizontal"
         android:background="@drawable/bg_login_tv"
         android:layout_above="@id/login_tv_signup"
-        android:layout_marginLeft="80dp"
-        android:layout_marginRight="80dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
         android:layout_marginBottom="16dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
@@ -73,14 +85,50 @@
 
     </LinearLayout>
 
+    <EditText
+        android:id="@+id/login_et_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_login_tv"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:drawableStart="@drawable/baseline_email_24"
+        android:drawablePadding="12dp"
+        android:textSize="12sp"
+        android:paddingLeft="8dp"
+        android:hint="E-mail"
+        android:inputType="textEmailAddress"
+        android:paddingVertical="8dp"
+        android:layout_marginBottom="12dp"
+        android:layout_above="@+id/login_et_password"/>
+
+    <EditText
+        android:id="@+id/login_et_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_login_tv"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:drawableStart="@drawable/baseline_key_24"
+        android:drawablePadding="12dp"
+        android:textSize="12sp"
+        android:paddingLeft="8dp"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:paddingVertical="8dp"
+        android:layout_marginBottom="50dp"
+        android:layout_above="@+id/login_layout_email"/>
+
+
+
     <LinearLayout
         android:id="@+id/layout_login_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_above="@id/login_layout_email"
-        android:layout_marginBottom="16dp">
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="42dp">
 
         <ImageView
             android:id="@+id/login_btn_kakao"
@@ -107,6 +155,7 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/login_tv_easy_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/layout_login_btn"

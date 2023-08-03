@@ -1,7 +1,7 @@
 package kr.carepet.service.app.navi.activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import kr.carepet.service.app.navi.R
 import kr.carepet.service.app.navi.databinding.ActivityTimerBinding
 import java.util.Timer

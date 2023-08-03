@@ -20,9 +20,9 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
-import kr.carepet.service.app.navi.R
-import kr.carepet.service.app.navi.singleton.G
 import kr.carepet.service.app.navi.databinding.ActivityLoginBinding
+import kr.carepet.service.app.navi.fragment.ChangePwFragment
+import kr.carepet.service.app.navi.singleton.G
 
 class LoginActivity : AppCompatActivity() {
 
@@ -34,9 +34,8 @@ class LoginActivity : AppCompatActivity() {
 
 
 
-        binding.loginTvSignup.setOnClickListener {
-            startActivity(Intent(this, SignUpActivity::class.java))
-        }
+
+        binding.loginTvSignup.setOnClickListener { startActivity(Intent(this, SignUpActivity::class.java)) }
 
         binding.loginBtnKakao.setOnClickListener { kakaoClick() }
 
@@ -46,6 +45,15 @@ class LoginActivity : AppCompatActivity() {
 
         binding.loginTvGo.setOnClickListener { startActivity(Intent(this,TimerActivity::class.java)) }
 
+        binding.loginLayoutEmail.setOnClickListener { startActivity(Intent(this, MainActivity::class.java)) }
+
+        binding.loginChangePw.setOnClickListener { openBottomSheet() }
+
+    }
+
+    private fun openBottomSheet() {
+        val bottomSheetFragment = ChangePwFragment()
+        bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun kakaoClick() {
@@ -83,18 +91,18 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun naverClick() {
-        var naverToken : String = ""
+        var naverToken = ""
 
         NaverIdLoginSDK.initialize(this, "J_pbuqdm8q9u37YZOMFI", "gOYGlN__Wh", "carepet")
 
         val profileCallback = object : NidProfileCallback<NidProfileResponse>{
             // 유저 정보를 가져오는 콜백 메소드
             override fun onError(errorCode: Int, message: String) {
-                Log.d("naver","회원가져오기 실패"+message.toString())
+                Log.d("naver","회원가져오기 실패"+message)
             }
 
             override fun onFailure(httpStatus: Int, message: String) {
-                Log.d("naver","회원가져오기 실패"+message.toString())
+                Log.d("naver","회원가져오기 실패"+message)
             }
 
             override fun onSuccess(result: NidProfileResponse) {
