@@ -22,7 +22,14 @@ import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
 import kr.carepet.service.app.navi.databinding.ActivityLoginBinding
 import kr.carepet.service.app.navi.fragment.ChangePwFragment
+import kr.carepet.service.app.navi.model.LoginData
+import kr.carepet.service.app.navi.model.LoginResModel
 import kr.carepet.service.app.navi.singleton.G
+import kr.carepet.service.app.navi.singleton.MySharedPreference
+import kr.carepet.service.app.navi.singleton.RetrofitClientServer
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
 
@@ -43,12 +50,70 @@ class LoginActivity : AppCompatActivity() {
 
         binding.loginBtnGoogle.setOnClickListener { googleClick() }
 
-        binding.loginTvGo.setOnClickListener { startActivity(Intent(this,TimerActivity::class.java)) }
+        binding.loginTvGo.setOnClickListener { startActivity(Intent(this,PetRegistActivity::class.java)) }
 
-        binding.loginLayoutEmail.setOnClickListener { startActivity(Intent(this, MainActivity::class.java)) }
+        binding.loginLayoutEmail.setOnClickListener { emailLoginClick() }
 
         binding.loginChangePw.setOnClickListener { openBottomSheet() }
 
+    }
+
+    private fun emailLoginClick() {
+        // 공란 검증 -> 서버로 전송 -> Response결과 -> Main OR detail Toast
+
+        // 공란 검증
+        if(binding.loginEtEmail.text.isNotEmpty() && binding.loginEtPassword.text.isNotEmpty()){
+            // 서버로 전송
+            val apiService = RetrofitClientServer.instance
+            val userId = binding.loginEtEmail.text.toString()
+            val userPw = binding.loginEtPassword.text.toString()
+
+            val loginData = LoginData(userId,userPw)
+
+            val call = apiService.sendLoginToServer(loginData)
+            call.enqueue(object :Callback<LoginResModel>{
+                override fun onResponse(
+                    call: Call<LoginResModel>,
+                    response: Response<LoginResModel>
+                ) {
+                    // Response 결과
+                    if(response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if(it.statusCode.toString().equals("200")){ // status code 200 검증
+                                // 200이면 login 처리, access/refresh token G 및 shared 에 저장
+
+                                G.accessToken = it.data.accessToken
+                                G.refreshToken = it.data.refreshToken
+
+                                // shared에 저장
+                                MySharedPreference.setAccessToken(it.data.accessToken)
+                                MySharedPreference.setRefreshToken(it.data.refreshToken)
+
+                                Log.d("Token","access: ${it.data.accessToken}, refresh: ${it.data.refreshToken}")
+
+                                Toast.makeText(this@LoginActivity, "로그인 성공", Toast.LENGTH_SHORT).show()
+
+                                startActivity(Intent(this@LoginActivity,MainActivity::class.java))
+                                finish()
+                            }else{
+                                Toast.makeText(this@LoginActivity, "로그인 실패 : ${it.detailMessage.toString()}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<LoginResModel>, t: Throwable) {
+
+                }
+
+            })
+
+
+
+        }else{
+            Toast.makeText(this, "정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun openBottomSheet() {

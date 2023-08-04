@@ -46,15 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.logTokenButton.setOnClickListener { getToken() }
 
-        binding.mainBtnPhone.setOnClickListener {
-
-            val model = Build.MODEL // 기기 모델명 (e.g., "Galaxy S20")
-
-            //모델명 찍기
-
-            Toast.makeText(this, "모델명: ${model}", Toast.LENGTH_SHORT).show()
-
-        }
+        binding.mainBtnPhone.setOnClickListener { startActivity(Intent(this, PetRegistActivity::class.java))        }
 
         binding.mainBtnToReg.setOnClickListener { startActivity(Intent(this, RegistActivity::class.java)) }
 

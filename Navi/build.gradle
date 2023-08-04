@@ -47,6 +47,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.11'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -66,5 +67,8 @@ dependencies {
 
     //Mapbox SDK
     implementation "com.mapbox.navigation:ui-dropin:2.14.1"
+
+    implementation "com.github.skydoves:expandablelayout:1.0.7"
+    implementation "com.ms-square:expandableTextView:0.1.4"
 
 }

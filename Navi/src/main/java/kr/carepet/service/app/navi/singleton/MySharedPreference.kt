@@ -40,4 +40,20 @@ object MySharedPreference {
     fun getFcmToken():String{
         return sharedPreferences.getString("FcmToken","").toString()
     }
+
+    fun setAccessToken(accessToken :String){
+        sharedPreferences.edit().putString("AccessToken",accessToken).apply()
+    }
+
+    fun getAccessToken():String{
+        return sharedPreferences.getString("AccessToken","").toString()
+    }
+
+    fun setRefreshToken(refreshToken:String){
+        sharedPreferences.edit().putString("RefreshToken",refreshToken).apply()
+    }
+
+    fun getRefreshToken():String{
+        return sharedPreferences.getString("RefreshToken"," ").toString()
+    }
 }

@@ -1,4 +1,4 @@
-package kr.carepet.service.app.navi.activity
+package kr.carepet.service.app.navi.service
 
 //noinspection SuspiciousImport
 
@@ -15,6 +15,8 @@ import androidx.work.WorkManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kr.carepet.service.app.navi.R
+import kr.carepet.service.app.navi.activity.MainActivity
+import kr.carepet.service.app.navi.activity.MyWorker
 import kr.carepet.service.app.navi.singleton.MySharedPreference
 
 
