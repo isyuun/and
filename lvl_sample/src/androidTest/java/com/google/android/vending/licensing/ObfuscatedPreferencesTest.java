@@ -16,16 +16,13 @@
 
 package com.google.android.vending.licensing;
 
-import com.google.android.vending.licensing.AESObfuscator;
-import com.google.android.vending.licensing.Obfuscator;
-import com.google.android.vending.licensing.PreferenceObfuscator;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.SmallTest;
-import android.support.test.runner.AndroidJUnit4;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.SmallTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.After;
 import org.junit.Before;
@@ -54,7 +51,8 @@ public class ObfuscatedPreferencesTest {
         };
 
         // Prepare PreferenceObfuscator instance
-        Context ctx = InstrumentationRegistry.getTargetContext();
+        //Context ctx = InstrumentationRegistry.getTargetContext();
+        Context ctx = InstrumentationRegistry.getInstrumentation().getTargetContext();
         sp = ctx.getSharedPreferences(filename, Context.MODE_PRIVATE);
         String deviceId = Settings.Secure.getString(
                 ctx.getContentResolver(),

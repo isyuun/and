@@ -16,10 +16,6 @@
 
 package com.google.android.vending.licensing;
 
-import android.support.test.runner.AndroidJUnit4;
-
-import com.google.android.vending.licensing.Policy;
-import com.google.android.vending.licensing.StrictPolicy;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +23,8 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 /**
  * Test suite for StrictPolicy.

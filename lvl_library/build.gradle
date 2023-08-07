@@ -4,6 +4,8 @@ android {
     namespace 'com.google.android.vending.licensing'
     compileSdkVersion 34
 
+    buildFeatures.aidl true
+
     defaultConfig {
         minSdkVersion 4
         targetSdkVersion 34

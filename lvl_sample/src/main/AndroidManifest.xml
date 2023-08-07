@@ -19,6 +19,7 @@
     android:versionName="3.0">
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:name=".MainActivity"
+            android:exported="true"
             android:label="@string/app_name"
             android:configChanges="orientation|keyboardHidden">
             <intent-filter>

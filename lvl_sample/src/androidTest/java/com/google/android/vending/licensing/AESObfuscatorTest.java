@@ -16,12 +16,6 @@
 
 package com.google.android.vending.licensing;
 
-import com.google.android.vending.licensing.AESObfuscator;
-import com.google.android.vending.licensing.Obfuscator;
-import com.google.android.vending.licensing.ValidationException;
-
-import android.support.test.filters.SmallTest;
-import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
 import java.util.Arrays;
@@ -32,6 +26,9 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.SmallTest;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest

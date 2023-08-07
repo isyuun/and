@@ -17,16 +17,12 @@
 package com.google.android.vending.licensing;
 
 
-import com.google.android.vending.licensing.AESObfuscator;
-import com.google.android.vending.licensing.Policy;
-import com.google.android.vending.licensing.ResponseData;
-import com.google.android.vending.licensing.ServerManagedPolicy;
-
 import android.content.Context;
 import android.provider.Settings;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.SmallTest;
-import android.support.test.runner.AndroidJUnit4;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.SmallTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +48,8 @@ public class ServerManagedPolicyTest {
             104, -12, 112, 82, -85, -10, -11, 61, 15, 54, 44, -66, -117, -89, -64, 110, -53, 123, 33
         };
 
-        Context ctx = InstrumentationRegistry.getTargetContext();
+        //Context ctx = InstrumentationRegistry.getTargetContext();
+        Context ctx = InstrumentationRegistry.getInstrumentation().getTargetContext();
         String deviceId = Settings.Secure.getString(
                 ctx.getApplicationContext().getContentResolver(),
                 Settings.Secure.ANDROID_ID);
