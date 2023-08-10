@@ -10,6 +10,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        //카카오 API 관련 maven 추가
         maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/'}
         //Mapbox 관련 maven 추가
         maven {
@@ -28,8 +29,8 @@ dependencyResolutionManagement {
 }
 rootProject.name = "and"
 include ':APP'
-//include ':lvl_sample'
-//include ':lvl_library'
+include ':lvl_sample'
+include ':lvl_library'
 include ':Navi'
 include ':Navi2'
 include ':TEST'
