@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kr.carepet.service.app.navi.R
-import kr.carepet.service.app.navi.model.CommentData
+import kr.carepet.model.CommentData
 
 class CommentRVAdapter(val commentDataList:MutableList<CommentData>): RecyclerView.Adapter<CommentRVAdapter.VH>() {
 
@@ -30,7 +30,7 @@ class CommentRVAdapter(val commentDataList:MutableList<CommentData>): RecyclerVi
         val tvUserId: TextView = view.findViewById(R.id.comment_tv_userid)
         val tvComment: TextView = view.findViewById(R.id.comment_tv_main)
 
-        fun bind(item:CommentData){
+        fun bind(item: CommentData){
             ivProfile.setImageResource(item.userProfile)
             tvUserId.text = item.userId
             tvComment.text = item.comment

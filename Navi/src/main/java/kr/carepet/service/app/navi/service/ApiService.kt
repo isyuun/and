@@ -11,13 +11,14 @@
 
 package kr.carepet.service.app.navi.service
 
-import kr.carepet.service.app.navi.model.LoginData
-import kr.carepet.service.app.navi.model.LoginResModel
-import kr.carepet.service.app.navi.model.MyPetResModel
-import kr.carepet.service.app.navi.model.PetModel
-import kr.carepet.service.app.navi.model.RefreshRes
-import kr.carepet.service.app.navi.model.UserDataModel
-import kr.carepet.service.app.navi.model.UserDataResponse
+import kr.carepet.model.LoginData
+import kr.carepet.model.LoginResModel
+import kr.carepet.model.MyPetResModel
+import kr.carepet.model.PetModel
+import kr.carepet.model.RefreshRes
+import kr.carepet.model.RefreshToken
+import kr.carepet.model.UserDataModel
+import kr.carepet.model.UserDataResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -30,7 +31,7 @@ interface ApiService {
     fun sendLoginToServer(@Body data:LoginData):Call<LoginResModel>
 
     @POST("api/v1/member/refresh-token")
-    fun sendRefreshToken(@Body refreshToken:String):Call<RefreshRes>
+    fun sendRefreshToken(@Body refreshToken:RefreshToken):Call<RefreshRes>
 
     @POST("api/v1/member/refresh-token")
     fun sendPetDataToServer(@Body data:PetModel):Call<MyPetResModel>

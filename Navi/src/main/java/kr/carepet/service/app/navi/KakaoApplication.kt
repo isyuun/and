@@ -14,13 +14,13 @@ class KakaoApplication : Application(){
         MySharedPreference.init(this)
 
         //Mapbox 초기화
-        if (!MapboxNavigationApp.isSetup()) {
-            MapboxNavigationApp.setup {
-                NavigationOptions.Builder(this)
-                    .accessToken("YOUR_ACCESS_TOKEN")
-                    // additional options
-                    .build()
-            }
-        }
+        //if (!MapboxNavigationApp.isSetup()) {
+        //    MapboxNavigationApp.setup {
+        //        NavigationOptions.Builder(this)
+        //            .accessToken("YOUR_ACCESS_TOKEN")
+        //            // additional options
+        //            .build()
+        //    }
+        //}
     }
 }

@@ -19,12 +19,11 @@ import android.widget.EditText
 import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kr.carepet.service.app.navi.R
 import kr.carepet.service.app.navi.activity.BoardActivity
 import kr.carepet.service.app.navi.adapter.CommentRVAdapter
-import kr.carepet.service.app.navi.model.CommentData
+import kr.carepet.model.CommentData
 
 class CommentFragment : BottomSheetDialogFragment() {
 

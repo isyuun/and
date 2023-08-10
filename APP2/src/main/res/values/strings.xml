@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">Navi</string>
+
+    <string name="signup_name">이름</string>
+    <string name="signup_cate">견종</string>
+    <string name="signup_birth">출생</string>
+    <string name="signup_gender">성별</string>
+    <string name="signup_gender_male">남아</string>
+    <string name="signup_gender_female">여아</string>
+    <string name="signup_address">주소</string>
+    <string name="signup_chip_num">칩번호</string>
+
+    <string name="login_title">Care Pet</string>
+    <string name="login_sub_title">마켓 둘러보기 ></string>
+    <string name="login_esay_login">간편하게 로그인하기</string>
+    <string name="login_signup">회원가입</string>
+    <string name="login_email">로그인</string>
+
+    <!-- 네이버 client   -->
+    <string name="naver_client">J_pbuqdm8q9u37YZOMFI</string>
+    <string name="naver_secret_client">gOYGlN__Wh</string>
+
+    <!-- 구글 FCM -->
+    <string name="default_notification_channel_id" translatable="false">fcm_carepet_default_channel</string>
+    <string name="default_notification_channel_name" translatable="true">Weather</string>
+    <string name="fcm_message">FCM Message</string>
+    <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
+    <string name="subscribe_to_weather">Subscribe To Weather</string>
+    <string name="log_token">Log Token</string>
+    <string name="msg_subscribed">Subscribed to weather topic</string>
+    <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+
+    <!-- Mapbox Public Token (Secret Token은 gradle.properties)-->
+    <string name="mapbox_access_token">pk.eyJ1IjoiZGFsYW5kcm9pZCIsImEiOiJjbGs3d3pkNXMwODdnM2VxbmNjOXM2MnJpIn0.Re3CGOsIzCAdMmuLFwVolw</string>
+
+
+    <string name="timer_pause">Pause</string>
+    <string name="timer_start">Start</string>
+    <string name="timer_stop">Stop</string>
+    <string name="login_change_pw">비밀번호 재설정</string>
+    <string name="cp_tv_title">비밀번호 변경</string>
+    <string name="cp_password">Password</string>
+    <string name="cp_password_check">Password Check</string>
+    <string name="cp_cancel">취소</string>
+    <string name="cp_confirm">확인</string>
+    <string name="expandable_text">We Sanchhaya Education Pvt. Ltd., are registered and headquartered
+        at BC 227, 2nd Floor, Matrix Business Tower, B4, Sector 132, Noida, UP-201301, hereinafter
+        referred to as GeeksforGeeks. We also offer paid Courses managed by Sanchhaya Classes Pvt. Ltd.
+        with registered office address B-142, Vishwash Park, Uttam Nagar, New Delhi, North Delhi, Delhi, India, 110059.
+        At GeeksforGeeks, we value your trust and  respect your privacy. This privacy statement (“Privacy Statement”)
+        applies to the treatment of personally identifiable information submitted by, or otherwise obtained from,
+        you in connection with the associated application (“Application”). The Application is
+        provided by GeeksforGeeks (and may be provided by Geeksforgeeks on behalf
+        of a GeeksforGeeks licensor or partner (“Application Partner”).
+        By using or otherwise accessing the Application, you acknowledge that you accept the practices
+        and policies outlined in this Privacy Statement.</string>
+    <string name="dummy_text">We Sanchhaya Education Pvt. Ltd., are registered and headquartered
+        at BC 227, 2nd Floor, Matrix Business Tower, B4, Sector 132, Noida, UP-201301, hereinafter
+        referred to as GeeksforGeeks. We also offer paid Courses managed by Sanchhaya Classes Pvt. Ltd.</string>
+    <string name="comment">댓글</string>
+    <string name="userid">UserId</string>
+    <string name="posting_comment">댓글쓰기...</string>
+</resources>

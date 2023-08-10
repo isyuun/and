@@ -18,8 +18,8 @@ import android.util.Patterns
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kr.carepet.service.app.navi.databinding.ActivityRegistBinding
-import kr.carepet.service.app.navi.model.UserDataModel
-import kr.carepet.service.app.navi.model.UserDataResponse
+import kr.carepet.model.UserDataModel
+import kr.carepet.model.UserDataResponse
 import kr.carepet.service.app.navi.singleton.MySharedPreference
 import kr.carepet.service.app.navi.singleton.RetrofitClientServer
 import retrofit2.Call

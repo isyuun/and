@@ -2,17 +2,15 @@ package kr.carepet.service.app.navi.activity
 
 import android.content.res.Resources
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kr.carepet.service.app.navi.R
 import kr.carepet.service.app.navi.adapter.CarouselRVAdapter
 import kr.carepet.service.app.navi.databinding.ActivityBoardBinding
 import kr.carepet.service.app.navi.fragment.CommentFragment
-import kr.carepet.service.app.navi.model.CommentData
+import kr.carepet.model.CommentData
 
 
 class BoardActivity : AppCompatActivity() {

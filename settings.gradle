@@ -29,8 +29,9 @@ dependencyResolutionManagement {
 }
 rootProject.name = "and"
 include ':APP'
-include ':lvl_sample'
-include ':lvl_library'
+//include ':lvl_sample'
+//include ':lvl_library'
 include ':Navi'
 include ':Navi2'
 include ':TEST'
+include ':APP2'

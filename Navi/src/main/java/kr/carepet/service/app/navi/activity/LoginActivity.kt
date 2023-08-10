@@ -22,8 +22,8 @@ import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
 import kr.carepet.service.app.navi.databinding.ActivityLoginBinding
 import kr.carepet.service.app.navi.fragment.ChangePwFragment
-import kr.carepet.service.app.navi.model.LoginData
-import kr.carepet.service.app.navi.model.LoginResModel
+import kr.carepet.model.LoginData
+import kr.carepet.model.LoginResModel
 import kr.carepet.service.app.navi.singleton.G
 import kr.carepet.service.app.navi.singleton.MySharedPreference
 import kr.carepet.service.app.navi.singleton.RetrofitClientServer
@@ -37,10 +37,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-
-
-
 
         binding.loginTvSignup.setOnClickListener { startActivity(Intent(this, SignUpActivity::class.java)) }
 

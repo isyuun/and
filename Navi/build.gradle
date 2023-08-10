@@ -34,10 +34,23 @@ android {
     buildFeatures{
         viewBinding = true
     }
+    //buildFeatures {
+    //    compose = true
+    //}
+    //composeOptions {
+    //    kotlinCompilerExtensionVersion = '1.5.1'
+    //}
+    //packaging {
+    //    resources {
+    //        excludes += "/META-INF/{AL2.0,LGPL2.1}"
+    //    }
+    //}
 }
 
 dependencies {
+    implementation project(path: ':APP2')
 
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
