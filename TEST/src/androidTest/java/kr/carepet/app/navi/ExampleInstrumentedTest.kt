@@ -23,7 +23,7 @@
  *  isyuun@care-pet.kr             2023. 8. 9.   description...
  */
 
-package kr.carepet
+package kr.carepet.app.navi
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -44,6 +44,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("kr.carepet.test", appContext.packageName)
+        assertEquals("kr.carepet.app.navi", appContext.packageName)
     }
 }

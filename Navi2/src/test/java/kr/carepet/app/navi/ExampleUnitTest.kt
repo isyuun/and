@@ -23,27 +23,20 @@
  *  isyuun@care-pet.kr             2023. 8. 9.   description...
  */
 
-package kr.carepet
-
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.ext.junit.runners.AndroidJUnit4
+package kr.carepet.app.navi
 
 import org.junit.Test
-import org.junit.runner.RunWith
 
 import org.junit.Assert.*
 
 /**
- * Instrumented test, which will execute on an Android device.
+ * Example local unit test, which will execute on the development machine (host).
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
+class ExampleUnitTest {
     @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("kr.carepet.test", appContext.packageName)
+    fun addition_isCorrect() {
+        assertEquals(4, 2 + 2)
     }
 }

@@ -20,30 +20,27 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 9.   description...
+ *  isyuun@care-pet.kr             2023. 8. 8.   description...
  */
 
-package kr.carepet
-
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.ext.junit.runners.AndroidJUnit4
-
-import org.junit.Test
-import org.junit.runner.RunWith
-
-import org.junit.Assert.*
+package kr.carepet._app
 
 /**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * @Project     : carepet-android
+ * @FileName    : componentactivity.kt
+ * @Date        : 2023. 08. 08.
+ * @author      : isyuun@care-pet.kr
+ * @description :
  */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
-    @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("kr.carepet.test", appContext.packageName)
+open class componentactivity : androidx.activity.ComponentActivity() {
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+    fun getMethodName(): String? {
+        val stack = Thread.currentThread().stackTrace[3]
+        val className = stack.className
+        val methodName = stack.methodName
+        val path = "${className}.${methodName}"
+        val file = stack.fileName
+        val line = stack.lineNumber
+        return "${path}(${file}:${line}) "
     }
 }

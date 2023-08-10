@@ -20,30 +20,16 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 9.   description...
+ *  isyuun@care-pet.kr             2023. 8. 8.   description...
  */
 
-package kr.carepet
-
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.ext.junit.runners.AndroidJUnit4
-
-import org.junit.Test
-import org.junit.runner.RunWith
-
-import org.junit.Assert.*
+package kr.carepet._app
 
 /**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * @Project     : carepet-android
+ * @FileName    : _componentactivity.kt
+ * @Date        : 2023. 08. 08.
+ * @author      : isyuun@care-pet.kr
+ * @description :
  */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
-    @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("kr.carepet.test", appContext.packageName)
-    }
-}
+open class _componentactivity : componentactivity()
