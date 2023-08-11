@@ -26,6 +26,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -73,6 +74,7 @@ android {
 
 dependencies {
     implementation(project(mapOf("path" to ":APP")))
+    implementation(project(mapOf("path" to ":APP2")))
 
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")

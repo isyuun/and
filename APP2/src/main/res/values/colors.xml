@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="pause">#E777EC</color>
+    <color name="start">#55CD4D</color>
+    <color name="stop">#EFED67</color>
+    <color name="stop_press">#F65B5B</color>
+    <color name="colorAccent">#8BEAD4</color>
+</resources>
