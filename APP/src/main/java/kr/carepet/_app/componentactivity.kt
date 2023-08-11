@@ -34,7 +34,7 @@ package kr.carepet._app
  */
 open class componentactivity : androidx.activity.ComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-    fun getMethodName(): String? {
+    fun getMethodName(): String {
         val stack = Thread.currentThread().stackTrace[3]
         val className = stack.className
         val methodName = stack.methodName

@@ -69,7 +69,14 @@ open class DeviceUuidFactory(context: Context) {
                             if ("9774d56d682e549c" != androidId) {
                                 UUID.nameUUIDFromBytes(androidId.toByteArray(charset("utf8")))
                             } else {
+                                /**
+                                 * This method was deprecated in API level 26.
+                                 * Use getImei() which returns IMEI for GSM or getMeid() which returns MEID for CDMA.
+                                 * <a href="https://developer.android.com/reference/android/telephony/TelephonyManager.html#getDeviceId()"></a>
+                                 */
                                 val deviceId = (context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId
+                                //val deviceId = (context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).imei
+                                //val deviceId = (context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).meid
                                 if (deviceId != null) UUID.nameUUIDFromBytes(deviceId.toByteArray(charset("utf8")))
                                 else UUID.randomUUID()
                             }

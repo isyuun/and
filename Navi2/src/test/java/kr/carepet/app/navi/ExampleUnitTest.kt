@@ -20,7 +20,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 9.   description...
+ *  isyuun@care-pet.kr             2023. 8. 11.   description...
  */
 
 package kr.carepet.app.navi

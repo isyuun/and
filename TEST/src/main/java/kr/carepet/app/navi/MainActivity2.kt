@@ -28,6 +28,7 @@ package kr.carepet.app.navi
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,7 +41,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.parcelize.Parcelize
 import kr.carepet.app.navi.ui.theme.AndTheme
 import kr.carepet.util.Log
@@ -56,24 +59,31 @@ open class MainActivity2 : MainActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.Companion.wtf(__CLASSNAME__, "${getMethodName()}:$savedInstanceState")
+        Log.Companion.wtf(__CLASSNAME__, "${getMethodName()}:${this@MainActivity2.intent}")
         super.onCreate(savedInstanceState)
-        setContent {
-            AndTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        setContent { setContent() }
+        Log.Companion.wtf(__CLASSNAME__, "${getMethodName()}:${this@MainActivity2.intent}")
+    }
+
+    @Preview
+    @Composable
+    fun setContent() {
+        Log.Companion.wtf(__CLASSNAME__, "${getMethodName()}:${this@MainActivity2.intent}")
+        AndTheme {
+            // A surface container using the 'background' color from the theme
+            Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                     Greeting("Android")
                     Root()
                 }
             }
         }
-        Log.Companion.wtf(__CLASSNAME__, "${getMethodName()}:$savedInstanceState")
+        Log.Companion.wtf(__CLASSNAME__, "${getMethodName()}:${this@MainActivity2.intent}")
     }
 }
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-fun getMethodName(): String? {
+fun getMethodName(): String {
     val stack = Thread.currentThread().stackTrace[3]
     val className = stack.className
     val methodName = stack.methodName
@@ -92,14 +102,15 @@ var var1 = 0
 fun Root() {
     var data by remember { mutableStateOf(TestData(0)) }
     Log.w(__CLASSNAME__, "${getMethodName()} data = ${data.num}, var1 = $var1")
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Button(
             onClick = {
+                Log.wtf(__CLASSNAME__, "${getMethodName()} data = ${data.num}, var1 = $var1")
                 data = TestData(data.num + 1); var1++
-                Log.w(__CLASSNAME__, "${getMethodName()} data = ${data.num}, var1 = $var1")
+                Log.wtf(__CLASSNAME__, "${getMethodName()} data = ${data.num}, var1 = $var1")
             },
         ) {
-            Log.w(__CLASSNAME__, "${getMethodName()} data = ${data.num}, var1 = $var1")
+            Log.i(__CLASSNAME__, "${getMethodName()} data = ${data.num}, var1 = $var1")
             Text("CLICK")
         }
         Log.w(__CLASSNAME__, "${getMethodName()} data = ${data.num}, var1 = $var1")

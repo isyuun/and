@@ -20,26 +20,30 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 9.   description...
+ *  isyuun@care-pet.kr             2023. 8. 11.   description...
  */
 
+@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.com.android.application)
+    alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
     namespace = "kr.carepet.app.navi"
-    compileSdk = 34
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "kr.carepet.app.navi"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -55,16 +59,34 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.3"
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":APP")))
 
-    implementation("androidx.core:core-ktx:1.10.1")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.material3)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.ui.test.manifest)
 }
