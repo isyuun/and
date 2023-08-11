@@ -1,3 +1,5 @@
+import org.gradle.internal.impldep.org.jsoup.safety.Safelist.basic
+
 pluginManagement {
     repositories {
         google()
@@ -11,27 +13,27 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         //카카오 API 관련 maven 추가
-        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/'}
+        maven { url = uri("https://devrepo.kakao.com/nexus/content/groups/public/") }
         //Mapbox 관련 maven 추가
         maven {
-            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            url = uri("https://api.mapbox.com/downloads/v2/releases/maven")
             authentication {
-                basic(BasicAuthentication)
+                create<BasicAuthentication>("basic")
             }
             credentials {
                 // 아래의 username은 항상 `mapbox`로 유지해야 합니다. 개인 사용자 이름이 아닙니다.
                 username = "mapbox"
                 // gradle.properties에 저장한 비밀 토큰을 비밀번호로 사용합니다.
-                password = MAPBOX_DOWNLOADS_TOKEN
+                password = extra["MAPBOX_DOWNLOADS_TOKEN"].toString()
             }
         }
     }
 }
 rootProject.name = "and"
-//include ':lvl_sample'
-//include ':lvl_library'
-include ':APP'
-include ':APP2'
-include ':Navi'
-include ':Navi2'
-include ':TEST'
+//include ":lvl_sample"
+//include ":lvl_library"
+include(":APP")
+include(":APP2")
+include(":Navi")
+include(":Navi2")
+include(":TEST")
