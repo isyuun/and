@@ -33,5 +33,5 @@ rootProject.name = "and"
 include ':APP'
 include ':APP2'
 include ':Navi'
-//include ':Navi2'
+include ':Navi2'
 include ':TEST'
