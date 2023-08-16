@@ -20,27 +20,16 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 8.   description...
+ *  isyuun@care-pet.kr             2023. 8. 16.   description...
  */
 
-package kr.carepet._app
+package kr.carepet.app.navi
 
 /**
  * @Project     : carepet-android
- * @FileName    : componentactivity.kt
- * @Date        : 2023. 08. 08.
+ * @FileName    : _MainActivity.kt
+ * @Date        : 2023. 08. 16.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class componentactivity : androidx.activity.ComponentActivity()
-
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-fun getMethodName(): String {
-    val stack = Thread.currentThread().stackTrace[3]
-    val className = stack.className
-    val methodName = stack.methodName
-    val path = "${className}.${methodName}"
-    val file = stack.fileName
-    val line = stack.lineNumber
-    return "${path}(${file}:${line}) "
-}
+class _MainActivity : MainActivity2()
