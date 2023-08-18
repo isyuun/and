@@ -20,16 +20,26 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 8.   description...
+ *  isyuun@care-pet.kr             2023. 8. 17.   description...
  */
 
-package kr.carepet._app
+package kr.carepet.app.navi
+
+import android.os.Bundle
 
 /**
  * @Project     : carepet-android
- * @FileName    : _componentactivity.kt
- * @Date        : 2023. 08. 08.
+ * @FileName    : MainActivity3.kt
+ * @Date        : 2023. 08. 17.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class _componentactivity : componentactivity4()
+class MainActivity3 : MainActivity2() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        post { init() }
+    }
+
+    private fun init() {
+    }
+}

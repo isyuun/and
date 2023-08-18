@@ -1,7 +1,7 @@
 package kr.carepet.app.navi
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+//import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import kr.carepet.app.ComponentActivity
 import kr.carepet.app.navi.ui.theme.AndTheme
 
 open class MainActivity : ComponentActivity() {

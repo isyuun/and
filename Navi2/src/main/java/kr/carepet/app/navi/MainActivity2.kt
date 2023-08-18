@@ -61,13 +61,13 @@ open class MainActivity2 : MainActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$savedInstanceState")
         super.onCreate(savedInstanceState)
-        setContent { setContent(savedInstanceState) }
+        setContent { Content(savedInstanceState) }
     }
 
 }
 
 @Composable
-private fun setContent(savedInstanceState: Bundle?) {
+private fun Content(savedInstanceState: Bundle?) {
     Log.i(__CLASSNAME__, "${getMethodName()}$savedInstanceState")
     AndTheme {
         // A surface container using the 'background' color from the theme
@@ -76,6 +76,7 @@ private fun setContent(savedInstanceState: Bundle?) {
             color = MaterialTheme.colorScheme.background
         ) {
             Greeting("Android")
+            Root()
         }
     }
     Log.i(__CLASSNAME__, "${getMethodName()}$savedInstanceState")

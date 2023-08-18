@@ -9,16 +9,16 @@ open class appcompatactivity2 : appcompatactivity() {
 
     private val handler: Handler = Handler(Looper.getMainLooper())
 
-    fun post(r: Runnable, d: Long = 0) {
-        handler.postDelayed(r, d)
+    fun post(d: Long? = 0, r: Runnable) {
+        handler.postDelayed(r, d!!)
     }
 
     fun remove(r: Runnable) {
         handler.removeCallbacks(r)
     }
 
-    fun send(m: Message, d: Long = 0) {
-        handler.sendMessageDelayed(m, d)
+    fun send(d: Long? = 0, m: Message) {
+        handler.sendMessageDelayed(m, d!!)
     }
 
     fun handle(m: Message) {
