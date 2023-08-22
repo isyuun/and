@@ -453,7 +453,7 @@ public class GPSApplication extends Application implements LocationListener {
     /**
      * Starts and Binds to the Foreground Service GPSService
      */
-    private void startAndBindGPSService() {
+    protected void startAndBindGPSService() {
         gpsServiceIntent = new Intent(GPSApplication.this, GPSService.class);
         //Start the service
         startService(gpsServiceIntent);

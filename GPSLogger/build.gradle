@@ -19,7 +19,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
@@ -28,7 +28,7 @@ android {
     //buildToolsVersion '32.0.0'
 
     defaultConfig {
-        applicationId "eu.basicairdata.graziano.gpslogger"
+        //applicationId "eu.basicairdata.graziano.gpslogger"
         minSdk 26
         targetSdk 34
 
@@ -42,7 +42,7 @@ android {
 
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = [ eventBusIndex : 'eu.basicairdata.graziano.gpslogger.EventBusIndex' ]
+                arguments = [eventBusIndex: 'eu.basicairdata.graziano.gpslogger.EventBusIndex']
             }
         }
     }
@@ -67,13 +67,6 @@ android {
     //lint {
     //    abortOnError false
     //}
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
     buildFeatures {
         buildConfig true
     }

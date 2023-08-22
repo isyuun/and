@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation(project(mapOf("path" to ":GPSLogger")))
     implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":APP2")))
 

@@ -16,7 +16,7 @@ class TokenInterceptor : Interceptor {
             .build()
 
         val response = chain.proceed(requestWithToken)
-        Log.d("INTERCEPT","기존 response 반환${response.code}//${token}")
+        Log.d("INTERCEPT", "기존 response 반환${response.code}//${token}")
 
         return response
     }

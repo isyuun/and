@@ -63,7 +63,7 @@ public class FragmentAboutDialog extends DialogFragment {
         final GPSApplication gpsApp = GPSApplication.getInstance();
 
         tvVersion = view.findViewById(R.id.id_about_textView_Version);
-        String versionName = BuildConfig.VERSION_NAME;
+        String versionName = "3.2.1";   //BuildConfig.VERSION_NAME;
         tvVersion.setText(getString(R.string.about_version) + " " + versionName);
 
         tvDescription = view.findViewById(R.id.id_about_textView_description);
@@ -91,14 +91,14 @@ public class FragmentAboutDialog extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         boolean marketfailed = false;
                         try {
-                            getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + BuildConfig.APPLICATION_ID)));
+                            getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + "eu.basicairdata.graziano.gpslogger"/*BuildConfig.APPLICATION_ID*/)));
                         } catch (Exception e) {
                             // Unable to start the Google Play gpsApp for rating
                             marketfailed = true;
                         }
                         if (marketfailed) {
                             try {               // Try with the web browser
-                                getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)));
+                                getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + "eu.basicairdata.graziano.gpslogger"/*BuildConfig.APPLICATION_ID*/)));
                             } catch (Exception e) {
                                 // Unable to start also the browser for rating
                                 Toast.makeText(getContext(), getString(R.string.about_unable_to_rate), Toast.LENGTH_SHORT).show();

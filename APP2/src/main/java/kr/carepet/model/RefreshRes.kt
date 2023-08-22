@@ -28,5 +28,5 @@ data class TokenData(
 )
 
 data class RefreshToken(
-    var refreshToken:String
+    var refreshToken: String
 )

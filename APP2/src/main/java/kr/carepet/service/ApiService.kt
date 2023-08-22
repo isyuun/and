@@ -25,14 +25,14 @@ import retrofit2.http.POST
 
 interface ApiService {
     @POST("api/v1/member/create-user")
-    fun sendUserToServer(@Body data: UserDataModel):Call<UserDataResponse>
+    fun sendUserToServer(@Body data: UserDataModel): Call<UserDataResponse>
 
     @POST("api/v1/member/login")
-    fun sendLoginToServer(@Body data: LoginData):Call<LoginResModel>
+    fun sendLoginToServer(@Body data: LoginData): Call<LoginResModel>
 
     @POST("api/v1/member/refresh-token")
-    fun sendRefreshToken(@Body refreshToken: RefreshToken):Call<RefreshRes>
+    fun sendRefreshToken(@Body refreshToken: RefreshToken): Call<RefreshRes>
 
     @POST("api/v1/member/refresh-token")
-    fun sendPetDataToServer(@Body data: PetModel):Call<MyPetResModel>
+    fun sendPetDataToServer(@Body data: PetModel): Call<MyPetResModel>
 }

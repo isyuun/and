@@ -23,7 +23,7 @@ object RetrofitClientServer {
     private const val BASE_URL = "http://carepet.hopto.org:8020/"
     private val tokenInterceptor = TokenInterceptor()
 
-    val instance : ApiService by lazy {
+    val instance: ApiService by lazy {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
@@ -32,13 +32,13 @@ object RetrofitClientServer {
         retrofit.create()
     }
 
-    val okHttpClient : OkHttpClient by lazy {
+    val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(tokenInterceptor)
             .build()
     }
 
-    val apiInstanceForToken : ApiService by lazy {
+    val apiInstanceForToken: ApiService by lazy {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())

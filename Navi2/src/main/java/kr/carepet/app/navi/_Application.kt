@@ -20,22 +20,16 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 9.   description...
+ *  isyuun@care-pet.kr             2023. 8. 22.   description...
  */
 
-package kr.carepet
-
-import org.junit.Assert.assertEquals
-import org.junit.Test
+package kr.carepet.app.navi
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * @Project     : carepet-android
+ * @FileName    : _Application.kt
+ * @Date        : 2023. 08. 22.
+ * @author      : isyuun@care-pet.kr
+ * @description :
  */
-class ExampleUnitTest {
-    @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
-    }
-}
+class _Application : Application()

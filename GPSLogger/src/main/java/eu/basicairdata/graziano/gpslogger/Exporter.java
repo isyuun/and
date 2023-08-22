@@ -207,7 +207,7 @@ class Exporter extends Thread {
 
         Date creationTime;
         long elements_total;
-        String versionName = BuildConfig.VERSION_NAME;
+        String versionName = "3.2.1";   //BuildConfig.VERSION_NAME;
         GPSApplication gpsApp = GPSApplication.getInstance();
         if (gpsApp == null) return;
 
