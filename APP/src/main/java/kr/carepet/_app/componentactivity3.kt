@@ -38,8 +38,6 @@ import com.google.android.material.snackbar.Snackbar
  * @description :
  */
 open class componentactivity3 : componentactivity2() {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
     private lateinit var root: View
 
     override fun onCreate(savedInstanceState: Bundle?) {

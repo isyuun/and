@@ -44,9 +44,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.parcelize.Parcelize
-import kr.carepet._app.getMethodName
 import kr.carepet.app.navi.ui.theme.AndTheme
 import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 

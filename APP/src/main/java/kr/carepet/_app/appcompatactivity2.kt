@@ -5,8 +5,6 @@ import android.os.Looper
 import android.os.Message
 
 open class appcompatactivity2 : appcompatactivity() {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     fun post(d: Long? = 0, r: Runnable) {

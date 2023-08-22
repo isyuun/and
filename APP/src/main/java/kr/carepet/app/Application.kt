@@ -20,18 +20,18 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 8.   description...
+ *  isyuun@care-pet.kr             2023. 8. 21.   description...
  */
 
-package kr.carepet._app
+package kr.carepet.app
 
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+import kr.carepet._app._application
 
 /**
  * @Project     : carepet-android
- * @FileName    : componentactivity.kt
- * @Date        : 2023. 08. 08.
+ * @FileName    : Application.kt
+ * @Date        : 2023. 08. 21.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class componentactivity : androidx.activity.ComponentActivity()
+class Application : _application()

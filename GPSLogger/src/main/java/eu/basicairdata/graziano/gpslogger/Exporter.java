@@ -21,6 +21,7 @@
 
 package eu.basicairdata.graziano.gpslogger;
 
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.util.Log;
 
@@ -207,7 +208,12 @@ class Exporter extends Thread {
 
         Date creationTime;
         long elements_total;
-        String versionName = BuildConfig.VERSION_NAME;
+        String versionName = null;//BuildConfig.VERSION_NAME;
+        try {
+            versionName = getInstance().getPackageManager().getPackageInfo(getInstance().getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         GPSApplication gpsApp = GPSApplication.getInstance();
         if (gpsApp == null) return;
 

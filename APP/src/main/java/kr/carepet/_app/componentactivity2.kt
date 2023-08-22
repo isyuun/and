@@ -37,8 +37,6 @@ import android.os.Message
  * @description :
  */
 open class componentactivity2 : componentactivity() {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     fun post(d: Long? = 0, r: Runnable) {

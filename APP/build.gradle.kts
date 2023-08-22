@@ -30,7 +30,7 @@ plugins {
 
 android {
     namespace = "kr.carepet"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 26
@@ -58,6 +58,7 @@ android {
 }
 
 dependencies {
+    implementation(project(mapOf("path" to ":GPSLogger")))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
