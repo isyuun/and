@@ -224,13 +224,13 @@ class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder> {
                 imageViewThumbnail.setImageBitmap (GPSApplication.getInstance().isRecording() ? BMP_CURRENT_TRACK_RECORDING : BMP_CURRENT_TRACK_PAUSED);
             }
             else {
-                //Glide.clear(imageViewThumbnail);
+                Glide.clear(imageViewThumbnail);
                 Glide
                         .with(GPSApplication.getInstance().getApplicationContext())
                         .load(GPSApplication.getInstance().getApplicationContext().getFilesDir().toString() + "/Thumbnails/" + track.getId() + ".png")
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         //.skipMemoryCache(true)
-                        //.error(null)
+                        .error(null)
                         .dontAnimate()
                         .into(imageViewThumbnail);
             }

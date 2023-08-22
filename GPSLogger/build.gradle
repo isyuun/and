@@ -19,12 +19,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//apply plugin: 'com.android.application'
-//apply plugin: 'org.jetbrains.kotlin.android'
-plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-}
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     namespace "eu.basicairdata.graziano.gpslogger"
@@ -68,16 +64,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-    lint {
-        abortOnError false
-    }
+    //lint {
+    //    abortOnError false
+    //}
     buildFeatures {
         buildConfig true
     }
@@ -95,7 +84,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
     //implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
 
-    implementation 'com.github.bumptech.glide:glide:4.15.1'
+    implementation 'com.github.bumptech.glide:glide:3.8.0'
 
     implementation "org.greenrobot:eventbus:3.3.1"
     annotationProcessor "org.greenrobot:eventbus-annotation-processor:3.3.1"
