@@ -146,8 +146,10 @@ class LoginActivity : AppCompatActivity() {
         // 카카오톡 로그인을 권장하지만 설치가 되어 있지 않다면 카카오계정으로 로그인 시도.
         if(UserApiClient.instance.isKakaoTalkLoginAvailable(this)){
             UserApiClient.instance.loginWithKakaoTalk(this, callback= callback )
+            Log.d("LOG","if 진입")
         }else{
             UserApiClient.instance.loginWithKakaoAccount(this, callback = callback )
+            Log.d("LOG","else 진입")
         }
     }
 
