@@ -20,7 +20,7 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'org.jetbrains.kotlin.android'    //IY:코틀린 버전(1.7/1.8) 충돌 방지
 
 android {
     namespace "eu.basicairdata.graziano.gpslogger"
@@ -64,9 +64,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    //lint {
-    //    abortOnError false
-    //}
+    lint {
+        abortOnError false
+    }
     buildFeatures {
         buildConfig true
     }
