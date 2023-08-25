@@ -27,6 +27,8 @@ package kr.carepet.gps
 
 import android.content.Context
 import android.content.Intent
+import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
