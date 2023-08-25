@@ -29,7 +29,6 @@ import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
 /**
  * @Project     : carepet-android
  * @FileName    : GPSService.kt

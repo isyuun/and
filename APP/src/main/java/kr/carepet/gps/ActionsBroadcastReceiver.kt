@@ -25,36 +25,21 @@
 
 package kr.carepet.gps
 
-import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
+import android.content.Context
+import android.content.Intent
+
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 /**
  * @Project     : carepet-android
- * @FileName    : GPSApplication.kt
+ * @FileName    : ActionsBroadcastReceiver.kt
  * @Date        : 2023. 08. 22.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-open class GPSApplication : eu.basicairdata.graziano.gpslogger.GPSApplication() {
-    override fun onCreate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
-        super.onCreate()
-    }
-
-    override fun onTerminate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
-        super.onTerminate()
-    }
-
-    override fun startAndBindGPSService() {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
-        super.startAndBindGPSService()
-    }
-
-    override fun stopAndUnbindGPSService() {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
-        super.stopAndUnbindGPSService()
+class ActionsBroadcastReceiver : eu.basicairdata.graziano.gpslogger.ActionsBroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        Log.i(__CLASSNAME__, "${getMethodName()}context:$context, intent:$intent")
+        super.onReceive(context, intent)
     }
 }

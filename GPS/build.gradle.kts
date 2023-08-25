@@ -60,6 +60,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play)
     implementation(libs.androidx.work.runtime.ktx)
 
+    implementation(libs.androidx.animation)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
