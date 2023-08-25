@@ -55,6 +55,7 @@ dependencies {
     implementation(project(mapOf("path" to ":GPSLogger")))
     implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":APP2")))
+    implementation(project(mapOf("path" to ":GPS")))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)

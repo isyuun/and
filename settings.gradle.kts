@@ -30,9 +30,9 @@ dependencyResolutionManagement {
 rootProject.name = "and"
 //include ":lvl_sample"
 //include ":lvl_library"
-include(":GPSLogger")
 include(":APP")
 include(":APP2")
+include(":GPSLogger")
 include(":GPS")
 include(":Navi")
 include(":Navi2")

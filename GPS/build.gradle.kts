@@ -56,18 +56,10 @@ android {
 }
 
 dependencies {
-    implementation(libs.play.services.location)
-    implementation(libs.kotlinx.coroutines.play)
-    implementation(libs.androidx.work.runtime.ktx)
 
-    implementation(libs.androidx.animation)
-    implementation(libs.androidx.material.icons.core)
-    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.firebase.inappmessaging.ktx)
     testImplementation(libs.junit4)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
