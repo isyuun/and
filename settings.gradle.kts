@@ -31,6 +31,7 @@ rootProject.name = "and"
 //include ":lvl_sample"
 //include ":lvl_library"
 include(":GPSLogger")
+include(":_GPS")
 include(":APP")
 include(":APP2")
 include(":Navi")

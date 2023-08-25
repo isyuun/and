@@ -20,26 +20,23 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 22.   description...
+ *  isyuun@care-pet.kr             2023. 8. 25.   description...
  */
 
 package kr.carepet.gps
 
-import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
+import org.junit.Test
 
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+import org.junit.Assert.*
 
 /**
- * @Project     : carepet-android
- * @FileName    : GPSService.kt
- * @Date        : 2023. 08. 22.
- * @author      : isyuun@care-pet.kr
- * @description :
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
  */
-class GPSService : eu.basicairdata.graziano.gpslogger.GPSService() {
-    override fun onCreate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
-        super.onCreate()
+class ExampleUnitTest {
+    @Test
+    fun addition_isCorrect() {
+        assertEquals(4, 2 + 2)
     }
 }

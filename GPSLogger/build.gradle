@@ -34,8 +34,6 @@ android {
 
         // -----------------------------------------------------------------------------------------
         // We use the Semantic Versioning (https://semver.org/):
-        versionName '3.2.1'
-        versionCode 50
         // -----------------------------------------------------------------------------------------
 
         vectorDrawables.useSupportLibrary = true
@@ -50,16 +48,13 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
-            crunchPngs false
             //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             final BUILD_DATE = new Date().format('yyyyMMdd')
-            versionNameSuffix "-dev.$BUILD_DATE"
         }
         release {
             minifyEnabled false
-            crunchPngs false
             //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
