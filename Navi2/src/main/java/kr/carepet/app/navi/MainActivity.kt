@@ -1,8 +1,6 @@
 package kr.carepet.app.navi
 
 import android.os.Bundle
-//import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -12,18 +10,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import kr.carepet.app.ComponentActivity
 import kr.carepet.app.navi.ui.theme.AndTheme
+import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
+
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 open class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(__CLASSNAME__, "${getMethodName()}$savedInstanceState")
         super.onCreate(savedInstanceState)
-        setContent {
-            AndTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Greeting("Android")
-                }
-            }
-        }
+        //setContent { GreetingPreview() }
     }
 }
 
@@ -39,6 +35,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     AndTheme {
-        Greeting("Android")
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            Greeting("Android")
+        }
     }
 }

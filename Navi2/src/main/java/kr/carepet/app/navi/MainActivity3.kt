@@ -26,6 +26,15 @@
 package kr.carepet.app.navi
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.platform.location.bglocationaccess.BgLocationAccessScreen
+import kr.carepet.app.navi.ui.theme.AndTheme
 
 /**
  * @Project     : carepet-android
@@ -34,12 +43,23 @@ import android.os.Bundle
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class MainActivity3 : MainActivity2() {
+open class MainActivity3 : MainActivity2() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContent { Content() }
         post { init() }
     }
 
-    private fun init() {
+    protected fun init() {
+    }
+}
+
+@Preview
+@Composable
+internal fun Content() {
+    AndTheme {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            BgLocationAccessScreen()
+        }
     }
 }

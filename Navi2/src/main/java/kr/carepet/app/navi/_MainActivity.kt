@@ -32,4 +32,4 @@ package kr.carepet.app.navi
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class _MainActivity : MainActivity2()
+class _MainActivity : MainActivity3()

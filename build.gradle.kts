@@ -8,7 +8,47 @@ plugins {
     //id("com.android.library") version "8.1.0" apply false
     alias(libs.plugins.com.android.library) apply false
     //id("org.jetbrains.kotlin.android") version "1.8.10" apply false
-    alias(libs.plugins.org.jetbrains.kotlin.android) apply false
+    alias(libs.plugins.kotlin.android) apply false
     //id("com.google.gms.google-services") version "4.3.15" apply false
     alias(libs.plugins.com.google.gms.google.services) apply false
+    //
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.kotlin.kapt) apply false
+    //
+    alias(libs.plugins.affectedmoduledetector)
+    alias(libs.plugins.versionCatalogUpdate)
+    alias(libs.plugins.benManesVersions)
+
+    id("com.example.platform")
+}
+
+versionCatalogUpdate {
+    sortByKey.set(true)
+    keep {
+        keepUnusedVersions.set(true)
+    }
+}
+
+affectedModuleDetector {
+    baseDir = "${project.rootDir}"
+    pathsAffectingAllModules = setOf(
+        "gradle/libs.versions.toml",
+    )
+    excludedModules = setOf<String>()
+
+    logFilename = "output.log"
+    logFolder = "${rootProject.buildDir}/affectedModuleDetector"
+
+    val baseRef = findProperty("affected_base_ref") as? String
+    // If we have a base ref to diff against, extract the branch name and use it
+    if (!baseRef.isNullOrEmpty()) {
+        // Remove the prefix from the head.
+        // TODO: need to support other types of git refs
+        specifiedBranch = baseRef.replace("refs/heads/", "")
+        compareFrom = "SpecifiedBranchCommit"
+    } else {
+        // Otherwise we use the previous commit. This is mostly used for commits to main.
+        compareFrom = "PreviousCommit"
+    }
 }

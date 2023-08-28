@@ -27,7 +27,6 @@ package kr.carepet.app.navi
 
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.parcelize.Parcelize
 import kr.carepet.app.navi.ui.theme.AndTheme
 import kr.carepet.util.Log
@@ -59,22 +59,19 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
  */
 open class MainActivity2 : MainActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$savedInstanceState")
+        Log.d(__CLASSNAME__, "${getMethodName()}$savedInstanceState")
         super.onCreate(savedInstanceState)
-        setContent { Content(savedInstanceState) }
+        //setContent { Content(savedInstanceState) }
     }
 
 }
 
 @Composable
-private fun Content(savedInstanceState: Bundle?) {
+fun Content(savedInstanceState: Bundle?) {
     Log.i(__CLASSNAME__, "${getMethodName()}$savedInstanceState")
     AndTheme {
         // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Greeting("Android")
             Root()
         }
