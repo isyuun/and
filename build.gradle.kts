@@ -21,6 +21,13 @@ plugins {
     alias(libs.plugins.benManesVersions)
 
     //id("com.example.platform")      ///** Define the samples to load */
+    alias(libs.plugins.kotlin.jvm)
+}
+
+dependencies {
+    implementation(gradleKotlinDsl())
+    compileOnly(libs.android.gradlePlugin)
+    compileOnly(libs.kotlin.gradlePlugin)
 }
 
 versionCatalogUpdate {

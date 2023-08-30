@@ -30,6 +30,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -79,6 +80,9 @@ open class ForegroundOnlyLocationService : Service() {
     // last location to create a Notification if the user navigates away from the app.
     private var currentLocation: Location? = null
 
+    //https://stackoverflow.com/questions/74264850/localbroadcastmanager-is-now-deprecated-how-to-send-data-from-service-to-activi
+    //Define a LiveData to observe in activity
+    val tokenLiveData = MutableLiveData<String>()
     override fun onCreate() {
         Log.d(__CLASSNAME__, "${getMethodName()}:${serviceRunningInForeground}")        //Log.d(TAG, "onCreate()")
 
