@@ -44,18 +44,24 @@ import androidx.compose.ui.unit.dp
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.android.catalog.framework.annotations.Sample
 import kr.carepet.base.PermissionBox
+import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
 //import com.google.android.catalog.framework.annotations.Sample
 import java.util.concurrent.TimeUnit
 
 
-//@Sample(
-//    name = "Location - Background Location updates",
-//    description = "This Sample demonstrate how to access location and get location updates when app is in background",
-//    documentation = "https://developer.android.com/training/location/background",
-//)
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+@Sample(
+    name = "Location - Background Location updates",
+    description = "This Sample demonstrate how to access location and get location updates when app is in background",
+    documentation = "https://developer.android.com/training/location/background",
+)
 @Composable
-fun BgLocationAccessScreen(repeatInterval: Long, repeatIntervalTimeUnit: TimeUnit) {
+fun BgLocationAccessScreen() {
+    Log.w(__CLASSNAME__, "${getMethodName()}")
     // Request for foreground permissions first
     PermissionBox(
         permissions = listOf(
@@ -67,17 +73,18 @@ fun BgLocationAccessScreen(repeatInterval: Long, repeatIntervalTimeUnit: TimeUni
             // From Android 10 onwards request for background permission only after fine or coarse is granted
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 PermissionBox(permissions = listOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-                    BackgroundLocationControls(repeatInterval, repeatIntervalTimeUnit)
+                    BackgroundLocationControls()
                 }
             } else {
-                BackgroundLocationControls(repeatInterval, repeatIntervalTimeUnit)
+                BackgroundLocationControls()
             }
         },
     )
 }
 
 @Composable
-private fun BackgroundLocationControls(repeatInterval: Long, repeatIntervalTimeUnit: TimeUnit) {
+private fun BackgroundLocationControls() {
+    Log.wtf(__CLASSNAME__, "${getMethodName()}")
     val context = LocalContext.current
     val workManager = WorkManager.getInstance(context)
 
@@ -109,8 +116,8 @@ private fun BackgroundLocationControls(repeatInterval: Long, repeatIntervalTimeU
                         BgLocationWorker.workName,
                         ExistingPeriodicWorkPolicy.KEEP,
                         PeriodicWorkRequestBuilder<BgLocationWorker>(
-                            repeatInterval,
-                            repeatIntervalTimeUnit,
+                            -1,
+                            TimeUnit.SECONDS,
                         ).build(),
                     )
                 },

@@ -36,13 +36,16 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
+
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 class BgLocationWorker(context: Context, param: WorkerParameters) :
     CoroutineWorker(context, param) {
     companion object {
         // unique name for the work
         val workName = "BgLocationWorker"
-        private /*const*/ val TAG = Exception().stackTrace[0].fileName /*"BackgroundLocationWork"*/
+        private const val TAG = "BackgroundLocationWork"
     }
 
     private val locationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -55,16 +58,13 @@ class BgLocationWorker(context: Context, param: WorkerParameters) :
         ) {
             return Result.failure()
         }
-        locationClient.getCurrentLocation(
-            Priority.PRIORITY_BALANCED_POWER_ACCURACY, CancellationTokenSource().token,
-        ).addOnSuccessListener { location ->
-            location?.let {
-                Log.d(
-                    TAG,
-                    "Current Location = [lat : ${location.latitude}, lng : ${location.longitude}, alt(ele) : ${location.altitude}, time : ${location.time}, speed : ${location.speed}, accuracy : ${location.accuracy}]",
-                )
+        locationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, CancellationTokenSource().token)
+            .addOnSuccessListener { location ->
+                location?.let {
+                    //Log.d(TAG, "Current Location = [lat : ${location.latitude}, lng : ${location.longitude}, alt(ele) : ${location.altitude}, time : ${location.time}, speed : ${location.speed}, accuracy : ${location.accuracy}]")
+                    Log.wtf(__CLASSNAME__, "${getMethodName()}${location}]")
+                }
             }
-        }
         return Result.success()
     }
 }

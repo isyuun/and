@@ -64,8 +64,8 @@ open class MainActivity3 : MainActivity2() {
 internal fun Content() {
     AndTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            Log.wtf(__CLASSNAME__, "${getMethodName()}")
-            BgLocationAccessScreen(1000, TimeUnit.MILLISECONDS)
+            Log.d(__CLASSNAME__, "${getMethodName()}")
+            BgLocationAccessScreen()
         }
     }
 }
