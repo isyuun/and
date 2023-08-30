@@ -74,11 +74,11 @@ dependencyResolutionManagement {
 rootProject.name = "and"
 //include ":lvl_sample"
 //include ":lvl_library"
-//include(":complete")
+include(":complete")
 include(":_APP")
 include(":APP")
 include(":APP2")
-include(":GPSLogger")
 include(":GPS")
+include(":GPSLogger")
 include(":Navi")
 include(":Navi2")
