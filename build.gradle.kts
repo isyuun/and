@@ -20,7 +20,7 @@ plugins {
     alias(libs.plugins.versionCatalogUpdate)
     alias(libs.plugins.benManesVersions)
 
-    id("com.example.platform")
+    //id("com.example.platform")      ///** Define the samples to load */
 }
 
 versionCatalogUpdate {

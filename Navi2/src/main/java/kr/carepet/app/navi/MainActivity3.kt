@@ -33,8 +33,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.platform.location.bglocationaccess.BgLocationAccessScreen
 import kr.carepet.app.navi.ui.theme.AndTheme
+import kr.carepet.location.bglocationaccess.BgLocationAccessScreen
+import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
+import java.util.concurrent.TimeUnit
+
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 /**
  * @Project     : carepet-android
@@ -59,7 +64,8 @@ open class MainActivity3 : MainActivity2() {
 internal fun Content() {
     AndTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            BgLocationAccessScreen()
+            Log.wtf(__CLASSNAME__, "${getMethodName()}")
+            BgLocationAccessScreen(1000, TimeUnit.MILLISECONDS)
         }
     }
 }

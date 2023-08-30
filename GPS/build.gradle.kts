@@ -24,10 +24,10 @@
  */
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
-plugins {
-    alias(libs.plugins.com.android.library)
-    alias(libs.plugins.kotlin.android)
-}
+//plugins {
+//    alias(libs.plugins.com.android.library)
+//    alias(libs.plugins.kotlin.android)
+//}
 
 android {
     namespace = "kr.carepet.gps"
@@ -53,9 +53,59 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+    buildFeatures {
+        buildConfig = true
+    }
+}
+
+plugins {
+    alias(libs.plugins.com.android.library)
+    alias(libs.plugins.kotlin.android)
+    /** <-- samples --> */
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+    /** <-- //samples --> */
 }
 
 dependencies {
+    /** Define the samples to load */
+    implementation(libs.play.services.location)
+    implementation(libs.kotlin.coroutines.play)
+    implementation(libs.androidx.work.runtime.ktx)
+    //implementation(project(":samples:base"))
+    implementation(platform(libs.compose.bom))
+    androidTestImplementation(platform(libs.compose.bom))
+    implementation(libs.casa.base)
+    ksp(libs.casa.processor)
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.core)
+    //implementation(libs.androidx.fragment)
+    //implementation(libs.androidx.activity.compose)
+    implementation(libs.compose.foundation.foundation)
+    //implementation(libs.compose.runtime.runtime)
+    implementation(libs.compose.runtime.livedata)
+    //implementation(libs.androidx.lifecycle.viewmodel.compose)
+    //implementation(libs.compose.ui.ui)
+    implementation(libs.compose.material3)
+    //implementation(libs.coil.compose)
+    //implementation(libs.coil.video)
+    implementation(libs.accompanist.permissions)
+    //implementation(libs.compose.ui.tooling.preview)
+    //debugImplementation(libs.compose.ui.tooling)
+    //androidTestImplementation(libs.androidx.test.core)
+    //androidTestImplementation(libs.androidx.test.runner)
+    /** Define the samples to load */
+
+    implementation(project(mapOf("path" to ":_APP")))
+    implementation(project(mapOf("path" to ":GPSLogger")))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

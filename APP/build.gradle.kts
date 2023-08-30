@@ -58,7 +58,7 @@ android {
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":GPSLogger")))
+    implementation(project(mapOf("path" to ":_APP")))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
