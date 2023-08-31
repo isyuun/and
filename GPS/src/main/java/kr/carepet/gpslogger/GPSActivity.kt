@@ -20,52 +20,26 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 17.   description...
+ *  isyuun@care-pet.kr             2023. 8. 31.   description...
  */
 
-package kr.carepet.app.navi
+package kr.carepet.gpslogger
 
 import android.os.Bundle
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import kr.carepet.app.navi.ui.theme.AndTheme
-import kr.carepet.location.bglocationaccess.BgLocationAccessScreen
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
-import java.util.concurrent.TimeUnit
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
 /**
  * @Project     : carepet-android
- * @FileName    : MainActivity3.kt
- * @Date        : 2023. 08. 17.
+ * @FileName    : GPSActivity.kt
+ * @Date        : 2023. 08. 31.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class MainActivity3 : MainActivity2() {
+class GPSActivity : eu.basicairdata.graziano.gpslogger.GPSActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i(__CLASSNAME__, "${getMethodName()}")
         super.onCreate(savedInstanceState)
-        setContent { Content() }
-        post { init() }
-    }
-
-    private fun init() {
-    }
-}
-
-@Preview
-@Composable
-internal fun Content() {
-    AndTheme {
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            Log.d(__CLASSNAME__, "${getMethodName()}")
-            BgLocationAccessScreen()
-        }
     }
 }

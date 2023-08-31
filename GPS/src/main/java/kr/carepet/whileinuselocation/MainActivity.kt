@@ -15,31 +15,7 @@
  */
 package kr.carepet.whileinuselocation
 
-import android.Manifest
-import android.content.BroadcastReceiver
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.ServiceConnection
-import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.location.Location
-import android.net.Uri
-import android.os.Bundle
-import android.os.IBinder
-import android.provider.Settings
-import android.util.Log
-import android.widget.Button
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.android.material.snackbar.Snackbar
-import kr.carepet.gps.R
-
-private const val TAG = "MainActivity"
-private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 /**
  *  This app allows a user to receive location updates without the background permission even when

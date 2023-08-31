@@ -75,7 +75,10 @@ plugins {
 }
 
 dependencies {
-    /** Define the samples to load */
+    implementation(project(mapOf("path" to ":_APP")))
+    implementation(project(mapOf("path" to ":GPL")))
+
+    /** IY:플랫폼:샘플스:Define the samples to load */
     implementation(libs.play.services.location)
     implementation(libs.kotlin.coroutines.play)
     implementation(libs.androidx.work.runtime.ktx)
@@ -102,10 +105,7 @@ dependencies {
     //debugImplementation(libs.compose.ui.tooling)
     //androidTestImplementation(libs.androidx.test.core)
     //androidTestImplementation(libs.androidx.test.runner)
-    /** Define the samples to load */
-
-    implementation(project(mapOf("path" to ":_APP")))
-    implementation(project(mapOf("path" to ":GPSLogger")))
+    /** IY:플랫폼:샘플스:Define the samples to load */
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

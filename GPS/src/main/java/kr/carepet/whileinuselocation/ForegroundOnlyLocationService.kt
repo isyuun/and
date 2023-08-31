@@ -15,6 +15,8 @@
  */
 package kr.carepet.whileinuselocation
 
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
 /**
  * Service tracks location when requested and updates Activity via binding. If Activity is
  * stopped/unbinds and tracking is enabled, the service promotes itself to a foreground service to

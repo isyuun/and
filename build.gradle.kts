@@ -20,7 +20,7 @@ plugins {
     alias(libs.plugins.versionCatalogUpdate)
     alias(libs.plugins.benManesVersions)
 
-    //id("com.example.platform")      ///** Define the samples to load */
+    //id("com.example.platform")      ///** IY:플랫폼:샘플스:Define the samples to load */
     alias(libs.plugins.kotlin.jvm)
 }
 
@@ -29,7 +29,8 @@ dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
 }
-
+/**
+/** IY:플랫폼:샘플스:Define the samples to load */
 versionCatalogUpdate {
     sortByKey.set(true)
     keep {
@@ -59,3 +60,5 @@ affectedModuleDetector {
         compareFrom = "PreviousCommit"
     }
 }
+/** IY:플랫폼:샘플스:Define the samples to load */
+*/

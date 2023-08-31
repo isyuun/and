@@ -55,8 +55,8 @@ dependencies {
     implementation(project(mapOf("path" to ":_APP")))
     implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":APP2")))
+    implementation(project(mapOf("path" to ":GPL")))
     implementation(project(mapOf("path" to ":GPS")))
-    implementation(project(mapOf("path" to ":GPSLogger")))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
