@@ -31,7 +31,7 @@
 
 android {
     namespace = "kr.carepet.gps"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 26
@@ -57,7 +57,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     buildFeatures {
         buildConfig = true
@@ -68,18 +68,18 @@ plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.kotlin.android)
     ///** IY:플랫폼:샘플스:Define the samples to load */
-    //alias(libs.plugins.hilt)
-    ///** IY:플랫폼:샘플스:Define the samples to load */
-    ///** IY:플랫폼:샘플스:Define the samples to load */
-    //id("com.example.platform")
-    ///** IY:플랫폼:샘플스:Define the samples to load */
     //id("org.jetbrains.kotlin.jvm") version "1.9.0"
-    ///** IY:플랫폼:샘플스:Define the samples to load */
-    //id("dagger.hilt.android.plugin") version "2.47"
-    //id("com.google.dagger.hilt.android") version "2.47"
-    id("com.google.devtools.ksp") version "1.9.10-1.0.13"
+    /** IY:플랫폼:샘플스:Define the samples to load */
+    alias(libs.plugins.hilt)
+    id("dagger.hilt.android.plugin")
+    //id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.kapt")
     ///** IY:플랫폼:샘플스:Define the samples to load */
+    //id("com.example.platform")
+}
+kapt {
+    correctErrorTypes = true
 }
 /**
 /** IY:플랫폼:샘플스:Define the samples to load */
@@ -120,7 +120,7 @@ affectedModuleDetector {
 /** IY:플랫폼:샘플스:Define the samples to load */
 */
 dependencies {
-    //implementation(project(mapOf("path" to ":_APP")))
+    implementation(project(mapOf("path" to ":_APP")))
     implementation(project(mapOf("path" to ":GPL")))
 
     /** IY:플랫폼:샘플스:Define the samples to load */
@@ -135,21 +135,22 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.core)
-    //implementation(libs.androidx.fragment)
-    //implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.fragment)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.compose.foundation.foundation)
-    //implementation(libs.compose.runtime.runtime)
+    implementation(libs.compose.runtime.runtime)
     implementation(libs.compose.runtime.livedata)
-    //implementation(libs.androidx.lifecycle.viewmodel.compose)
-    //implementation(libs.compose.ui.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.compose.ui.ui)
     implementation(libs.compose.material3)
-    //implementation(libs.coil.compose)
-    //implementation(libs.coil.video)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.video)
     implementation(libs.accompanist.permissions)
-    //implementation(libs.compose.ui.tooling.preview)
-    //debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.compose.ui.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
     //androidTestImplementation(libs.androidx.test.core)
     //androidTestImplementation(libs.androidx.test.runner)
+    implementation(libs.androidx.exifinterface)
     /** IY:플랫폼:샘플스:Define the samples to load */
 
     implementation(libs.androidx.core.ktx)

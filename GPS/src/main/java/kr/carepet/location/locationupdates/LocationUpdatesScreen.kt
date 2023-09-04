@@ -47,15 +47,20 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import kr.carepet.base.PermissionBox
 import com.google.android.catalog.framework.annotations.Sample
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import kr.carepet.base.PermissionBox
+import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 @SuppressLint("MissingPermission")
 @Sample(
@@ -85,6 +90,7 @@ fun LocationUpdatesScreen() {
 )
 @Composable
 fun LocationUpdatesContent(usePreciseLocation: Boolean) {
+    Log.wtf(__CLASSNAME__, "${getMethodName()}${usePreciseLocation}")
     // The location request that defines the location updates
     var locationRequest by remember {
         mutableStateOf<LocationRequest?>(null)
@@ -99,11 +105,13 @@ fun LocationUpdatesContent(usePreciseLocation: Boolean) {
         LocationUpdatesEffect(locationRequest!!) { result ->
             // For each result update the text
             for (currentLocation in result.locations) {
-                locationUpdates = "${System.currentTimeMillis()}:\n" +
+                //locationUpdates += "${System.currentTimeMillis()}:\n" +
+                locationUpdates += "${SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS'Z'").format(Date(System.currentTimeMillis()))}:\n" +
                         "- @lat: ${currentLocation.latitude}\n" +
                         "- @lng: ${currentLocation.longitude}\n" +
                         "- Accuracy: ${currentLocation.accuracy}\n\n" +
-                        locationUpdates
+                        //        locationUpdates
+                        Log.wtf(__CLASSNAME__, "${getMethodName()}${locationRequest}, ${currentLocation}")
             }
         }
     }

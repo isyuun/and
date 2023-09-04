@@ -20,16 +20,17 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 16.   description...
+ *  isyuun@care-pet.kr             2023. 9. 4.   description...
  */
 
 package kr.carepet.app.navi
 
 /**
  * @Project     : carepet-android
- * @FileName    : _MainActivity.kt
- * @Date        : 2023. 08. 16.
+ * @FileName    : MainActivity4.kt
+ * @Date        : 2023. 09. 04.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class _MainActivity : MainActivity4()
+open class MainActivity4 : MainActivity3() {
+}

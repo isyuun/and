@@ -50,7 +50,7 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 open class MainActivity3 : MainActivity2() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { Content() }
+        //setContent { Content() }
         post { init() }
     }
 

@@ -31,7 +31,7 @@ plugins {
 
 android {
     namespace = "kr.carepet"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 26
