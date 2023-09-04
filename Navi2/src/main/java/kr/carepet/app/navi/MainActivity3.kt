@@ -34,10 +34,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import kr.carepet.app.navi.ui.theme.AndTheme
-import kr.carepet.location.bglocationaccess.BgLocationAccessScreen
+import kr.carepet.location.locationupdates.LocationUpdatesScreen
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
-import java.util.concurrent.TimeUnit
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
@@ -65,7 +64,7 @@ internal fun Content() {
     AndTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Log.d(__CLASSNAME__, "${getMethodName()}")
-            BgLocationAccessScreen()
+            LocationUpdatesScreen()
         }
     }
 }

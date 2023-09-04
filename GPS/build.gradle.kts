@@ -67,15 +67,60 @@ android {
 plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.kotlin.android)
-    /** <-- samples --> */
-    alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
-    /** <-- //samples --> */
+    ///** IY:플랫폼:샘플스:Define the samples to load */
+    //alias(libs.plugins.hilt)
+    ///** IY:플랫폼:샘플스:Define the samples to load */
+    ///** IY:플랫폼:샘플스:Define the samples to load */
+    //id("com.example.platform")
+    ///** IY:플랫폼:샘플스:Define the samples to load */
+    //id("org.jetbrains.kotlin.jvm") version "1.9.0"
+    ///** IY:플랫폼:샘플스:Define the samples to load */
+    //id("dagger.hilt.android.plugin") version "2.47"
+    //id("com.google.dagger.hilt.android") version "2.47"
+    id("com.google.devtools.ksp") version "1.9.10-1.0.13"
+    id("org.jetbrains.kotlin.kapt")
+    ///** IY:플랫폼:샘플스:Define the samples to load */
+}
+/**
+/** IY:플랫폼:샘플스:Define the samples to load */
+dependencies {
+    id("com.dropbox.affectedmoduledetector") version "0.2.0"
+    id("nl.littlerobots.version-catalog-update") version "0.7.0"
+    id("com.github.ben-manes.versions") version "0.44.0"
+}
+versionCatalogUpdate {
+    sortByKey.set(true)
+    keep {
+        keepUnusedVersions.set(true)
+    }
 }
 
+affectedModuleDetector {
+    baseDir = "${project.rootDir}"
+    pathsAffectingAllModules = setOf(
+        "gradle/libs.versions.toml",
+    )
+    excludedModules = setOf<String>()
+
+    logFilename = "output.log"
+    logFolder = "${rootProject.buildDir}/affectedModuleDetector"
+
+    val baseRef = findProperty("affected_base_ref") as? String
+    // If we have a base ref to diff against, extract the branch name and use it
+    if (!baseRef.isNullOrEmpty()) {
+        // Remove the prefix from the head.
+        // TODO: need to support other types of git refs
+        specifiedBranch = baseRef.replace("refs/heads/", "")
+        compareFrom = "SpecifiedBranchCommit"
+    } else {
+        // Otherwise we use the previous commit. This is mostly used for commits to main.
+        compareFrom = "PreviousCommit"
+    }
+}
+/** IY:플랫폼:샘플스:Define the samples to load */
+*/
 dependencies {
-    implementation(project(mapOf("path" to ":_APP")))
+    //implementation(project(mapOf("path" to ":_APP")))
     implementation(project(mapOf("path" to ":GPL")))
 
     /** IY:플랫폼:샘플스:Define the samples to load */
