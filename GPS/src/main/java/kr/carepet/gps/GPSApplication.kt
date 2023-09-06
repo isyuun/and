@@ -20,40 +20,30 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 29.   description...
+ *  isyuun@care-pet.kr             2023. 9. 5.   description...
  */
 
-package kr.carepet.gpslogger
+package kr.carepet.gps
 
-import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
+import kr.carepet._gps.gpsapplication
 
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 /**
  * @Project     : carepet-android
  * @FileName    : GPSApplication.kt
- * @Date        : 2023. 08. 22.
+ * @Date        : 2023. 09. 05.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class GPSApplication : eu.basicairdata.graziano.gpslogger.GPSApplication() {
+open class GPSApplication : gpsapplication() {
+    companion object {
+        private lateinit var singleton: GPSApplication
+        fun getInstance(): GPSApplication? {
+            return singleton
+        }
+    }
+
     override fun onCreate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
         super.onCreate()
-    }
-
-    override fun onTerminate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
-        super.onTerminate()
-    }
-
-    override fun startAndBindGPSService() {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
-        super.startAndBindGPSService()
-    }
-
-    override fun stopAndUnbindGPSService() {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
-        super.stopAndUnbindGPSService()
+        singleton = this
     }
 }

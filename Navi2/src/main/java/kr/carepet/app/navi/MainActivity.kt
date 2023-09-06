@@ -11,11 +11,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import kr.carepet.app.ComponentActivity
 import kr.carepet.app.navi.ui.theme.AndTheme
 import kr.carepet.util.Log
+import kr.carepet.util.__CLASSNAME__
 import kr.carepet.util.getMethodName
 
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
 open class MainActivity : ComponentActivity() {
+    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(__CLASSNAME__, "${getMethodName()}$savedInstanceState")
         super.onCreate(savedInstanceState)

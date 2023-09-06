@@ -20,28 +20,18 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 29.   description...
+ *  isyuun@care-pet.kr             2023. 9. 5.   description...
  */
 
-package kr.carepet.gpslogger
+package kr.carepet.gps
 
-import android.content.Context
-import android.content.Intent
-import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
-
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+import kr.carepet._gps.gpscomponentactivity
 
 /**
  * @Project     : carepet-android
- * @FileName    : ActionsBroadcastReceiver.kt
- * @Date        : 2023. 08. 22.
+ * @FileName    : GPSComponentActivity.kt
+ * @Date        : 2023. 09. 05.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class ActionsBroadcastReceiver : eu.basicairdata.graziano.gpslogger.ActionsBroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent?) {
-        Log.i(__CLASSNAME__, "${getMethodName()}context:$context, intent:$intent")
-        super.onReceive(context, intent)
-    }
-}
+open class GPSComponentActivity : gpscomponentactivity()

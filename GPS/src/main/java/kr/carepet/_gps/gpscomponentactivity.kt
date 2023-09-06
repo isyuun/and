@@ -20,26 +20,53 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 31.   description...
+ *  isyuun@care-pet.kr             2023. 9. 5.   description...
  */
 
-package kr.carepet.gpslogger
+package kr.carepet._gps
 
 import android.os.Bundle
+import kr.carepet.gps.GPSApplication
 import kr.carepet.util.Log
+import kr.carepet.util.__CLASSNAME__
 import kr.carepet.util.getMethodName
 
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 /**
  * @Project     : carepet-android
- * @FileName    : GPSActivity.kt
- * @Date        : 2023. 08. 31.
+ * @FileName    : gpscomponentactivity.kt
+ * @Date        : 2023. 09. 04.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class GPSActivity : eu.basicairdata.graziano.gpslogger.GPSActivity() {
+open class gpscomponentactivity : kr.carepet.app.ComponentActivity() {
+    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
+        Log.w(__CLASSNAME__, "${getMethodName()}")
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onStart() {
+        Log.w(__CLASSNAME__, "${getMethodName()}")
+        super.onStart()
+        GPSApplication.getInstance()?.onStart()
+    }
+
+    override fun onResume() {
+        Log.w(__CLASSNAME__, "${getMethodName()}")
+        super.onResume()
+        GPSApplication.getInstance()?.onResume()
+    }
+
+    override fun onPause() {
+        Log.w(__CLASSNAME__, "${getMethodName()}")
+        super.onPause()
+        GPSApplication.getInstance()?.onPause()
+    }
+
+    override fun onStop() {
+        Log.w(__CLASSNAME__, "${getMethodName()}")
+        super.onStop()
+        GPSApplication.getInstance()?.onStop()
     }
 }

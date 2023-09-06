@@ -20,25 +20,18 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 29.   description...
+ *  isyuun@care-pet.kr             2023. 9. 5.   description...
  */
 
-package kr.carepet.gpslogger
+package kr.carepet.gps
 
-import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
+import kr.carepet._gps.gpsappcompatactivity
 
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 /**
  * @Project     : carepet-android
- * @FileName    : GPSService.kt
- * @Date        : 2023. 08. 22.
+ * @FileName    : GPSAppCompatActivity.kt
+ * @Date        : 2023. 09. 05.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class GPSService : eu.basicairdata.graziano.gpslogger.GPSService() {
-    override fun onCreate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}")
-        super.onCreate()
-    }
-}
+open class GPSAppCompatActivity : gpsappcompatactivity()

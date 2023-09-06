@@ -20,27 +20,46 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 22.   description...
+ *  isyuun@care-pet.kr             2023. 9. 6.   description...
  */
 
-package kr.carepet.app.navi
+package kr.carepet._gps
 
+import android.app.Notification
+import android.location.Location
+import com.google.android.gms.location.LocationResult
 import kr.carepet.util.Log
 import kr.carepet.util.__CLASSNAME__
 import kr.carepet.util.getMethodName
 
 /**
  * @Project     : carepet-android
- * @FileName    : Application.kt
- * @Date        : 2023. 08. 22.
+ * @FileName    : foregroundonlylocationservice2.kt
+ * @Date        : 2023. 09. 05.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class Application : kr.carepet.gps.GPSApplication() {
+open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
+    private var tick: Long = 0L;
+    private lateinit var notification: Notification
+
     override fun onCreate() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}")
+        Log.i(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")
         super.onCreate()
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$fusedLocationProviderClient")
+    }
+
+    override fun generateNotification(location: Location?): Notification {
+        this.notification = super.generateNotification(location)
+        Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, ${this.notification}, $location")
+        return this.notification
+    }
+
+    override fun onLocationResult(locationResult: LocationResult) {
+        //Log.i(__CLASSNAME__, "${getMethodName()}${serviceRunningInForeground}")
+        Log.w(__CLASSNAME__, "locationResult::lastLocation:${locationResult.lastLocation}, locations:${locationResult.locations}")
+        super.onLocationResult(locationResult)
     }
 }

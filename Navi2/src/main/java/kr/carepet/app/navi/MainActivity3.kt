@@ -26,19 +26,17 @@
 package kr.carepet.app.navi
 
 import android.os.Bundle
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.platform.location.locationupdates.LocationUpdatesScreen
 import kr.carepet.app.navi.ui.theme.AndTheme
-import kr.carepet.location.locationupdates.LocationUpdatesScreen
 import kr.carepet.util.Log
+import kr.carepet.util.__CLASSNAME__
 import kr.carepet.util.getMethodName
-
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 /**
  * @Project     : carepet-android
@@ -48,13 +46,11 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
  * @description :
  */
 open class MainActivity3 : MainActivity2() {
+    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContent { Content() }
-        post { init() }
-    }
-
-    private fun init() {
     }
 }
 

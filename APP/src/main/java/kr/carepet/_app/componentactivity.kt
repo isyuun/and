@@ -25,7 +25,7 @@
 
 package kr.carepet._app
 
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+import android.os.Bundle
 
 /**
  * @Project     : carepet-android
@@ -34,4 +34,31 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class componentactivity : androidx.activity.ComponentActivity()
+open class componentactivity : androidx.activity.ComponentActivity() {
+    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    private lateinit var application: application
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        application = this.applicationContext as application
+    }
+
+    override fun onResume() {
+        super.onResume()
+        application.setActivity(this)
+    }
+
+    override fun onPause() {
+        clearReferences()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        clearReferences()
+        super.onDestroy()
+    }
+
+    private fun clearReferences() {
+        if (this == application.getActivity()) application.setActivity(null)
+    }
+}

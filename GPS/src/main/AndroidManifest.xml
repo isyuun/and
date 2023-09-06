@@ -13,7 +13,8 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -22,4 +23,28 @@
     <uses-permission
         android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"
         android:maxSdkVersion="28" />
+
+    <!-- Required for foreground services on P+. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- TODO: Step 1.0, Review Permissions: Specify permissions you are using. -->
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        tools:ignore="CoarseFineLocation" />
+
+    <application tools:node="merge">
+        <!-- Foreground services in Android 10+ require type. -->
+        <!-- TODO: 2.2, Add foreground service type. -->
+        <service
+            android:name="kr.carepet.gps.ForegroundOnlyLocationService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+        <!--&lt;!&ndash; Foreground services in Android 10+ require type. &ndash;&gt;-->
+        <!--&lt;!&ndash; TODO: 2.2, Add foreground service type. &ndash;&gt;-->
+        <!--<service android:name="com.example.android.whileinuselocation.ForegroundOnlyLocationService"-->
+        <!--    android:enabled="true"-->
+        <!--    android:exported="false"-->
+        <!--    android:foregroundServiceType="location" />-->
+    </application>
 </manifest>

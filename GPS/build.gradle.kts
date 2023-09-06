@@ -121,15 +121,15 @@ affectedModuleDetector {
 */
 dependencies {
     implementation(project(mapOf("path" to ":_APP")))
-    implementation(project(mapOf("path" to ":GPL")))
+    implementation(project(mapOf("path" to ":APP")))
+    //implementation(project(mapOf("path" to ":GPL")))
 
-    /** IY:플랫폼:샘플스:Define the samples to load */
     implementation(libs.play.services.location)
     implementation(libs.kotlin.coroutines.play)
     implementation(libs.androidx.work.runtime.ktx)
-    //implementation(project(":samples:base"))
+
+    /** IY:플랫폼:샘플스:Define the samples to load */
     implementation(platform(libs.compose.bom))
-    androidTestImplementation(platform(libs.compose.bom))
     implementation(libs.casa.base)
     ksp(libs.casa.processor)
     implementation(libs.hilt.android)
@@ -148,8 +148,9 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
-    //androidTestImplementation(libs.androidx.test.core)
-    //androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.runner)
     implementation(libs.androidx.exifinterface)
     /** IY:플랫폼:샘플스:Define the samples to load */
 

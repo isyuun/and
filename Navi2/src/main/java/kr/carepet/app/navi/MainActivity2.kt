@@ -42,13 +42,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.parcelize.Parcelize
 import kr.carepet.app.navi.ui.theme.AndTheme
 import kr.carepet.util.Log
+import kr.carepet.util.__CLASSNAME__
 import kr.carepet.util.getMethodName
-
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 /**
  * @Project     : carepet-android
@@ -58,6 +56,8 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
  * @description :
  */
 open class MainActivity2 : MainActivity() {
+    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(__CLASSNAME__, "${getMethodName()}$savedInstanceState")
         super.onCreate(savedInstanceState)

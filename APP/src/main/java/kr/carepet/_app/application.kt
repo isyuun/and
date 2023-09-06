@@ -25,7 +25,7 @@
 
 package kr.carepet._app
 
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+import android.app.Activity
 
 /**
  * @Project     : carepet-android
@@ -34,5 +34,16 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class application : android.app.Application()
-//open class application : eu.basicairdata.graziano.gpslogger.GPSApplication()
+open class application : android.app.Application() {
+    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    private var activity: Activity? = null
+
+    open fun getActivity(): Activity? {
+        return activity
+    }
+
+    open fun setActivity(activity: Activity?) {
+        this.activity = activity
+    }
+}

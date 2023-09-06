@@ -34,4 +34,4 @@ import kr.carepet._app._application
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class Application : _application()
+open class Application : _application()

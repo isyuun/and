@@ -55,7 +55,7 @@ dependencies {
     implementation(project(mapOf("path" to ":_APP")))
     implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":APP2")))
-    implementation(project(mapOf("path" to ":GPL")))
+    //implementation(project(mapOf("path" to ":GPL")))
     implementation(project(mapOf("path" to ":GPS")))
 
     implementation(libs.androidx.core.ktx)
@@ -66,6 +66,9 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.constraintlayout)
     testImplementation(libs.junit4)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)

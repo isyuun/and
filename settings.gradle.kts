@@ -71,7 +71,6 @@ extra["samples"] = samples
 rootProject.name = "and"
 //include ":lvl_sample"
 //include ":lvl_library"
-//include(":complete")
 include(":_APP")
 include(":APP")
 include(":APP2")
