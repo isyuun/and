@@ -66,7 +66,7 @@ class ForegroundOnlyLocationService : foregroundonlylocationservice2() {
 
     override fun onBind(intent: Intent): IBinder {
         val ret = super.onBind(intent)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}:$ret, $localBinder")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $ret, $localBinder")
         return localBinder
     }
 
@@ -94,13 +94,13 @@ class ForegroundOnlyLocationService : foregroundonlylocationservice2() {
 
         internal const val EXTRA_LOCATION = "$PACKAGE_NAME.extra.LOCATION"
 
-        private const val EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION =
-            "$PACKAGE_NAME.extra.CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION"
-
-        private const val NOTIFICATION_ID = 12345678
-
-        private const val NOTIFICATION_CHANNEL_ID = "while_in_use_channel_01"
-
-        private const val INTERVAL_SECONDS = 5L
+        //private const val EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION =
+        //    "$PACKAGE_NAME.extra.CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION"
+        //
+        //private const val NOTIFICATION_ID = 12345678
+        //
+        //private const val NOTIFICATION_CHANNEL_ID = "while_in_use_channel_01"
+        //
+        //private const val INTERVAL_SECONDS = 5L
     }
 }

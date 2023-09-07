@@ -27,13 +27,12 @@ plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.kotlin.android)
     //id("org.jetbrains.kotlin.jvm") version "1.9.0"
-    ///** IY:플랫폼:샘플스:Define the samples to load */
-    id("com.google.devtools.ksp")
+    /** IY:플랫폼:샘플스:Define the samples to load */
     //id("org.jetbrains.kotlin.kapt")
-    id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp")
     //id("dagger.hilt.android.plugin")
-    //id("kotlin-kapt")
-    ///** IY:플랫폼:샘플스:Define the samples to load */
+    id("com.google.dagger.hilt.android")
+    /** IY:플랫폼:샘플스:Define the samples to load */
     //id("com.example.platform")
 }
 

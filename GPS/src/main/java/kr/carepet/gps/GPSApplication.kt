@@ -25,7 +25,9 @@
 
 package kr.carepet.gps
 
-import kr.carepet._gps.gpsapplication
+import kr.carepet._gps.gpsapplication2
+import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
 
 /**
  * @Project     : carepet-android
@@ -34,15 +36,23 @@ import kr.carepet._gps.gpsapplication
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class GPSApplication : gpsapplication() {
+open class GPSApplication : gpsapplication2() {
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
     companion object {
-        private lateinit var singleton: GPSApplication
-        fun getInstance(): GPSApplication? {
-            return singleton
+        private var singleton: GPSApplication? = null
+
+        fun getInstance(): GPSApplication {
+            return singleton ?: synchronized(this) {
+                singleton ?: GPSApplication().also {
+                    singleton = it
+                }
+            }
         }
     }
 
     override fun onCreate() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate()
         singleton = this
     }

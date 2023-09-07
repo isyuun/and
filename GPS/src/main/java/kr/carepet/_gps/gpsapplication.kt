@@ -25,6 +25,7 @@
 
 package kr.carepet._gps
 
+/**import kr.carepet.util.__CLASSNAME__*/
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.ComponentName
@@ -43,7 +44,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kr.carepet.gps.ForegroundOnlyLocationService
 import kr.carepet.gps.R
 import kr.carepet.util.Log
-/**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
 import java.util.Date
 
@@ -127,11 +127,10 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$name,$service")
         var binder: ForegroundOnlyLocationService.LocalBinder = service as ForegroundOnlyLocationService.LocalBinder
         foregroundOnlyLocationService = binder.service
         foregroundOnlyLocationServiceBound = true
-        Log.w(__CLASSNAME__, "${getMethodName()}${foregroundOnlyLocationServiceBound},${foregroundOnlyLocationService}")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundOnlyLocationServiceBound},${foregroundOnlyLocationService}")
         start()
     }
 
@@ -142,13 +141,13 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     override fun onCreate() {
-        Log.w(__CLASSNAME__, "${getMethodName()}")
+        Log.d(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate()
         init()
     }
 
     private fun init() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
         Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
@@ -156,7 +155,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     open fun start() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()}, ${foregroundOnlyLocationService}")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()}, $foregroundOnlyLocationService")
         // TODO: Step 1.0, Review Permissions: Checks and requests if needed.
         if (foregroundPermissionApproved()) {
             foregroundOnlyLocationService?.subscribeToLocationUpdates() ?: Log.w(__CLASSNAME__, "${getMethodName()}Service Not Bound")
@@ -330,18 +329,23 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     private inner class ForegroundOnlyBroadcastReceiver : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            val location =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION, Location::class.java)
-                } else {
-                    intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION)
-                }
+            this@gpsapplication.onReceive(context, intent)
+        }
+    }
 
-            if (location != null) {
-                Log.wtf(__CLASSNAME__, "${getMethodName()}\t${location}")
-                val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:sss'Z'").format(Date(System.currentTimeMillis()))
-                logResultsToScreen("${tick} - $location")
+    open fun onReceive(context: Context, intent: Intent) {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$context, $intent")
+        val location =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION, Location::class.java)
+            } else {
+                intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION)
             }
+
+        if (location != null) {
+            val current = resources.configuration.locales[0]
+            val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:sss'Z'", current).format(Date(System.currentTimeMillis()))
+            logResultsToScreen("${tick} - $location")
         }
     }
 }

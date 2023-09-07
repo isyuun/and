@@ -42,11 +42,10 @@ import kr.carepet.util.getMethodName
 open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private var tick: Long = 0L;
+    private var tick: Long = 0L
     private lateinit var notification: Notification
 
     override fun onCreate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")
         super.onCreate()
         Log.wtf(__CLASSNAME__, "${getMethodName()}$fusedLocationProviderClient")
     }
@@ -58,8 +57,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     override fun onLocationResult(locationResult: LocationResult) {
-        //Log.i(__CLASSNAME__, "${getMethodName()}${serviceRunningInForeground}")
-        Log.w(__CLASSNAME__, "${getMethodName()}lastLocation:${locationResult.lastLocation}, locations:${locationResult.locations}")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${serviceRunningInForeground}, lastLocation:${locationResult.lastLocation}, locations:${locationResult.locations}")
         super.onLocationResult(locationResult)
     }
 }

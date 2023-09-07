@@ -194,7 +194,7 @@ open class foregroundonlylocationservice(
         stopForeground(STOP_FOREGROUND_REMOVE)      //stopForeground(true)
         serviceRunningInForeground = false
         configurationChange = false
-        Log.d(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $localBinder")
+        Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $localBinder")
         return localBinder
     }
 

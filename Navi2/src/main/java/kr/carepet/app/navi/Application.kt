@@ -25,9 +25,7 @@
 
 package kr.carepet.app.navi
 
-import kr.carepet.util.Log
 /**import kr.carepet.util.__CLASSNAME__*/
-import kr.carepet.util.getMethodName
 
 /**
  * @Project     : carepet-android
@@ -36,11 +34,4 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class Application : kr.carepet.gps.GPSApplication() {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    override fun onCreate() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}")
-        super.onCreate()
-    }
-}
+open class Application : kr.carepet.gps.GPSApplication()
