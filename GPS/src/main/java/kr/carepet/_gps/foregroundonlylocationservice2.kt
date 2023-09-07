@@ -26,6 +26,7 @@
 package kr.carepet._gps
 
 import android.app.Notification
+import android.content.Intent
 import android.location.Location
 import com.google.android.gms.location.LocationResult
 import kr.carepet.util.Log
@@ -42,22 +43,21 @@ import kr.carepet.util.getMethodName
 open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private var tick: Long = 0L
-    private lateinit var notification: Notification
+    private var notification: Notification? = null
 
     override fun onCreate() {
         super.onCreate()
         Log.wtf(__CLASSNAME__, "${getMethodName()}$fusedLocationProviderClient")
     }
 
-    override fun generateNotification(location: Location?): Notification {
+    override fun generateNotification(location: Location?): Notification? {
+        Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, ${this.notification != null}, $location, ${this.notification}")
         this.notification = super.generateNotification(location)
-        Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, ${this.notification}, $location")
         return this.notification
     }
 
     override fun onLocationResult(locationResult: LocationResult) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${serviceRunningInForeground}, lastLocation:${locationResult.lastLocation}, locations:${locationResult.locations}")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${serviceRunningInForeground}, currentLocation(lastLocation):$currentLocation, locationResult:$locationResult")
         super.onLocationResult(locationResult)
     }
 }

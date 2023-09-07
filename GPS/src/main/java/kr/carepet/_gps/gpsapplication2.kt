@@ -43,32 +43,32 @@ import kr.carepet.util.getMethodName
 open class gpsapplication2 : gpsapplication() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceDisconnected(name)
     }
 
     override fun start() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.start()
     }
 
     override fun stop() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.stop()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+        Log.i(__CLASSNAME__, "${getMethodName()}$sharedPreferences, $key")
         super.onSharedPreferenceChanged(sharedPreferences, key)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+        Log.i(__CLASSNAME__, "${getMethodName()}$context, $intent")
         super.onReceive(context, intent)
     }
 }

@@ -60,19 +60,7 @@ class ForegroundOnlyLocationService : foregroundonlylocationservice2() {
     private val localBinder = LocalBinder()
 
     override fun startService() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")
         startService(Intent(applicationContext, ForegroundOnlyLocationService::class.java))
-    }
-
-    override fun onBind(intent: Intent): IBinder {
-        val ret = super.onBind(intent)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $ret, $localBinder")
-        return localBinder
-    }
-
-    override fun onRebind(intent: Intent) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}:$intent")
-        super.onRebind(intent)
     }
 
     /**
@@ -82,6 +70,18 @@ class ForegroundOnlyLocationService : foregroundonlylocationservice2() {
     open inner class LocalBinder : Binder() {
         internal val service: ForegroundOnlyLocationService
             get() = this@ForegroundOnlyLocationService
+    }
+
+    override fun onBind(intent: Intent): IBinder {
+        val ret = super.onBind(intent)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $ret, $localBinder")
+        return localBinder
+    }
+
+    override fun actionForegroundIntent(): Intent {
+        val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
+        intent.putExtra(EXTRA_LOCATION, currentLocation)
+        return intent
     }
 
     companion object {

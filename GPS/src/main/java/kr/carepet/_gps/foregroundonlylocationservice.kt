@@ -20,7 +20,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 6.   description...
+ *  isyuun@care-pet.kr             2023. 9. 7.   description...
  */
 
 package kr.carepet._gps
@@ -73,7 +73,7 @@ open class foregroundonlylocationservice(
      */
     private var configurationChange = false
 
-    internal var serviceRunningInForeground = false
+    protected var serviceRunningInForeground = false
 
     private val localBinder = LocalBinder()
 
@@ -93,11 +93,11 @@ open class foregroundonlylocationservice(
     // Used only for local storage of the last known location. Usually, this would be saved to your
     // database, but because this is a simplified sample without a full database, we only need the
     // last location to create a Notification if the user navigates away from the app.
-    private var currentLocation: Location? = null
+    protected var currentLocation: Location? = null
 
     //https://stackoverflow.com/questions/74264850/localbroadcastmanager-is-now-deprecated-how-to-send-data-from-service-to-activi
     //Define a LiveData to observe in activity
-    val tokenLiveData = MutableLiveData<String>()
+    private val tokenLiveData = MutableLiveData<String>()
 
     override fun onCreate() {
         Log.d(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")        //Log.d(TAG, "onCreate()")
@@ -147,6 +147,12 @@ open class foregroundonlylocationservice(
         }
     }
 
+    protected open fun actionForegroundIntent(): Intent {
+        val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
+        intent.putExtra(EXTRA_LOCATION, currentLocation)
+        return intent
+    }
+
     open fun onLocationResult(locationResult: LocationResult) {
         //Log.w(__CLASSNAME__, "${getMethodName()}${serviceRunningInForeground}, ${locationResult}")
 
@@ -159,17 +165,20 @@ open class foregroundonlylocationservice(
         // production app, the Activity would be listening for changes to a database
         // with new locations, but we are simplifying things a bit to focus on just
         // learning the location side of things.
-        val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
-        intent.putExtra(EXTRA_LOCATION, currentLocation)
+        //val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
+        //intent.putExtra(EXTRA_LOCATION, currentLocation)
+        val intent = actionForegroundIntent()
         LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
 
         //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")
         // Updates notification content if this service is running as a foreground
         // service.
         if (serviceRunningInForeground) {
+            //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $notification")
+            val notification = generateNotification(currentLocation)
             notificationManager.notify(
                 NOTIFICATION_ID,
-                generateNotification(currentLocation)
+                notification
             )
         }
     }
@@ -297,7 +306,7 @@ open class foregroundonlylocationservice(
     /*
      * Generates a BIG_TEXT_STYLE Notification that represent latest location.
      */
-    internal open fun generateNotification(location: Location?): Notification {
+    internal open fun generateNotification(location: Location?): Notification? {
 
         // Main steps for building a BIG_TEXT_STYLE notification:
         //      0. Get data
@@ -366,7 +375,7 @@ open class foregroundonlylocationservice(
                 servicePendingIntent
             )
             .build()
-        //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $ret, $location")
+        //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $location, $ret")
         return ret
     }
 
