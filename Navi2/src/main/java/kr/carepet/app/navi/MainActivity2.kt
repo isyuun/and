@@ -45,7 +45,7 @@ import androidx.compose.ui.Modifier
 import kotlinx.parcelize.Parcelize
 import kr.carepet.app.navi.ui.theme.AndTheme
 import kr.carepet.util.Log
-import kr.carepet.util.__CLASSNAME__
+/**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
 
 /**
@@ -55,8 +55,9 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
 open class MainActivity2 : MainActivity() {
-    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(__CLASSNAME__, "${getMethodName()}$savedInstanceState")

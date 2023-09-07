@@ -29,7 +29,7 @@ import android.app.Notification
 import android.location.Location
 import com.google.android.gms.location.LocationResult
 import kr.carepet.util.Log
-import kr.carepet.util.__CLASSNAME__
+/**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
 
 /**
@@ -40,7 +40,7 @@ import kr.carepet.util.getMethodName
  * @description :
  */
 open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
-    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private var tick: Long = 0L;
     private lateinit var notification: Notification
@@ -59,7 +59,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     override fun onLocationResult(locationResult: LocationResult) {
         //Log.i(__CLASSNAME__, "${getMethodName()}${serviceRunningInForeground}")
-        Log.w(__CLASSNAME__, "locationResult::lastLocation:${locationResult.lastLocation}, locations:${locationResult.locations}")
+        Log.w(__CLASSNAME__, "${getMethodName()}lastLocation:${locationResult.lastLocation}, locations:${locationResult.locations}")
         super.onLocationResult(locationResult)
     }
 }

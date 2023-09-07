@@ -35,7 +35,7 @@ import android.os.Bundle
  * @description :
  */
 open class componentactivity : androidx.activity.ComponentActivity() {
-    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private lateinit var application: application
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -22,12 +22,20 @@
  *  --------------------------     ----------    ----------------------------------------
  *  isyuun@care-pet.kr             2023. 8. 25.   description...
  */
-
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
-//plugins {
-//    alias(libs.plugins.com.android.library)
-//    alias(libs.plugins.kotlin.android)
-//}
+plugins {
+    alias(libs.plugins.com.android.library)
+    alias(libs.plugins.kotlin.android)
+    //id("org.jetbrains.kotlin.jvm") version "1.9.0"
+    ///** IY:플랫폼:샘플스:Define the samples to load */
+    id("com.google.devtools.ksp")
+    //id("org.jetbrains.kotlin.kapt")
+    id("com.google.dagger.hilt.android")
+    //id("dagger.hilt.android.plugin")
+    //id("kotlin-kapt")
+    ///** IY:플랫폼:샘플스:Define the samples to load */
+    //id("com.example.platform")
+}
 
 android {
     namespace = "kr.carepet.gps"
@@ -64,76 +72,63 @@ android {
     }
 }
 
-plugins {
-    alias(libs.plugins.com.android.library)
-    alias(libs.plugins.kotlin.android)
-    ///** IY:플랫폼:샘플스:Define the samples to load */
-    //id("org.jetbrains.kotlin.jvm") version "1.9.0"
-    /** IY:플랫폼:샘플스:Define the samples to load */
-    alias(libs.plugins.hilt)
-    id("dagger.hilt.android.plugin")
-    //id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp")
-    id("org.jetbrains.kotlin.kapt")
-    ///** IY:플랫폼:샘플스:Define the samples to load */
-    //id("com.example.platform")
-}
-kapt {
-    correctErrorTypes = true
-}
 /**
 /** IY:플랫폼:샘플스:Define the samples to load */
 dependencies {
-    id("com.dropbox.affectedmoduledetector") version "0.2.0"
-    id("nl.littlerobots.version-catalog-update") version "0.7.0"
-    id("com.github.ben-manes.versions") version "0.44.0"
+id("com.dropbox.affectedmoduledetector") version "0.2.0"
+id("nl.littlerobots.version-catalog-update") version "0.7.0"
+id("com.github.ben-manes.versions") version "0.44.0"
 }
 versionCatalogUpdate {
-    sortByKey.set(true)
-    keep {
-        keepUnusedVersions.set(true)
-    }
+sortByKey.set(true)
+keep {
+keepUnusedVersions.set(true)
+}
 }
 
 affectedModuleDetector {
-    baseDir = "${project.rootDir}"
-    pathsAffectingAllModules = setOf(
-        "gradle/libs.versions.toml",
-    )
-    excludedModules = setOf<String>()
+baseDir = "${project.rootDir}"
+pathsAffectingAllModules = setOf(
+"gradle/libs.versions.toml",
+)
+excludedModules = setOf<String>()
 
-    logFilename = "output.log"
-    logFolder = "${rootProject.buildDir}/affectedModuleDetector"
+logFilename = "output.log"
+logFolder = "${rootProject.buildDir}/affectedModuleDetector"
 
-    val baseRef = findProperty("affected_base_ref") as? String
-    // If we have a base ref to diff against, extract the branch name and use it
-    if (!baseRef.isNullOrEmpty()) {
-        // Remove the prefix from the head.
-        // TODO: need to support other types of git refs
-        specifiedBranch = baseRef.replace("refs/heads/", "")
-        compareFrom = "SpecifiedBranchCommit"
-    } else {
-        // Otherwise we use the previous commit. This is mostly used for commits to main.
-        compareFrom = "PreviousCommit"
-    }
+val baseRef = findProperty("affected_base_ref") as? String
+// If we have a base ref to diff against, extract the branch name and use it
+if (!baseRef.isNullOrEmpty()) {
+// Remove the prefix from the head.
+// TODO: need to support other types of git refs
+specifiedBranch = baseRef.replace("refs/heads/", "")
+compareFrom = "SpecifiedBranchCommit"
+} else {
+// Otherwise we use the previous commit. This is mostly used for commits to main.
+compareFrom = "PreviousCommit"
+}
 }
 /** IY:플랫폼:샘플스:Define the samples to load */
-*/
+ */
+//kapt {
+//    correctErrorTypes = true
+//}
 dependencies {
     implementation(project(mapOf("path" to ":_APP")))
     implementation(project(mapOf("path" to ":APP")))
-    //implementation(project(mapOf("path" to ":GPL")))
 
+    implementation(platform(libs.compose.bom))
     implementation(libs.play.services.location)
     implementation(libs.kotlin.coroutines.play)
     implementation(libs.androidx.work.runtime.ktx)
 
     /** IY:플랫폼:샘플스:Define the samples to load */
-    implementation(platform(libs.compose.bom))
+    //implementation(libs.hilt.android)
+    //kapt(libs.hilt.compiler)
+    implementation("com.google.dagger:hilt-android:2.48")
+    annotationProcessor("com.google.dagger:hilt-compiler:2.48")
     implementation(libs.casa.base)
     ksp(libs.casa.processor)
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.activity.compose)

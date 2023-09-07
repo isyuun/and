@@ -30,7 +30,7 @@ import android.os.Binder
 import android.os.IBinder
 import kr.carepet._gps.foregroundonlylocationservice2
 import kr.carepet.util.Log
-import kr.carepet.util.__CLASSNAME__
+/**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
 
 /**
@@ -41,12 +41,12 @@ import kr.carepet.util.getMethodName
  * @description :
  */
 class ForegroundOnlyLocationService : foregroundonlylocationservice2() {
-    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private fun launcherIntent(): Intent? {
-        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $packageName, $launchIntent")
-        return launchIntent
+        //val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $packageName, $launchIntent")
+        return packageManager.getLaunchIntentForPackage(packageName)
     }
 
     override fun launchActivityIntent(): Intent? {

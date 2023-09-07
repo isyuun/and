@@ -36,13 +36,14 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import android.location.Location
+import android.os.Build
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kr.carepet.gps.ForegroundOnlyLocationService
 import kr.carepet.gps.R
 import kr.carepet.util.Log
-import kr.carepet.util.__CLASSNAME__
+/**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
 import java.util.Date
 
@@ -97,7 +98,7 @@ private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
  * @description :
  */
 open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSharedPreferenceChangeListener, ServiceConnection {
-    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private var foregroundOnlyLocationServiceBound = false
 
@@ -268,7 +269,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         permissions: Array<String>,
         grantResults: IntArray
     ) {
-        Log.d(__CLASSNAME__, "onRequestPermissionResult")
+        Log.d(__CLASSNAME__, "${getMethodName()}$requestCode, $permissions, $grantResults")
 
         when (requestCode) {
             REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE -> when {
@@ -283,8 +284,8 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
 
                 else -> {
                     // Permission denied.
-                    //updateButtonState(false)
-                    //
+                    updateButtonState(false)
+
                     //Snackbar.make(
                     //    findViewById(R.id.activity_main),
                     //    R.string.permission_denied_explanation,
@@ -310,11 +311,11 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     private fun updateButtonState(trackingLocation: Boolean) {
-        //if (trackingLocation) {
-        //    foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
-        //} else {
-        //    foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
-        //}
+        if (trackingLocation) {
+            //foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
+        } else {
+            //foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
+        }
     }
 
     private fun logResultsToScreen(output: String) {
@@ -329,14 +330,17 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     private inner class ForegroundOnlyBroadcastReceiver : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            val location = intent.getParcelableExtra<Location>(
-                ForegroundOnlyLocationService.EXTRA_LOCATION
-            )
+            val location =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION, Location::class.java)
+                } else {
+                    intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION)
+                }
 
             if (location != null) {
                 Log.wtf(__CLASSNAME__, "${getMethodName()}\t${location}")
                 val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:sss'Z'").format(Date(System.currentTimeMillis()))
-                logResultsToScreen("${tick}: ${location.toText()}")
+                logResultsToScreen("${tick} - $location")
             }
         }
     }

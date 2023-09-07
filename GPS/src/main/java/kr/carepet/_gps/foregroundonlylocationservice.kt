@@ -50,7 +50,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kr.carepet.gps.R
 import kr.carepet.util.Log
-import kr.carepet.util.__CLASSNAME__
+/**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
 import java.util.concurrent.TimeUnit
 
@@ -65,7 +65,7 @@ open class foregroundonlylocationservice(
     private var intervalSeconds: Long = 1L,
     private var minUpdateDistanceMeters: Float = 1f
 ) : Service() {
-    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     /*
      * Checks whether the bound activity has really gone away (foreground service with notification
@@ -191,7 +191,7 @@ open class foregroundonlylocationservice(
     override fun onBind(intent: Intent): IBinder {
         // MainActivity (client) comes into foreground and binds to service, so the service can
         // become a background services.
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)      //stopForeground(true)
         serviceRunningInForeground = false
         configurationChange = false
         Log.d(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $localBinder")
@@ -203,7 +203,7 @@ open class foregroundonlylocationservice(
 
         // MainActivity (client) returns to the foreground and rebinds to service, so the service
         // can become a background services.
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)      //stopForeground(true)
         serviceRunningInForeground = false
         configurationChange = false
         Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")

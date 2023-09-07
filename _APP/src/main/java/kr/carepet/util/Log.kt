@@ -25,12 +25,13 @@
 
 package kr.carepet.util
 
-val __CLASSNAME__ = Exception().stackTrace[0].fileName
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+/** getMethodLine() */
 fun getMethodName(): String {
     val stack = Thread.currentThread().stackTrace[3]
-    val className = stack.fileName
+    val className = stack.className
     val methodName = stack.methodName
-    val path = "${className}::${methodName}"
+    val path = "::${methodName}" //"${className}::${methodName}"
     val file = stack.fileName
     val line = stack.lineNumber
     return "${path}(${file}:${line})"

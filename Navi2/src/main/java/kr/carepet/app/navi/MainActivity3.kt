@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.platform.location.locationupdates.LocationUpdatesScreen
 import kr.carepet.app.navi.ui.theme.AndTheme
 import kr.carepet.util.Log
-import kr.carepet.util.__CLASSNAME__
+/**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
 
 /**
@@ -45,8 +45,9 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
 open class MainActivity3 : MainActivity2() {
-    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -28,7 +28,7 @@ package kr.carepet._gps
 import android.os.Bundle
 import kr.carepet.gps.GPSApplication
 import kr.carepet.util.Log
-import kr.carepet.util.__CLASSNAME__
+/**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
 
 /**
@@ -39,7 +39,7 @@ import kr.carepet.util.getMethodName
  * @description :
  */
 open class gpsappcompatactivity : kr.carepet.app.AppCompatActivity() {
-    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.w(__CLASSNAME__, "${getMethodName()}")

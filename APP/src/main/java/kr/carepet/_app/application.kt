@@ -35,7 +35,7 @@ import android.app.Activity
  * @description :
  */
 open class application : android.app.Application() {
-    //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private var activity: Activity? = null
 
