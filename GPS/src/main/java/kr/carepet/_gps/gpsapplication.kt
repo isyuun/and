@@ -35,17 +35,18 @@ import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.icu.text.SimpleDateFormat
+/**import android.icu.text.SimpleDateFormat*/
 import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kr.carepet.gps.ForegroundOnlyLocationService
+import kr.carepet.gps.ForegroundOnlyLocationService.LocalBinder
 import kr.carepet.gps.R
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
-import java.util.Date
+/**import java.util.Date*/
 
 private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
 
@@ -127,7 +128,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        var binder: ForegroundOnlyLocationService.LocalBinder = service as ForegroundOnlyLocationService.LocalBinder
+        var binder: LocalBinder = service as LocalBinder
         foregroundOnlyLocationService = binder.service
         foregroundOnlyLocationServiceBound = true
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundOnlyLocationServiceBound},${foregroundOnlyLocationService}")
@@ -318,7 +319,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     private fun logResultsToScreen(output: String) {
-        Log.wtf(__CLASSNAME__, output)
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}$output")
         //val outputWithPreviousLogs = "$output\n${outputTextView.text}"
         //outputTextView.text = outputWithPreviousLogs
     }
@@ -343,8 +344,8 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
             }
 
         if (location != null) {
-            val current = resources.configuration.locales[0]
-            val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:sss'Z'", current).format(Date(System.currentTimeMillis()))
+            //val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSZ", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
+            val tick = ""
             logResultsToScreen("${tick} - $location")
         }
     }
