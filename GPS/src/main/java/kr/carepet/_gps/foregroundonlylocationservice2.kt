@@ -28,7 +28,6 @@ package kr.carepet._gps
 /**import kr.carepet.util.__CLASSNAME__*/
 import android.app.Notification
 import android.location.Location
-import com.google.android.gms.location.LocationResult
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -50,13 +49,9 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     override fun generateNotification(location: Location?): Notification? {
-        Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, ${this.notification != null}, $location, ${this.notification}")
+        //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, ${this.notification != null}, $location, ${this.notification}")
         this.notification = super.generateNotification(location)
         return this.notification
     }
 
-    override fun onLocationResult(locationResult: LocationResult) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${serviceRunningInForeground}, currentLocation(lastLocation):$currentLocation, locationResult:$locationResult")
-        super.onLocationResult(locationResult)
-    }
 }

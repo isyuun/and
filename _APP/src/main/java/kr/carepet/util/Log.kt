@@ -30,12 +30,9 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 /** getMethodLine() */
 fun getMethodName(): String {
     val stack = Thread.currentThread().stackTrace[3]
-    val className = stack.className
-    val methodName = stack.methodName
-    val path = "::${methodName}" //"${className}::${methodName}"
-    val file = stack.fileName
-    val line = stack.lineNumber
-    return "${path}(${file}:${line})"
+    //val path = "${stack.className}::${stack.methodName}"
+    val path = "::${stack.methodName}"
+    return "${path}(${stack.fileName}:${stack.lineNumber})"
 }
 
 class Log {

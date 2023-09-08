@@ -106,7 +106,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     private var foregroundOnlyLocationService: ForegroundOnlyLocationService? = null
 
     // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver2.
-    @Deprecated("Use gpsapplication2.foregroundOnlyBroadcastReceiver instead. ", ReplaceWith("gpsapplication2.foregroundOnlyBroadcastReceiver"))
+    //@Deprecated("Use foregroundOnlyBroadcastReceiver instead. ", ReplaceWith("foregroundOnlyBroadcastReceiver"))
     private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver
 
     private lateinit var sharedPreferences: SharedPreferences
@@ -150,7 +150,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     protected open fun init() {
         Log.d(__CLASSNAME__, "${getMethodName()}...")
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
-        Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        Log.w(__CLASSNAME__, "${getMethodName()}${foregroundOnlyBroadcastReceiver}")
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
         Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences")
     }
@@ -182,12 +182,12 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     /**
-     * @see gpsapplication2.registerReceiver
+     * @see registerReceiver
      *
      * IY: deprecate*/
-    @Deprecated("Use gpsapplication2.onResume instead. ", ReplaceWith("gpsapplication2.onResume"))
+    @Deprecated("Use onResume instead. ", ReplaceWith("onResume"))
     private fun onResume() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         //super.onResume()
         //LocalBroadcastManager.getInstance(this).registerReceiver(
         //    foregroundOnlyBroadcastReceiver,
@@ -198,12 +198,12 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     /**
-     * @see gpsapplication2.unregisterReceiver
+     * @see unregisterReceiver
      *
      * IY: deprecate*/
-    @Deprecated("Use gpsapplication2.onPause instead. ", ReplaceWith("gpsapplication2.onPause"))
+    @Deprecated("Use onPause instead. ", ReplaceWith("onPause"))
     private fun onPause() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         //LocalBroadcastManager.getInstance(this).unregisterReceiver(
         //    foregroundOnlyBroadcastReceiver
         //)
@@ -341,7 +341,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
      *
      * @see : kr.carepet.gps.ForegroundOnlyBroadcastReceiver2
      */
-    @Deprecated("Use kr.carepet.gps.ForegroundOnlyBroadcastReceiver2 instead. ", ReplaceWith("kr.carepet.gps.ForegroundOnlyBroadcastReceiver2"))
+    //@Deprecated("Use kr.carepet.gps.ForegroundOnlyBroadcastReceiver2 instead. ", ReplaceWith("kr.carepet.gps.ForegroundOnlyBroadcastReceiver2"))
     private inner class ForegroundOnlyBroadcastReceiver : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {

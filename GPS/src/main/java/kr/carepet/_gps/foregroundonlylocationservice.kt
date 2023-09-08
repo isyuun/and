@@ -154,7 +154,7 @@ open class foregroundonlylocationservice(
     }
 
     open fun onLocationResult(locationResult: LocationResult) {
-        //Log.w(__CLASSNAME__, "${getMethodName()}${serviceRunningInForeground}, ${locationResult}")
+        //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, ${locationResult}")
 
         // Normally, you want to save a new location to a database. We are simplifying
         // things a bit and just saving it as a local variable, as we only need it again
@@ -173,8 +173,8 @@ open class foregroundonlylocationservice(
         //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")
         // Updates notification content if this service is running as a foreground
         // service.
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation, $locationResult")
         if (serviceRunningInForeground) {
-            //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $notification")
             val notification = generateNotification(currentLocation)
             notificationManager.notify(
                 NOTIFICATION_ID,
@@ -303,6 +303,8 @@ open class foregroundonlylocationservice(
         return Intent(this, Activity::class.java)
     }
 
+    lateinit var notificationCompatBuilder: NotificationCompat.Builder
+
     /*
      * Generates a BIG_TEXT_STYLE Notification that represent latest location.
      */
@@ -353,10 +355,8 @@ open class foregroundonlylocationservice(
 
         // 4. Build and issue the notification.
         // Notification Channel Id is ignored for Android pre O (26).
-        val notificationCompatBuilder =
-            NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
-
-        //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, S${location}")      //Log.d(TAG, "generateNotification()")
+        notificationCompatBuilder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
+        Log.w(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, ${this.notificationCompatBuilder}")
         val ret = notificationCompatBuilder
             .setStyle(bigTextStyle)
             .setContentTitle(titleText)

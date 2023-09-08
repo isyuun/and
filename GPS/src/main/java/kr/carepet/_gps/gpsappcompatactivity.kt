@@ -50,7 +50,7 @@ open class gpsappcompatactivity : kr.carepet.app.AppCompatActivity(), IForegroun
 
     override fun onReceive(context: Context, intent: Intent) {
         val location = application.location4Intent(intent)
-        Log.w(__CLASSNAME__, "${getMethodName()}$location, $context, $intent")
+        Log.w(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $context, $intent")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,8 +75,8 @@ open class gpsappcompatactivity : kr.carepet.app.AppCompatActivity(), IForegroun
     override fun onPause() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         super.onPause()
-        application.unregisterReceiver()
-        application.unregisterReceiver2(foregroundOnlyBroadcastReceiver)
+        //application.unregisterReceiver()
+        //application.unregisterReceiver2(foregroundOnlyBroadcastReceiver)
     }
 
     override fun onStop() {
