@@ -90,12 +90,12 @@ open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver 
         )
     }
 
-    internal fun onResume() {
+    internal fun registerReceiver() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         registerReceiver2(foregroundOnlyBroadcastReceiver)
     }
 
-    internal fun onPause() {
+    internal fun unregisterReceiver() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         unregisterReceiver2(foregroundOnlyBroadcastReceiver)
     }

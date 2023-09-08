@@ -41,7 +41,7 @@ import android.content.Intent
  *
  * IY: 앱이 활성화 상태일때 로컬 브로드케스트 메시지 전달확인.
  */
-class ForegroundOnlyBroadcastReceiver2(val iinterface : IForegroundOnlyBroadcastReceiver) : BroadcastReceiver() {
+internal class ForegroundOnlyBroadcastReceiver2(private val iinterface : IForegroundOnlyBroadcastReceiver) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         iinterface.onReceive(context, intent)
     }

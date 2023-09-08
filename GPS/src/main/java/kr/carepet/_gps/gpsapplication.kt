@@ -32,7 +32,6 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -40,7 +39,6 @@ import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kr.carepet.gps.ForegroundOnlyLocationService
 import kr.carepet.gps.ForegroundOnlyLocationService.LocalBinder
 import kr.carepet.gps.R
@@ -130,7 +128,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        var binder: LocalBinder = service as LocalBinder
+        val binder: LocalBinder = service as LocalBinder
         foregroundOnlyLocationService = binder.service
         foregroundOnlyLocationServiceBound = true
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundOnlyLocationServiceBound},${foregroundOnlyLocationService}")
@@ -184,12 +182,12 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     /**
-     * @see gpsapplication2.onResume
+     * @see gpsapplication2.registerReceiver
      *
      * IY: deprecate*/
     @Deprecated("Use gpsapplication2.onResume instead. ", ReplaceWith("gpsapplication2.onResume"))
     private fun onResume() {
-        //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         //super.onResume()
         //LocalBroadcastManager.getInstance(this).registerReceiver(
         //    foregroundOnlyBroadcastReceiver,
@@ -200,12 +198,12 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     /**
-     * @see gpsapplication2.onPause
+     * @see gpsapplication2.unregisterReceiver
      *
      * IY: deprecate*/
     @Deprecated("Use gpsapplication2.onPause instead. ", ReplaceWith("gpsapplication2.onPause"))
     private fun onPause() {
-        //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         //LocalBroadcastManager.getInstance(this).unregisterReceiver(
         //    foregroundOnlyBroadcastReceiver
         //)

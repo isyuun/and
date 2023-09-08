@@ -60,7 +60,7 @@ open class MainActivity3 : MainActivity2() {
 internal fun Content() {
     AndTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            Log.d(__CLASSNAME__, "${getMethodName()}")
+            Log.d(__CLASSNAME__, "${getMethodName()}...")
             LocationUpdatesScreen()
         }
     }

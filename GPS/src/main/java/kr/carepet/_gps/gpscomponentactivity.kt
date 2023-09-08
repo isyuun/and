@@ -49,39 +49,39 @@ open class gpscomponentactivity : kr.carepet.app.ComponentActivity(), IForegroun
     private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver2
 
     override fun onReceive(context: Context, intent: Intent) {
-        val location = GPSApplication.getInstance().location4Intent(intent)
+        val location = application.location4Intent(intent)
         Log.w(__CLASSNAME__, "${getMethodName()}$location, $context, $intent")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.w(__CLASSNAME__, "${getMethodName()}")
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate(savedInstanceState)
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver2(this)
     }
 
     override fun onStart() {
-        Log.w(__CLASSNAME__, "${getMethodName()}")
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onStart()
-        GPSApplication.getInstance().onStart()
+        application.onStart()
     }
 
     override fun onResume() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         super.onResume()
-        GPSApplication.getInstance().onResume()
-        GPSApplication.getInstance().registerReceiver2(foregroundOnlyBroadcastReceiver)
+        application.registerReceiver()
+        application.registerReceiver2(foregroundOnlyBroadcastReceiver)
     }
 
     override fun onPause() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         super.onPause()
-        GPSApplication.getInstance().onPause()
-        GPSApplication.getInstance().unregisterReceiver2(foregroundOnlyBroadcastReceiver)
+        application.unregisterReceiver()
+        application.unregisterReceiver2(foregroundOnlyBroadcastReceiver)
     }
 
     override fun onStop() {
-        Log.w(__CLASSNAME__, "${getMethodName()}")
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onStop()
-        GPSApplication.getInstance().onStop()
+        application.onStop()
     }
 }
