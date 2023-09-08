@@ -20,30 +20,33 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 4.   description...
+ *  isyuun@care-pet.kr             2023. 9. 8.   description...
  */
 
-package kr.carepet.app.navi
+package kr.carepet.gps
 
-import android.os.Bundle
-import kr.carepet.gps.GPSAppCompatActivity
-import kr.carepet.gps.GPSComponentActivity
-import kr.carepet.util.Log
-/**import kr.carepet.util.__CLASSNAME__*/
-import kr.carepet.util.getMethodName
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 
 /**
  * @Project     : carepet-android
- * @FileName    : MainActivity4.kt
- * @Date        : 2023. 09. 04.
+ * @FileName    : ForegroundOnlyBroadcastReceiver.kt
+ * @Date        : 2023. 09. 08.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class MainActivity4 : GPSComponentActivity()/*GPSAppCompatActivity()*/ {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.i(__CLASSNAME__, "${getMethodName()}$savedInstanceState")
-        super.onCreate(savedInstanceState)
+/**
+ * Receiver for location broadcasts from [ForegroundOnlyLocationService].
+ *
+ * IY: 앱이 활성화 상태일때 로컬 브로드케스트 메시지 전달확인.
+ */
+class ForegroundOnlyBroadcastReceiver2(val iinterface : IForegroundOnlyBroadcastReceiver) : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        iinterface.onReceive(context, intent)
     }
+}
+
+interface IForegroundOnlyBroadcastReceiver {
+    fun onReceive(context: Context, intent: Intent)
 }

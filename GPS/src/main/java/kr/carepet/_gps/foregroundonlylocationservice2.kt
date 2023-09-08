@@ -25,12 +25,11 @@
 
 package kr.carepet._gps
 
+/**import kr.carepet.util.__CLASSNAME__*/
 import android.app.Notification
-import android.content.Intent
 import android.location.Location
 import com.google.android.gms.location.LocationResult
 import kr.carepet.util.Log
-/**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
 
 /**

@@ -25,8 +25,12 @@
 
 package kr.carepet._gps
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import kr.carepet.gps.ForegroundOnlyBroadcastReceiver2
 import kr.carepet.gps.GPSApplication
+import kr.carepet.gps.IForegroundOnlyBroadcastReceiver
 import kr.carepet.util.Log
 /**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
@@ -38,35 +42,46 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class gpsappcompatactivity : kr.carepet.app.AppCompatActivity() {
+open class gpsappcompatactivity : kr.carepet.app.AppCompatActivity(), IForegroundOnlyBroadcastReceiver {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    private val application: GPSApplication = GPSApplication.getInstance()
+    private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver2
+
+    override fun onReceive(context: Context, intent: Intent) {
+        val location = GPSApplication.getInstance().location4Intent(intent)
+        Log.w(__CLASSNAME__, "${getMethodName()}$location, $context, $intent")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.w(__CLASSNAME__, "${getMethodName()}")
         super.onCreate(savedInstanceState)
+        foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver2(this)
     }
 
     override fun onStart() {
         Log.w(__CLASSNAME__, "${getMethodName()}")
         super.onStart()
-        GPSApplication.getInstance()?.onStart()
+        GPSApplication.getInstance().onStart()
     }
 
     override fun onResume() {
-        Log.w(__CLASSNAME__, "${getMethodName()}")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         super.onResume()
-        GPSApplication.getInstance()?.onResume()
+        GPSApplication.getInstance().onResume()
+        GPSApplication.getInstance().registerReceiver2(foregroundOnlyBroadcastReceiver)
     }
 
     override fun onPause() {
-        Log.w(__CLASSNAME__, "${getMethodName()}")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         super.onPause()
-        GPSApplication.getInstance()?.onPause()
+        GPSApplication.getInstance().onPause()
+        GPSApplication.getInstance().unregisterReceiver2(foregroundOnlyBroadcastReceiver)
     }
 
     override fun onStop() {
         Log.w(__CLASSNAME__, "${getMethodName()}")
         super.onStop()
-        GPSApplication.getInstance()?.onStop()
+        GPSApplication.getInstance().onStop()
     }
 }

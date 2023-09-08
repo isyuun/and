@@ -26,6 +26,7 @@
 package kr.carepet._gps
 
 /**import kr.carepet.util.__CLASSNAME__*/
+/**import android.icu.text.SimpleDateFormat*/
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.ComponentName
@@ -35,7 +36,6 @@ import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-/**import android.icu.text.SimpleDateFormat*/
 import android.location.Location
 import android.os.Build
 import android.os.IBinder
@@ -46,6 +46,7 @@ import kr.carepet.gps.ForegroundOnlyLocationService.LocalBinder
 import kr.carepet.gps.R
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
+
 /**import java.util.Date*/
 
 private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
@@ -106,7 +107,8 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     // Provides location updates for while-in-use feature.
     private var foregroundOnlyLocationService: ForegroundOnlyLocationService? = null
 
-    // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver.
+    // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver2.
+    @Deprecated("Use gpsapplication2.foregroundOnlyBroadcastReceiver instead. ", ReplaceWith("gpsapplication2.foregroundOnlyBroadcastReceiver"))
     private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver
 
     private lateinit var sharedPreferences: SharedPreferences
@@ -147,8 +149,8 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         init()
     }
 
-    private fun init() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+    protected open fun init() {
+        Log.d(__CLASSNAME__, "${getMethodName()}...")
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
         Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
@@ -170,7 +172,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         foregroundOnlyLocationService?.unsubscribeToLocationUpdates()
     }
 
-    fun onStart() {
+    internal fun onStart() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
         //super.onStart()
         updateButtonState(
@@ -181,26 +183,36 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         bindService(serviceIntent, foregroundOnlyServiceConnection, BIND_AUTO_CREATE)
     }
 
-    fun onResume() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+    /**
+     * @see gpsapplication2.onResume
+     *
+     * IY: deprecate*/
+    @Deprecated("Use gpsapplication2.onResume instead. ", ReplaceWith("gpsapplication2.onResume"))
+    private fun onResume() {
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         //super.onResume()
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            foregroundOnlyBroadcastReceiver,
-            IntentFilter(
-                ForegroundOnlyLocationService.ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST
-            )
-        )
+        //LocalBroadcastManager.getInstance(this).registerReceiver(
+        //    foregroundOnlyBroadcastReceiver,
+        //    IntentFilter(
+        //        ForegroundOnlyLocationService.ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST
+        //    )
+        //)
     }
 
-    fun onPause() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(
-            foregroundOnlyBroadcastReceiver
-        )
+    /**
+     * @see gpsapplication2.onPause
+     *
+     * IY: deprecate*/
+    @Deprecated("Use gpsapplication2.onPause instead. ", ReplaceWith("gpsapplication2.onPause"))
+    private fun onPause() {
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        //LocalBroadcastManager.getInstance(this).unregisterReceiver(
+        //    foregroundOnlyBroadcastReceiver
+        //)
         //super.onPause()
     }
 
-    fun onStop() {
+    internal fun onStop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
         if (foregroundOnlyLocationServiceBound) {
             unbindService(foregroundOnlyServiceConnection)
@@ -318,7 +330,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         }
     }
 
-    private fun logResultsToScreen(output: String) {
+    protected fun logResultsToScreen(output: String) {
         //Log.wtf(__CLASSNAME__, "${getMethodName()}$output")
         //val outputWithPreviousLogs = "$output\n${outputTextView.text}"
         //outputTextView.text = outputWithPreviousLogs
@@ -326,27 +338,28 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
 
     /**
      * Receiver for location broadcasts from [ForegroundOnlyLocationService].
+     *
+     * IY: Deprecated
+     *
+     * @see : kr.carepet.gps.ForegroundOnlyBroadcastReceiver2
      */
+    @Deprecated("Use kr.carepet.gps.ForegroundOnlyBroadcastReceiver2 instead. ", ReplaceWith("kr.carepet.gps.ForegroundOnlyBroadcastReceiver2"))
     private inner class ForegroundOnlyBroadcastReceiver : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            this@gpsapplication.onReceive(context, intent)
-        }
-    }
+            //Log.wtf(__CLASSNAME__, "${getMethodName()}$context, $intent")
+            val location =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION, Location::class.java)
+                } else {
+                    intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION)
+                }
 
-    open fun onReceive(context: Context, intent: Intent) {
-        //Log.wtf(__CLASSNAME__, "${getMethodName()}$context, $intent")
-        val location =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION, Location::class.java)
-            } else {
-                intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION)
+            if (location != null) {
+                //val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSZ", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
+                val tick = ""
+                logResultsToScreen("${tick} - $location")
             }
-
-        if (location != null) {
-            //val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSZ", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
-            val tick = ""
-            logResultsToScreen("${tick} - $location")
         }
     }
 }

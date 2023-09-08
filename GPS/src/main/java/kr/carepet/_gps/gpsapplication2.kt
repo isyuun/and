@@ -25,11 +25,19 @@
 
 package kr.carepet._gps
 
+import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
+import android.location.Location
+import android.os.Build
 import android.os.IBinder
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import kr.carepet.gps.ForegroundOnlyBroadcastReceiver2
+import kr.carepet.gps.ForegroundOnlyLocationService
+import kr.carepet.gps.IForegroundOnlyBroadcastReceiver
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -40,7 +48,7 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class gpsapplication2 : gpsapplication() {
+open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
@@ -67,8 +75,58 @@ open class gpsapplication2 : gpsapplication() {
         super.onSharedPreferenceChanged(sharedPreferences, key)
     }
 
+    internal fun registerReceiver2(receiver: BroadcastReceiver) {
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            receiver,
+            IntentFilter(
+                ForegroundOnlyLocationService.ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST
+            )
+        )
+    }
+
+    internal fun unregisterReceiver2(receiver: BroadcastReceiver) {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(
+            receiver
+        )
+    }
+
+    internal fun onResume() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        registerReceiver2(foregroundOnlyBroadcastReceiver)
+    }
+
+    internal fun onPause() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        unregisterReceiver2(foregroundOnlyBroadcastReceiver)
+    }
+
+    // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver2.
+    private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver2
+
+    override fun init() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+        super.init()
+        foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver2(this)
+        Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+    }
+
+    internal fun location4Intent(intent: Intent): Location? {
+        val location =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION, Location::class.java)
+            } else {
+                intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION)
+            }
+        return location
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
-        Log.i(__CLASSNAME__, "${getMethodName()}$context, $intent")
-        super.onReceive(context, intent)
+        val location = location4Intent(intent)
+        Log.i(__CLASSNAME__, "${getMethodName()}$location, $context, $intent")
+        if (location != null) {
+            //val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSZ", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
+            val tick = ""
+            logResultsToScreen("${tick} - $location")
+        }
     }
 }
