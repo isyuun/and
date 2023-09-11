@@ -28,6 +28,7 @@ package kr.carepet._gps
 /**import kr.carepet.util.__CLASSNAME__*/
 import android.app.Notification
 import android.location.Location
+import com.google.android.gms.location.LocationResult
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -54,4 +55,8 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         return this.notification
     }
 
+    override fun onLocationResult(locationResult: LocationResult) {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $locationResult")
+        super.onLocationResult(locationResult)
+    }
 }

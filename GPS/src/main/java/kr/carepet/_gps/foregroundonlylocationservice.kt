@@ -154,9 +154,8 @@ open class foregroundonlylocationservice(
         return intent
     }
 
-    open fun onLocationResult(locationResult: LocationResult) {
+    protected open fun onLocationResult(locationResult: LocationResult) {
         //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, ${locationResult}")
-
         // Normally, you want to save a new location to a database. We are simplifying
         // things a bit and just saving it as a local variable, as we only need it again
         // if a Notification is created (when the user navigates away from app).
@@ -171,10 +170,9 @@ open class foregroundonlylocationservice(
         val intent = actionForegroundIntent()
         LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
 
-        //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")
         // Updates notification content if this service is running as a foreground
         // service.
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $locationResult")
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $locationResult")
         if (serviceRunningInForeground) {
             val notification = generateNotification(location)
             notificationManager.notify(
