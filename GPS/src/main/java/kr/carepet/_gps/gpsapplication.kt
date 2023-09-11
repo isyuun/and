@@ -170,7 +170,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         foregroundOnlyLocationService?.unsubscribeToLocationUpdates()
     }
 
-    internal fun onStart() {
+    internal open fun onStart() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
         //super.onStart()
         updateButtonState(
@@ -186,7 +186,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
      *
      * IY: deprecate*/
     @Deprecated("Use onResume instead. ", ReplaceWith("onResume"))
-    private fun onResume() {
+    internal open fun onResume() {
         //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         //super.onResume()
         //LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -202,7 +202,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
      *
      * IY: deprecate*/
     @Deprecated("Use onPause instead. ", ReplaceWith("onPause"))
-    private fun onPause() {
+    internal open fun onPause() {
         //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         //LocalBroadcastManager.getInstance(this).unregisterReceiver(
         //    foregroundOnlyBroadcastReceiver
@@ -210,7 +210,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         //super.onPause()
     }
 
-    internal fun onStop() {
+    internal open fun onStop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
         if (foregroundOnlyLocationServiceBound) {
             unbindService(foregroundOnlyServiceConnection)

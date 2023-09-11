@@ -68,15 +68,15 @@ open class gpscomponentactivity : kr.carepet.app.ComponentActivity(), IForegroun
     override fun onResume() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         super.onResume()
-        application.registerReceiver()
+        application.onResume()
         application.registerReceiver2(foregroundOnlyBroadcastReceiver)
     }
 
     override fun onPause() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         super.onPause()
-        //application.unregisterReceiver()
-        //application.unregisterReceiver2(foregroundOnlyBroadcastReceiver)
+        application.onPause()
+        application.unregisterReceiver2(foregroundOnlyBroadcastReceiver)
     }
 
     override fun onStop() {

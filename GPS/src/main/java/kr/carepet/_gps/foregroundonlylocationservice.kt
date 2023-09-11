@@ -25,12 +25,12 @@
 
 package kr.carepet._gps
 
+/**import kr.carepet.util.__CLASSNAME__*/
 import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
 import android.content.res.Configuration
 import android.location.Location
@@ -50,7 +50,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kr.carepet.gps.R
 import kr.carepet.util.Log
-/**import kr.carepet.util.__CLASSNAME__*/
 import kr.carepet.util.getMethodName
 import java.util.concurrent.TimeUnit
 
@@ -64,7 +63,7 @@ import java.util.concurrent.TimeUnit
 open class foregroundonlylocationservice(
     private var intervalSeconds: Long = 1L,
     private var minUpdateDistanceMeters: Float = 1f
-) : Service() {
+) : kr.carepet.app.Service() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     /*

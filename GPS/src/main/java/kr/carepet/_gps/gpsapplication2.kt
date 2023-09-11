@@ -90,14 +90,32 @@ open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver 
         )
     }
 
-    internal fun registerReceiver() {
+    private fun registerReceiver() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         registerReceiver2(foregroundOnlyBroadcastReceiver)
     }
 
-    internal fun unregisterReceiver() {
+    private fun unregisterReceiver() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         unregisterReceiver2(foregroundOnlyBroadcastReceiver)
+    }
+
+    override fun onStart() {
+        Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        super.onStart()
+    }
+
+    override fun onResume() {
+        registerReceiver()
+    }
+
+    override fun onPause() {
+        unregisterReceiver()
+    }
+
+    override fun onStop() {
+        Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        super.onStop()
     }
 
     // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver2.
