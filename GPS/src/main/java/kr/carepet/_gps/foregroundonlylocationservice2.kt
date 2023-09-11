@@ -50,7 +50,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     override fun generateNotification(location: Location?): Notification? {
-        //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, ${this.notification != null}, $location, ${this.notification}")
+        Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, ${this.notification != null}, $location, ${this.notification}")
         this.notification = super.generateNotification(location)
         return this.notification
     }
