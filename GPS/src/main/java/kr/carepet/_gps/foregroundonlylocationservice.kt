@@ -35,7 +35,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.location.Location
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
@@ -53,6 +52,9 @@ import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.util.concurrent.TimeUnit
 
+const val INTERVAL_UPDATE_SECONDS: Long = 1L
+const val INTERVAL_UPDATE_METERS: Float = 1f
+
 /**
  * @Project     : carepet-android
  * @FileName    : foregroundonlylocationservice.kt
@@ -61,8 +63,8 @@ import java.util.concurrent.TimeUnit
  * @description :
  */
 open class foregroundonlylocationservice(
-    private var intervalSeconds: Long = 1L,
-    private var minUpdateDistanceMeters: Float = 1f
+    private var intervalSeconds: Long = INTERVAL_UPDATE_SECONDS,
+    private var minUpdateDistanceMeters: Float = INTERVAL_UPDATE_METERS
 ) : kr.carepet.app.Service() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
@@ -92,7 +94,7 @@ open class foregroundonlylocationservice(
     // Used only for local storage of the last known location. Usually, this would be saved to your
     // database, but because this is a simplified sample without a full database, we only need the
     // last location to create a Notification if the user navigates away from the app.
-    protected var currentLocation: Location? = null
+    protected var location: Location? = null
 
     //https://stackoverflow.com/questions/74264850/localbroadcastmanager-is-now-deprecated-how-to-send-data-from-service-to-activi
     //Define a LiveData to observe in activity
@@ -109,28 +111,28 @@ open class foregroundonlylocationservice(
         // TODO: Step 1.3, Create a LocationRequest.
         /** This method is deprecated. Use LocationRequest.Builder instead. May be removed in a future release */
         //locationRequest = LocationRequest.create().apply {
+        //    // Sets the desired interval for active location updates. This interval is inexact. You
+        //    // may not receive updates at all if no location sources are available, or you may
+        //    // receive them less frequently than requested. You may also receive updates more
+        //    // frequently than requested if other applications are requesting location at a more
+        //    // frequent interval.
+        //    //
+        //    // IMPORTANT NOTE: Apps running on Android 8.0 and higher devices (regardless of
+        //    // targetSdkVersion) may receive updates less frequently than this interval when the app
+        //    // is no longer in the foreground.
+        //    interval = TimeUnit.SECONDS.toMillis(INTERVAL_SECONDS)
+        //
+        //    // Sets the fastest rate for active location updates. This interval is exact, and your
+        //    // application will never receive updates more frequently than this value.
+        //    fastestInterval = TimeUnit.SECONDS.toMillis(INTERVAL_SECONDS / 2L)
+        //
+        //    // Sets the maximum time when batched location updates are delivered. Updates may be
+        //    // delivered sooner than this interval.
+        //    maxWaitTime = TimeUnit.MINUTES.toMillis(2)
+        //
+        //    priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        //}.build()
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, TimeUnit.SECONDS.toMillis(intervalSeconds)).apply {
-            //// Sets the desired interval for active location updates. This interval is inexact. You
-            //// may not receive updates at all if no location sources are available, or you may
-            //// receive them less frequently than requested. You may also receive updates more
-            //// frequently than requested if other applications are requesting location at a more
-            //// frequent interval.
-            ////
-            //// IMPORTANT NOTE: Apps running on Android 8.0 and higher devices (regardless of
-            //// targetSdkVersion) may receive updates less frequently than this interval when the app
-            //// is no longer in the foreground.
-            //interval = TimeUnit.SECONDS.toMillis(INTERVAL_SECONDS)
-            //
-            //// Sets the fastest rate for active location updates. This interval is exact, and your
-            //// application will never receive updates more frequently than this value.
-            //fastestInterval = TimeUnit.SECONDS.toMillis(INTERVAL_SECONDS / 2L)
-            //
-            //// Sets the maximum time when batched location updates are delivered. Updates may be
-            //// delivered sooner than this interval.
-            //maxWaitTime = TimeUnit.MINUTES.toMillis(2)
-            //
-            //priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            /** This method is deprecated. Use LocationRequest.Builder instead. May be removed in a future release */
             setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(intervalSeconds))
             setMinUpdateDistanceMeters(minUpdateDistanceMeters)
             setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
@@ -148,7 +150,7 @@ open class foregroundonlylocationservice(
 
     protected open fun actionForegroundIntent(): Intent {
         val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
-        intent.putExtra(EXTRA_LOCATION, currentLocation)
+        intent.putExtra(EXTRA_LOCATION, location)
         return intent
     }
 
@@ -158,7 +160,7 @@ open class foregroundonlylocationservice(
         // Normally, you want to save a new location to a database. We are simplifying
         // things a bit and just saving it as a local variable, as we only need it again
         // if a Notification is created (when the user navigates away from app).
-        currentLocation = locationResult.lastLocation
+        location = locationResult.lastLocation
 
         // Notify our Activity that a new location was added. Again, if this was a
         // production app, the Activity would be listening for changes to a database
@@ -172,9 +174,9 @@ open class foregroundonlylocationservice(
         //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")
         // Updates notification content if this service is running as a foreground
         // service.
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation, $locationResult")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $locationResult")
         if (serviceRunningInForeground) {
-            val notification = generateNotification(currentLocation)
+            val notification = generateNotification(location)
             notificationManager.notify(
                 NOTIFICATION_ID,
                 notification
@@ -228,7 +230,7 @@ open class foregroundonlylocationservice(
         // we do nothing.
         if (!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this)) {
             //Log.d(TAG, "Start foreground service")
-            val notification = generateNotification(currentLocation)
+            val notification = generateNotification(location)
             Log.wtf(__CLASSNAME__, "${getMethodName()}$notification")
             startForeground(NOTIFICATION_ID, notification)
             serviceRunningInForeground = true
@@ -321,17 +323,26 @@ open class foregroundonlylocationservice(
         val titleText = getString(R.string.app_name)
 
         // 1. Create Notification Channel for O+ and beyond devices (26+).
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-            val notificationChannel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID, titleText, NotificationManager.IMPORTANCE_DEFAULT
-            )
+        val notificationChannel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID, titleText, NotificationManager.IMPORTANCE_DEFAULT
+        )
 
-            // Adds NotificationChannel to system. Attempting to create an
-            // existing notification channel with its original values performs
-            // no operation, so it's safe to perform the below sequence.
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
+        // Adds NotificationChannel to system. Attempting to create an
+        // existing notification channel with its original values performs
+        // no operation, so it's safe to perform the below sequence.
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        //
+        //    val notificationChannel = NotificationChannel(
+        //        NOTIFICATION_CHANNEL_ID, titleText, NotificationManager.IMPORTANCE_DEFAULT
+        //    )
+        //
+        //    // Adds NotificationChannel to system. Attempting to create an
+        //    // existing notification channel with its original values performs
+        //    // no operation, so it's safe to perform the below sequence.
+        //    notificationManager.createNotificationChannel(notificationChannel)
+        //}
+        notificationManager.createNotificationChannel(notificationChannel)
 
         // 2. Build the BIG_TEXT_STYLE.
         val bigTextStyle = NotificationCompat.BigTextStyle()
@@ -355,7 +366,6 @@ open class foregroundonlylocationservice(
         // 4. Build and issue the notification.
         // Notification Channel Id is ignored for Android pre O (26).
         notificationCompatBuilder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
-        Log.w(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, ${this.notificationCompatBuilder}")
         val ret = notificationCompatBuilder
             .setStyle(bigTextStyle)
             .setContentTitle(titleText)
@@ -374,7 +384,7 @@ open class foregroundonlylocationservice(
                 servicePendingIntent
             )
             .build()
-        //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $location, $ret")
+        Log.i(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, ${this.notificationCompatBuilder}")
         return ret
     }
 

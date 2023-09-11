@@ -80,7 +80,7 @@ class ForegroundOnlyLocationService : foregroundonlylocationservice2() {
 
     override fun actionForegroundIntent(): Intent {
         val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
-        intent.putExtra(EXTRA_LOCATION, currentLocation)
+        intent.putExtra(EXTRA_LOCATION, location)
         return intent
     }
 

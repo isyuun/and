@@ -182,10 +182,9 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     /**
-     * @see registerReceiver
+     * @see gpsapplication2.onResume
      *
      * IY: deprecate*/
-    @Deprecated("Use onResume instead. ", ReplaceWith("onResume"))
     internal open fun onResume() {
         //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         //super.onResume()
@@ -198,10 +197,9 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     /**
-     * @see unregisterReceiver
+     * @see gpsapplication2.onPause
      *
      * IY: deprecate*/
-    @Deprecated("Use onPause instead. ", ReplaceWith("onPause"))
     internal open fun onPause() {
         //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         //LocalBroadcastManager.getInstance(this).unregisterReceiver(
@@ -356,7 +354,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
             if (location != null) {
                 //val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSZ", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
                 val tick = ""
-                logResultsToScreen("${tick} - $location")
+                logResultsToScreen("${tick} - ${location.toText()}, $location")
             }
         }
     }

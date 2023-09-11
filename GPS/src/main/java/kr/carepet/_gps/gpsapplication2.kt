@@ -106,10 +106,12 @@ open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver 
     }
 
     override fun onResume() {
+        Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         registerReceiver()
     }
 
     override fun onPause() {
+        Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
         unregisterReceiver()
     }
 
@@ -144,7 +146,7 @@ open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver 
         if (location != null) {
             //val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSZ", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
             val tick = ""
-            logResultsToScreen("${tick} - $location")
+            logResultsToScreen("${tick} - ${location.toText()}, $location")
         }
     }
 }
