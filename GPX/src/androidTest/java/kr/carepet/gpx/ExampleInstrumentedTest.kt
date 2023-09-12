@@ -20,41 +20,30 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 5.   description...
+ *  isyuun@care-pet.kr             2023. 9. 12.   description...
  */
 
-package kr.carepet.gps
+package kr.carepet.gpx
 
-import kr.carepet._gps.gpsapplication2
-import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.ext.junit.runners.AndroidJUnit4
+
+import org.junit.Test
+import org.junit.runner.RunWith
+
+import org.junit.Assert.*
 
 /**
- * @Project     : carepet-android
- * @FileName    : GPSApplication.kt
- * @Date        : 2023. 09. 05.
- * @author      : isyuun@care-pet.kr
- * @description :
+ * Instrumented test, which will execute on an Android device.
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
  */
-open class GPSApplication : gpsapplication2() {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    companion object {
-        private var singleton: GPSApplication? = null
-
-        @JvmStatic
-        fun getInstance(): GPSApplication {
-            return singleton ?: synchronized(this) {
-                singleton ?: GPSApplication().also {
-                    singleton = it
-                }
-            }
-        }
-    }
-
-    override fun onCreate() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
-        super.onCreate()
-        singleton = this
+@RunWith(AndroidJUnit4::class)
+class ExampleInstrumentedTest {
+    @Test
+    fun useAppContext() {
+        // Context of the app under test.
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+        assertEquals("kr.carepet.gpx.test", appContext.packageName)
     }
 }

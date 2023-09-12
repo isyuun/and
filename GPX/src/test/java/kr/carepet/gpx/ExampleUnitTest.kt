@@ -20,41 +20,23 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 5.   description...
+ *  isyuun@care-pet.kr             2023. 9. 12.   description...
  */
 
-package kr.carepet.gps
+package kr.carepet.gpx
 
-import kr.carepet._gps.gpsapplication2
-import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
+import org.junit.Test
+
+import org.junit.Assert.*
 
 /**
- * @Project     : carepet-android
- * @FileName    : GPSApplication.kt
- * @Date        : 2023. 09. 05.
- * @author      : isyuun@care-pet.kr
- * @description :
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
  */
-open class GPSApplication : gpsapplication2() {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    companion object {
-        private var singleton: GPSApplication? = null
-
-        @JvmStatic
-        fun getInstance(): GPSApplication {
-            return singleton ?: synchronized(this) {
-                singleton ?: GPSApplication().also {
-                    singleton = it
-                }
-            }
-        }
-    }
-
-    override fun onCreate() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
-        super.onCreate()
-        singleton = this
+class ExampleUnitTest {
+    @Test
+    fun addition_isCorrect() {
+        assertEquals(4, 2 + 2)
     }
 }

@@ -44,8 +44,6 @@ class ForegroundOnlyLocationService : foregroundonlylocationservice2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private fun launcherIntent(): Intent? {
-        //val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
-        //Log.wtf(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $packageName, $launchIntent")
         return packageManager.getLaunchIntentForPackage(packageName)
     }
 
@@ -80,7 +78,7 @@ class ForegroundOnlyLocationService : foregroundonlylocationservice2() {
 
     override fun actionForegroundIntent(): Intent {
         val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
-        intent.putExtra(EXTRA_LOCATION, location)
+        intent.putExtra(EXTRA_LOCATION, currentLocation)
         return intent
     }
 

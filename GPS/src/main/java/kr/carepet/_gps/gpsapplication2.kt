@@ -40,6 +40,8 @@ import kr.carepet.gps.ForegroundOnlyLocationService
 import kr.carepet.gps.IForegroundOnlyBroadcastReceiver
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
+import java.text.SimpleDateFormat
+import java.util.Date
 
 /**
  * @Project     : carepet-android
@@ -144,8 +146,7 @@ open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver 
         val location = location4Intent(intent)
         Log.i(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $context, $intent")
         if (location != null) {
-            //val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSZ", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
-            val tick = ""
+            val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSZ", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
             logResultsToScreen("${tick} - ${location.toText()}, $location")
         }
     }

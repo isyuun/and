@@ -159,7 +159,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()}, $foregroundOnlyLocationService")
         // TODO: Step 1.0, Review Permissions: Checks and requests if needed.
         if (foregroundPermissionApproved()) {
-            foregroundOnlyLocationService?.subscribeToLocationUpdates() ?: Log.w(__CLASSNAME__, "${getMethodName()}Service Not Bound")
+            foregroundOnlyLocationService?.start() ?: Log.w(__CLASSNAME__, "${getMethodName()}Service Not Bound")
         } else {
             requestForegroundPermissions()
         }
@@ -167,7 +167,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
 
     open fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()},${foregroundOnlyLocationService}")
-        foregroundOnlyLocationService?.unsubscribeToLocationUpdates()
+        foregroundOnlyLocationService?.stop()
     }
 
     internal open fun onStart() {
@@ -288,7 +288,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
 
                 grantResults[0] == PackageManager.PERMISSION_GRANTED ->
                     // Permission was granted.
-                    foregroundOnlyLocationService?.subscribeToLocationUpdates()
+                    foregroundOnlyLocationService?.start()
 
                 else -> {
                     // Permission denied.

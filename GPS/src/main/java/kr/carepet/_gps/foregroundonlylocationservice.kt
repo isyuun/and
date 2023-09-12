@@ -94,7 +94,7 @@ open class foregroundonlylocationservice(
     // Used only for local storage of the last known location. Usually, this would be saved to your
     // database, but because this is a simplified sample without a full database, we only need the
     // last location to create a Notification if the user navigates away from the app.
-    protected var location: Location? = null
+    protected var currentLocation: Location? = null
 
     //https://stackoverflow.com/questions/74264850/localbroadcastmanager-is-now-deprecated-how-to-send-data-from-service-to-activi
     //Define a LiveData to observe in activity
@@ -146,11 +146,12 @@ open class foregroundonlylocationservice(
                 this@foregroundonlylocationservice.onLocationResult(locationResult)
             }
         }
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}$fusedLocationProviderClient")
     }
 
     protected open fun actionForegroundIntent(): Intent {
         val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
-        intent.putExtra(EXTRA_LOCATION, location)
+        intent.putExtra(EXTRA_LOCATION, currentLocation)
         return intent
     }
 
@@ -159,7 +160,7 @@ open class foregroundonlylocationservice(
         // Normally, you want to save a new location to a database. We are simplifying
         // things a bit and just saving it as a local variable, as we only need it again
         // if a Notification is created (when the user navigates away from app).
-        location = locationResult.lastLocation
+        currentLocation = locationResult.lastLocation
 
         // Notify our Activity that a new location was added. Again, if this was a
         // production app, the Activity would be listening for changes to a database
@@ -174,7 +175,7 @@ open class foregroundonlylocationservice(
         // service.
         //Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $locationResult")
         if (serviceRunningInForeground) {
-            val notification = generateNotification(location)
+            val notification = generateNotification(currentLocation)
             notificationManager.notify(
                 NOTIFICATION_ID,
                 notification
@@ -183,14 +184,13 @@ open class foregroundonlylocationservice(
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        //Log.w(__CLASSNAME__, "${getMethodName()}:${intent}")     //Log.d(TAG, "onStartCommand()")
+        Log.w(__CLASSNAME__, "${getMethodName()}$intent, $flags, $startId")     //Log.d(TAG, "onStartCommand()")
 
         val cancelLocationTrackingFromNotification =
             intent.getBooleanExtra(EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, false)
 
         if (cancelLocationTrackingFromNotification) {
-            unsubscribeToLocationUpdates()
-            stopSelf()
+            stop()
         }
         // Tells the system not to recreate the service after it's been killed.
         return START_NOT_STICKY
@@ -228,8 +228,8 @@ open class foregroundonlylocationservice(
         // we do nothing.
         if (!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this)) {
             //Log.d(TAG, "Start foreground service")
-            val notification = generateNotification(location)
-            Log.wtf(__CLASSNAME__, "${getMethodName()}$notification")
+            val notification = generateNotification(currentLocation)
+            Log.w(__CLASSNAME__, "${getMethodName()}$notification")
             startForeground(NOTIFICATION_ID, notification)
             serviceRunningInForeground = true
         }
@@ -247,12 +247,12 @@ open class foregroundonlylocationservice(
         configurationChange = true
     }
 
-    open fun startService() {
+    protected open fun startService() {
         Log.d(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")
         startService(Intent(applicationContext, foregroundonlylocationservice::class.java))
     }
 
-    fun subscribeToLocationUpdates() {
+    private fun subscribeToLocationUpdates() {
         Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")        //Log.d(TAG, "subscribeToLocationUpdates()")
 
         SharedPreferenceUtil.saveLocationTrackingPref(this, true)
@@ -273,7 +273,7 @@ open class foregroundonlylocationservice(
         }
     }
 
-    fun unsubscribeToLocationUpdates() {
+    private fun unsubscribeToLocationUpdates() {
         Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")        //Log.d(TAG, "unsubscribeToLocationUpdates()")
 
         try {
@@ -411,6 +411,17 @@ open class foregroundonlylocationservice(
         private const val NOTIFICATION_ID = 12345678
 
         private const val NOTIFICATION_CHANNEL_ID = "while_in_use_channel_01"
+    }
+
+    internal open fun start() {
+        Log.i(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
+        subscribeToLocationUpdates()
+    }
+
+    internal open fun stop() {
+        Log.i(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
+        unsubscribeToLocationUpdates()
+        stopSelf()
     }
 
 }

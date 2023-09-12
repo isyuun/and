@@ -115,6 +115,7 @@ compareFrom = "PreviousCommit"
 dependencies {
     implementation(project(mapOf("path" to ":_APP")))
     implementation(project(mapOf("path" to ":APP")))
+    implementation(project(mapOf("path" to ":GPX")))
 
     implementation(platform(libs.compose.bom))
     implementation(libs.play.services.location)
@@ -125,6 +126,8 @@ dependencies {
     //implementation(libs.hilt.android)
     //kapt(libs.hilt.compiler)
     implementation("com.google.dagger:hilt-android:2.48")
+    implementation(libs.androidx.preference.ktx)
+    implementation(project(mapOf("path" to ":GPX")))
     annotationProcessor("com.google.dagger:hilt-compiler:2.48")
     implementation(libs.casa.base)
     ksp(libs.casa.processor)

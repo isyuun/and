@@ -20,41 +20,44 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 5.   description...
+ *  isyuun@care-pet.kr             2023. 9. 12.   description...
  */
 
-package kr.carepet.gps
+package kr.carepet.gpx
 
-import kr.carepet._gps.gpsapplication2
-import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
+import android.location.Location
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
+
 
 /**
  * @Project     : carepet-android
- * @FileName    : GPSApplication.kt
- * @Date        : 2023. 09. 05.
+ * @FileName    : GPXWriter.kt
+ * @Date        : 2023. 09. 12.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class GPSApplication : gpsapplication2() {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+class GPXWriter {
 
     companion object {
-        private var singleton: GPSApplication? = null
-
-        @JvmStatic
-        fun getInstance(): GPSApplication {
-            return singleton ?: synchronized(this) {
-                singleton ?: GPSApplication().also {
-                    singleton = it
+        fun saveLocationsToGPX(locations: List<Location>, gpxFile: File?) {
+            try {
+                val writer = FileWriter(gpxFile)
+                writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")
+                writer.write("<gpx version=\"1.1\" xmlns=\"http://www.topografix.com/GPX/1/1\">\n")
+                for (location in locations) {
+                    writer.write(
+                        """<wpt lat="${location.latitude}" lon="${location.longitude}">
+"""
+                    )
+                    writer.write("</wpt>\n")
                 }
+                writer.write("</gpx>\n")
+                writer.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
         }
-    }
-
-    override fun onCreate() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
-        super.onCreate()
-        singleton = this
     }
 }
