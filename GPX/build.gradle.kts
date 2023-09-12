@@ -75,6 +75,8 @@ dependencies {
     implementation("org.greenrobot:eventbus:3.3.1")
     annotationProcessor("org.greenrobot:eventbus-annotation-processor:3.3.1")
 
+    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+
     implementation("org.osmdroid:osmdroid-android:6.1.10")
 
     implementation(libs.androidx.core.ktx)

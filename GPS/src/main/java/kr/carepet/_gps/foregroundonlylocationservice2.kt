@@ -38,6 +38,8 @@ import java.util.Collections
 import java.util.Date
 
 
+const val LATITUDE_ZERO_KO = 127.054136
+const val LONGITUDE_ZERO_KO = 37.275935
 /**
  * @Project     : carepet-android
  * @FileName    : foregroundonlylocationservice2.kt
@@ -50,7 +52,27 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     private val locations = Collections.synchronizedList(ArrayList<Location>()) // The list of Tracks
 
+    /** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-locations-in-metre">Calculate distance between two locations in metre</a> */
+    //https://stackoverflow.com/questions/43080343/calculate-distance-between-two-locations-in-metre
+    private fun distance(loc1: Location?, loc2: Location?): Float {
+        if (loc1 == null || loc2 == null) return 0.0f
+        val lat1: Double = loc1?.latitude ?: LATITUDE_ZERO_KO
+        val lon1: Double = loc1?.longitude ?: LONGITUDE_ZERO_KO
+        val lat2: Double = loc2?.latitude ?: LATITUDE_ZERO_KO
+        val lon2: Double = loc2?.longitude ?: LONGITUDE_ZERO_KO
+        val distance = FloatArray(2)
+        Location.distanceBetween(
+            lat1, lon1,
+            lat2, lon2, distance
+        )
+        return distance[0]
+    }
+
     override fun onLocationResult(locationResult: LocationResult) {
+        val loc1 = currentLocation
+        val loc2 = locationResult.lastLocation
+        val dist = distance(loc1, loc2)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${dist}.M][${loc1.toText()}, ${loc2.toText()}], $loc1, $loc2")
         super.onLocationResult(locationResult)
         locations.add(currentLocation)
     }
@@ -63,48 +85,46 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val fileCacheDir = cacheDir
         val getCacheDir = fileCacheDir.path
         Log.i(__CLASSNAME__, "${getMethodName()}$getCacheDir")
-
         // 데이터베이스(Database)
         val fileDataBase = getDatabasePath("Android")
         val getDatabasePath = fileDataBase.path
         Log.i(__CLASSNAME__, "${getMethodName()}$getDatabasePath")
-
         // 일반 파일
         val fileFile = filesDir
         val getFile = fileFile.path
         Log.i(__CLASSNAME__, "${getMethodName()}$getFile")
-
         // 일반 파일 폴더
         val fileFileName = getFileStreamPath("Android")
         val getFileName = fileFileName.path
         Log.i(__CLASSNAME__, "${getMethodName()}$getFileName")
-
         /* 외부저장소 - 공용 영역 */
         // 최상위 경로
         val getDirectory = Environment.getExternalStorageDirectory().toString() + "/tmp"
         Log.i(__CLASSNAME__, "${getMethodName()}$getDirectory")
-
         // 특정 데이터를 저장
         val fileAlarms = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val getAlarms = fileAlarms.path
         Log.i(__CLASSNAME__, "${getMethodName()}$getAlarms")
-
         /* 외부저장소 - 어플리케이션 고유 영역 */
         // 특정 데이터를 저장
         val fileAlarms2 = getExternalFilesDirs(Environment.DIRECTORY_DOWNLOADS)
         val getAlarms2 = fileAlarms2[0].path
         Log.i(__CLASSNAME__, "${getMethodName()}$getAlarms2")
-
         // 캐시 데이터를 저장
         val getCache2 = externalCacheDir.toString() + "/tmp"
         Log.i(__CLASSNAME__, "${getMethodName()}$getCache2")
     }
 
+    private var tick = ""
+
     override fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}")
         super.start()
+        tick()
     }
-
+    private fun tick() {
+        tick = SimpleDateFormat("yyyyMMdd-HHmmss", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
+    }
     override fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}")
         super.stop()
@@ -112,7 +132,6 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     private fun write() {
-        val tick = SimpleDateFormat("yyyyMMdd-HHmmss", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
         //val path = externalCacheDir
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val file = File("$path/.GPX/$tick.gpx")

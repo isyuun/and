@@ -91,8 +91,8 @@ public class Track {
     public static final int TRACK_TYPE_ND               = NOT_AVAILABLE;
 
     public static final int[] ACTIVITY_DRAWABLE_RESOURCE = {    // The indexes must match the Track Types previously defined:
-            R.drawable.ic_tracktype_place_24dp,                 // STEADY           = 0
-            R.drawable.ic_tracktype_walk_24dp,                  // WALK             = 1
+            //R.drawable.ic_tracktype_place_24dp,                 // STEADY           = 0
+            //R.drawable.ic_tracktype_walk_24dp,                  // WALK             = 1
             //R.drawable.ic_tracktype_mountain_24dp,              // MOUNTAIN         = 2
             //R.drawable.ic_tracktype_run_24dp,                   // RUN              = 3
             //R.drawable.ic_tracktype_bike_24dp,                  // BICYCLE          = 4
@@ -135,8 +135,8 @@ public class Track {
             //R.drawable.ic_tracktype_search_24,                  // RESEARCH         = 41
             //R.drawable.ic_tracktype_sports_soccer_24,           // SOCCER           = 42
             //R.drawable.ic_tracktype_golf_24,                    // GOLF             = 43
-            R.drawable.ic_tracktype_pets_24,                    // PETS             = 44
-            R.drawable.ic_tracktype_map_24                      // MAP              = 45
+            //R.drawable.ic_tracktype_pets_24,                    // PETS             = 44
+            //R.drawable.ic_tracktype_map_24                      // MAP              = 45
     };
 
     public static final String[] ACTIVITY_DESCRIPTION = {       // The indexes must match the Track Types previously defined:
