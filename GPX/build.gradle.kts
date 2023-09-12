@@ -77,8 +77,6 @@ dependencies {
 
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
 
-    implementation("org.osmdroid:osmdroid-android:6.1.10")
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

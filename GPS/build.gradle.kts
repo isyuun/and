@@ -117,6 +117,8 @@ dependencies {
     implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":GPX")))
 
+    implementation("org.osmdroid:osmdroid-android:6.1.10")
+
     implementation(platform(libs.compose.bom))
     implementation(libs.play.services.location)
     implementation(libs.kotlin.coroutines.play)

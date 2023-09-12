@@ -40,6 +40,7 @@ import java.util.Date
 
 const val LATITUDE_ZERO_KO = 127.054136
 const val LONGITUDE_ZERO_KO = 37.275935
+
 /**
  * @Project     : carepet-android
  * @FileName    : foregroundonlylocationservice2.kt
@@ -56,10 +57,10 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     //https://stackoverflow.com/questions/43080343/calculate-distance-between-two-locations-in-metre
     private fun distance(loc1: Location?, loc2: Location?): Float {
         if (loc1 == null || loc2 == null) return 0.0f
-        val lat1: Double = loc1?.latitude ?: LATITUDE_ZERO_KO
-        val lon1: Double = loc1?.longitude ?: LONGITUDE_ZERO_KO
-        val lat2: Double = loc2?.latitude ?: LATITUDE_ZERO_KO
-        val lon2: Double = loc2?.longitude ?: LONGITUDE_ZERO_KO
+        val lat1: Double = loc1.latitude
+        val lon1: Double = loc1.longitude
+        val lat2: Double = loc2.latitude
+        val lon2: Double = loc2.longitude
         val distance = FloatArray(2)
         Location.distanceBetween(
             lat1, lon1,
@@ -72,9 +73,9 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val loc1 = currentLocation
         val loc2 = locationResult.lastLocation
         val dist = distance(loc1, loc2)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${dist}.M][${loc1.toText()}, ${loc2.toText()}], $loc1, $loc2")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${dist > 1.0}][${dist}.m][${loc1.toText()}, ${loc2.toText()}], $loc1, $loc2")
         super.onLocationResult(locationResult)
-        locations.add(currentLocation)
+        if (dist > 1.0) locations.add(currentLocation)
     }
 
     override fun onCreate() {
@@ -122,9 +123,11 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         super.start()
         tick()
     }
+
     private fun tick() {
         tick = SimpleDateFormat("yyyyMMdd-HHmmss", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
     }
+
     override fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}")
         super.stop()
@@ -137,7 +140,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val file = File("$path/.GPX/$tick.gpx")
         file.parentFile.mkdirs()
         Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}, $file")
-        GPXWriter.saveLocationsToGPX(locations, file)
+        GPXWriter.write(locations, file)
         locations.clear()
     }
 }
