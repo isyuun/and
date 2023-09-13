@@ -76,7 +76,10 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val size = locations.size
         val exit = (size > 0 && dist < 2.0f)
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${exit}][$size][${dist}.m][${loc1.toText()}, ${loc2.toText()}], $loc1, $loc2")
-        if (exit) return
+        if (exit) {
+            currentLocation = locationResult.lastLocation
+            return
+        }
         super.onLocationResult(locationResult)
         locations.add(currentLocation)
     }
