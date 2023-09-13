@@ -43,9 +43,8 @@ const val GPX_NAMESPACE = "http://www.topografix.com/GPX/1/1"
 const val GPX_XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
 val GPX_SIMPLE_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.KOREA)
 val GPX_SIMPLE_TICK_FORMAT = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.KOREA)
-val GPX_DECIMAL_3_FORMAT = DecimalFormat("0.000")
-val GPX_DECIMAL_7_FORMAT = DecimalFormat("0.0000000")
-
+val GPX_DECIMAL_FORMAT_3 = DecimalFormat("0.000")
+val GPX_DECIMAL_FORMAT_7 = DecimalFormat("0.0000000")
 open class _GPXWriter {
     companion object {
         @JvmStatic

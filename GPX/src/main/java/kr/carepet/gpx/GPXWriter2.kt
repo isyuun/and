@@ -78,11 +78,11 @@ class GPXWriter2 : _GPXWriter() {
             val trksegStringBuilder = StringBuilder()
 
             for (location in locations) {
-                val lat = GPX_DECIMAL_7_FORMAT.format(location.latitude)
-                val lon = GPX_DECIMAL_7_FORMAT.format(location.longitude)
+                val lat = GPX_DECIMAL_FORMAT_7.format(location.latitude)
+                val lon = GPX_DECIMAL_FORMAT_7.format(location.longitude)
                 val time = GPX_SIMPLE_DATE_FORMAT.format(location.time)
-                val speed = GPX_DECIMAL_3_FORMAT.format(location.speed)
-                val ele = GPX_DECIMAL_3_FORMAT.format(location.altitude)
+                val speed = GPX_DECIMAL_FORMAT_3.format(location.speed)
+                val ele = GPX_DECIMAL_FORMAT_3.format(location.altitude)
                 val trkpt = """ <trkpt lat="${lat}" lon="${lon}"><time>$time</time><speed>$speed</speed><ele>$ele</ele></trkpt>""" + "\n"
                 trksegStringBuilder.append(trkpt)
             }
