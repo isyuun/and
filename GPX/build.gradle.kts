@@ -67,15 +67,15 @@ android {
 }
 
 dependencies {
+    //implementation("com.github.bumptech.glide:glide:4.15.1")    //https://github.com/BasicAirData/GPSLogger
+    //implementation("org.greenrobot:eventbus:3.3.1") //https://github.com/BasicAirData/GPSLogger
+    //annotationProcessor("org.greenrobot:eventbus-annotation-processor:3.3.1")   //https://github.com/BasicAirData/GPSLogger
+
     // JodaTime for Android
     // https://github.com/dlew/joda-time-android
-    implementation("net.danlew:android.joda:2.12.1.1")
-
-    implementation("com.github.bumptech.glide:glide:4.15.1")
-    implementation("org.greenrobot:eventbus:3.3.1")
-    annotationProcessor("org.greenrobot:eventbus-annotation-processor:3.3.1")
-
-    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation("net.danlew:android.joda:2.12.1.1")  //https://github.com/ticofab/android-gpx-parser
+    implementation("io.reactivex.rxjava2:rxjava:2.2.21")    //https://github.com/RideBeeline/android-rx-gpx-writer
+    implementation("org.osmdroid:osmdroid-android:6.1.10")  //https://github.com/osmdroid/osmdroid
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

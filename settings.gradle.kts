@@ -7,7 +7,7 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    //repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
@@ -72,7 +72,6 @@ rootProject.name = "and"
 include(":_APP")
 include(":APP")
 include(":APP2")
-include(":GPL")
 include(":GPS")
 include(":GPX")
 include(":Navi")

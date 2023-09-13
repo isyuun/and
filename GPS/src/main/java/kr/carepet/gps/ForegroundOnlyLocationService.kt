@@ -72,7 +72,7 @@ class ForegroundOnlyLocationService : foregroundonlylocationservice2() {
 
     override fun onBind(intent: Intent): IBinder {
         val ret = super.onBind(intent)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $ret, $localBinder")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground, $ret, $localBinder")
         return localBinder
     }
 

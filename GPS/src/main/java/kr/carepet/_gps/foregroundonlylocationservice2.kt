@@ -29,7 +29,7 @@ package kr.carepet._gps
 import android.location.Location
 import android.os.Environment
 import com.google.android.gms.location.LocationResult
-import kr.carepet.gpx.GPXWriter
+import kr.carepet.gpx.GPXWriter2
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.io.File
@@ -73,9 +73,12 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val loc1 = currentLocation
         val loc2 = locationResult.lastLocation
         val dist = distance(loc1, loc2)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${dist > 1.0}][${dist}.m][${loc1.toText()}, ${loc2.toText()}], $loc1, $loc2")
+        val size = locations.size
+        val exit = (size > 0 && dist < 2.0f)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${exit}][$size][${dist}.m][${loc1.toText()}, ${loc2.toText()}], $loc1, $loc2")
+        if (exit) return
         super.onLocationResult(locationResult)
-        if (dist > 1.0) locations.add(currentLocation)
+        locations.add(currentLocation)
     }
 
     override fun onCreate() {
@@ -118,20 +121,14 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     private var tick = ""
 
+    private fun tick() {
+        tick = SimpleDateFormat("yyyyMMdd.HHmmss", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
+    }
+
     override fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}")
         super.start()
         tick()
-    }
-
-    private fun tick() {
-        tick = SimpleDateFormat("yyyyMMdd-HHmmss", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
-    }
-
-    override fun stop() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}")
-        super.stop()
-        write()
     }
 
     private fun write() {
@@ -140,7 +137,13 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val file = File("$path/.GPX/$tick.gpx")
         file.parentFile.mkdirs()
         Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}, $file")
-        GPXWriter.write(locations, file)
+        GPXWriter2.write(locations, file)
         locations.clear()
+    }
+
+    override fun stop() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}")
+        super.stop()
+        write()
     }
 }

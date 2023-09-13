@@ -101,7 +101,7 @@ open class foregroundonlylocationservice(
     private val tokenLiveData = MutableLiveData<String>()
 
     override fun onCreate() {
-        Log.d(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")        //Log.d(TAG, "onCreate()")
+        Log.d(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")        //Log.d(TAG, "onCreate()")
 
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
@@ -156,7 +156,7 @@ open class foregroundonlylocationservice(
     }
 
     protected open fun onLocationResult(locationResult: LocationResult) {
-        //Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, ${locationResult}")
+        Log.d(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground, $locationResult")
         // Normally, you want to save a new location to a database. We are simplifying
         // things a bit and just saving it as a local variable, as we only need it again
         // if a Notification is created (when the user navigates away from app).
@@ -202,7 +202,7 @@ open class foregroundonlylocationservice(
         stopForeground(STOP_FOREGROUND_REMOVE)      //stopForeground(true)
         serviceRunningInForeground = false
         configurationChange = false
-        Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground, $localBinder")
+        Log.w(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground, $localBinder")
         return localBinder
     }
 
@@ -214,7 +214,7 @@ open class foregroundonlylocationservice(
         stopForeground(STOP_FOREGROUND_REMOVE)      //stopForeground(true)
         serviceRunningInForeground = false
         configurationChange = false
-        Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")
+        Log.w(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")
         super.onRebind(intent)
     }
 
@@ -248,12 +248,12 @@ open class foregroundonlylocationservice(
     }
 
     protected open fun startService() {
-        Log.d(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")
+        Log.d(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")
         startService(Intent(applicationContext, foregroundonlylocationservice::class.java))
     }
 
     private fun subscribeToLocationUpdates() {
-        Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")        //Log.d(TAG, "subscribeToLocationUpdates()")
+        Log.w(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")        //Log.d(TAG, "subscribeToLocationUpdates()")
 
         SharedPreferenceUtil.saveLocationTrackingPref(this, true)
 
@@ -274,7 +274,7 @@ open class foregroundonlylocationservice(
     }
 
     private fun unsubscribeToLocationUpdates() {
-        Log.w(__CLASSNAME__, "${getMethodName()}$serviceRunningInForeground")        //Log.d(TAG, "unsubscribeToLocationUpdates()")
+        Log.w(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")        //Log.d(TAG, "unsubscribeToLocationUpdates()")
 
         try {
             // TODO: Step 1.6, Unsubscribe to location changes.
@@ -307,7 +307,7 @@ open class foregroundonlylocationservice(
     /*
      * Generates a BIG_TEXT_STYLE Notification that represent latest location.
      */
-    internal open fun generateNotification(location: Location?): Notification? {
+    protected open fun generateNotification(location: Location?): Notification? {
 
         // Main steps for building a BIG_TEXT_STYLE notification:
         //      0. Get data
@@ -373,7 +373,8 @@ open class foregroundonlylocationservice(
             .setOngoing(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .addAction(
-                R.drawable.ic_launch, getString(R.string.launch_activity),
+                R.drawable.ic_launch,
+                getString(R.string.launch_activity),
                 activityPendingIntent
             )
             .addAction(
