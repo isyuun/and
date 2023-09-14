@@ -20,43 +20,33 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 5.   description...
+ *  isyuun@care-pet.kr             2023. 9. 14.   description...
  */
 
-package kr.carepet.gps
+package kr.carepet._gps
 
-/**import kr.carepet.util.__CLASSNAME__*/
-import android.content.Intent
-import android.os.Binder
+import android.content.ComponentName
+import android.content.ServiceConnection
 import android.os.IBinder
-import kr.carepet._gps.foregroundonlylocationservice4
+import kr.carepet.gps.GPSApplication
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
 /**
  * @Project     : carepet-android
- * @FileName    : ForegroundOnlyLocationService.kt
- * @Date        : 2023. 09. 05.
+ * @FileName    : foregroundonlylocationservice4.kt
+ * @Date        : 2023. 09. 14.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class ForegroundOnlyLocationService : foregroundonlylocationservice4() {
+open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), ServiceConnection {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    /**
-     * Class used for the client Binder.  Since this service runs in the same process as its
-     * clients, we don't need to deal with IPC.
-     */
-    inner class LocalBinder : Binder() {
-        internal val service: ForegroundOnlyLocationService
-            get() = this@ForegroundOnlyLocationService
+    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
+        //GPSApplication.getInstance().start()    //test
     }
 
-    private val localBinder = LocalBinder()
-
-    override fun onBind(intent: Intent): IBinder {
-        val ret = super.onBind(intent)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground, $ret, $localBinder")
-        return localBinder
+    override fun onServiceDisconnected(name: ComponentName) {
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
     }
 }

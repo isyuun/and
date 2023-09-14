@@ -26,6 +26,7 @@
 package kr.carepet.gps
 
 import kr.carepet._gps.gpsapplication2
+import kr.carepet._gps.gpsapplication3
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -36,7 +37,7 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class GPSApplication : gpsapplication2() {
+open class GPSApplication : gpsapplication3() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     companion object {

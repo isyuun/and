@@ -32,7 +32,6 @@ package kr.carepet.gpx
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-import android.location.Location
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -45,6 +44,10 @@ val GPX_SIMPLE_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale
 val GPX_SIMPLE_TICK_FORMAT = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.KOREA)
 val GPX_DECIMAL_FORMAT_3 = DecimalFormat("0.000")
 val GPX_DECIMAL_FORMAT_7 = DecimalFormat("0.0000000")
+
+const val GPX_LATITUDE_ZERO_KO = 127.054136
+const val GPX_LONGITUDE_ZERO_KO = 37.275935
+
 open class _GPXWriter {
     companion object {
         @JvmStatic
@@ -53,7 +56,7 @@ open class _GPXWriter {
             for (i in 1 until locations.size) {
                 val prevLocation = locations[i - 1]
                 val currentLocation = locations[i]
-                val distance = prevLocation.distanceTo(currentLocation)
+                val distance = prevLocation.location.distanceTo(currentLocation.location)
                 totalDistance += distance
             }
             return String.format("%.2f km", totalDistance / 1000)
@@ -65,8 +68,8 @@ open class _GPXWriter {
                 return "N/A"
             }
 
-            val startTime = locations.first().time
-            val endTime = locations.last().time
+            val startTime = locations.first().location.time
+            val endTime = locations.last().location.time
             val durationInMillis = endTime - startTime
             val seconds = durationInMillis / 1000
             val minutes = seconds / 60
@@ -84,7 +87,7 @@ open class _GPXWriter {
             for (i in 1 until locations.size) {
                 val prevLocation = locations[i - 1]
                 val currentLocation = locations[i]
-                val altitudeGap = Math.abs(currentLocation.altitude - prevLocation.altitude)
+                val altitudeGap = Math.abs(currentLocation.location.altitude - prevLocation.location.altitude)
                 if (altitudeGap > maxAltitudeGap) {
                     maxAltitudeGap = altitudeGap
                 }
@@ -100,8 +103,8 @@ open class _GPXWriter {
 
             var maxSpeed = 0.0f
             for (location in locations) {
-                if (location.speed > maxSpeed) {
-                    maxSpeed = location.speed
+                if (location.location.speed > maxSpeed) {
+                    maxSpeed = location.location.speed
                 }
             }
             return String.format("%.2f m/s", maxSpeed)
@@ -115,7 +118,7 @@ open class _GPXWriter {
 
             var totalSpeed = 0.0f
             for (location in locations) {
-                totalSpeed += location.speed
+                totalSpeed += location.location.speed
             }
             val avgSpeed = totalSpeed / locations.size
             return String.format("%.2f m/s", avgSpeed)

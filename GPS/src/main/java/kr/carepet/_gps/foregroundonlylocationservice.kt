@@ -52,9 +52,6 @@ import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.util.concurrent.TimeUnit
 
-const val INTERVAL_UPDATE_SECONDS: Long = 1L
-const val INTERVAL_UPDATE_METERS: Float = 1f
-
 /**
  * @Project     : carepet-android
  * @FileName    : foregroundonlylocationservice.kt
@@ -65,7 +62,7 @@ const val INTERVAL_UPDATE_METERS: Float = 1f
 open class foregroundonlylocationservice(
     private var intervalSeconds: Long = INTERVAL_UPDATE_SECONDS,
     private var minUpdateDistanceMeters: Float = INTERVAL_UPDATE_METERS
-) : kr.carepet.app.Service() {
+) : _foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     /*
@@ -101,7 +98,7 @@ open class foregroundonlylocationservice(
     private val tokenLiveData = MutableLiveData<String>()
 
     override fun onCreate() {
-        Log.d(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")        //Log.d(TAG, "onCreate()")
+        Log.d(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")        //Log.d(__CLASSNAME__, "onCreate()")
 
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
@@ -184,7 +181,7 @@ open class foregroundonlylocationservice(
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.w(__CLASSNAME__, "${getMethodName()}$intent, $flags, $startId")     //Log.d(TAG, "onStartCommand()")
+        Log.w(__CLASSNAME__, "${getMethodName()}$intent, $flags, $startId")     //Log.d(__CLASSNAME__, "onStartCommand()")
 
         val cancelLocationTrackingFromNotification =
             intent.getBooleanExtra(EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, false)
@@ -207,7 +204,7 @@ open class foregroundonlylocationservice(
     }
 
     override fun onRebind(intent: Intent) {
-        Log.d(TAG, "onRebind()")
+        Log.d(__CLASSNAME__, "onRebind()")
 
         // MainActivity (client) returns to the foreground and rebinds to service, so the service
         // can become a background services.
@@ -219,7 +216,7 @@ open class foregroundonlylocationservice(
     }
 
     override fun onUnbind(intent: Intent): Boolean {
-        //Log.d(TAG, "onUnbind()")
+        //Log.d(__CLASSNAME__, "onUnbind()")
 
         Log.d(__CLASSNAME__, "${getMethodName()}:${(!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this))}")
         // MainActivity (client) leaves foreground, so service needs to become a foreground service
@@ -227,7 +224,7 @@ open class foregroundonlylocationservice(
         // NOTE: If this method is called due to a configuration change in MainActivity,
         // we do nothing.
         if (!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this)) {
-            //Log.d(TAG, "Start foreground service")
+            //Log.d(__CLASSNAME__, "Start foreground service")
             val notification = generateNotification(currentLocation)
             Log.w(__CLASSNAME__, "${getMethodName()}$notification")
             startForeground(NOTIFICATION_ID, notification)
@@ -239,7 +236,7 @@ open class foregroundonlylocationservice(
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "onDestroy()")
+        Log.d(__CLASSNAME__, "onDestroy()")
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -247,13 +244,18 @@ open class foregroundonlylocationservice(
         configurationChange = true
     }
 
+    /**
+     * IY:상속시 실행지점을 최종 상속 클래스로 이동한다.
+     *
+     * @see ForegroundOnlyLocationService.startService
+     */
     protected open fun startService() {
-        Log.d(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")
-        startService(Intent(applicationContext, foregroundonlylocationservice::class.java))
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${applicationContext}, ${this::class.java}")
+        startService(Intent(applicationContext, this::class.java))
     }
 
     private fun subscribeToLocationUpdates() {
-        Log.w(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")        //Log.d(TAG, "subscribeToLocationUpdates()")
+        Log.w(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")        //Log.d(__CLASSNAME__, "subscribeToLocationUpdates()")
 
         SharedPreferenceUtil.saveLocationTrackingPref(this, true)
 
@@ -269,28 +271,28 @@ open class foregroundonlylocationservice(
             )
         } catch (unlikely: SecurityException) {
             SharedPreferenceUtil.saveLocationTrackingPref(this, false)
-            Log.e(TAG, "Lost location permissions. Couldn't remove updates. $unlikely")
+            Log.e(__CLASSNAME__, "Lost location permissions. Couldn't remove updates. $unlikely")
         }
     }
 
     private fun unsubscribeToLocationUpdates() {
-        Log.w(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")        //Log.d(TAG, "unsubscribeToLocationUpdates()")
+        Log.w(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground")        //Log.d(__CLASSNAME__, "unsubscribeToLocationUpdates()")
 
         try {
             // TODO: Step 1.6, Unsubscribe to location changes.
             val removeTask = fusedLocationProviderClient.removeLocationUpdates(locationCallback)
             removeTask.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d(TAG, "Location Callback removed.")
+                    Log.d(__CLASSNAME__, "Location Callback removed.")
                     stopSelf()
                 } else {
-                    Log.d(TAG, "Failed to remove Location Callback.")
+                    Log.d(__CLASSNAME__, "Failed to remove Location Callback.")
                 }
             }
             SharedPreferenceUtil.saveLocationTrackingPref(this, false)
         } catch (unlikely: SecurityException) {
             SharedPreferenceUtil.saveLocationTrackingPref(this, true)
-            Log.e(TAG, "Lost location permissions. Couldn't remove updates. $unlikely")
+            Log.e(__CLASSNAME__, "Lost location permissions. Couldn't remove updates. $unlikely")
         }
     }
 
@@ -391,38 +393,44 @@ open class foregroundonlylocationservice(
      * Class used for the client Binder.  Since this service runs in the same process as its
      * clients, we don't need to deal with IPC.
      */
-    open inner class LocalBinder : Binder() {
+    inner class LocalBinder : Binder() {
         internal val service: foregroundonlylocationservice
             get() = this@foregroundonlylocationservice
     }
 
-    companion object {
-        private const val TAG = "foregroundonlylocationservice"
+    //companion object {
+    //    private const val TAG = "foregroundonlylocationservice"
+    //
+    //    private const val PACKAGE_NAME = "com.example.android.whileinuselocation"
+    //
+    //    internal const val ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST =
+    //        "$PACKAGE_NAME.action.FOREGROUND_ONLY_LOCATION_BROADCAST"
+    //
+    //    internal const val EXTRA_LOCATION = "$PACKAGE_NAME.extra.LOCATION"
+    //
+    //    private const val EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION =
+    //        "$PACKAGE_NAME.extra.CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION"
+    //
+    //    private const val NOTIFICATION_ID = 12345678
+    //
+    //    private const val NOTIFICATION_CHANNEL_ID = "while_in_use_channel_01"
+    //}
 
-        private const val PACKAGE_NAME = "com.example.android.whileinuselocation"
+    protected open fun tick() {}
 
-        internal const val ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST =
-            "$PACKAGE_NAME.action.FOREGROUND_ONLY_LOCATION_BROADCAST"
-
-        internal const val EXTRA_LOCATION = "$PACKAGE_NAME.extra.LOCATION"
-
-        private const val EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION =
-            "$PACKAGE_NAME.extra.CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION"
-
-        private const val NOTIFICATION_ID = 12345678
-
-        private const val NOTIFICATION_CHANNEL_ID = "while_in_use_channel_01"
-    }
-
-    internal open fun start() {
+    internal fun start() {
         Log.i(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         subscribeToLocationUpdates()
+        tick()
     }
 
-    internal open fun stop() {
+    protected open fun write() {}
+
+    internal fun stop() {
         Log.i(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         unsubscribeToLocationUpdates()
         stopSelf()
+        write()
     }
 
 }

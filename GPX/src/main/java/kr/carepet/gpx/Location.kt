@@ -20,33 +20,49 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 8.   description...
+ *  isyuun@care-pet.kr             2023. 9. 14.   description...
  */
 
-package kr.carepet.gps
-
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
+package kr.carepet.gpx
 
 /**
  * @Project     : carepet-android
- * @FileName    : ForegroundOnlyBroadcastReceiver.kt
- * @Date        : 2023. 09. 08.
+ * @FileName    : Location.kt
+ * @Date        : 2023. 09. 14.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-/**
- * Receiver for location broadcasts from [ForegroundOnlyLocationService].
- *
- * IY: 앱이 활성화 상태일때 로컬 브로드케스트 메시지 전달확인.
- */
-internal class ForegroundOnlyBroadcastReceiver2(private val iinterface: IForegroundOnlyBroadcastReceiver) : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        iinterface.onReceive(context, intent)
+data class Location(
+    val location: android.location.Location,
+    val pee: Int = 0,
+    val poo: Int = 0
+) {
+    fun toText(): String {
+        return if (this != null) {
+            "($latitude, $longitude)"
+        } else {
+            "Unknown location"
+        }
     }
-}
 
-interface IForegroundOnlyBroadcastReceiver {
-    fun onReceive(context: Context, intent: Intent)
+    val latitude: Double
+        get() = location.latitude
+
+    val longitude: Double
+        get() = location.longitude
+
+    val time: Long
+        get() = location.time
+
+    val speed: Float
+        get() = location.speed
+
+    val altitude: Double
+        get() = location.altitude
+
+    companion object {
+        fun distanceBetween(lat1: Double, lon1: Double, lat2: Double, lon2: Double, distances: FloatArray) {
+            android.location.Location.distanceBetween(lat1, lon1, lat2, lon2, distances)
+        }
+    }
 }

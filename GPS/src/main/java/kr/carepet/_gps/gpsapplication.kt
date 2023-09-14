@@ -103,7 +103,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     private var foregroundOnlyLocationServiceBound = false
 
     // Provides location updates for while-in-use feature.
-    private var foregroundOnlyLocationService: ForegroundOnlyLocationService? = null
+    protected var foregroundOnlyLocationService: ForegroundOnlyLocationService? = null
 
     // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver2.
     //@Deprecated("Use foregroundOnlyBroadcastReceiver instead. ", ReplaceWith("foregroundOnlyBroadcastReceiver"))
@@ -132,7 +132,6 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         foregroundOnlyLocationService = binder.service
         foregroundOnlyLocationServiceBound = true
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundOnlyLocationServiceBound},${foregroundOnlyLocationService}")
-        start()
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
@@ -346,9 +345,9 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
             //Log.wtf(__CLASSNAME__, "${getMethodName()}$context, $intent")
             val location =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION, Location::class.java)
+                    intent.getParcelableExtra(EXTRA_LOCATION, Location::class.java)
                 } else {
-                    intent.getParcelableExtra(ForegroundOnlyLocationService.EXTRA_LOCATION)
+                    intent.getParcelableExtra(EXTRA_LOCATION)
                 }
 
             if (location != null) {

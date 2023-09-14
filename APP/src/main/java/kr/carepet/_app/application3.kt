@@ -36,14 +36,8 @@ import com.google.android.material.snackbar.Snackbar
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class application3: application2() {
+open class application3 : application2() {
     private lateinit var root: View
-
-    override fun onCreate() {
-        super.onCreate()
-        //root = getActivity()!!.findViewById<View>(android.R.id.content).rootView
-        //root = getActivity()!!.window.decorView.findViewById(android.R.id.content)
-    }
 
     private lateinit var toast: Toast
 

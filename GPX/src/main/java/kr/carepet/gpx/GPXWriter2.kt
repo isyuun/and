@@ -25,7 +25,6 @@
 
 package kr.carepet.gpx
 
-import android.location.Location
 import java.io.File
 import java.util.Date
 
@@ -83,14 +82,14 @@ class GPXWriter2 : _GPXWriter() {
                 val time = GPX_SIMPLE_DATE_FORMAT.format(location.time)
                 val speed = GPX_DECIMAL_FORMAT_3.format(location.speed)
                 val ele = GPX_DECIMAL_FORMAT_3.format(location.altitude)
-                val trkpt = """ <trkpt lat="${lat}" lon="${lon}"><time>$time</time><speed>$speed</speed><ele>$ele</ele></trkpt>""" + "\n"
+                val pee = location.pee
+                val poo = location.poo
+                val trkpt = """ <trkpt lat="${lat}" lon="${lon}"><time>$time</time><speed>$speed</speed><ele>$ele</ele><pee>$pee</pee><poo>$poo</poo></trkpt>""" + "\n"
                 trksegStringBuilder.append(trkpt)
             }
 
             val trkseg = "<trkseg>\n$trksegStringBuilder</trkseg>\n"
-
             val trk = "<trk>\n<name>$firstTime</name>\n$trkseg</trk>\n"
-
             val content = "$header$metadata$trk$footer"
 
             file.writeText(comment + content)

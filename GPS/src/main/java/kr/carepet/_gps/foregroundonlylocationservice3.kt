@@ -20,33 +20,37 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 8.   description...
+ *  isyuun@care-pet.kr             2023. 9. 14.   description...
  */
 
-package kr.carepet.gps
+package kr.carepet._gps
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 
 /**
  * @Project     : carepet-android
- * @FileName    : ForegroundOnlyBroadcastReceiver.kt
- * @Date        : 2023. 09. 08.
+ * @FileName    : foregroundonlylocationservice3.kt
+ * @Date        : 2023. 09. 14.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-/**
- * Receiver for location broadcasts from [ForegroundOnlyLocationService].
- *
- * IY: 앱이 활성화 상태일때 로컬 브로드케스트 메시지 전달확인.
- */
-internal class ForegroundOnlyBroadcastReceiver2(private val iinterface: IForegroundOnlyBroadcastReceiver) : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        iinterface.onReceive(context, intent)
-    }
-}
+open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
 
-interface IForegroundOnlyBroadcastReceiver {
-    fun onReceive(context: Context, intent: Intent)
+    private fun launcherIntent(): Intent? {
+        return packageManager.getLaunchIntentForPackage(packageName)
+    }
+
+    override fun launchActivityIntent(): Intent? {
+        return launcherIntent()
+    }
+
+    override fun cancelIntent(): Intent {
+        return Intent(this, this::class.java)
+    }
+
+    override fun actionForegroundIntent(): Intent {
+        val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
+        intent.putExtra(EXTRA_LOCATION, currentLocation)
+        return intent
+    }
 }

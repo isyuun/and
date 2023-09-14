@@ -36,7 +36,7 @@ import android.os.Message
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class service2: service() {
+open class service2 : service() {
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     fun post(d: Long? = 0, r: Runnable) {
