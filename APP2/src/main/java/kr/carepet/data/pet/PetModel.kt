@@ -1,4 +1,4 @@
-package kr.carepet.model
+package kr.carepet.data.pet
 
 
 import com.google.gson.annotations.SerializedName

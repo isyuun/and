@@ -1,11 +1,11 @@
-package kr.carepet.model
+package kr.carepet.data.user
 
 
 import com.google.gson.annotations.SerializedName
 
-data class RefreshRes(
+data class LoginResModel(
     @SerializedName("data")
-    var data: TokenData,
+    var `data`: Data,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")
@@ -14,7 +14,7 @@ data class RefreshRes(
     var statusCode: Int // 200
 )
 
-data class TokenData(
+data class Data(
     @SerializedName("accessToken")
     var accessToken: String,
     @SerializedName("failReason")
@@ -23,10 +23,15 @@ data class TokenData(
     var message: Any?, // null
     @SerializedName("refreshToken")
     var refreshToken: String,
+    @SerializedName("scope")
+    var scope: String, // profile email
     @SerializedName("status")
-    var status: Boolean // true
+    var status: Boolean, // true
+    @SerializedName("tokenType")
+    var tokenType: String // Bearer
 )
 
-data class RefreshToken(
-    var refreshToken: String
+data class LoginData(
+    var userID: String,
+    var userPW: String
 )

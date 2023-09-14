@@ -9,15 +9,15 @@
  *  *
  */
 
-package kr.carepet.model
+package kr.carepet.data.user
 
-data class MyPetDataModel(
-    var petBrthYmd: String,
-    var petInfoUnqNo: Int,
-    var petNm: String,
-    var petRelCd: String,
-    var petRprsYn: String,
-    var stdgCtpvCd: String,
-    var stdgEmdCd: String,
-    var stdgSggCd: String
+data class UserDataModel(
+    var appKey:String,
+    var appOs:String,
+    var appTypNm:String? = "",
+    var ncknm:String,
+    var snsLogin:String? = "",
+    var userID:String,
+    var userName:String,
+    var userPW:String
 )

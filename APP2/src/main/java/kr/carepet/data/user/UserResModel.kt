@@ -9,11 +9,18 @@
  *  *
  */
 
-package kr.carepet.model
+package kr.carepet.data.user
 
-data class MyPetResModel(
-    val data: Any?,
-    val statusCode: Int,
+data class UserDataResponse(
+    val data: UserData?,
+    val statusCode: Int?,
     val resultMessage: String?,
     val detailMessage: String?
+)
+
+data class UserData(
+    val status: Boolean?,
+    val message: String?,
+    val failReason: String?,
+    val userID: String?
 )

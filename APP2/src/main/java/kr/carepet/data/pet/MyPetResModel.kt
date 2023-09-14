@@ -9,14 +9,11 @@
  *  *
  */
 
-package kr.carepet.model
+package kr.carepet.data.pet
 
-data class UserDataModel(
-    var appKey: String,
-    var appOs: String,
-    var appTypNm: String? = "",
-    var snsLogin: String? = "",
-    var userID: String,
-    var userName: String,
-    var userPW: String
+data class MyPetResModel(
+    val data: Any?,
+    val statusCode: Int,
+    val resultMessage: String?,
+    val detailMessage: String?
 )
