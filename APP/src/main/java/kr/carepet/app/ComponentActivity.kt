@@ -25,8 +25,6 @@
 
 package kr.carepet.app
 
-import kr.carepet._app._componentactivity
-
 /**
  * @Project     : carepet-android
  * @FileName    : ComponentActivity.kt
@@ -34,4 +32,4 @@ import kr.carepet._app._componentactivity
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class ComponentActivity : _componentactivity()
+open class ComponentActivity : kr.carepet._app.componentactivity4()

@@ -25,8 +25,6 @@
 
 package kr.carepet.app
 
-import kr.carepet._app._application
-
 /**
  * @Project     : carepet-android
  * @FileName    : Application.kt
@@ -34,4 +32,4 @@ import kr.carepet._app._application
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class Application : _application()
+open class Application : kr.carepet._app.application4()
