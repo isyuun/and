@@ -1,6 +1,6 @@
 package kr.carepet.data
 
-import com.google.errorprone.annotations.Immutable
+import androidx.compose.runtime.Immutable
 import javax.inject.Inject
 
 @Immutable
@@ -12,7 +12,6 @@ data class SCD(
 
 class SCDLocalData @Inject constructor(){
     val scd = listOf( // 시도코드
-        SCD(cdld = "00", upCdId = "SCD", cdNm = "시/도 선택"),
         SCD(cdld = "36", upCdId = "SCD", cdNm = "세종특별자치시"),
         SCD(cdld = "50", upCdId = "SCD", cdNm = "제주특별자치도"),
         SCD(cdld = "48", upCdId = "SCD", cdNm = "경상남도"),

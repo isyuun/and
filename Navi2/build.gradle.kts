@@ -10,7 +10,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "kr.carepet.app.navi"
+        applicationId = "kr.carepet.app.navi2"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

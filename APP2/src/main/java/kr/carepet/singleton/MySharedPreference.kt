@@ -2,6 +2,7 @@ package kr.carepet.singleton
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import android.util.Log
 import java.time.LocalDate
 
@@ -21,7 +22,7 @@ object MySharedPreference {
     fun getTodayData(): Boolean {
         //today key값의 데이터를 호출, 없으면 false 반환
         val today = LocalDate.now().toString()
-        Log.d("today", today)
+        Log.d("today",today)
         return sharedPreferences.getBoolean(today, false)
     }
 
@@ -30,30 +31,45 @@ object MySharedPreference {
         //today key값을 true로 설정
         val today = LocalDate.now().toString()
         sharedPreferences.edit().putBoolean(today, true).apply()
-        Log.d("today", "성공")
+        Log.d("today","성공")
     }
 
-    fun setFcmToken(fcmToken: String) {
+    fun setFcmToken(fcmToken:String){
         sharedPreferences.edit().putString("FcmToken", fcmToken).apply()
     }
 
-    fun getFcmToken(): String {
-        return sharedPreferences.getString("FcmToken", "").toString()
+    fun getFcmToken():String{
+        return sharedPreferences.getString("FcmToken","").toString()
     }
 
-    fun setAccessToken(accessToken: String) {
-        sharedPreferences.edit().putString("AccessToken", accessToken).apply()
+    fun setAccessToken(accessToken :String){
+        sharedPreferences.edit().putString("AccessToken",accessToken).apply()
     }
 
-    fun getAccessToken(): String {
-        return sharedPreferences.getString("AccessToken", "").toString()
+    fun getAccessToken():String{
+        return sharedPreferences.getString("AccessToken","").toString()
     }
 
-    fun setRefreshToken(refreshToken: String) {
-        sharedPreferences.edit().putString("RefreshToken", refreshToken).apply()
+    fun setRefreshToken(refreshToken:String){
+        sharedPreferences.edit().putString("RefreshToken",refreshToken).apply()
     }
 
-    fun getRefreshToken(): String {
-        return sharedPreferences.getString("RefreshToken", " ").toString()
+    fun getRefreshToken():String{
+        return sharedPreferences.getString("RefreshToken"," ").toString()
+    }
+
+    fun setIsLogin(loggined:Boolean){
+        sharedPreferences.edit().putBoolean("isLogin",loggined).apply()
+    }
+    fun getIsLogin():Boolean{
+        return sharedPreferences.getBoolean("isLogin",false)
+    }
+
+    fun setProfileImage(imageUri:Uri?){
+        sharedPreferences.edit().putString("imageUri",imageUri.toString()).apply()
+    }
+
+    fun getProfileImage():String?{
+        return sharedPreferences.getString("imageUri","")
     }
 }

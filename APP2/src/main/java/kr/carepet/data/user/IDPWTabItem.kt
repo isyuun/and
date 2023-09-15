@@ -2,9 +2,9 @@ package kr.carepet.data.user
 
 //import androidx.compose.runtime.Composable
 //import androidx.navigation.NavHostController
-//import kr.carepet.screens.IdFindScreen
-//import kr.carepet.screens.PwFindScreen
-//import kr.carepet.viewmodel.IPFViewModel
+//import kr.carepet.app.navi.screens.IdFindScreen
+//import kr.carepet.app.navi.screens.PwFindScreen
+//import kr.carepet.app.navi.viewmodel.IPFViewModel
 //
 //data class IDPWTabItem(
 //    val title: String,
