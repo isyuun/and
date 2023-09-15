@@ -154,7 +154,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences")
     }
 
-    open fun start() {
+    internal fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()}, $foregroundOnlyLocationService")
         // TODO: Step 1.0, Review Permissions: Checks and requests if needed.
         if (foregroundPermissionApproved()) {
@@ -164,7 +164,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         }
     }
 
-    open fun stop() {
+    internal fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()},${foregroundOnlyLocationService}")
         foregroundOnlyLocationService?.stop()
     }

@@ -39,11 +39,11 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), ServiceConnection {
+open class foregroundonlylocationservice4 : foregroundonlylocationservice2(), ServiceConnection {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
-        //GPSApplication.getInstance().start()    //test
+        GPSApplication.getInstance().start()    //test
     }
 
     override fun onServiceDisconnected(name: ComponentName) {

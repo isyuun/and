@@ -50,15 +50,4 @@ open class gpsapplication3 : gpsapplication2() {
         super.onServiceDisconnected(name)
         foregroundOnlyLocationService?.onServiceDisconnected(name)
     }
-
-    override fun start() {
-        Log.w(__CLASSNAME__, "${getMethodName()}...")
-        super.start()
-    }
-
-    override fun stop() {
-        Log.w(__CLASSNAME__, "${getMethodName()}...")
-        super.stop()
-    }
-
 }

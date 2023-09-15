@@ -181,11 +181,9 @@ open class foregroundonlylocationservice(
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.w(__CLASSNAME__, "${getMethodName()}$intent, $flags, $startId")     //Log.d(__CLASSNAME__, "onStartCommand()")
-
         val cancelLocationTrackingFromNotification =
             intent.getBooleanExtra(EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, false)
-
+        Log.w(__CLASSNAME__, "${getMethodName()}$cancelLocationTrackingFromNotification, $intent, $flags, $startId")     //Log.d(__CLASSNAME__, "onStartCommand()")
         if (cancelLocationTrackingFromNotification) {
             stop()
         }
@@ -297,7 +295,8 @@ open class foregroundonlylocationservice(
     }
 
     open fun cancelIntent(): Intent {
-        return Intent(this, foregroundonlylocationservice::class.java)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $this, ${this::class.java}")
+        return Intent(this, this::class.java)
     }
 
     open fun launchActivityIntent(): Intent? {
@@ -350,15 +349,15 @@ open class foregroundonlylocationservice(
             .setBigContentTitle(titleText)
 
         // 3. Set up main Intent/Pending Intents for notification.
-        val launchActivityIntent = launchActivityIntent()
-
         val cancelIntent = cancelIntent()
         cancelIntent.putExtra(EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, true)
-
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$cancelIntent, $EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION")
         val servicePendingIntent = PendingIntent.getService(
             this, 0, cancelIntent, PendingIntent.FLAG_IMMUTABLE
         )
 
+        val launchActivityIntent = launchActivityIntent()
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
         val activityPendingIntent = PendingIntent.getActivity(
             this, 0, launchActivityIntent, PendingIntent.FLAG_MUTABLE
         )
