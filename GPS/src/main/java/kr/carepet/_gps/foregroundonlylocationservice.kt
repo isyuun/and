@@ -376,16 +376,16 @@ open class foregroundonlylocationservice(
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .addAction(
                 R.drawable.ic_launch,
-                getString(R.string.launch_activity),
+                getString(R.string.start),    //getString(R.string.launch_activity),
                 activityPendingIntent
             )
             .addAction(
                 R.drawable.ic_cancel,
-                getString(R.string.stop_location_updates_button_text),
+                getString(R.string.stop),  //getString(R.string.stop_location_updates_button_text),
                 servicePendingIntent
             )
             .build()
-        Log.i(__CLASSNAME__, "${getMethodName()}$ret, ${this.notificationCompatBuilder}")
+        //Log.i(__CLASSNAME__, "${getMethodName()}$ret, ${this.notificationCompatBuilder}")
         return ret
     }
 

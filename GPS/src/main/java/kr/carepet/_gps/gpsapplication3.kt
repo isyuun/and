@@ -26,8 +26,9 @@
 package kr.carepet._gps
 
 import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.os.IBinder
-import kr.carepet.gps.GPSApplication
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -40,6 +41,7 @@ import kr.carepet.util.getMethodName
  */
 open class gpsapplication3 : gpsapplication2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
@@ -51,5 +53,19 @@ open class gpsapplication3 : gpsapplication2() {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceDisconnected(name)
         foregroundOnlyLocationService?.onServiceDisconnected(name)
+    }
+
+    fun pee(id: String = "") {
+        foregroundOnlyLocationService?.pee(id)
+    }
+
+    fun poo(id: String = "") {
+        foregroundOnlyLocationService?.poo(id)
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        post {pee()}    //test
+        post {poo()}    //test
     }
 }

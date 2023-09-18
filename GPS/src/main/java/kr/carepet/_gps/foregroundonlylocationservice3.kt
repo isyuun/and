@@ -25,10 +25,10 @@
 
 package kr.carepet._gps
 
+import android.app.Notification
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
-import com.google.android.gms.location.LocationResult
 import kr.carepet.gpx.Location
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -43,10 +43,10 @@ import kr.carepet.util.getMethodName
 open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), ServiceConnection {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    override fun onCreate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}...")
-        super.onCreate()
-    }
+    //override fun onCreate() {
+    //    Log.i(__CLASSNAME__, "${getMethodName()}...")
+    //    super.onCreate()
+    //}
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.i(__CLASSNAME__, "${getMethodName()}...")
@@ -56,17 +56,9 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
         Log.i(__CLASSNAME__, "${getMethodName()}...")
     }
 
-    override fun onLocationResult(locationResult: LocationResult) {
-        super.onLocationResult(locationResult)
-    }
-
-    fun pee(id: String = "") {
-        val location = currentLocation?.let { Location(it, id, 1, 0) }
-        location?.let { add(it) }
-    }
-
-    fun poo(id: String = "") {
-        val location = currentLocation?.let { Location(it, id, 0, 1) }
-        location?.let { add(it) }
+    override fun generateNotification(location: android.location.Location?): Notification? {
+        val ret = super.generateNotification(location)
+        Log.i(__CLASSNAME__, "${getMethodName()}${location.toText()}, ret")
+        return ret
     }
 }

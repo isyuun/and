@@ -112,25 +112,43 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val dist = distance(loc1, loc2)
         val size = locations.size
         val exit = (size > 0 && dist < 2.0f)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${exit}][$size][${dist}.m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit][$size][${dist}.m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
         if (exit) {
             currentLocation = locationResult.lastLocation
+            dump()
             return
         }
         super.onLocationResult(locationResult)
         currentLocation?.let { add(Location(it)) }
-        if (start > 0) write()
+        dump()
     }
 
-    private fun write(clear : Boolean = false) {
-        Log.i(__CLASSNAME__, "${getMethodName()}$clear, ${(locations.size > 0)}")
+    private fun dump() {
+        if (start > 0) write(false)
+    }
+
+    private fun write(clear: Boolean) {
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val time = locations.first().location.time
         val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$clear, ${locations.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
         GPXWriter2.write(locations, file)
         if (clear) locations.clear()
+    }
+
+    fun pee(id: String = "") {
+        Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
+        val location = currentLocation?.let { Location(it, id, 1, 0) }
+        location?.let { add(it) }
+        dump()
+    }
+
+    fun poo(id: String = "") {
+        Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
+        val location = currentLocation?.let { Location(it, id, 0, 1) }
+        location?.let { add(it) }
+        dump()
     }
 
     private var start = 0L
