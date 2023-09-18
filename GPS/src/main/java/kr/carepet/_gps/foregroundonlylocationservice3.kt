@@ -25,11 +25,18 @@
 
 package kr.carepet._gps
 
+import android.Manifest
 import android.app.Notification
 import android.content.ComponentName
+import android.content.ContentResolver
 import android.content.ServiceConnection
+import android.net.Uri
+import android.os.Handler
+import android.os.HandlerThread
 import android.os.IBinder
+import android.os.Looper
 import android.provider.MediaStore
+import androidx.annotation.RequiresPermission
 import kr.carepet.gps.CameraContentObserver
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -60,18 +67,24 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
     }
 
     private lateinit var cameraContentObserver: CameraContentObserver
+    private val handler: Handler = Handler(Looper.getMainLooper())
+
+    @RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
     override fun onCreate() {
         super.onCreate()
-        cameraContentObserver = CameraContentObserver(this)
+
+        cameraContentObserver = CameraContentObserver(this, handler)
+        val contentResolver: ContentResolver = contentResolver
+        val cameraImageUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         contentResolver.registerContentObserver(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            cameraImageUri,
             true,
             cameraContentObserver
         )
     }
 
     override fun onDestroy() {
-        contentResolver.unregisterContentObserver(cameraContentObserver)
         super.onDestroy()
+        contentResolver.unregisterContentObserver(cameraContentObserver)
     }
 }
