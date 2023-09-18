@@ -26,7 +26,6 @@
 package kr.carepet._gps
 
 /**import kr.carepet.util.__CLASSNAME__*/
-import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -245,9 +244,8 @@ open class foregroundonlylocationservice(
     /**
      * IY:상속시 실행지점을 최종 상속 클래스로 이동한다.
      *
-     * @see ForegroundOnlyLocationService.startService
      */
-    protected open fun startService() {
+    private fun startService() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${applicationContext}, ${this::class.java}")
         startService(Intent(applicationContext, this::class.java))
     }

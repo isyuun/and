@@ -25,7 +25,6 @@
 
 package kr.carepet.gps
 
-import kr.carepet._gps.gpsapplication2
 import kr.carepet._gps.gpsapplication3
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName

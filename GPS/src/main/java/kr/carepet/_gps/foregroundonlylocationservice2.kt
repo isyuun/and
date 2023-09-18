@@ -125,12 +125,12 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     override fun write() {
-        Log.i(__CLASSNAME__, "${getMethodName()}${(locations.size > 0) ?: return}")
+        Log.i(__CLASSNAME__, "${getMethodName()}${(locations.size > 0)}")
         //if (locations.size < 1) return
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val tick = GPX_SIMPLE_TICK_FORMAT.format(locations.last().location.time)
         val file = File("$path/.GPX/$tick.gpx")
-        file.parentFile.mkdirs()
+        file.parentFile?.mkdirs()
         Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}, ${this.tick}, $tick, $file")
         GPXWriter2.write(locations, file)
         locations.clear()
