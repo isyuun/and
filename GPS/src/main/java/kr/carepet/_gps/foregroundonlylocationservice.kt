@@ -385,7 +385,7 @@ open class foregroundonlylocationservice(
                 servicePendingIntent
             )
             .build()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $ret, ${this.notificationCompatBuilder}")
+        Log.i(__CLASSNAME__, "${getMethodName()}$ret, ${this.notificationCompatBuilder}")
         return ret
     }
 
