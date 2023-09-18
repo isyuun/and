@@ -102,7 +102,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         return distances[0]
     }
 
-    protected fun add(location:Location) {
+    protected fun add(location: Location) {
         locations.add(location)
     }
 
@@ -119,34 +119,32 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         }
         super.onLocationResult(locationResult)
         currentLocation?.let { add(Location(it)) }
+        if (start > 0) write()
     }
 
-    private var tick = 0L
-
-    private fun tick() {
-        tick = System.currentTimeMillis() /*GPX_SIMPLE_TICK_FORMAT.format(Date(System.currentTimeMillis()))*/
-    }
-
-    private fun write() {
-        Log.i(__CLASSNAME__, "${getMethodName()}${(locations.size > 0)}")
+    private fun write(clear : Boolean = false) {
+        Log.i(__CLASSNAME__, "${getMethodName()}$clear, ${(locations.size > 0)}")
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val time = locations.first().location.time
         val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.tick)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
         GPXWriter2.write(locations, file)
-        locations.clear()
+        if (clear) locations.clear()
     }
+
+    private var start = 0L
 
     override fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         super.start()
-        tick()
+        start = System.currentTimeMillis() /*GPX_SIMPLE_TICK_FORMAT.format(Date(System.currentTimeMillis()))*/
     }
 
     override fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         super.stop()
-        if (locations.size > 0) write()
+        if (locations.size > 0) write(true)
+        start = 0L
     }
 }
