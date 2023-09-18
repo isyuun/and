@@ -123,7 +123,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         dump()
     }
 
-    private fun dump() {
+    protected fun dump() {
         if (start > 0) write(false)
     }
 

@@ -29,9 +29,11 @@ import android.app.Notification
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
-import kr.carepet.gpx.Location
+import android.provider.MediaStore
+import kr.carepet.gps.CameraContentObserver
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
+
 
 /**
  * @Project     : carepet-android
@@ -43,11 +45,6 @@ import kr.carepet.util.getMethodName
 open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), ServiceConnection {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    //override fun onCreate() {
-    //    Log.i(__CLASSNAME__, "${getMethodName()}...")
-    //    super.onCreate()
-    //}
-
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.i(__CLASSNAME__, "${getMethodName()}...")
     }
@@ -58,7 +55,23 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
 
     override fun generateNotification(location: android.location.Location?): Notification? {
         val ret = super.generateNotification(location)
-        Log.i(__CLASSNAME__, "${getMethodName()}${location.toText()}, ret")
+        Log.i(__CLASSNAME__, "${getMethodName()}${location.toText()}, $ret")
         return ret
+    }
+
+    private lateinit var cameraContentObserver: CameraContentObserver
+    override fun onCreate() {
+        super.onCreate()
+        cameraContentObserver = CameraContentObserver(this)
+        contentResolver.registerContentObserver(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            true,
+            cameraContentObserver
+        )
+    }
+
+    override fun onDestroy() {
+        contentResolver.unregisterContentObserver(cameraContentObserver)
+        super.onDestroy()
     }
 }

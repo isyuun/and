@@ -30,6 +30,9 @@
     <uses-permission
         android:name="android.permission.ACCESS_FINE_LOCATION"
         tools:ignore="CoarseFineLocation" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application tools:node="merge">
         <!-- Foreground services in Android 10+ require type. -->
         <!-- TODO: 2.2, Add foreground service type. -->
@@ -38,11 +41,15 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
-        <!--&lt;!&ndash; Foreground services in Android 10+ require type. &ndash;&gt;-->
-        <!--&lt;!&ndash; TODO: 2.2, Add foreground service type. &ndash;&gt;-->
-        <!--<service android:name="com.example.android.whileinuselocation.ForegroundOnlyLocationService"-->
+        <!--<receiver-->
+        <!--    android:name="kr.carepet.gps.CameraEventReciver"-->
         <!--    android:enabled="true"-->
-        <!--    android:exported="false"-->
-        <!--    android:foregroundServiceType="location" />-->
+        <!--    tools:node="merge"-->
+        <!--    android:exported="true">-->
+        <!--    <intent-filter>-->
+        <!--        <action android:name="com.android.camera.NEW_PICTURE" />-->
+        <!--        <data android:mimeType="image/*" />-->
+        <!--    </intent-filter>-->
+        <!--</receiver>-->
     </application>
 </manifest>
