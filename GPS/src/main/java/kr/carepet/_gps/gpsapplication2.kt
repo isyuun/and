@@ -50,11 +50,6 @@ import java.util.Date
 open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        Log.i(__CLASSNAME__, "${getMethodName()}$sharedPreferences, $key")
-        super.onSharedPreferenceChanged(sharedPreferences, key)
-    }
-
     internal fun registerReceiver2(receiver: BroadcastReceiver) {
         LocalBroadcastManager.getInstance(this).registerReceiver(
             receiver,

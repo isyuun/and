@@ -218,7 +218,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$sharedPreferences,$key")
+        Log.i(__CLASSNAME__, "${getMethodName()}$sharedPreferences,$key")
         // Updates button states if new while in use location is added to SharedPreferences.
         if (key == SharedPreferenceUtil.KEY_FOREGROUND_ENABLED) {
             sharedPreferences?.let {
@@ -234,7 +234,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
     // TODO: Step 1.0, Review Permissions: Method checks if permissions approved.
     private fun foregroundPermissionApproved(): Boolean {
         val ret = PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-        Log.i(__CLASSNAME__, "${getMethodName()}$sharedPreferences,$ret")
+        Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences,$ret")
         return ret
     }
 

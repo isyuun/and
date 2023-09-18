@@ -42,12 +42,17 @@ import kr.carepet.util.getMethodName
 open class foregroundonlylocationservice3 : foregroundonlylocationservice(), ServiceConnection {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
+    override fun onCreate() {
+        Log.i(__CLASSNAME__, "${getMethodName()}...")
+        super.onCreate()
+    }
+
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        Log.w(__CLASSNAME__, "${getMethodName()}...")
+        Log.i(__CLASSNAME__, "${getMethodName()}...")
         GPSApplication.getInstance().start()    //test
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        Log.w(__CLASSNAME__, "${getMethodName()}...")
+        Log.i(__CLASSNAME__, "${getMethodName()}...")
     }
 }
