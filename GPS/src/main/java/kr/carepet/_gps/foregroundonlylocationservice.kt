@@ -146,7 +146,7 @@ open class foregroundonlylocationservice(
         //Log.wtf(__CLASSNAME__, "${getMethodName()}$fusedLocationProviderClient")
     }
 
-    protected open fun actionForegroundIntent(): Intent {
+    private fun actionForegroundIntent(): Intent {
         val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
         intent.putExtra(EXTRA_LOCATION, currentLocation)
         return intent
@@ -294,13 +294,16 @@ open class foregroundonlylocationservice(
         }
     }
 
-    open fun cancelIntent(): Intent {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $this, ${this::class.java}")
-        return Intent(this, this::class.java)
+    private fun cancelIntent(): Intent {
+        val intent: Intent = Intent(this, this::class.java)
+        Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
+        return intent
     }
 
-    open fun launchActivityIntent(): Intent? {
-        return Intent(this, Activity::class.java)
+    private fun launchActivityIntent(): Intent? {
+        val intent = packageManager.getLaunchIntentForPackage(packageName)
+        Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
+        return intent
     }
 
     lateinit var notificationCompatBuilder: NotificationCompat.Builder

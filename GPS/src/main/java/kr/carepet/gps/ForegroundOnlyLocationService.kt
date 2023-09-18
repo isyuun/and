@@ -29,7 +29,7 @@ package kr.carepet.gps
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import kr.carepet._gps.foregroundonlylocationservice4
+import kr.carepet._gps.foregroundonlylocationservice3
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -40,7 +40,7 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class ForegroundOnlyLocationService : foregroundonlylocationservice4() {
+class ForegroundOnlyLocationService : foregroundonlylocationservice3() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     /**

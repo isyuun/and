@@ -20,49 +20,119 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 14.   description...
+ *  isyuun@care-pet.kr             2023. 9. 6.   description...
  */
 
 package kr.carepet._gps
 
-import android.content.Intent
+/**import kr.carepet.util.__CLASSNAME__*/
+import android.os.Environment
+import com.google.android.gms.location.LocationResult
+import kr.carepet.gpx.GPXWriter2
+import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
+import kr.carepet.gpx.Location
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
+import java.io.File
+import java.util.Collections
+import java.util.Date
 
 /**
  * @Project     : carepet-android
  * @FileName    : foregroundonlylocationservice2.kt
- * @Date        : 2023. 09. 14.
+ * @Date        : 2023. 09. 05.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class foregroundonlylocationservice2 : foregroundonlylocationservice3() {
+open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private fun launcherIntent(): Intent? {
-        return packageManager.getLaunchIntentForPackage(packageName)
+    override fun onCreate() {
+        super.onCreate()
+        /* 내부저장소 */
+        // 캐시(Cache)
+        val fileCacheDir = cacheDir
+        val getCacheDir = fileCacheDir.path
+        Log.i(__CLASSNAME__, "${getMethodName()}$getCacheDir")
+        // 데이터베이스(Database)
+        val fileDataBase = getDatabasePath("...")
+        val getDatabasePath = fileDataBase.path
+        Log.i(__CLASSNAME__, "${getMethodName()}$getDatabasePath")
+        // 일반 파일
+        val fileFile = filesDir
+        val getFile = fileFile.path
+        Log.i(__CLASSNAME__, "${getMethodName()}$getFile")
+        // 일반 파일 폴더
+        val fileFileName = getFileStreamPath("...")
+        val getFileName = fileFileName.path
+        Log.i(__CLASSNAME__, "${getMethodName()}$getFileName")
+        /* 외부저장소 - 공용 영역 */
+        // 최상위 경로
+        val getDirectory = Environment.getExternalStorageDirectory().toString()
+        Log.i(__CLASSNAME__, "${getMethodName()}$getDirectory")
+        // 특정 데이터를 저장
+        val fileDowns = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val getDowns = fileDowns.path
+        Log.i(__CLASSNAME__, "${getMethodName()}$getDowns")
+        /* 외부저장소 - 어플리케이션 고유 영역 */
+        // 특정 데이터를 저장
+        val fileDowns2 = getExternalFilesDirs(Environment.DIRECTORY_DOWNLOADS)
+        val getDowns2 = fileDowns2[0].path
+        Log.i(__CLASSNAME__, "${getMethodName()}$getDowns2")
+        // 캐시 데이터를 저장
+        val getCache2 = externalCacheDir.toString()
+        Log.i(__CLASSNAME__, "${getMethodName()}$getCache2")
     }
 
-    override fun launchActivityIntent(): Intent? {
-        val intent = launcherIntent()
-        Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
-        return intent
+    private val locations = Collections.synchronizedList(ArrayList<Location>()) // The list of Tracks
+
+    /** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-locations-in-metre">Calculate distance between two locations in metre</a> */
+    //https://stackoverflow.com/questions/43080343/calculate-distance-between-two-locations-in-metre
+    private fun distance(loc1: Location?, loc2: Location?): Float {
+        if (loc1 == null || loc2 == null) return 0.0f
+        val lat1: Double = loc1.latitude
+        val lon1: Double = loc1.longitude
+        val lat2: Double = loc2.latitude
+        val lon2: Double = loc2.longitude
+        val distances = FloatArray(2)
+        Location.distanceBetween(
+            lat1, lon1,
+            lat2, lon2,
+            distances
+        )
+        return distances[0]
     }
 
-    override fun cancelIntent(): Intent {
-        val intent: Intent = Intent(this, this::class.java)
-        Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
-        return intent
+    override fun onLocationResult(locationResult: LocationResult) {
+        val loc1 = currentLocation?.let { Location(it) }
+        val loc2 = locationResult.lastLocation?.let { Location(it) }
+        val dist = distance(loc1, loc2)
+        val size = locations.size
+        val exit = (size > 0 && dist < 2.0f)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${exit}][$size][${dist}.m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
+        if (exit) {
+            currentLocation = locationResult.lastLocation
+            return
+        }
+        super.onLocationResult(locationResult)
+        locations.add(currentLocation?.let { Location(it) })
     }
 
-    override fun actionForegroundIntent(): Intent {
-        val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
-        intent.putExtra(EXTRA_LOCATION, currentLocation)
-        return intent
+    private var tick = ""
+
+    override fun tick() {
+        tick = GPX_SIMPLE_TICK_FORMAT.format(Date(System.currentTimeMillis()))
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $flags, $startId")     //Log.d(__CLASSNAME__, "onStartCommand()")
-        return super.onStartCommand(intent, flags, startId)
+    override fun write() {
+        Log.i(__CLASSNAME__, "${getMethodName()}${(locations.size > 0) ?: return}")
+        //if (locations.size < 1) return
+        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val tick = GPX_SIMPLE_TICK_FORMAT.format(locations.last().location.time)
+        val file = File("$path/.GPX/$tick.gpx")
+        file.parentFile.mkdirs()
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}, ${this.tick}, $tick, $file")
+        GPXWriter2.write(locations, file)
+        locations.clear()
     }
 }
