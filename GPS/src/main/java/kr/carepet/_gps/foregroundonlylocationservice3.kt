@@ -28,7 +28,8 @@ package kr.carepet._gps
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
-import kr.carepet.gps.GPSApplication
+import com.google.android.gms.location.LocationResult
+import kr.carepet.gpx.Location
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -39,7 +40,7 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class foregroundonlylocationservice3 : foregroundonlylocationservice(), ServiceConnection {
+open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), ServiceConnection {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onCreate() {
@@ -49,10 +50,23 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice(), Ser
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.i(__CLASSNAME__, "${getMethodName()}...")
-        GPSApplication.getInstance().start()    //test
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
         Log.i(__CLASSNAME__, "${getMethodName()}...")
+    }
+
+    override fun onLocationResult(locationResult: LocationResult) {
+        super.onLocationResult(locationResult)
+    }
+
+    fun pee(id: String = "") {
+        val location = currentLocation?.let { Location(it, id, 1, 0) }
+        location?.let { add(it) }
+    }
+
+    fun poo(id: String = "") {
+        val location = currentLocation?.let { Location(it, id, 0, 1) }
+        location?.let { add(it) }
     }
 }

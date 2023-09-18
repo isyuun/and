@@ -102,6 +102,10 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         return distances[0]
     }
 
+    protected fun add(location:Location) {
+        locations.add(location)
+    }
+
     override fun onLocationResult(locationResult: LocationResult) {
         val loc1 = currentLocation?.let { Location(it) }
         val loc2 = locationResult.lastLocation?.let { Location(it) }
@@ -114,7 +118,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
             return
         }
         super.onLocationResult(locationResult)
-        locations.add(currentLocation?.let { Location(it) })
+        currentLocation?.let { add(Location(it)) }
     }
 
     private var tick = 0L

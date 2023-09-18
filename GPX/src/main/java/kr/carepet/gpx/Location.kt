@@ -25,6 +25,8 @@
 
 package kr.carepet.gpx
 
+import android.location.Location
+
 /**
  * @Project     : carepet-android
  * @FileName    : Location.kt
@@ -33,7 +35,8 @@ package kr.carepet.gpx
  * @description :
  */
 data class Location(
-    val location: android.location.Location,
+    val location: Location,
+    val id: String = "",
     val pee: Int = 0,
     val poo: Int = 0
 ) {

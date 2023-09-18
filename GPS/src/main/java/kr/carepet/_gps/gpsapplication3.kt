@@ -27,6 +27,7 @@ package kr.carepet._gps
 
 import android.content.ComponentName
 import android.os.IBinder
+import kr.carepet.gps.GPSApplication
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -43,6 +44,7 @@ open class gpsapplication3 : gpsapplication2() {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
         foregroundOnlyLocationService?.onServiceConnected(name, service)
+        start()    //test
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
