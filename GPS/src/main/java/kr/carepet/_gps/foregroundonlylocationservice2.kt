@@ -35,7 +35,6 @@ import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.io.File
 import java.util.Collections
-import java.util.Date
 
 /**
  * @Project     : carepet-android
@@ -118,21 +117,32 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         locations.add(currentLocation?.let { Location(it) })
     }
 
-    private var tick = ""
+    private var tick = 0L
 
-    override fun tick() {
-        tick = GPX_SIMPLE_TICK_FORMAT.format(Date(System.currentTimeMillis()))
+    private fun tick() {
+        tick = System.currentTimeMillis() /*GPX_SIMPLE_TICK_FORMAT.format(Date(System.currentTimeMillis()))*/
     }
 
-    override fun write() {
+    private fun write() {
         Log.i(__CLASSNAME__, "${getMethodName()}${(locations.size > 0)}")
-        //if (locations.size < 1) return
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val tick = GPX_SIMPLE_TICK_FORMAT.format(locations.last().location.time)
-        val file = File("$path/.GPX/$tick.gpx")
+        val time = locations.first().location.time
+        val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}, ${this.tick}, $tick, $file")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${locations.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.tick)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
         GPXWriter2.write(locations, file)
         locations.clear()
+    }
+
+    override fun start() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
+        super.start()
+        tick()
+    }
+
+    override fun stop() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
+        super.stop()
+        if (locations.size > 0) write()
     }
 }

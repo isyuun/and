@@ -154,7 +154,7 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences")
     }
 
-    internal fun start() {
+    protected fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()}, $foregroundOnlyLocationService")
         // TODO: Step 1.0, Review Permissions: Checks and requests if needed.
         if (foregroundPermissionApproved()) {
@@ -164,12 +164,12 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
         }
     }
 
-    internal fun stop() {
+    protected fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()},${foregroundOnlyLocationService}")
         foregroundOnlyLocationService?.stop()
     }
 
-    internal open fun onStart() {
+    internal fun onStart() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
         //super.onStart()
         updateButtonState(
@@ -184,30 +184,15 @@ open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSh
      * @see gpsapplication2.onResume
      *
      * IY: deprecate*/
-    internal open fun onResume() {
-        //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
-        //super.onResume()
-        //LocalBroadcastManager.getInstance(this).registerReceiver(
-        //    foregroundOnlyBroadcastReceiver,
-        //    IntentFilter(
-        //        ForegroundOnlyLocationService.ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST
-        //    )
-        //)
-    }
+    internal open fun onResume() {}
 
     /**
      * @see gpsapplication2.onPause
      *
      * IY: deprecate*/
-    internal open fun onPause() {
-        //Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
-        //LocalBroadcastManager.getInstance(this).unregisterReceiver(
-        //    foregroundOnlyBroadcastReceiver
-        //)
-        //super.onPause()
-    }
+    internal open fun onPause() {}
 
-    internal open fun onStop() {
+    internal fun onStop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
         if (foregroundOnlyLocationServiceBound) {
             unbindService(foregroundOnlyServiceConnection)

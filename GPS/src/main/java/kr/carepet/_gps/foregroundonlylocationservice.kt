@@ -152,7 +152,7 @@ open class foregroundonlylocationservice(
     }
 
     protected open fun onLocationResult(locationResult: LocationResult) {
-        Log.d(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground, $locationResult")
+        //Log.d(__CLASSNAME__, "${getMethodName()}serviceRunningInForeground:$serviceRunningInForeground, $locationResult")
         // Normally, you want to save a new location to a database. We are simplifying
         // things a bit and just saving it as a local variable, as we only need it again
         // if a Notification is created (when the user navigates away from app).
@@ -294,17 +294,17 @@ open class foregroundonlylocationservice(
 
     private fun cancelIntent(): Intent {
         val intent: Intent = Intent(this, this::class.java)
-        Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
+        //Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
         return intent
     }
 
     private fun launchActivityIntent(): Intent? {
         val intent = packageManager.getLaunchIntentForPackage(packageName)
-        Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
+        //Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
         return intent
     }
 
-    lateinit var notificationCompatBuilder: NotificationCompat.Builder
+    protected lateinit var notificationCompatBuilder: NotificationCompat.Builder
 
     /*
      * Generates a BIG_TEXT_STYLE Notification that represent latest location.
@@ -352,13 +352,13 @@ open class foregroundonlylocationservice(
         // 3. Set up main Intent/Pending Intents for notification.
         val cancelIntent = cancelIntent()
         cancelIntent.putExtra(EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, true)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$cancelIntent, $EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION")
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}$cancelIntent, $EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION")
         val servicePendingIntent = PendingIntent.getService(
             this, 0, cancelIntent, PendingIntent.FLAG_IMMUTABLE
         )
 
         val launchActivityIntent = launchActivityIntent()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
         val activityPendingIntent = PendingIntent.getActivity(
             this, 0, launchActivityIntent, PendingIntent.FLAG_MUTABLE
         )
@@ -416,21 +416,15 @@ open class foregroundonlylocationservice(
     //    private const val NOTIFICATION_CHANNEL_ID = "while_in_use_channel_01"
     //}
 
-    protected open fun tick() {}
-
-    internal fun start() {
-        Log.i(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
+    internal open fun start() {
+        //Log.i(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         subscribeToLocationUpdates()
-        tick()
     }
 
-    protected open fun write() {}
-
-    internal fun stop() {
-        Log.i(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
+    internal open fun stop() {
+        //Log.i(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         unsubscribeToLocationUpdates()
         stopSelf()
-        write()
     }
 
 }
