@@ -122,10 +122,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val size = tracks.size
         val max = GPX_METERS_TO_UPDATE
         val exit = (size > 0 && dist < max)
-        Log.wtf(
-            __CLASSNAME__,
-            "${getMethodName()}[exit:$exit][$size][${max}m][${dist}m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2"
-        )
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit][$size][${max}m][${dist}m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
         currentLocation = locationResult.lastLocation
         if (exit) return
         super.onLocationResult(locationResult)
@@ -155,12 +152,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val time = (tracks.first()?.loc)?.time
         val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
-        Log.w(
-            __CLASSNAME__,
-            "${getMethodName()}$clear, ${tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${
-                GPX_SIMPLE_TICK_FORMAT.format(time)
-            }, $file"
-        )
+        Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
         GPXWriter2.write(tracks, file)
         if (clear) tracks.clear()
     }
