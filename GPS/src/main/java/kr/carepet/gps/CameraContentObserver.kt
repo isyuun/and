@@ -25,15 +25,10 @@
 
 package kr.carepet.gps
 
-import android.content.Context
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
-import android.provider.MediaStore
-import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
-import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
-import java.io.File
+import kr.carepet._gps.foregroundonlylocationservice3
 
 /**
  * @Project     : carepet-android
@@ -42,44 +37,9 @@ import java.io.File
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class CameraContentObserver(private val context: Context, handler: Handler) : ContentObserver(handler) {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+class CameraContentObserver(private val context: foregroundonlylocationservice3, handler: Handler) : ContentObserver(handler) {
     override fun onChange(selfChange: Boolean, uri: Uri?) {
         super.onChange(selfChange, uri)
-        //Log.d(__CLASSNAME__, "${getMethodName()}: $uri")
-        if (uri != null) {
-            val path = path(uri)
-            val time = time(uri)
-            if (path == null || time == null) return
-            val file = File(path)
-            val name = file.name
-            Log.i(__CLASSNAME__, "${getMethodName()}[${name?.let { it }}][exist:${file?.let { file.exists() }}]: path:${path?.let { it }}, time:${time?.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}")
-        }
-    }
-
-    private fun path(uri: Uri): String? {
-        var path: String? = null
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = context.contentResolver.query(uri, projection, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndex(projection[0])
-                path = it.getString(columnIndex)
-            }
-        }
-        return path
-    }
-
-    private fun time(uri: Uri): Long? {
-        var time: Long? = null
-        val projection = arrayOf(MediaStore.Images.Media.DATE_ADDED)
-        val cursor = context.contentResolver.query(uri, projection, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndex(projection[0])
-                time = it.getLong(columnIndex)
-            }
-        }
-        return time
+        context.onChange(selfChange, uri)
     }
 }

@@ -55,17 +55,36 @@ open class gpsapplication3 : gpsapplication2() {
         foregroundOnlyLocationService?.onServiceDisconnected(name)
     }
 
+    private var _id = ""
+    internal var id: String
+        get() = this._id
+        set(id) {
+            this._id = id
+            foregroundOnlyLocationService?.id = this._id
+        }
+
+    override fun onCreate() {
+        Log.i(__CLASSNAME__, "${getMethodName()}[$id]")
+        super.onCreate()
+        //this.id = ""
+    }
+
     fun pee(id: String = "") {
-        foregroundOnlyLocationService?.pee(id)
+        foregroundOnlyLocationService?.pee()
     }
 
     fun poo(id: String = "") {
-        foregroundOnlyLocationService?.poo(id)
+        foregroundOnlyLocationService?.poo()
+    }
+
+    fun mark(id: String = "") {
+        foregroundOnlyLocationService?.mark()
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        post {pee()}    //test
-        post {poo()}    //test
+        post { pee() }    //test
+        post { poo() }    //test
+        post { mark() }    //test
     }
 }

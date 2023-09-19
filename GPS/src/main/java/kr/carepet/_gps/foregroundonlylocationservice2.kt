@@ -26,11 +26,12 @@
 package kr.carepet._gps
 
 /**import kr.carepet.util.__CLASSNAME__*/
+import android.location.Location
 import android.os.Environment
 import com.google.android.gms.location.LocationResult
 import kr.carepet.gpx.GPXWriter2
 import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
-import kr.carepet.gpx.Location
+import kr.carepet.gpx.Track
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.io.File
@@ -83,16 +84,16 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         Log.i(__CLASSNAME__, "${getMethodName()}$getCache2")
     }
 
-    private val locations = Collections.synchronizedList(ArrayList<Location>()) // The list of Tracks
+    private val tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
 
-    /** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-locations-in-metre">Calculate distance between two locations in metre</a> */
+    /** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-tracks-in-metre">Calculate distance between two tracks in metre</a> */
     //https://stackoverflow.com/questions/43080343/calculate-distance-between-two-locations-in-metre
-    private fun distance(loc1: Location?, loc2: Location?): Float {
-        if (loc1 == null || loc2 == null) return 0.0f
-        val lat1: Double = loc1.latitude
-        val lon1: Double = loc1.longitude
-        val lat2: Double = loc2.latitude
-        val lon2: Double = loc2.longitude
+    private fun distance(trk1: Track?, trk2: Track?): Float {
+        if (trk1 == null || trk2 == null) return 0.0f
+        val lat1: Double = trk1.latitude
+        val lon1: Double = trk1.longitude
+        val lat2: Double = trk2.latitude
+        val lon2: Double = trk2.longitude
         val distances = FloatArray(2)
         Location.distanceBetween(
             lat1, lon1,
@@ -102,15 +103,15 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         return distances[0]
     }
 
-    protected fun add(location: Location) {
-        locations.add(location)
+    protected fun add(track: Track) {
+        tracks.add(track)
     }
 
     override fun onLocationResult(locationResult: LocationResult) {
-        val loc1 = currentLocation?.let { Location(it) }
-        val loc2 = locationResult.lastLocation?.let { Location(it) }
+        val loc1 = currentLocation?.let { Track(it) }
+        val loc2 = locationResult.lastLocation?.let { Track(it) }
         val dist = distance(loc1, loc2)
-        val size = locations.size
+        val size = tracks.size
         val exit = (size > 0 && dist < 2.0f)
         Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit][$size][${dist}.m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
         if (exit) {
@@ -119,7 +120,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
             return
         }
         super.onLocationResult(locationResult)
-        currentLocation?.let { add(Location(it)) }
+        currentLocation?.let { add(Track(it)) }
         dump()
     }
 
@@ -129,25 +130,39 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     private fun write(clear: Boolean) {
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val time = locations.first().location.time
+        val time = tracks.first().loc.time
         val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$clear, ${locations.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
-        GPXWriter2.write(locations, file)
-        if (clear) locations.clear()
+        Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
+        GPXWriter2.write(tracks, file)
+        if (clear) tracks.clear()
     }
 
-    fun pee(id: String = "") {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val location = currentLocation?.let { Location(it, id, 1, 0) }
-        location?.let { add(it) }
+    private var _id = ""
+    internal var id: String
+        get() = this._id
+        set(id) {
+            this._id = id
+        }
+
+    fun pee() {
+        Log.d(__CLASSNAME__, "${getMethodName()}[$_id]${currentLocation.toText()}")
+        val track = currentLocation?.let { Track(it, id = _id, pee = 1) }
+        track?.let { add(it) }
         dump()
     }
 
-    fun poo(id: String = "") {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val location = currentLocation?.let { Location(it, id, 0, 1) }
-        location?.let { add(it) }
+    fun poo() {
+        Log.d(__CLASSNAME__, "${getMethodName()}[$_id]${currentLocation.toText()}")
+        val track = currentLocation?.let { Track(it, id = _id, poo = 1) }
+        track?.let { add(it) }
+        dump()
+    }
+
+    fun mark() {
+        Log.d(__CLASSNAME__, "${getMethodName()}[$_id]${currentLocation.toText()}")
+        val track = currentLocation?.let { Track(it, id = _id, mark = 1) }
+        track?.let { add(it) }
         dump()
     }
 
@@ -162,7 +177,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     override fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         super.stop()
-        if (locations.size > 0) write(true)
+        if (tracks.size > 0) write(true)
         start = 0L
     }
 }

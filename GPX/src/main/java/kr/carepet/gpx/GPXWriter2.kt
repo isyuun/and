@@ -37,21 +37,21 @@ import java.util.Date
  */
 class GPXWriter2 : _GPXWriter() {
     companion object {
-        fun write(locations: List<Location>, file: File) {
-            if (locations.isEmpty()) {
+        fun write(tracks: List<Track>, file: File) {
+            if (tracks.isEmpty()) {
                 return
             }
-            val firstTime = GPX_SIMPLE_TICK_FORMAT.format(Date(locations.first().time))
+            val firstTime = GPX_SIMPLE_TICK_FORMAT.format(Date(tracks.first().time))
 
             val comment = """
                 <!-- Created with CarePet -->
-                <!-- Track = ${locations.size} TrackPoints + 0 Placemarks -->
+                <!-- Track = ${tracks.size} TrackPoints + 0 Placemarks -->
                 <!-- Track Statistics (based on Total Time | Time in Movement): -->
-                <!-- Distance = ${calculateTotalDistance(locations)} -->
-                <!-- Duration = ${calculateDuration(locations)} | N/A -->
-                <!-- Altitude Gap = ${calculateMaxAltitudeGap(locations)} -->
-                <!-- Max Speed = ${calculateMaxSpeed(locations)} m/s -->
-                <!-- Avg Speed = ${calculateAvgSpeed(locations)} | N/A -->
+                <!-- Distance = ${calculateTotalDistance(tracks)} -->
+                <!-- Duration = ${calculateDuration(tracks)} | N/A -->
+                <!-- Altitude Gap = ${calculateMaxAltitudeGap(tracks)} -->
+                <!-- Max Speed = ${calculateMaxSpeed(tracks)} m/s -->
+                <!-- Avg Speed = ${calculateAvgSpeed(tracks)} | N/A -->
                 <!-- Direction = N/A -->
                 <!-- Activity = N/A -->
                 <!-- Altitudes = N/A -->
@@ -60,7 +60,7 @@ class GPXWriter2 : _GPXWriter() {
             val metadata = """
                 <metadata>
                  <name>CarePet $firstTime</name>
-                 <time>${GPX_SIMPLE_DATE_FORMAT.format(locations.first().time)}</time>
+                 <time>${GPX_SIMPLE_DATE_FORMAT.format(tracks.first().time)}</time>
                 </metadata>
             """.trimIndent() + "\n"
 
@@ -76,16 +76,17 @@ class GPXWriter2 : _GPXWriter() {
 
             val trksegStringBuilder = StringBuilder()
 
-            for (location in locations) {
-                val lat = GPX_DECIMAL_FORMAT_7.format(location.latitude)
-                val lon = GPX_DECIMAL_FORMAT_7.format(location.longitude)
-                val time = GPX_SIMPLE_DATE_FORMAT.format(location.time)
-                val speed = GPX_DECIMAL_FORMAT_3.format(location.speed)
-                val ele = GPX_DECIMAL_FORMAT_3.format(location.altitude)
-                val id = location.id
-                val pee = location.pee
-                val poo = location.poo
-                val trkpt = """ <trkpt id="${id}" lat="${lat}" lon="${lon}"><time>$time</time><speed>$speed</speed><ele>$ele</ele><pee>$pee</pee><poo>$poo</poo></trkpt>""" + "\n"
+            for (track in tracks) {
+                val lat = GPX_DECIMAL_FORMAT_7.format(track.latitude)
+                val lon = GPX_DECIMAL_FORMAT_7.format(track.longitude)
+                val time = GPX_SIMPLE_DATE_FORMAT.format(track.time)
+                val speed = GPX_DECIMAL_FORMAT_3.format(track.speed)
+                val ele = GPX_DECIMAL_FORMAT_3.format(track.altitude)
+                val id = track.id
+                val pee = track.pee
+                val poo = track.poo
+                val img = track.img
+                val trkpt = """ <trkpt id="${id}" lat="${lat}" lon="${lon}"><time>$time</time><speed>$speed</speed><ele>$ele</ele><pee>$pee</pee><poo>$poo</poo><img>$img</img></trkpt>""" + "\n"
                 trksegStringBuilder.append(trkpt)
             }
 

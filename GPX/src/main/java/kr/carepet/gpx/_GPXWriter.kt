@@ -51,25 +51,25 @@ const val GPX_LONGITUDE_ZERO_KO = 37.275935
 open class _GPXWriter {
     companion object {
         @JvmStatic
-        protected fun calculateTotalDistance(locations: List<Location>): String {
+        protected fun calculateTotalDistance(tracks: List<Track>): String {
             var totalDistance = 0.0
-            for (i in 1 until locations.size) {
-                val prevLocation = locations[i - 1]
-                val currentLocation = locations[i]
-                val distance = prevLocation.location.distanceTo(currentLocation.location)
+            for (i in 1 until tracks.size) {
+                val prevLocation = tracks[i - 1]
+                val currentLocation = tracks[i]
+                val distance = prevLocation.loc.distanceTo(currentLocation.loc)
                 totalDistance += distance
             }
             return String.format("%.2f km", totalDistance / 1000)
         }
 
         @JvmStatic
-        protected fun calculateDuration(locations: List<Location>): String {
-            if (locations.isEmpty()) {
+        protected fun calculateDuration(tracks: List<Track>): String {
+            if (tracks.isEmpty()) {
                 return "N/A"
             }
 
-            val startTime = locations.first().location.time
-            val endTime = locations.last().location.time
+            val startTime = tracks.first().loc.time
+            val endTime = tracks.last().loc.time
             val durationInMillis = endTime - startTime
             val seconds = durationInMillis / 1000
             val minutes = seconds / 60
@@ -78,16 +78,16 @@ open class _GPXWriter {
         }
 
         @JvmStatic
-        protected fun calculateMaxAltitudeGap(locations: List<Location>): String {
-            if (locations.isEmpty()) {
+        protected fun calculateMaxAltitudeGap(tracks: List<Track>): String {
+            if (tracks.isEmpty()) {
                 return "N/A"
             }
 
             var maxAltitudeGap = 0.0
-            for (i in 1 until locations.size) {
-                val prevLocation = locations[i - 1]
-                val currentLocation = locations[i]
-                val altitudeGap = Math.abs(currentLocation.location.altitude - prevLocation.location.altitude)
+            for (i in 1 until tracks.size) {
+                val prevLocation = tracks[i - 1]
+                val currentLocation = tracks[i]
+                val altitudeGap = Math.abs(currentLocation.loc.altitude - prevLocation.loc.altitude)
                 if (altitudeGap > maxAltitudeGap) {
                     maxAltitudeGap = altitudeGap
                 }
@@ -96,31 +96,31 @@ open class _GPXWriter {
         }
 
         @JvmStatic
-        protected fun calculateMaxSpeed(locations: List<Location>): String {
-            if (locations.isEmpty()) {
+        protected fun calculateMaxSpeed(tracks: List<Track>): String {
+            if (tracks.isEmpty()) {
                 return "N/A"
             }
 
             var maxSpeed = 0.0f
-            for (location in locations) {
-                if (location.location.speed > maxSpeed) {
-                    maxSpeed = location.location.speed
+            for (location in tracks) {
+                if (location.loc.speed > maxSpeed) {
+                    maxSpeed = location.loc.speed
                 }
             }
             return String.format("%.2f m/s", maxSpeed)
         }
 
         @JvmStatic
-        protected fun calculateAvgSpeed(locations: List<Location>): String {
-            if (locations.isEmpty()) {
+        protected fun calculateAvgSpeed(tracks: List<Track>): String {
+            if (tracks.isEmpty()) {
                 return "N/A"
             }
 
             var totalSpeed = 0.0f
-            for (location in locations) {
-                totalSpeed += location.location.speed
+            for (location in tracks) {
+                totalSpeed += location.loc.speed
             }
-            val avgSpeed = totalSpeed / locations.size
+            val avgSpeed = totalSpeed / tracks.size
             return String.format("%.2f m/s", avgSpeed)
         }
     }

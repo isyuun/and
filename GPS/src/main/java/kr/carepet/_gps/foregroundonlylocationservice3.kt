@@ -32,14 +32,16 @@ import android.content.ContentResolver
 import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Handler
-import android.os.HandlerThread
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
 import androidx.annotation.RequiresPermission
 import kr.carepet.gps.CameraContentObserver
+import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
+import kr.carepet.gpx.Track
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
+import java.io.File
 
 
 /**
@@ -83,8 +85,93 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
         )
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
         contentResolver.unregisterContentObserver(cameraContentObserver)
+    }
+
+    private fun path(uri: Uri): String? {
+        var path: String? = null
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndex(projection[0])
+                path = it.getString(columnIndex)
+            }
+        }
+        return path
+    }
+
+    private fun camera(uri: Uri): Boolean {
+        val projection = arrayOf(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndex(projection[0])
+                val bucketName = it.getString(columnIndex)
+                return bucketName.contains("DCIM/Camera") || mime(uri)
+            }
+        }
+
+        return false
+    }
+
+    private fun mime(imageUri: Uri): Boolean {
+        val mimeType = contentResolver.getType(imageUri)
+        return mimeType?.startsWith("image/") == true
+    }
+
+    private fun time(uri: Uri): Long? {
+        var time: Long? = null
+        val projection = arrayOf(MediaStore.Images.Media.DATE_ADDED)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndex(projection[0])
+                time = it.getLong(columnIndex)
+            }
+        }
+        return time
+    }
+
+    fun onChange(selfChange: Boolean, uri: Uri?) {
+        //Log.d(__CLASSNAME__, "${getMethodName()}: $uri")
+        if (uri != null) {
+            val path = path(uri)
+            val time = time(uri)
+            if (path == null || time == null) return
+            val file = File(path)
+            val name = file.name
+            val exists = file.exists()
+            if (exists && !name.startsWith(".") && camera(uri)) {
+                Log.i(__CLASSNAME__, "${getMethodName()}[$selfChange][exists:$exists][$name]: path:$path, time:${time?.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}")
+                img(path)
+            }
+        }
+    }
+
+    private var imgs = ArrayList<String>()
+    override fun start() {
+        super.start()
+        imgs.clear()
+    }
+
+    override fun stop() {
+        super.stop()
+        imgs.clear()
+    }
+
+    private fun img(path: String) {
+        if (imgs.size > 0 && imgs.contains(path)) return
+        imgs.add(path)
+        val loc = currentLocation
+        val img = if (imgs.size > 0) imgs.size - 1 else -1
+        val trk = loc?.let { Track(it, id = this.id, img = img) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$img, ${imgs.size}], ${imgs[img]}, $trk")
+        trk?.let { add(it) }
     }
 }

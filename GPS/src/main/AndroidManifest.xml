@@ -43,15 +43,5 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
-        <receiver
-            android:name="kr.carepet.gps.CameraEventReciver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.camera.NEW_PICTURE" />
-                <data android:mimeType="image/*" />
-                <action android:name="android.intent.action.CAMERA_BUTTON" />
-            </intent-filter>
-        </receiver>
     </application>
 </manifest>

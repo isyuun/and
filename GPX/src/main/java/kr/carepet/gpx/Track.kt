@@ -29,16 +29,18 @@ import android.location.Location
 
 /**
  * @Project     : carepet-android
- * @FileName    : Location.kt
+ * @FileName    : Track.kt
  * @Date        : 2023. 09. 14.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-data class Location(
-    val location: Location,
+data class Track(
+    val loc: Location,
     val id: String = "",
+    val img: Int = -1,
     val pee: Int = 0,
-    val poo: Int = 0
+    val poo: Int = 0,
+    val mark: Int = 0,
 ) {
     fun toText(): String {
         return if (this != null) {
@@ -49,23 +51,23 @@ data class Location(
     }
 
     val latitude: Double
-        get() = location.latitude
+        get() = loc.latitude
 
     val longitude: Double
-        get() = location.longitude
+        get() = loc.longitude
 
     val time: Long
-        get() = location.time
+        get() = loc.time
 
     val speed: Float
-        get() = location.speed
+        get() = loc.speed
 
     val altitude: Double
-        get() = location.altitude
+        get() = loc.altitude
 
-    companion object {
-        fun distanceBetween(lat1: Double, lon1: Double, lat2: Double, lon2: Double, distances: FloatArray) {
-            android.location.Location.distanceBetween(lat1, lon1, lat2, lon2, distances)
-        }
-    }
+    //companion object {
+    //    fun distanceBetween(lat1: Double, lon1: Double, lat2: Double, lon2: Double, distances: FloatArray) {
+    //        Location.distanceBetween(lat1, lon1, lat2, lon2, distances)
+    //    }
+    //}
 }
