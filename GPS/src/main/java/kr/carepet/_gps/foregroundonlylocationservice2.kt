@@ -136,12 +136,13 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     protected fun dump() {
+        Log.e(__CLASSNAME__, "${getMethodName()}...")
         if (start > 0) write(false)
     }
 
-    private fun write(clear: Boolean) {
+    protected open fun write(clear: Boolean) {
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val time = tracks?.first()?.loc?.time
+        val time = (tracks.first()?.loc)?.time
         val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
         Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")

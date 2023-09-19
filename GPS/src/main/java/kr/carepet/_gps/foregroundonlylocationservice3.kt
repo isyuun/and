@@ -25,7 +25,6 @@
 
 package kr.carepet._gps
 
-import android.Manifest
 import android.app.Notification
 import android.content.ComponentName
 import android.content.ContentResolver
@@ -35,13 +34,13 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
-import androidx.annotation.RequiresPermission
 import kr.carepet.gps.CameraContentObserver
 import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
 import kr.carepet.gpx.Track
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.io.File
+import java.util.Collections
 
 
 /**
@@ -71,7 +70,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
     private lateinit var cameraContentObserver: CameraContentObserver
     private val handler: Handler = Handler(Looper.getMainLooper())
 
-    @RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
+    //@RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
     override fun onCreate() {
         super.onCreate()
 
@@ -144,36 +143,31 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
         val loc = currentLocation
         val img = if (imgs.size > 0) imgs.size - 1 else -1
         val trk = loc?.let { Track(it, id = this.id, img = img) }
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$img, ${imgs.size}], ${imgs[img]}, $trk")
+        Log.d(__CLASSNAME__, "${getMethodName()}[$img, ${imgs.size}], ${imgs[img]}, $trk")
         trk?.let { add(it) }
         dump()
     }
 
     fun onChange(selfChange: Boolean, uri: Uri?) {
-        //Log.d(__CLASSNAME__, "${getMethodName()}: $uri")
         if (uri != null) {
             val path = path(uri)
             val time = time(uri)
+            //Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
             if (path == null || time == null) return
             val file = File(path)
             val name = file.name
             val exists = file.exists()
-            val camera = (exists && !name.startsWith(".") && camera(uri))
-            if (exists && !name.startsWith(".") && camera(uri)) {
-                Log.i(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][$name]: path:$path, time:${time?.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}")
+            val camera = exists && camera(uri) && !imgs.contains(path) && !name.startsWith(".")
+            if (camera) {
+                Log.i(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][$name]: path:$path, time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}")
                 img(path)
             }
         }
     }
 
-    private var imgs = ArrayList<String>()
-    override fun start() {
-        super.start()
-        imgs.clear()
-    }
-
-    override fun stop() {
-        super.stop()
-        imgs.clear()
+    private val imgs = Collections.synchronizedList(ArrayList<String>()) // The list of Tracks
+    override fun write(clear: Boolean) {
+        super.write(clear)
+        if (clear) imgs.clear()
     }
 }
