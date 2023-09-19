@@ -26,6 +26,7 @@
 package kr.carepet._gps
 
 /**import kr.carepet.util.__CLASSNAME__*/
+import android.content.Intent
 import android.location.Location
 import android.os.Environment
 import com.google.android.gms.location.LocationResult
@@ -116,12 +117,22 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit][$size][${dist}.m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
         if (exit) {
             currentLocation = locationResult.lastLocation
-            dump()
             return
         }
         super.onLocationResult(locationResult)
         currentLocation?.let { add(Track(it)) }
-        dump()
+    }
+
+    override fun onUnbind(intent: Intent): Boolean {
+        Log.i(__CLASSNAME__, "${getMethodName()}$intent")
+        post { dump() }
+        return super.onUnbind(intent)
+    }
+
+    override fun onRebind(intent: Intent) {
+        Log.i(__CLASSNAME__, "${getMethodName()}$intent")
+        super.onRebind(intent)
+        post { dump() }
     }
 
     protected fun dump() {
@@ -130,7 +141,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     private fun write(clear: Boolean) {
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val time = tracks.first().loc.time
+        val time = tracks?.first()?.loc?.time
         val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
         Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
@@ -146,22 +157,22 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         }
 
     fun pee() {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$_id]${currentLocation.toText()}")
-        val track = currentLocation?.let { Track(it, id = _id, pee = 1) }
+        Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
+        val track = currentLocation?.let { Track(it, id = id, pee = 1) }
         track?.let { add(it) }
         dump()
     }
 
     fun poo() {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$_id]${currentLocation.toText()}")
-        val track = currentLocation?.let { Track(it, id = _id, poo = 1) }
+        Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
+        val track = currentLocation?.let { Track(it, id = id, poo = 1) }
         track?.let { add(it) }
         dump()
     }
 
     fun mark() {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$_id]${currentLocation.toText()}")
-        val track = currentLocation?.let { Track(it, id = _id, mark = 1) }
+        Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
+        val track = currentLocation?.let { Track(it, id = id, mrk = 1) }
         track?.let { add(it) }
         dump()
     }

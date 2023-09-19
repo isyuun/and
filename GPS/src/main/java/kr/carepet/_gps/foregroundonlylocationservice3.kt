@@ -104,6 +104,19 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
         return path
     }
 
+    private fun time(uri: Uri): Long? {
+        var time: Long? = null
+        val projection = arrayOf(MediaStore.Images.Media.DATE_ADDED)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndex(projection[0])
+                time = it.getLong(columnIndex)
+            }
+        }
+        return time
+    }
+
     private fun camera(uri: Uri): Boolean {
         val projection = arrayOf(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
 
@@ -125,17 +138,15 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
         return mimeType?.startsWith("image/") == true
     }
 
-    private fun time(uri: Uri): Long? {
-        var time: Long? = null
-        val projection = arrayOf(MediaStore.Images.Media.DATE_ADDED)
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndex(projection[0])
-                time = it.getLong(columnIndex)
-            }
-        }
-        return time
+    private fun img(path: String) {
+        if (imgs.size > 0 && imgs.contains(path)) return
+        imgs.add(path)
+        val loc = currentLocation
+        val img = if (imgs.size > 0) imgs.size - 1 else -1
+        val trk = loc?.let { Track(it, id = this.id, img = img) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$img, ${imgs.size}], ${imgs[img]}, $trk")
+        trk?.let { add(it) }
+        dump()
     }
 
     fun onChange(selfChange: Boolean, uri: Uri?) {
@@ -147,8 +158,9 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
             val file = File(path)
             val name = file.name
             val exists = file.exists()
+            val camera = (exists && !name.startsWith(".") && camera(uri))
             if (exists && !name.startsWith(".") && camera(uri)) {
-                Log.i(__CLASSNAME__, "${getMethodName()}[$selfChange][exists:$exists][$name]: path:$path, time:${time?.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}")
+                Log.i(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][$name]: path:$path, time:${time?.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}")
                 img(path)
             }
         }
@@ -163,15 +175,5 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
     override fun stop() {
         super.stop()
         imgs.clear()
-    }
-
-    private fun img(path: String) {
-        if (imgs.size > 0 && imgs.contains(path)) return
-        imgs.add(path)
-        val loc = currentLocation
-        val img = if (imgs.size > 0) imgs.size - 1 else -1
-        val trk = loc?.let { Track(it, id = this.id, img = img) }
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$img, ${imgs.size}], ${imgs[img]}, $trk")
-        trk?.let { add(it) }
     }
 }

@@ -40,7 +40,7 @@ data class Track(
     val img: Int = -1,
     val pee: Int = 0,
     val poo: Int = 0,
-    val mark: Int = 0,
+    val mrk: Int = 0,
 ) {
     fun toText(): String {
         return if (this != null) {

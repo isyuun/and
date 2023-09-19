@@ -215,7 +215,7 @@ open class foregroundonlylocationservice(
     override fun onUnbind(intent: Intent): Boolean {
         //Log.d(__CLASSNAME__, "onUnbind()")
 
-        Log.i(__CLASSNAME__, "${getMethodName()}:${(!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this))}")
+        //Log.i(__CLASSNAME__, "${getMethodName()}:${(!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this))}")
         // MainActivity (client) leaves foreground, so service needs to become a foreground service
         // to maintain the 'while-in-use' label.
         // NOTE: If this method is called due to a configuration change in MainActivity,

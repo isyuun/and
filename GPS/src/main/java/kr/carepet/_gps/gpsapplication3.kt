@@ -56,7 +56,7 @@ open class gpsapplication3 : gpsapplication2() {
     }
 
     private var _id = ""
-    internal var id: String
+    private var id: String
         get() = this._id
         set(id) {
             this._id = id
@@ -69,22 +69,25 @@ open class gpsapplication3 : gpsapplication2() {
         //this.id = ""
     }
 
-    fun pee(id: String = "") {
+    fun pee(id: String) {
+        this.id = id
         foregroundOnlyLocationService?.pee()
     }
 
-    fun poo(id: String = "") {
+    fun poo(id: String) {
+        this.id = id
         foregroundOnlyLocationService?.poo()
     }
 
-    fun mark(id: String = "") {
+    fun mark(id: String) {
+        this.id = id
         foregroundOnlyLocationService?.mark()
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        post { pee() }    //test
-        post { poo() }    //test
-        post { mark() }    //test
+        post { pee("") }    //test
+        post { poo("") }    //test
+        post { mark("") }    //test
     }
 }
