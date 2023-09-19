@@ -117,10 +117,8 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val max = GPX_METERS_TO_UPDATE
         val exit = (size > 0 && dist < max)
         Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit][$size][${max}m][${dist}m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
-        if (exit) {
-            currentLocation = locationResult.lastLocation
-            return
-        }
+        currentLocation = locationResult.lastLocation
+        if (exit) return
         super.onLocationResult(locationResult)
         currentLocation?.let { add(Track(it)) }
     }
