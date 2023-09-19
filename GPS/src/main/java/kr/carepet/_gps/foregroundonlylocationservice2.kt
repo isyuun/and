@@ -31,6 +31,7 @@ import android.location.Location
 import android.os.Environment
 import com.google.android.gms.location.LocationResult
 import kr.carepet.gpx.GPXWriter2
+import kr.carepet.gpx.GPX_METERS_TO_UPDATE
 import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
 import kr.carepet.gpx.Track
 import kr.carepet.util.Log
@@ -113,8 +114,9 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val loc2 = locationResult.lastLocation?.let { Track(it) }
         val dist = distance(loc1, loc2)
         val size = tracks.size
-        val exit = (size > 0 && dist < 2.0f)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit][$size][${dist}.m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
+        val max = GPX_METERS_TO_UPDATE
+        val exit = (size > 0 && dist < max)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit][$size][$max.m][$dist.m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
         if (exit) {
             currentLocation = locationResult.lastLocation
             return
