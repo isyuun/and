@@ -49,8 +49,7 @@ import java.util.Collections
 open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    override fun onCreate() {
-        super.onCreate()
+    private fun paths() {
         /* 내부저장소 */
         // 캐시(Cache)
         val fileCacheDir = cacheDir
@@ -73,7 +72,8 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val getDirectory = Environment.getExternalStorageDirectory().toString()
         Log.i(__CLASSNAME__, "${getMethodName()}$getDirectory")
         // 특정 데이터를 저장
-        val fileDowns = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val fileDowns =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val getDowns = fileDowns.path
         Log.i(__CLASSNAME__, "${getMethodName()}$getDowns")
         /* 외부저장소 - 어플리케이션 고유 영역 */
@@ -84,6 +84,12 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         // 캐시 데이터를 저장
         val getCache2 = externalCacheDir.toString()
         Log.i(__CLASSNAME__, "${getMethodName()}$getCache2")
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        tracks.clear()
+        paths()
     }
 
     private val tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
@@ -116,7 +122,10 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val size = tracks.size
         val max = GPX_METERS_TO_UPDATE
         val exit = (size > 0 && dist < max)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit][$size][${max}m][${dist}m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
+        Log.wtf(
+            __CLASSNAME__,
+            "${getMethodName()}[exit:$exit][$size][${max}m][${dist}m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2"
+        )
         currentLocation = locationResult.lastLocation
         if (exit) return
         super.onLocationResult(locationResult)
@@ -141,11 +150,17 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     protected open fun write(clear: Boolean) {
+        if (tracks.size < 1) return
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val time = (tracks.first()?.loc)?.time
         val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
-        Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
+        Log.w(
+            __CLASSNAME__,
+            "${getMethodName()}$clear, ${tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${
+                GPX_SIMPLE_TICK_FORMAT.format(time)
+            }, $file"
+        )
         GPXWriter2.write(tracks, file)
         if (clear) tracks.clear()
     }
@@ -183,7 +198,8 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     override fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         super.start()
-        start = System.currentTimeMillis() /*GPX_SIMPLE_TICK_FORMAT.format(Date(System.currentTimeMillis()))*/
+        start =
+            System.currentTimeMillis() /*GPX_SIMPLE_TICK_FORMAT.format(Date(System.currentTimeMillis()))*/
     }
 
     override fun stop() {
