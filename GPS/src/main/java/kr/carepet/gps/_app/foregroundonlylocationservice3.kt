@@ -20,10 +20,10 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 14.   description...
+ *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
-package kr.carepet._gps
+package kr.carepet.gps._app
 
 import android.app.Notification
 import android.content.ComponentName
@@ -34,7 +34,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
-import kr.carepet.gps.CameraContentObserver
+import kr.carepet.gps.app.CameraContentObserver
 import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
 import kr.carepet.gpx.Track
 import kr.carepet.util.Log

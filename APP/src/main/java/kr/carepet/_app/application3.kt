@@ -39,6 +39,12 @@ import com.google.android.material.snackbar.Snackbar
 open class application3 : application2() {
     private lateinit var root: View
 
+    override fun onCreate() {
+        super.onCreate()
+        //root = findViewById<View>(android.R.id.content).rootView
+        //root = window.decorView.findViewById(android.R.id.content)
+    }
+
     private lateinit var toast: Toast
 
     fun toast(text: CharSequence, duration: Int = Toast.LENGTH_LONG) {

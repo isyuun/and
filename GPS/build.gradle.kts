@@ -117,17 +117,29 @@ dependencies {
     implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":GPX")))
 
+    implementation("com.naver.maps:map-sdk:3.14.0")
+    //implementation("androidx.compose.ui:ui:1.0.3")
+    //implementation("androidx.activity:activity-compose:1.3.1")
+    //implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+
     implementation(platform(libs.compose.bom))
     implementation(libs.play.services.location)
     implementation(libs.kotlin.coroutines.play)
     implementation(libs.androidx.work.runtime.ktx)
+
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    testImplementation(libs.junit4)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.espresso.core)
 
     /** IY:플랫폼:샘플스:Define the samples to load */
     //implementation(libs.hilt.android)
     //kapt(libs.hilt.compiler)
     implementation("com.google.dagger:hilt-android:2.48")
     implementation(libs.androidx.preference.ktx)
-    implementation(project(mapOf("path" to ":GPX")))
     annotationProcessor("com.google.dagger:hilt-compiler:2.48")
     implementation(libs.casa.base)
     ksp(libs.casa.processor)
@@ -150,11 +162,4 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     implementation(libs.androidx.exifinterface)
     /** IY:플랫폼:샘플스:Define the samples to load */
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit4)
-    androidTestImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.espresso.core)
 }

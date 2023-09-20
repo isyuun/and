@@ -20,18 +20,18 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 5.   description...
+ *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
-package kr.carepet.gps
+package kr.carepet.map.app
 
-import kr.carepet._gps.gpsappcompatactivity
+import kr.carepet.map._app.NaverMapApplication
 
 /**
  * @Project     : carepet-android
- * @FileName    : GPSAppCompatActivity.kt
- * @Date        : 2023. 09. 05.
+ * @FileName    : MapApplication.kt
+ * @Date        : 2023. 09. 20.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class GPSAppCompatActivity : gpsappcompatactivity()
+open class MapApplication : NaverMapApplication()

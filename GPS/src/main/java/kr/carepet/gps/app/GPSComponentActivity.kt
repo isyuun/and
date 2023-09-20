@@ -20,33 +20,18 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 14.   description...
+ *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
-package kr.carepet._gps
+package kr.carepet.gps.app
 
-private const val PACKAGE_NAME = "kr.carepet.app.navi"
-
-internal const val ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST =
-    "$PACKAGE_NAME.action.FOREGROUND_ONLY_LOCATION_BROADCAST"
-
-internal const val EXTRA_LOCATION = "$PACKAGE_NAME.extra.LOCATION"
-
-internal const val EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION =
-    "$PACKAGE_NAME.extra.CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION"
-
-internal const val NOTIFICATION_ID = 12345678
-
-internal const val NOTIFICATION_CHANNEL_ID = "kr.carepet.app.navi.channel.01"
-
-const val INTERVAL_UPDATE_SECONDS: Long = 1L
-const val INTERVAL_UPDATE_METERS: Float = 1f
+import kr.carepet.gps._app.gpscomponentactivity
 
 /**
  * @Project     : carepet-android
- * @FileName    : _foregroundonlylocationservice.kt
- * @Date        : 2023. 09. 14.
+ * @FileName    : GPSComponentActivity.kt
+ * @Date        : 2023. 09. 05.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class _foregroundonlylocationservice : kr.carepet.app.Service()
+open class GPSComponentActivity : gpscomponentactivity()

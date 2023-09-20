@@ -23,17 +23,30 @@
  *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
-package kr.carepet.app.navi
+package kr.carepet.gps.app
 
-/**import kr.carepet.util.__CLASSNAME__*/
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 
 /**
  * @Project     : carepet-android
- * @FileName    : Application.kt
- * @Date        : 2023. 08. 22.
+ * @FileName    : ForegroundOnlyBroadcastReceiver.kt
+ * @Date        : 2023. 09. 08.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-import kr.carepet.map.app.MapApplication
+/**
+ * Receiver for location broadcasts from [ForegroundOnlyLocationService].
+ *
+ * IY: 앱이 활성화 상태일때 로컬 브로드케스트 메시지 전달확인.
+ */
+internal class ForegroundOnlyBroadcastReceiver2(private val iinterface: IForegroundOnlyBroadcastReceiver) : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        iinterface.onReceive(context, intent)
+    }
+}
 
-open class Application : MapApplication()
+interface IForegroundOnlyBroadcastReceiver {
+    fun onReceive(context: Context, intent: Intent)
+}

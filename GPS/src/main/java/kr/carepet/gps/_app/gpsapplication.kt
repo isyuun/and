@@ -20,10 +20,10 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 5.   description...
+ *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
-package kr.carepet._gps
+package kr.carepet.gps._app
 
 /**import kr.carepet.util.__CLASSNAME__*/
 /**import android.icu.text.SimpleDateFormat*/
@@ -39,8 +39,9 @@ import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
-import kr.carepet.gps.ForegroundOnlyLocationService
-import kr.carepet.gps.ForegroundOnlyLocationService.LocalBinder
+import kr.carepet.app.Application
+import kr.carepet.gps.app.ForegroundOnlyLocationService
+import kr.carepet.gps.app.ForegroundOnlyLocationService.LocalBinder
 import kr.carepet.gps.R
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -97,7 +98,7 @@ private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class gpsapplication : kr.carepet.app.Application(), SharedPreferences.OnSharedPreferenceChangeListener, ServiceConnection {
+open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceChangeListener, ServiceConnection {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private var foregroundOnlyLocationServiceBound = false

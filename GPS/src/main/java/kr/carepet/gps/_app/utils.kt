@@ -20,9 +20,9 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 6.   description...
+ *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
-package kr.carepet._gps
+package kr.carepet.gps._app
 
 import android.content.Context
 import android.location.Location

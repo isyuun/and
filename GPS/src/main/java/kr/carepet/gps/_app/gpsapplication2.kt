@@ -20,10 +20,10 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 7.   description...
+ *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
-package kr.carepet._gps
+package kr.carepet.gps._app
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -32,8 +32,8 @@ import android.content.IntentFilter
 import android.location.Location
 import android.os.Build
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import kr.carepet.gps.ForegroundOnlyBroadcastReceiver2
-import kr.carepet.gps.IForegroundOnlyBroadcastReceiver
+import kr.carepet.gps.app.ForegroundOnlyBroadcastReceiver2
+import kr.carepet.gps.app.IForegroundOnlyBroadcastReceiver
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.text.SimpleDateFormat

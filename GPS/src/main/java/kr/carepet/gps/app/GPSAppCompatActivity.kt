@@ -23,17 +23,15 @@
  *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
-package kr.carepet.app.navi
+package kr.carepet.gps.app
 
-/**import kr.carepet.util.__CLASSNAME__*/
+import kr.carepet.gps._app.gpsappcompatactivity
 
 /**
  * @Project     : carepet-android
- * @FileName    : Application.kt
- * @Date        : 2023. 08. 22.
+ * @FileName    : GPSAppCompatActivity.kt
+ * @Date        : 2023. 09. 05.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-import kr.carepet.map.app.MapApplication
-
-open class Application : MapApplication()
+open class GPSAppCompatActivity : gpsappcompatactivity()

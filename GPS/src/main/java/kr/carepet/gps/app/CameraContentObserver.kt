@@ -20,16 +20,26 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 22.   description...
+ *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
-package kr.carepet.app.navi
+package kr.carepet.gps.app
+
+import android.database.ContentObserver
+import android.net.Uri
+import android.os.Handler
+import kr.carepet.gps._app.foregroundonlylocationservice3
 
 /**
  * @Project     : carepet-android
- * @FileName    : _Application.kt
- * @Date        : 2023. 08. 22.
+ * @FileName    : CameraContentObserver.kt
+ * @Date        : 2023. 09. 18.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class _Application : Application()
+class CameraContentObserver(private val context: foregroundonlylocationservice3, handler: Handler) : ContentObserver(handler) {
+    override fun onChange(selfChange: Boolean, uri: Uri?) {
+        super.onChange(selfChange, uri)
+        context.onChange(selfChange, uri)
+    }
+}
