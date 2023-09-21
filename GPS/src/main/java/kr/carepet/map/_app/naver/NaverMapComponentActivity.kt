@@ -87,9 +87,9 @@ open class NaverMapComponentActivity : _mapcomponentactivity() {
         super.onCreate(savedInstanceState)
         locationSource = FusedLocationSource(this, PERMISSION_REQUEST_CODE)
         Log.wtf(__CLASSNAME__, "${getMethodName()}$locationSource")
-        //setContent {
-        //    NaverMapApp()
-        //}
+        setContent {
+            NaverMapApp()
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -142,7 +142,7 @@ fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
     }
 
     fun RedrawMap() {
-        Log.w(__CLASSNAME__, "${getMethodName()}$mapView, $lntLng, $coords")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$mapView, $lntLng, $coords")
         coroutineScope.launch {
             /*val map = */mapView.getMapAsync { naverMap ->
             if (lntLng != null) naverMap.cameraPosition = CameraPosition(lntLng, GPX_CAMERA_ZOOM_ZERO)
@@ -157,7 +157,7 @@ fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
         }
     }
 
-    LaunchedEffect(lntLng) {
+    LaunchedEffect(lntLng, paths) {
         Log.w(__CLASSNAME__, "${getMethodName()}$lntLng, $paths")
         RedrawMap()
     }
@@ -175,7 +175,7 @@ fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        RedrawMap()
+        //RedrawMap()
         AndroidView(
             factory = { context ->
                 MapView(context, mapOptions).apply {
