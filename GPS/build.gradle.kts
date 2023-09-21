@@ -28,12 +28,12 @@ plugins {
     alias(libs.plugins.kotlin.android)
     //id("org.jetbrains.kotlin.jvm") version "1.9.0"
     /** IY:플랫폼:샘플스:Define the samples to load */
-    //id("org.jetbrains.kotlin.kapt")
-    id("com.google.devtools.ksp")
+    ///**id("org.jetbrains.kotlin.kapt")*/
+    //id("com.google.devtools.ksp")
+    //id("com.google.dagger.hilt.android")
     //id("dagger.hilt.android.plugin")
-    id("com.google.dagger.hilt.android")
     /** IY:플랫폼:샘플스:Define the samples to load */
-    //id("com.example.platform")
+    ///**id("com.example.platform")*/
 }
 
 android {
@@ -66,9 +66,9 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
     }
-    buildFeatures {
-        buildConfig = true
-    }
+    //buildFeatures {
+    //    buildConfig = true
+    //}
 }
 
 /**
@@ -109,57 +109,61 @@ compareFrom = "PreviousCommit"
 }
 /** IY:플랫폼:샘플스:Define the samples to load */
  */
-//kapt {
-//    correctErrorTypes = true
-//}
 dependencies {
     implementation(project(mapOf("path" to ":_APP")))
     implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":GPX")))
 
-    implementation("com.naver.maps:map-sdk:3.14.0")
-    //implementation("androidx.compose.ui:ui:1.0.3")
-    //implementation("androidx.activity:activity-compose:1.3.1")
-    //implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.naver.maps:map-sdk:3.17.0")
 
-    implementation(platform(libs.compose.bom))
-    implementation(libs.play.services.location)
-    implementation(libs.kotlin.coroutines.play)
-    implementation(libs.androidx.work.runtime.ktx)
-
-
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
+    //implementation(libs.material)
+    //implementation(libs.androidx.work.runtime.ktx)
+    //implementation(libs.kotlin.coroutines.play)
+
+    /** 컴포즈.기본...JetPack.Compose */
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit4)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
-
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.testManifest)
+    /** 컴포즈.기본...JetPack.Compose */
     /** IY:플랫폼:샘플스:Define the samples to load */
-    //implementation(libs.hilt.android)
-    //kapt(libs.hilt.compiler)
-    implementation("com.google.dagger:hilt-android:2.48")
-    implementation(libs.androidx.preference.ktx)
-    annotationProcessor("com.google.dagger:hilt-compiler:2.48")
-    implementation(libs.casa.base)
-    ksp(libs.casa.processor)
-    implementation(libs.androidx.core)
-    implementation(libs.androidx.fragment)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.compose.foundation.foundation)
-    implementation(libs.compose.runtime.runtime)
-    implementation(libs.compose.runtime.livedata)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.compose.ui.ui)
-    implementation(libs.compose.material3)
-    implementation(libs.coil.compose)
-    implementation(libs.coil.video)
-    implementation(libs.accompanist.permissions)
-    implementation(libs.compose.ui.tooling.preview)
-    debugImplementation(libs.compose.ui.tooling)
-    androidTestImplementation(platform(libs.compose.bom))
-    androidTestImplementation(libs.androidx.test.core)
-    androidTestImplementation(libs.androidx.test.runner)
-    implementation(libs.androidx.exifinterface)
+    ///** 컴포즈.추가...JetPack.Compose */
+    //implementation(libs.compose.runtime.livedata)
+    //implementation(libs.compose.ui.ui)
+    //implementation(libs.compose.foundation.foundation)
+    //implementation(libs.compose.material3)
+    //implementation(libs.androidx.lifecycle.viewmodel.compose)
+    //implementation(libs.compose.runtime.runtime)
+    ///** 컴포즈.추가...JetPack.Compose */
+    /////*implementation(libs.hilt.android)*/
+    /////*kapt(libs.hilt.compiler)*/
+    //implementation("com.google.dagger:hilt-android:2.48")
+    //annotationProcessor("com.google.dagger:hilt-compiler:2.48")
+    //implementation(libs.androidx.preference.ktx)
+    //implementation(libs.casa.base)
+    //ksp(libs.casa.processor)
+    //implementation(libs.accompanist.permissions)
+    //implementation(libs.androidx.fragment)
+    //implementation(libs.coil.compose)
+    //implementation(libs.coil.video)
+    //implementation(libs.compose.ui.tooling.preview)
+    //implementation(libs.androidx.exifinterface)
+    //debugImplementation(libs.compose.ui.tooling)
+    //androidTestImplementation(libs.androidx.test.core)
+    //androidTestImplementation(libs.androidx.test.runner)
     /** IY:플랫폼:샘플스:Define the samples to load */
 }

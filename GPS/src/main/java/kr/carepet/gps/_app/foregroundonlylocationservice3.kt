@@ -92,26 +92,34 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
 
     private fun path(uri: Uri): String? {
         var path: String? = null
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndex(projection[0])
-                path = it.getString(columnIndex)
+        try {
+            val projection = arrayOf(MediaStore.Images.Media.DATA)
+            val cursor = contentResolver.query(uri, projection, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val columnIndex = it.getColumnIndex(projection[0])
+                    path = it.getString(columnIndex)
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         return path
     }
 
     private fun time(uri: Uri): Long? {
         var time: Long? = null
-        val projection = arrayOf(MediaStore.Images.Media.DATE_ADDED)
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndex(projection[0])
-                time = it.getLong(columnIndex)
+        try {
+            val projection = arrayOf(MediaStore.Images.Media.DATE_ADDED)
+            val cursor = contentResolver.query(uri, projection, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val columnIndex = it.getColumnIndex(projection[0])
+                    time = it.getLong(columnIndex)
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         return time
     }

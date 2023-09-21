@@ -34,4 +34,4 @@ import kr.carepet.gps.app.GPSComponentActivity
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class _mapcomponentactivity : GPSComponentActivity(), _imapactivity
+open class _mapcomponentactivity : GPSComponentActivity(), __mapinterface

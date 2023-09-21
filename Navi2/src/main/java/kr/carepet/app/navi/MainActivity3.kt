@@ -32,7 +32,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.platform.location.locationupdates.LocationUpdatesScreen
+//import com.example.platform.location.locationupdates.LocationUpdatesScreen
 import kr.carepet.app.navi.ui.theme.AndTheme
 import kr.carepet.util.Log
 /**import kr.carepet.util.__CLASSNAME__*/
@@ -61,7 +61,7 @@ internal fun Content() {
     AndTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Log.d(__CLASSNAME__, "${getMethodName()}...")
-            LocationUpdatesScreen()
+            //LocationUpdatesScreen()
         }
     }
 }

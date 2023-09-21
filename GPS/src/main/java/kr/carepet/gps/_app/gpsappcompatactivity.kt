@@ -27,7 +27,9 @@ package kr.carepet.gps._app
 
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
+import android.view.WindowManager
 import kr.carepet.app.AppCompatActivity
 import kr.carepet.gps.app.ForegroundOnlyBroadcastReceiver2
 import kr.carepet.gps.app.GPSApplication
@@ -49,15 +51,21 @@ open class gpsappcompatactivity : AppCompatActivity(), IForegroundOnlyBroadcastR
     private val application: GPSApplication = GPSApplication.getInstance()
     private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver2
 
+    internal fun location4Intent(intent: Intent): Location? {
+        return application.location4Intent(intent)
+    }
+
+    protected var location: Location? = null
     override fun onReceive(context: Context, intent: Intent) {
-        val location = application.location4Intent(intent)
-        Log.w(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $context, $intent")
+        location = location4Intent(intent)
+        Log.i(__CLASSNAME__, "${getMethodName()}${location?.toText()}, $location, $context, $intent")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate(savedInstanceState)
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver2(this)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onStart() {

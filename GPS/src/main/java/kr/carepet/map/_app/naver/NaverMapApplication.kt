@@ -20,10 +20,10 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 20.   description...
+ *  isyuun@care-pet.kr             2023. 9. 21.   description...
  */
 
-package kr.carepet.map._app
+package kr.carepet.map._app.naver
 
 import com.naver.maps.map.NaverMapSdk
 import kr.carepet.gps.app.GPSApplication
@@ -38,7 +38,6 @@ import kr.carepet.gps.app.GPSApplication
 open class NaverMapApplication : GPSApplication() {
     override fun onCreate() {
         super.onCreate()
-        //NaverMapSdk.getInstance(this).client =
-        //    NaverMapSdk.NaverCloudPlatformClient("YOUR_CLIENT_ID_HERE")
+        NaverMapSdk.getInstance(this).client = NaverMapSdk.NaverCloudPlatformClient("j535dgyex9")
     }
 }

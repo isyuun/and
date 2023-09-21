@@ -27,10 +27,10 @@ package kr.carepet.map._app
 
 /**
  * @Project     : carepet-android
- * @FileName    : _imapactivity.kt
+ * @FileName    : __mapinterface.kt
  * @Date        : 2023. 09. 20.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-interface _imapactivity {
+interface __mapinterface {
 }

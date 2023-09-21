@@ -20,10 +20,10 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 20.   description...
+ *  isyuun@care-pet.kr             2023. 9. 21.   description...
  */
 
-package kr.carepet.map._app
+package kr.carepet.map._app.naver
 
 /**
  * @Project     : carepet-android
@@ -32,6 +32,9 @@ package kr.carepet.map._app
  * @author      : isyuun@care-pet.kr
  * @description :
  */
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -55,61 +58,137 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
+import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
+import com.naver.maps.map.NaverMap
 import com.naver.maps.map.NaverMapOptions
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.PathOverlay
+import com.naver.maps.map.util.FusedLocationSource
 import kotlinx.coroutines.launch
-import kr.carepet.gps.app.GPSComponentActivity
+import kr.carepet.gps._app.toText
+import kr.carepet.gpx.GPX_CAMERA_ZOOM_ZERO
+import kr.carepet.gpx.GPX_LATITUDE_ZERO
+import kr.carepet.gpx.GPX_LONGITUDE_ZERO
+import kr.carepet.map._app._mapcomponentactivity
+import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
 
-open class NaverMapComponentActivity : GPSComponentActivity() {
+const val PERMISSION_REQUEST_CODE = 100
+
+open class NaverMapComponentActivity : _mapcomponentactivity() {
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    private var locationSource: FusedLocationSource? = null
+
+    var paths = mutableListOf<LatLng>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            NaverMapApp()
-        }
+        locationSource = FusedLocationSource(this, PERMISSION_REQUEST_CODE)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$locationSource")
+        //setContent {
+        //    NaverMapApp()
+        //}
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$locationSource, ${location?.toText()}, $location, $context, $intent")
+        super.onReceive(context, intent)
+        val lat = location?.latitude
+        val lon = location?.longitude
+        val lng = lat?.let { lon?.let { it1 -> LatLng(it, it1) } }
+        lng?.let { paths.add(it) }
+        //post {
+        //}
+        setContent { NaverMapApp() }
+    }
+
+    @Composable
+    fun NaverMapApp() {
+        NaverMapApp(this, paths)
     }
 }
 
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
 @Composable
-fun NaverMapApp() {
+fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
+    Log.i(__CLASSNAME__, "${getMethodName()}$paths")
+    //val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val mapView = rememberMapViewWithLifecycle()
+    val latLngZero = LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)
 
-    val mapOptions = remember {
-        NaverMapOptions()
-            .camera(CameraPosition(LatLng(37.5, 127.0), 10.0))
+    val coords = remember {
+        //listOf(
+        //    LatLng(37.123, 127.456),
+        //    LatLng(37.456, 127.789)
+        //    // 필요한 만큼 좌표를 추가합니다.
+        //)
+        paths
     }
 
-    val pathCoordinates = remember {
-        listOf(
-            LatLng(37.123, 127.456),
-            LatLng(37.456, 127.789)
-            // 필요한 만큼 좌표를 추가합니다.
-        )
+    val lntLng = remember {
+        if (paths.isNotEmpty()) paths.last() else null
     }
 
     val markers = remember {
         mutableStateListOf<LatLng>()
     }
 
-    LaunchedEffect(true) {
-        coroutineScope.launch {
-            val naverMap = mapView.getMapAsync { naverMap ->
-                naverMap.uiSettings.isZoomControlEnabled = true
+    val locationSource = remember {
+        FusedLocationSource(activity, PERMISSION_REQUEST_CODE)
+    }
 
+    fun RedrawMap() {
+        Log.w(__CLASSNAME__, "${getMethodName()}$mapView, $lntLng, $coords")
+        coroutineScope.launch {
+            /*val map = */mapView.getMapAsync { naverMap ->
+            if (lntLng != null) naverMap.cameraPosition = CameraPosition(lntLng, GPX_CAMERA_ZOOM_ZERO)
+            if (coords.size > 2) {
                 val path = PathOverlay()
-                path.coords = pathCoordinates
+                path.coords = coords
                 path.color = 0xFFFF0000.toInt()
                 path.width = 10
                 path.map = naverMap
             }
         }
+        }
+    }
+
+    LaunchedEffect(lntLng) {
+        Log.w(__CLASSNAME__, "${getMethodName()}$lntLng, $paths")
+        RedrawMap()
+    }
+
+    val mapOptions = remember {
+        NaverMapOptions()
+            .logoClickEnabled(true)
+            .camera(CameraPosition(latLngZero, GPX_CAMERA_ZOOM_ZERO))
+            .mapType(NaverMap.MapType.Navi)
+            .locationButtonEnabled(true)
+            .zoomControlEnabled(true)
+            .compassEnabled(true)
     }
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        RedrawMap()
+        AndroidView(
+            factory = { context ->
+                MapView(context, mapOptions).apply {
+                    getMapAsync { naverMap ->
+                        Log.i(__CLASSNAME__, "${getMethodName()}$lntLng, $paths")
+                        naverMap.locationSource = locationSource
+                        naverMap.locationTrackingMode = LocationTrackingMode.Face
+                        naverMap.cameraPosition = CameraPosition(latLngZero, GPX_CAMERA_ZOOM_ZERO)
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxSize(),
+        )
         Button(
             onClick = {
                 val newMarker = Marker()
@@ -121,27 +200,16 @@ fun NaverMapApp() {
                 }
                 markers.add(LatLng(lat, lng))
             },
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
         ) {
             Text("마킹")
         }
-
-        AndroidView(
-            factory = { context ->
-                MapView(context).apply {
-                    getMapAsync { naverMap ->
-                        naverMap.uiSettings.isZoomControlEnabled = true
-                        naverMap.cameraPosition = CameraPosition(LatLng(37.5, 127.0), 10.0)
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxSize()
-        )
     }
 }
 
 @Composable
 fun rememberMapViewWithLifecycle(): MapView {
+    Log.i(__CLASSNAME__, "${getMethodName()}...")
     val context = LocalContext.current
     val mapView = remember {
         MapView(context)
