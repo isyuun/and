@@ -114,7 +114,7 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 @Composable
 fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
-    Log.i(__CLASSNAME__, "${getMethodName()}$paths")
+    Log.wtf(__CLASSNAME__, "${getMethodName()}$paths")
     //val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val mapView = rememberMapViewWithLifecycle()
