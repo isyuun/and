@@ -154,6 +154,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, paths: List<LatLng>) {
             .zoomControlEnabled(true)
             .compassEnabled(true)
             .zoomGesturesEnabled(true)
+            .indoorEnabled(true)
     }
     val mapView = rememberMapViewWithLifecycle(context, mapOptions)
 
@@ -164,28 +165,28 @@ fun NaverMapApp(locationSource: FusedLocationSource, paths: List<LatLng>) {
                 if (coords.size > 1) {
                     val path = PathOverlay()
                     path.coords = coords
-                    path.color = 0xFFFFDBDB.toInt()
-                    path.outlineColor = 0xF0FF5000.toInt()
-                    path.width = 50
+                    path.color = 0xA0FFDBDB.toInt()
+                    path.outlineColor = 0xA0FF5000.toInt()
+                    path.width = 48
                     path.globalZIndex = 10
                     path.outlineWidth = 3
                     path.map = naverMap
                     Log.wtf(__CLASSNAME__, "::LaunchedEffect@${getMethodName()}[${paths.size}][${coords.size}]${latLng.toText()}, $coords")
                 }
-                //naverMap.apply {
-                //    locationOverlay.isVisible = true
-                //    locationOverlay.position = latLng
-                //    locationOverlay.bearing = 0f
-                //    locationOverlay.icon = OverlayImage.fromResource(R.drawable.ic_location_overlay)
-                //    locationOverlay.iconWidth = 100
-                //    locationOverlay.iconHeight = 100
-                //    //locationOverlay.anchor = PointF(0.0f, 0.0f)
-                //    //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.ic_location_overlay_start)
-                //    //locationOverlay.subIconWidth = 80
-                //    //locationOverlay.subIconHeight = 80
-                //    //locationOverlay.subAnchor = PointF(-10.0f, 20.0f)
-                //    locationOverlay.circleRadius = 100
-                //}
+                naverMap.apply {
+                    locationOverlay.isVisible = true
+                    locationOverlay.position = latLng
+                    //locationOverlay.bearing = 0f
+                    locationOverlay.icon = OverlayImage.fromResource(R.drawable.ic_location_overlay)
+                    locationOverlay.iconWidth = 100
+                    locationOverlay.iconHeight = 100
+                    //locationOverlay.anchor = PointF(0.0f, 0.0f)
+                    //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.ic_location_overlay_start)
+                    //locationOverlay.subIconWidth = 80
+                    //locationOverlay.subIconHeight = 80
+                    //locationOverlay.subAnchor = PointF(-10.0f, 20.0f)
+                    locationOverlay.circleRadius = 100
+                }
             }
         }
     }
@@ -199,7 +200,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, paths: List<LatLng>) {
                     getMapAsync { naverMap ->
                         Log.d(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${paths.size}][${coords.size}]$latLng , $coords")
                         naverMap.locationSource = locationSource
-                        naverMap.locationTrackingMode = LocationTrackingMode.Face
+                        naverMap.locationTrackingMode = LocationTrackingMode.NoFollow
                     }
                 }
             },

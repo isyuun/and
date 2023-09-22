@@ -51,7 +51,7 @@ const val GPX_LATITUDE_ZERO = 37.275935      //37.5
 const val GPX_LONGITUDE_ZERO = 127.054136    //127.0
 //const val GPX_LATITUDE_ZERO = 37.5      //37.5
 //const val GPX_LONGITUDE_ZERO = 127.0    //127.0
-const val GPX_CAMERA_ZOOM_ZERO = 16.0
+const val GPX_CAMERA_ZOOM_ZERO = 17.8
 
 open class _GPXWriter {
     companion object {
