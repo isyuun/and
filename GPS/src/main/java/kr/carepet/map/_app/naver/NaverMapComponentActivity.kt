@@ -35,7 +35,6 @@ package kr.carepet.map._app.naver
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -81,13 +80,6 @@ open class NaverMapComponentActivity : _mapcomponentactivity() {
 
     var paths = mutableListOf<LatLng>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        //setContent {
-        //    NaverMapApp()
-        //}
-    }
-
     override fun onReceive(context: Context, intent: Intent) {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${location?.toText()}, $location, $context, $intent")
         super.onReceive(context, intent)
@@ -110,11 +102,11 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 @Composable
 fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
-    Log.wtf(__CLASSNAME__, "${getMethodName()}$paths")
+    val latLngZero = LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)
+    //Log.wtf(__CLASSNAME__, "${getMethodName()}[${paths.size}][${coords.size}]$latLngZero, $paths")
     //val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val mapView = rememberMapViewWithLifecycle()
-    val latLngZero = LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)
 
     val coords = remember {
         //listOf(
@@ -125,8 +117,11 @@ fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
         paths
     }
 
+    val lat = if (paths.isNotEmpty()) paths.last().latitude else GPX_LATITUDE_ZERO
+    val lon = if (paths.isNotEmpty()) paths.last().longitude else GPX_LONGITUDE_ZERO
+
     val lntLng = remember {
-        if (paths.isNotEmpty()) paths.last() else null
+        LatLng(lat, lon)
     }
 
     val markers = remember {
@@ -137,49 +132,49 @@ fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
         FusedLocationSource(activity, PERMISSION_REQUEST_CODE)
     }
 
+    Log.i(__CLASSNAME__, "${getMethodName()}[${paths.size}][${coords.size}][${lntLng == paths.last()}][$lat, $lon]$lntLng, ${paths.last()}, $paths, $coords")
+
     fun RedrawMap() {
+        val path = PathOverlay()
+        if (coords.size > 2) path.coords = coords
+        path.color = 0xFFFF0000.toInt()
+        path.width = 10
         coroutineScope.launch {
-        Log.wtf(__CLASSNAME__, "::RedrawMap@${getMethodName()}$mapView, $lntLng, $coords")
-            /*val map = */mapView.getMapAsync { naverMap ->
-            if (lntLng != null) naverMap.cameraPosition = CameraPosition(lntLng, GPX_CAMERA_ZOOM_ZERO)
-            if (coords.size > 2) {
-                val path = PathOverlay()
-                path.coords = coords
-                path.color = 0xFFFF0000.toInt()
-                path.width = 10
+            Log.wtf(__CLASSNAME__, "::RedrawMap@${getMethodName()}[${paths.size}][${coords.size}][${lntLng == paths.last()}][$lat, $lon]$lntLng, ${paths.last()}, $paths, $coords")
+            mapView.getMapAsync { naverMap ->
+                naverMap.cameraPosition = CameraPosition(lntLng, GPX_CAMERA_ZOOM_ZERO)
                 path.map = naverMap
             }
         }
-        }
     }
 
-    LaunchedEffect(lntLng, paths) {
-        Log.w(__CLASSNAME__, "::LaunchedEffect@${getMethodName()}$lntLng, $paths")
+    LaunchedEffect(lntLng, coords) {
+        Log.w(__CLASSNAME__, "::LaunchedEffect@${getMethodName()}[${paths.size}][${coords.size}][${lntLng == paths.last()}][$lat, $lon]$lntLng, ${paths.last()}, $paths, $coords")
         RedrawMap()
     }
 
-    val mapOptions = remember {
-        NaverMapOptions()
-            .logoClickEnabled(true)
-            //.camera(CameraPosition(latLngZero, GPX_CAMERA_ZOOM_ZERO))
-            .mapType(NaverMap.MapType.Navi)
-            .locationButtonEnabled(true)
-            .zoomControlEnabled(true)
-            .compassEnabled(true)
-    }
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         //RedrawMap()
-        Log.i(__CLASSNAME__, "${getMethodName()}$locationSource, $lntLng, $paths")
+        val mapOptions = remember {
+            NaverMapOptions()
+                .logoClickEnabled(true)
+                .camera(CameraPosition(latLngZero, GPX_CAMERA_ZOOM_ZERO))
+                .mapType(NaverMap.MapType.Navi)
+                .locationButtonEnabled(true)
+                .zoomControlEnabled(true)
+                .compassEnabled(true)
+        }
         AndroidView(
             factory = { context ->
+                Log.d(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${paths.size}][${coords.size}][${lntLng == paths.last()}][$lat, $lon]$lntLng, ${paths.last()}, $coords")
                 MapView(context, mapOptions).apply {
                     getMapAsync { naverMap ->
                         naverMap.locationSource = locationSource
                         naverMap.locationTrackingMode = LocationTrackingMode.Face
-                        naverMap.cameraPosition = CameraPosition(latLngZero, GPX_CAMERA_ZOOM_ZERO)
+                        naverMap.cameraPosition = CameraPosition(lntLng, GPX_CAMERA_ZOOM_ZERO)
                     }
                 }
             },
@@ -187,14 +182,15 @@ fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
         )
         Button(
             onClick = {
+                Log.d(__CLASSNAME__, "::NaverMapApp@Button${getMethodName()}[${paths.size}][${coords.size}][${lntLng == paths.last()}][$lat, $lon]$lntLng, ${paths.last()}, $coords")
                 val newMarker = Marker()
                 val lat = 37.5 + markers.size * 0.01
-                val lng = 127.0 + markers.size * 0.01
-                newMarker.position = LatLng(lat, lng)
+                val lon = 127.0 + markers.size * 0.01
+                newMarker.position = LatLng(lat, lon)
                 mapView.getMapAsync {
                     newMarker.map = it
                 }
-                markers.add(LatLng(lat, lng))
+                markers.add(LatLng(lat, lon))
             },
             modifier = Modifier.padding(16.dp),
         ) {
