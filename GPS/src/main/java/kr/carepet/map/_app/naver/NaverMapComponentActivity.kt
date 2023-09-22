@@ -98,7 +98,7 @@ open class NaverMapComponentActivity : _mapcomponentactivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         locationSource = FusedLocationSource(this, PERMISSION_REQUEST_CODE)
-        setContent { NaverMapApp() }
+        //setContent { NaverMapApp() }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -141,10 +141,6 @@ fun NaverMapApp(locationSource: FusedLocationSource, paths: List<LatLng>) {
         mutableStateListOf<LatLng>()
     }
 
-    //val locationSource = remember {
-    //    FusedLocationSource(activity, PERMISSION_REQUEST_CODE)
-    //}
-
     Log.i(__CLASSNAME__, "${getMethodName()}[${paths.size}][${coords.size}]${latLng.toText()}, $paths, $coords")
 
     val coroutineScope = rememberCoroutineScope()
@@ -175,21 +171,20 @@ fun NaverMapApp(locationSource: FusedLocationSource, paths: List<LatLng>) {
                     path.map = naverMap
                     Log.wtf(__CLASSNAME__, "::LaunchedEffect@${getMethodName()}[${paths.size}][${coords.size}]${latLng.toText()}, $coords")
                 }
-                naverMap.apply {
-                    locationOverlay.isVisible = true
-                    locationOverlay.position = latLng
-                    //locationOverlay.bearing = 0f
-                    locationOverlay.icon = OverlayImage.fromResource(R.drawable.ic_location_overlay)
-                    //locationOverlay.icon = OverlayImage.fromResource(R.drawable.ic_location_overlay_start)
-                    locationOverlay.iconWidth = 100
-                    locationOverlay.iconHeight = 100
-                    //locationOverlay.anchor = PointF(1.0f, 1.0f)
-                    //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.ic_location_overlay_start)
-                    //locationOverlay.subIconWidth = 80
-                    //locationOverlay.subIconHeight = 80
-                    //locationOverlay.subAnchor = PointF(1.5f, 0.0f)
-                    locationOverlay.circleRadius = 200
-                }
+                //naverMap.apply {
+                //    locationOverlay.isVisible = true
+                //    locationOverlay.position = latLng
+                //    locationOverlay.bearing = 0f
+                //    locationOverlay.icon = OverlayImage.fromResource(R.drawable.ic_location_overlay)
+                //    locationOverlay.iconWidth = 100
+                //    locationOverlay.iconHeight = 100
+                //    //locationOverlay.anchor = PointF(0.0f, 0.0f)
+                //    //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.ic_location_overlay_start)
+                //    //locationOverlay.subIconWidth = 80
+                //    //locationOverlay.subIconHeight = 80
+                //    //locationOverlay.subAnchor = PointF(-10.0f, 20.0f)
+                //    locationOverlay.circleRadius = 100
+                //}
             }
         }
     }
@@ -203,8 +198,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, paths: List<LatLng>) {
                     getMapAsync { naverMap ->
                         Log.d(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${paths.size}][${coords.size}]$latLng , $coords")
                         naverMap.locationSource = locationSource
-                        naverMap.locationTrackingMode = LocationTrackingMode.Follow
-                        naverMap.cameraPosition = CameraPosition(latLng, GPX_CAMERA_ZOOM_ZERO)
+                        naverMap.locationTrackingMode = LocationTrackingMode.Face
                     }
                 }
             },
