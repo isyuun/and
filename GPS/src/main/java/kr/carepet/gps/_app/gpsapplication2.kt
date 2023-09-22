@@ -106,7 +106,7 @@ open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver 
 
     override fun onReceive(context: Context, intent: Intent) {
         val location = location4Intent(intent)
-        Log.i(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $context, $intent")
+        Log.w(__CLASSNAME__, "${getMethodName()}${location.toText()}, $location, $context, $intent")
         if (location != null) {
             val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSZ", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
             logResultsToScreen("${tick} - ${location.toText()}, $location")

@@ -79,21 +79,17 @@ const val PERMISSION_REQUEST_CODE = 100
 open class NaverMapComponentActivity : _mapcomponentactivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private var locationSource: FusedLocationSource? = null
-
     var paths = mutableListOf<LatLng>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        locationSource = FusedLocationSource(this, PERMISSION_REQUEST_CODE)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$locationSource")
-        setContent {
-            NaverMapApp()
-        }
+        //setContent {
+        //    NaverMapApp()
+        //}
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$locationSource, ${location?.toText()}, $location, $context, $intent")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${location?.toText()}, $location, $context, $intent")
         super.onReceive(context, intent)
         val lat = location?.latitude
         val lon = location?.longitude
@@ -142,8 +138,8 @@ fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
     }
 
     fun RedrawMap() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$mapView, $lntLng, $coords")
         coroutineScope.launch {
+        Log.wtf(__CLASSNAME__, "::RedrawMap@${getMethodName()}$mapView, $lntLng, $coords")
             /*val map = */mapView.getMapAsync { naverMap ->
             if (lntLng != null) naverMap.cameraPosition = CameraPosition(lntLng, GPX_CAMERA_ZOOM_ZERO)
             if (coords.size > 2) {
@@ -158,14 +154,14 @@ fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
     }
 
     LaunchedEffect(lntLng, paths) {
-        Log.w(__CLASSNAME__, "${getMethodName()}$lntLng, $paths")
+        Log.w(__CLASSNAME__, "::LaunchedEffect@${getMethodName()}$lntLng, $paths")
         RedrawMap()
     }
 
     val mapOptions = remember {
         NaverMapOptions()
             .logoClickEnabled(true)
-            .camera(CameraPosition(latLngZero, GPX_CAMERA_ZOOM_ZERO))
+            //.camera(CameraPosition(latLngZero, GPX_CAMERA_ZOOM_ZERO))
             .mapType(NaverMap.MapType.Navi)
             .locationButtonEnabled(true)
             .zoomControlEnabled(true)
@@ -176,11 +172,11 @@ fun NaverMapApp(activity: Activity, paths: List<LatLng>) {
         modifier = Modifier.fillMaxSize()
     ) {
         //RedrawMap()
+        Log.i(__CLASSNAME__, "${getMethodName()}$locationSource, $lntLng, $paths")
         AndroidView(
             factory = { context ->
                 MapView(context, mapOptions).apply {
                     getMapAsync { naverMap ->
-                        Log.i(__CLASSNAME__, "${getMethodName()}$lntLng, $paths")
                         naverMap.locationSource = locationSource
                         naverMap.locationTrackingMode = LocationTrackingMode.Face
                         naverMap.cameraPosition = CameraPosition(latLngZero, GPX_CAMERA_ZOOM_ZERO)

@@ -42,19 +42,6 @@ import kr.carepet.util.getMethodName
 open class gpsapplication3 : gpsapplication2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        Log.w(__CLASSNAME__, "${getMethodName()}...")
-        super.onServiceConnected(name, service)
-        foregroundOnlyLocationService?.onServiceConnected(name, service)
-        start()    //test
-    }
-
-    override fun onServiceDisconnected(name: ComponentName) {
-        Log.w(__CLASSNAME__, "${getMethodName()}...")
-        super.onServiceDisconnected(name)
-        foregroundOnlyLocationService?.onServiceDisconnected(name)
-    }
-
     private var _id = ""
     private var id: String
         get() = this._id
@@ -70,24 +57,41 @@ open class gpsapplication3 : gpsapplication2() {
     }
 
     fun pee(id: String) {
+        Log.d(__CLASSNAME__, "${getMethodName()}[$id]")
         this.id = id
         foregroundOnlyLocationService?.pee()
     }
 
     fun poo(id: String) {
+        Log.d(__CLASSNAME__, "${getMethodName()}[$id]")
         this.id = id
         foregroundOnlyLocationService?.poo()
     }
 
     fun mark(id: String) {
+        Log.d(__CLASSNAME__, "${getMethodName()}[$id]")
         this.id = id
         foregroundOnlyLocationService?.mark()
     }
 
     override fun onReceive(context: Context, intent: Intent) {
+        Log.i(__CLASSNAME__, "${getMethodName()}...")
         super.onReceive(context, intent)
-        post { pee("") }    //test
-        post { poo("") }    //test
-        post { mark("") }    //test
+        //post { pee("") }    //test
+        //post { poo("") }    //test
+        //post { mark("") }    //test
+    }
+
+    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
+        super.onServiceConnected(name, service)
+        foregroundOnlyLocationService?.onServiceConnected(name, service)
+        start()    //test
+    }
+
+    override fun onServiceDisconnected(name: ComponentName) {
+        Log.w(__CLASSNAME__, "${getMethodName()}...")
+        super.onServiceDisconnected(name)
+        foregroundOnlyLocationService?.onServiceDisconnected(name)
     }
 }

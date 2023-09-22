@@ -164,22 +164,22 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
             this._id = id
         }
 
-    fun pee() {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
+    internal fun pee() {
+        //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
         val track = currentLocation?.let { Track(it, id = id, pee = 1) }
         track?.let { add(it) }
         dump()
     }
 
-    fun poo() {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
+    internal fun poo() {
+        //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
         val track = currentLocation?.let { Track(it, id = id, poo = 1) }
         track?.let { add(it) }
         dump()
     }
 
-    fun mark() {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
+    internal fun mark() {
+        //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
         val track = currentLocation?.let { Track(it, id = id, mrk = 1) }
         track?.let { add(it) }
         dump()
