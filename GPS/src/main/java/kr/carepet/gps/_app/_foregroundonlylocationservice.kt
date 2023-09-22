@@ -26,6 +26,8 @@
 package kr.carepet.gps._app
 
 import kr.carepet.app.Service
+import kr.carepet.gpx.GPX_INTERVAL_UPDATE_METERS
+import kr.carepet.gpx.GPX_INTERVAL_UPDATE_SECONDS
 
 private const val PACKAGE_NAME = "kr.carepet.app.navi"
 
@@ -41,8 +43,8 @@ internal const val NOTIFICATION_ID = 12345678
 
 internal const val NOTIFICATION_CHANNEL_ID = "kr.carepet.app.navi.channel.01"
 
-const val INTERVAL_UPDATE_SECONDS: Long = 1L
-const val INTERVAL_UPDATE_METERS: Float = 1f
+const val INTERVAL_UPDATE_SECONDS: Long = GPX_INTERVAL_UPDATE_SECONDS
+const val INTERVAL_UPDATE_METERS: Float = GPX_INTERVAL_UPDATE_METERS
 
 /**
  * @Project     : carepet-android
