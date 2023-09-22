@@ -165,6 +165,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, paths: List<LatLng>) {
                     val path = PathOverlay()
                     path.coords = coords
                     path.color = 0xFFFFDBDB.toInt()
+                    path.outlineColor = 0xF0FF5000.toInt()
                     path.width = 50
                     path.globalZIndex = 10
                     path.outlineWidth = 3
