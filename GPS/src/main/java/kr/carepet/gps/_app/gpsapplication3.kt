@@ -86,6 +86,7 @@ open class gpsapplication3 : gpsapplication2() {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
         foregroundOnlyLocationService?.onServiceConnected(name, service)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         start()    //test
     }
 

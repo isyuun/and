@@ -6,4 +6,10 @@
 
     <string name="pee">쉬야</string>
     <string name="poo">응가</string>
+    <string name="mark">마킹</string>
+
+    <string name="track">산책</string>
+    <string name="note">노트</string>
+    <string name="location">위치</string>
+    <string name="photo">사진</string>
 </resources>

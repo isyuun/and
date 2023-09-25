@@ -23,7 +23,7 @@
  *  isyuun@care-pet.kr             2023. 9. 21.   description...
  */
 
-package kr.carepet.map._app.naver
+package kr.carepet.map.app.naver
 
 import com.naver.maps.map.NaverMapSdk
 import kr.carepet.gps.app.GPSApplication

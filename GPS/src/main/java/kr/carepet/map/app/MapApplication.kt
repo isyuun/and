@@ -25,7 +25,7 @@
 
 package kr.carepet.map.app
 
-import kr.carepet.map._app.naver.NaverMapApplication
+import kr.carepet.map.app.naver.NaverMapApplication
 
 /**
  * @Project     : carepet-android

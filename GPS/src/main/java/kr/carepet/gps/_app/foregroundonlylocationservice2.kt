@@ -87,12 +87,16 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     override fun onCreate() {
+        Log.d(__CLASSNAME__, "${getMethodName()}$tracks")
         super.onCreate()
-        tracks.clear()
+        _tracks.clear()
         paths()
     }
 
-    private val tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
+    private val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
+
+    val tracks: MutableList<Track>
+        get() = _tracks
 
     /** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-tracks-in-metre">Calculate distance between two tracks in metre</a> */
     //https://stackoverflow.com/questions/43080343/calculate-distance-between-two-locations-in-metre
@@ -112,14 +116,14 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     protected fun add(track: Track) {
-        tracks.add(track)
+        _tracks.add(track)
     }
 
     override fun onLocationResult(locationResult: LocationResult) {
         val loc1 = currentLocation?.let { Track(it) }
         val loc2 = locationResult.lastLocation?.let { Track(it) }
         val dist = distance(loc1, loc2)
-        val size = tracks.size
+        val size = _tracks.size
         val max = GPX_INTERVAL_UPDATE_METERS
         val exit = (size > 0 && dist < max)
         Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit][$size][${max}m][${dist}m][${loc1?.toText()}, ${loc2?.toText()}], $loc1, $loc2")
@@ -147,14 +151,14 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     protected open fun write(clear: Boolean) {
-        if (tracks.size < 1) return
+        if (_tracks.size < 1) return
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val time = (tracks.first()?.loc)?.time
+        val time = (_tracks.first()?.loc)?.time
         val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
-        Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
-        GPXWriter2.write(tracks, file)
-        if (clear) tracks.clear()
+        Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${_tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
+        GPXWriter2.write(_tracks, file)
+        if (clear) _tracks.clear()
     }
 
     private var _id = ""
@@ -197,7 +201,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     override fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         super.stop()
-        if (tracks.size > 0) write(true)
+        if (_tracks.size > 0) write(true)
         start = 0L
     }
 }
