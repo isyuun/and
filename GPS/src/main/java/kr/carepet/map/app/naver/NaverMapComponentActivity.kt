@@ -69,6 +69,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -121,10 +122,13 @@ open class NaverMapComponentActivity : _mapcomponentactivity() {
     private lateinit var locationSource: FusedLocationSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i(__CLASSNAME__, "${getMethodName()}${paths.size}$paths")
         super.onCreate(savedInstanceState)
-        paths.clear()
         locationSource = FusedLocationSource(this, PERMISSION_REQUEST_CODE)
         locationSource.isCompassEnabled = true
+        location = locationSource.lastLocation
+        paths.clear()
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${location?.toText()}, ${locationSource.lastLocation.toText()}")
     }
 
     override fun onResume() {
@@ -141,7 +145,7 @@ open class NaverMapComponentActivity : _mapcomponentactivity() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${location?.toText()}, $location, $context, $intent")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${paths.size}]${location?.toText()}, $location, $context, $intent")
         super.onReceive(context, intent)
         val lat = location?.latitude
         val lon = location?.longitude
@@ -241,6 +245,8 @@ fun getRounded(context: Context, id: Int): Bitmap {
 @Composable
 fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
     val context = LocalContext.current
+
+    val application = GPSApplication.getInstance()
 
     val coords = remember { locations }
 
@@ -515,9 +521,19 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
             }
         }
         /** tracking */
+        var isStarted = remember { mutableStateOf(GPSApplication.getInstance().start) }
+        val buttonText = if (isStarted.value) "${getString(context, R.string.track)} ${getString(context, R.string.stop)}" else "${getString(context, R.string.track)} ${getString(context, R.string.start)}"
+        val buttonColor = if (isStarted.value) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.Blue)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$isStarted]$buttonText")
         Button(
             onClick = {
-                /*TODO:산책시작*/
+                if (!isStarted.value) {
+                    application.start()
+                } else {
+                    application.stop()
+                }
+                isStarted.value = application.start
+                //isStarted = !isStarted
             },
             elevation = ButtonDefaults.elevatedButtonElevation(
                 defaultElevation = 0.dp,
@@ -533,7 +549,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 )
                 .align(Alignment.BottomCenter),
             contentPadding = PaddingValues(14.dp),
-            colors = ButtonDefaults.buttonColors(Color.Blue),
+            colors = buttonColor,
             border = BorderStroke(1.dp, Color.Gray),
         ) {
             Box(
@@ -551,7 +567,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         tint = Color.White,
                     )
                     Text(
-                        text = "${getString(context, R.string.track)} ${getString(context, R.string.start)}",
+                        text = buttonText,
                     )
                 }
             }

@@ -33,16 +33,16 @@ import kr.carepet.util.getMethodName
 
 /**
  * @Project     : carepet-android
- * @FileName    : MainActivity4.kt
+ * @FileName    : _MainActivity.kt
  * @Date        : 2023. 09. 04.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class MainActivity4 : MapComponentActivity() {
+open class _MainActivity : MapComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.i(__CLASSNAME__, "${getMethodName()}savedInstanceState:$savedInstanceState")
+        Log.d(__CLASSNAME__, "${getMethodName()}savedInstanceState:$savedInstanceState")
         super.onCreate(savedInstanceState)
     }
 }

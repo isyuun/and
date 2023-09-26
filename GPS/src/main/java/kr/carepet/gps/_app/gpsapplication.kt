@@ -40,9 +40,9 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import kr.carepet.app.Application
+import kr.carepet.gps.R
 import kr.carepet.gps.app.ForegroundOnlyLocationService
 import kr.carepet.gps.app.ForegroundOnlyLocationService.LocalBinder
-import kr.carepet.gps.R
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -155,7 +155,10 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
         Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences")
     }
 
-    protected fun start() {
+    var start = false
+        get() = (foregroundOnlyLocationService?.start ?: 0L > 0L)
+
+    fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()}, $foregroundOnlyLocationService")
         // TODO: Step 1.0, Review Permissions: Checks and requests if needed.
         if (foregroundPermissionApproved()) {
@@ -165,7 +168,7 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
         }
     }
 
-    protected fun stop() {
+    fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()},${foregroundOnlyLocationService}")
         foregroundOnlyLocationService?.stop()
     }
