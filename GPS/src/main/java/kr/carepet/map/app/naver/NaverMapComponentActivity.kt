@@ -37,12 +37,12 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.PointF
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.ViewGroup
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -52,8 +52,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -76,14 +78,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat.getString
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.naver.maps.geometry.LatLng
@@ -96,6 +99,8 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.FusedLocationSource
+import com.naver.maps.map.widget.LocationButtonView
+import com.naver.maps.map.widget.ZoomControlView
 import kotlinx.coroutines.launch
 import kr.carepet.gps.R
 import kr.carepet.gps._app.toText
@@ -106,20 +111,8 @@ import kr.carepet.gpx.GPX_LONGITUDE_ZERO
 import kr.carepet.map._app._mapcomponentactivity
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
-import kotlin.math.max
 
 const val PERMISSION_REQUEST_CODE = 100
-
-/**
- * Returns the `location` object as a human readable string.
- */
-fun LatLng?.toText(): String {
-    return if (this != null) {
-        "($latitude, $longitude)"
-    } else {
-        "Unknown location"
-    }
-}
 
 open class NaverMapComponentActivity : _mapcomponentactivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
@@ -129,8 +122,9 @@ open class NaverMapComponentActivity : _mapcomponentactivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        paths.clear()
         locationSource = FusedLocationSource(this, PERMISSION_REQUEST_CODE)
-        //locationSource.isCompassEnabled = true
+        locationSource.isCompassEnabled = true
     }
 
     override fun onResume() {
@@ -160,6 +154,18 @@ open class NaverMapComponentActivity : _mapcomponentactivity() {
     fun NaverMapApp() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${paths.size}]$paths, $this")
         NaverMapApp(locationSource, paths)
+    }
+}
+
+
+/**
+ * Returns the `location` object as a human readable string.
+ */
+fun LatLng?.toText(): String {
+    return if (this != null) {
+        "($latitude, $longitude)"
+    } else {
+        "Unknown location"
     }
 }
 
@@ -300,7 +306,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                     getMapAsync { naverMap ->
                         Log.d(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${locations.size}][${coords.size}]$latLng , $coords")
                         naverMap.locationSource = locationSource
-                        naverMap.locationTrackingMode = LocationTrackingMode.NoFollow
+                        naverMap.locationTrackingMode = LocationTrackingMode.Follow
                         naverMap.apply {
                             locationOverlay.isVisible = true
                             //locationOverlay.icon = OverlayImage.fromResource(R.drawable.currentlocation)
@@ -318,35 +324,6 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
             },
             modifier = Modifier.fillMaxSize(),
         )
-        //Button(
-        //    onClick = {
-        //        Log.d(__CLASSNAME__, "::NaverMapApp@Button${getMethodName()}[${locations.size}][${coords.size}]$latLng , $coords")
-        //        val marker = Marker()
-        //        marker.position = latLng
-        //        mapView.getMapAsync { naverMap ->
-        //            marker.map = naverMap
-        //        }
-        //        markers.add(latLng)
-        //    },
-        //    modifier = Modifier.padding(16.dp),
-        //) {
-        //    Column(
-        //        verticalArrangement = Arrangement.Center,
-        //        horizontalAlignment = Alignment.CenterHorizontally
-        //    ) {
-        //        Icon(
-        //            imageVector = ImageVector.vectorResource(R.drawable.icon_mark),
-        //            contentDescription = null,
-        //            tint = Color.Black
-        //        )
-        //        Text(
-        //            text = stringResource(id = R.string.mark),
-        //            textAlign = TextAlign.Center,
-        //            fontSize = 10.sp,
-        //            modifier = Modifier.padding(top = 4.dp)
-        //        )
-        //    }
-        //}
         Column(
             modifier = Modifier
                 .padding(
@@ -369,8 +346,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         marker.width = 96
                         marker.height = 96
                         marker.zIndex = 100
-                        marker.anchor = PointF(-1f, 10f)
-                        marker.icon = OverlayImage.fromResource(R.drawable.icon_pee)
+                        //marker.icon = OverlayImage.fromResource(R.drawable.icon_pee)
                         marker.icon = OverlayImage.fromBitmap(getRounded(context, R.drawable.icon_pee))
                         markers.add(latLng)
                     },
@@ -402,10 +378,11 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         mapView.getMapAsync { naverMap ->
                             marker.map = naverMap
                         }
-                        marker.width = 62
-                        marker.height = 62
+                        marker.width = 96
+                        marker.height = 96
                         marker.zIndex = 100
-                        marker.icon = OverlayImage.fromResource(R.drawable.icon_poo)
+                        //marker.icon = OverlayImage.fromResource(R.drawable.icon_poop)
+                        marker.icon = OverlayImage.fromBitmap(getRounded(context, R.drawable.icon_poop))
                         markers.add(latLng)
                     },
                     modifier = Modifier
@@ -421,7 +398,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         )
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.icon_poo),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.icon_poop),
                         contentDescription = stringResource(R.string.poo),
                     )
                 }
@@ -436,10 +413,11 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         mapView.getMapAsync { naverMap ->
                             marker.map = naverMap
                         }
-                        marker.width = 62
-                        marker.height = 62
+                        marker.width = 96
+                        marker.height = 96
                         marker.zIndex = 100
-                        marker.icon = OverlayImage.fromResource(R.drawable.icon_mark)
+                        //marker.icon = OverlayImage.fromResource(R.drawable.icon_mark)
+                        marker.icon = OverlayImage.fromBitmap(getRounded(context, R.drawable.icon_mark))
                         markers.add(latLng)
                     },
                     modifier = Modifier
@@ -480,41 +458,17 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         .size(40.dp)
                         .background(
                             color = Color.White,
-                            shape = CircleShape
+                            //shape = CircleShape,
                         )
                         .border(
                             width = 0.1.dp,
                             color = Color.Gray,
-                            shape = CircleShape
+                            //shape = CircleShape,
                         )
                 ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.icon_list),
                         contentDescription = stringResource(R.string.note),
-                    )
-                }
-            }
-            /** location */
-            Row {
-                //Text(stringResource(id = R.string.pee))
-                IconButton(
-                    onClick = {
-                    },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            color = Color.White,
-                            shape = CircleShape
-                        )
-                        .border(
-                            width = 0.1.dp,
-                            color = Color.Gray,
-                            shape = CircleShape
-                        )
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.icon_mylocation),
-                        contentDescription = stringResource(R.string.location),
                     )
                 }
             }
@@ -528,12 +482,12 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         .size(40.dp)
                         .background(
                             color = Color.White,
-                            shape = CircleShape
+                            //shape = CircleShape,
                         )
                         .border(
                             width = 0.1.dp,
                             color = Color.Gray,
-                            shape = CircleShape
+                            //shape = CircleShape,
                         )
                 ) {
                     Icon(
@@ -541,6 +495,23 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         contentDescription = stringResource(R.string.photo),
                     )
                 }
+            }
+            Spacer(modifier = Modifier.height(29.dp)) // 아래 마진 추가
+            /** location */
+            val locationButton = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
+            locationButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = 16.5.dp.toPx().toInt()
+                bottomMargin = 63.dp.toPx().toInt()
+            }
+            val zoomControlButton = mapView.findViewById<ZoomControlView>(com.naver.maps.map.R.id.navermap_zoom_control)
+            zoomControlButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                val density = LocalDensity.current.density
+                val metrics = context.resources.displayMetrics
+                val width = metrics.widthPixels / density
+                val height = metrics.heightPixels / density
+                val right = (width - 64)
+                Log.wtf(__CLASSNAME__, "${getMethodName()}$width, $height, $right")
+                rightMargin = right.dp.toPx().toInt()
             }
         }
         /** tracking */
@@ -560,22 +531,25 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                     horizontal = 32.dp,
                     vertical = 40.dp,
                 )
-                .align(Alignment.BottomCenter),  //
-            contentPadding = PaddingValues(20.dp),
+                .align(Alignment.BottomCenter),
+            contentPadding = PaddingValues(14.dp),
             colors = ButtonDefaults.buttonColors(Color.Blue),
             border = BorderStroke(1.dp, Color.Gray),
         ) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.BottomCenter
+                contentAlignment = Alignment.Center,
             ) {
                 Row {
-                    //Icon(
-                    //    imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
-                    //    modifier = Modifier.size(18.dp),
-                    //    contentDescription = getString(context, R.string.track),
-                    //    tint = Color.Unspecified
-                    //)
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
+                        //modifier = Modifier
+                        //    .padding(
+                        //        horizontal = 8.dp,
+                        //    ),
+                        contentDescription = getString(context, R.string.track),
+                        tint = Color.White,
+                    )
                     Text(
                         text = "${getString(context, R.string.track)} ${getString(context, R.string.start)}",
                     )
@@ -584,6 +558,11 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
         }
         /** tracking */
     }
+}
+
+@Composable
+private fun Dp.toPx(): Float {
+    return (this.value * LocalDensity.current.density).toFloat()
 }
 
 @Composable
