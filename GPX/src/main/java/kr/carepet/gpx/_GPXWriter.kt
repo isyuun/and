@@ -47,8 +47,8 @@ val GPX_DECIMAL_FORMAT_7 = DecimalFormat("0.0000000")
 
 const val GPX_INTERVAL_UPDATE_SECONDS = 0L
 const val GPX_INTERVAL_UPDATE_METERS = 3.0f
-const val GPX_LATITUDE_ZERO = 37.275935      //37.5
-const val GPX_LONGITUDE_ZERO = 127.054136    //127.0
+const val GPX_LATITUDE_ZERO = 37.546855      //37.5
+const val GPX_LONGITUDE_ZERO = 127.065330    //127.0
 //const val GPX_LATITUDE_ZERO = 37.5      //37.5
 //const val GPX_LONGITUDE_ZERO = 127.0    //127.0
 const val GPX_CAMERA_ZOOM_ZERO = 16.8
@@ -61,7 +61,7 @@ open class _GPXWriter {
             for (i in 1 until tracks.size) {
                 val prevLocation = tracks[i - 1]
                 val currentLocation = tracks[i]
-                val distance = prevLocation.loc.distanceTo(currentLocation.loc)
+                val distance = prevLocation.location.distanceTo(currentLocation.location)
                 totalDistance += distance
             }
             return String.format("%.2f km", totalDistance / 1000)
@@ -73,8 +73,8 @@ open class _GPXWriter {
                 return "N/A"
             }
 
-            val startTime = tracks.first().loc.time
-            val endTime = tracks.last().loc.time
+            val startTime = tracks.first().time
+            val endTime = tracks.last().time
             val durationInMillis = endTime - startTime
             val seconds = durationInMillis / 1000
             val minutes = seconds / 60
@@ -92,7 +92,7 @@ open class _GPXWriter {
             for (i in 1 until tracks.size) {
                 val prevLocation = tracks[i - 1]
                 val currentLocation = tracks[i]
-                val altitudeGap = Math.abs(currentLocation.loc.altitude - prevLocation.loc.altitude)
+                val altitudeGap = Math.abs(currentLocation.altitude - prevLocation.altitude)
                 if (altitudeGap > maxAltitudeGap) {
                     maxAltitudeGap = altitudeGap
                 }
@@ -108,8 +108,8 @@ open class _GPXWriter {
 
             var maxSpeed = 0.0f
             for (location in tracks) {
-                if (location.loc.speed > maxSpeed) {
-                    maxSpeed = location.loc.speed
+                if (location.speed > maxSpeed) {
+                    maxSpeed = location.speed
                 }
             }
             return String.format("%.2f m/s", maxSpeed)
@@ -123,7 +123,7 @@ open class _GPXWriter {
 
             var totalSpeed = 0.0f
             for (location in tracks) {
-                totalSpeed += location.loc.speed
+                totalSpeed += location.speed
             }
             val avgSpeed = totalSpeed / tracks.size
             return String.format("%.2f m/s", avgSpeed)

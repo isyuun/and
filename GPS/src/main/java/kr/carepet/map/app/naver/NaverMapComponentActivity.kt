@@ -34,12 +34,14 @@ package kr.carepet.map.app.naver
  */
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.MediaStore
@@ -88,6 +90,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat.getString
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -103,6 +106,7 @@ import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.widget.LocationButtonView
 import com.naver.maps.map.widget.ZoomControlView
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.gps.R
 import kr.carepet.gps._app.toText
@@ -115,58 +119,6 @@ import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.lang.Integer.min
 
-const val PERMISSION_REQUEST_CODE = 100
-
-open class NaverMapComponentActivity : _mapcomponentactivity() {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    var paths = mutableListOf<LatLng>()
-    private lateinit var locationSource: FusedLocationSource
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.i(__CLASSNAME__, "${getMethodName()}${paths.size}$paths")
-        super.onCreate(savedInstanceState)
-        locationSource = FusedLocationSource(this, PERMISSION_REQUEST_CODE)
-        locationSource.isCompassEnabled = true
-        location = locationSource.lastLocation
-        paths.clear()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${location?.toText()}, ${locationSource.lastLocation.toText()}")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (GPSApplication.getInstance().service?.tracks?.isEmpty() == true) return
-        GPSApplication.getInstance().service?.tracks?.forEach { track ->
-            val loc = track.loc
-            val lat = loc.latitude
-            val lon = loc.longitude
-            val lng = LatLng(lat, lon)
-            paths.add(lng)
-        }
-        setContent { NaverMapApp() }
-    }
-
-    override fun onReceive(context: Context, intent: Intent) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${paths.size}]${location?.toText()}, $location, $context, $intent")
-        super.onReceive(context, intent)
-        val lat = location?.latitude
-        val lon = location?.longitude
-        val lng = lat?.let { lon?.let { it1 -> LatLng(it, it1) } }
-        lng?.let { paths.add(it) }
-        setContent { NaverMapApp() }
-    }
-
-    @Composable
-    fun NaverMapApp() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${paths.size}]$paths, $this")
-        NaverMapApp(locationSource, paths)
-    }
-}
-
-
-/**
- * Returns the `location` object as a human readable string.
- */
 fun LatLng?.toText(): String {
     return if (this != null) {
         "($latitude, $longitude)"
@@ -175,9 +127,7 @@ fun LatLng?.toText(): String {
     }
 }
 
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-private fun getBitmap(drawable: Drawable): Bitmap {
+private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
     val bitmap = Bitmap.createBitmap(
         drawable.intrinsicWidth,
         drawable.intrinsicHeight,
@@ -189,16 +139,28 @@ private fun getBitmap(drawable: Drawable): Bitmap {
     return bitmap
 }
 
-fun getRounded(
-    source: Bitmap,
-    backColor: Int,
-    outline: Float,
-    outlineColor: Int
-): Bitmap {
+private fun getDrawableWithBackgroundColor(drawable: Drawable, backgroundColor: Int): Drawable {
+    val width = drawable.intrinsicWidth
+    val height = drawable.intrinsicHeight
+
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+
+    val paint = Paint()
+    paint.color = backgroundColor
+    canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+
+    drawable.setBounds(0, 0, width, height)
+    drawable.draw(canvas)
+
+    return BitmapDrawable(Resources.getSystem(), bitmap)
+}
+
+private fun getRounded(source: Bitmap, backColor: Int, outlineColor: Int): Bitmap {
     val width = source.width
     val height = source.height
 
-    val padding = min(width, height) / 5
+    val padding = min(width, height) / 4
     val newWidth = width - (padding * 2)
     val newHeight = height - (padding * 2)
 
@@ -227,7 +189,7 @@ fun getRounded(
     paint.xfermode = null
     paint.color = outlineColor
     paint.style = Paint.Style.STROKE
-    paint.strokeWidth = outline
+    paint.strokeWidth = 0.1f
 
     val outerRect = RectF(1f, 1f, width.toFloat() - 2, height.toFloat() - 2)
     canvas.drawRoundRect(outerRect, width.toFloat(), height.toFloat(), paint)
@@ -235,46 +197,127 @@ fun getRounded(
     return output
 }
 
-fun getRounded(context: Context, id: Int, backColor: Color): Bitmap {
-    val source = getBitmap(context.resources.getDrawable(id, null))
-    return getRounded(source, backColor.toArgb(), 0.1f, Color.Black.toArgb())
+fun getRounded(context: Context, id: Int, backColor: Color): Bitmap? {
+    val resources = context.resources
+    val drawable = ResourcesCompat.getDrawable(resources, id, null)?.let { getDrawableWithBackgroundColor(it, backColor.toArgb()) }
+    val source = drawable?.let { getBitmapFromDrawable(it) }
+    return source?.let { getRounded(it, backColor.toArgb(), Color.Black.toArgb()) }
 }
 
-fun marker(context: Context, latLng: LatLng, id: Int, back: Color = Color.White): Marker {
+const val PERMISSION_REQUEST_CODE = 100
+
+open class NaverMapComponentActivity : _mapcomponentactivity() {
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    private lateinit var source: FusedLocationSource
+
+    private var latLng: LatLng? = null
+    private var latLngs = mutableListOf<LatLng>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i(__CLASSNAME__, "::NaverMapApp${getMethodName()}[${latLngs.size}][${latLng?.toText()}]$latLngs")
+        super.onCreate(savedInstanceState)
+        source = FusedLocationSource(this, PERMISSION_REQUEST_CODE)
+        latLngs.clear()
+        latLng = LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)
+        //lifecycleScope.launch(Dispatchers.Main) {
+        //    waitForLocationUpdate()
+        //    Log.wtf(__CLASSNAME__, "::NaverMapApp${getMethodName()}[$source][${latLng?.toText()}][${location?.toText()}][${source.lastLocation?.toText()}]")
+        //    setContent { NaverMapApp() }
+        //}
+    }
+
+    private suspend fun waitForLocationUpdate() {
+        while (source.lastLocation == null) {
+            // 위치 업데이트가 아직 수신되지 않았으므로 대기
+            delay(1000) // 1초마다 체크하거나 필요한 시간으로 수정하세요.
+        }
+        // 위치 업데이트가 수신되면 이곳으로 진입
+        if (source.lastLocation != null) {
+            val lat = source.lastLocation!!.latitude
+            val lon = source.lastLocation!!.longitude
+            latLng = LatLng(lat, lon)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (GPSApplication.getInstance().service?.tracks?.isEmpty() == true) return
+        GPSApplication.getInstance().service?.tracks?.forEach { track ->
+            val lat = track.latitude
+            val lon = track.longitude
+            val lng = LatLng(lat, lon)
+            latLngs.add(lng)
+        }
+        setContent { NaverMapApp() }
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${latLngs.size}]${location?.toText()}, $location, $context, $intent")
+        super.onReceive(context, intent)
+        val lat = location?.latitude
+        val lon = location?.longitude
+        val lng = lat?.let { lon?.let { it1 -> LatLng(it, it1) } }
+        lng?.let { latLngs.add(it) }
+        setContent { NaverMapApp() }
+    }
+
+    @Composable
+    fun NaverMapApp() {
+        Log.d(__CLASSNAME__, "${getMethodName()}[${latLngs.size}][$latLng][$source][${source.lastLocation}]")
+        NaverMapApp(source, latLngs, latLng)
+    }
+}
+
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+fun marker(context: Context, position: LatLng?, id: Int, back: Color = Color.White): Marker {
     val marker = Marker()
-    marker.position = latLng
+    if (position != null) {
+        marker.position = position
+    }
     marker.width = 96
     marker.height = 96
     marker.zIndex = 100
-    //marker.icon = OverlayImage.fromResource(R.drawable.icon_pee)
-    marker.icon = OverlayImage.fromBitmap(getRounded(context, id, back))
+    getRounded(context, id, back)?.let { marker.icon = OverlayImage.fromBitmap(it) }
+    return marker
+}
+
+fun starter(position: LatLng?): Marker {
+    val marker = Marker()
+    if (position != null) {
+        marker.position = position
+    }
+    //marker.width = 96
+    //marker.height = 96
+    marker.zIndex = 1
+    marker.icon = OverlayImage.fromResource(R.drawable.marker_start)
     return marker
 }
 
 @Composable
-fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
+fun NaverMapApp(source: FusedLocationSource, latLngs: List<LatLng>, latLng: LatLng?) {
+    Log.i(__CLASSNAME__, "${getMethodName()}[${latLngs.size}][$latLng][$source][${source.lastLocation}]")
     val context = LocalContext.current
 
     val application = GPSApplication.getInstance()
 
-    val coords = remember { locations }
+    val coords = remember { latLngs }
 
-    var latLng = remember { LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO) }
-    if (locations.isNotEmpty()) {
-        val lat = locations.last().latitude
-        val lon = locations.last().longitude
-        latLng = LatLng(lat, lon)
+    var position = remember { latLng }
+    if (latLngs.isNotEmpty()) {
+        val lat = latLngs.last().latitude
+        val lon = latLngs.last().longitude
+        position = LatLng(lat, lon)
     }
 
-    //val markers = remember { mutableStateListOf<LatLng>() }
-
-    Log.i(__CLASSNAME__, "${getMethodName()}[${locations.size}][${coords.size}]${latLng.toText()}, $locations, $coords")
+    Log.w(__CLASSNAME__, "${getMethodName()}[${latLngs.size}][${coords.size}][$source][$position][$latLngs][$coords]")
 
     val coroutineScope = rememberCoroutineScope()
 
     val mapOptions = remember {
         NaverMapOptions()
-            .camera(CameraPosition(latLng, GPX_CAMERA_ZOOM_ZERO))
+            .camera(position?.let { CameraPosition(it, GPX_CAMERA_ZOOM_ZERO) })
             .logoClickEnabled(true)
             .mapType(NaverMap.MapType.Basic)
             .locationButtonEnabled(true)
@@ -284,56 +327,66 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
             .indoorEnabled(true)
     }
     val mapView = rememberMapViewWithLifecycle(context, mapOptions)
+    //val v = mapView/*.findViewById<View>(com.naver.maps.map.R.id.navermap_container)*/
+    //if (source.lastLocation != null) v?.visibility = View.VISIBLE else v?.visibility = View.INVISIBLE
 
-    var isStarted = remember { mutableStateOf(GPSApplication.getInstance().start) }
+    val isStarted = remember { mutableStateOf(GPSApplication.getInstance().start) }
     val buttonText = if (isStarted.value) "${getString(context, R.string.track)} ${getString(context, R.string.stop)}" else "${getString(context, R.string.track)} ${getString(context, R.string.start)}"
     val buttonColor = if (isStarted.value) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.Blue)
 
-    LaunchedEffect(latLng, coords) {
+    //val markers = remember { mutableStateListOf<LatLng>() }
+    val markers = remember { mutableListOf<Marker>() }
+
+    LaunchedEffect(source, position, coords) {
         coroutineScope.launch {
-            Log.w(__CLASSNAME__, "::LaunchedEffect@${getMethodName()}[${locations.size}][${coords.size}]${latLng.toText()}, $coords")
+            Log.w(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${latLngs.size}][${coords.size}][$source][${position}]$coords")
             mapView.getMapAsync { naverMap ->
-                if (coords.size > 1) {
-                    val path = PathOverlay()
-                    path.coords = coords
-                    path.color = 0xA0FFDBDB.toInt()
-                    path.outlineColor = 0xA0FF5000.toInt()
-                    path.width = 24
-                    path.globalZIndex = 10
-                    path.outlineWidth = 3
-                    path.map = naverMap
-                    Log.wtf(__CLASSNAME__, "::LaunchedEffect@${getMethodName()}[${locations.size}][${coords.size}]${latLng.toText()}, $coords")
+                if (coords.isNotEmpty()) {
+                    val starter = starter(coords.first())
+                    starter.map = naverMap
+                    if (coords.size > 1) {
+                        val path = PathOverlay()
+                        path.coords = coords
+                        path.color = 0xA0FFDBDB.toInt()
+                        path.outlineColor = 0xA0FF5000.toInt()
+                        path.width = 24
+                        path.globalZIndex = 10
+                        path.outlineWidth = 3
+                        path.map = naverMap
+                        Log.wtf(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${latLngs.size}][${coords.size}][$source][${position}]$coords")
+                    }
                 }
-                naverMap.apply {
-                    locationOverlay.position = latLng
-                    //locationOverlay.bearing = 0f
+                if (position != null) {
+                    naverMap.locationOverlay.position = position
                 }
-                //naverMap.locationTrackingMode = LocationTrackingMode.Follow
             }
         }
     }
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        Log.d(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${latLngs.size}][${coords.size}][$source][${source.lastLocation}][$position][$coords]")
         AndroidView(
             factory = { context ->
                 mapView.apply {
                     getMapAsync { naverMap ->
-                        Log.d(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${locations.size}][${coords.size}]$latLng , $coords")
-                        naverMap.locationSource = locationSource
-                        naverMap.locationTrackingMode = LocationTrackingMode.Follow
+                        Log.wtf(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${latLngs.size}][${coords.size}][$source][${source.lastLocation}][$position][$coords]")
                         naverMap.apply {
+                            locationSource = source
+                            locationTrackingMode = LocationTrackingMode.Follow
+                            cameraPosition = CameraPosition(cameraPosition.target, GPX_CAMERA_ZOOM_ZERO)
                             locationOverlay.isVisible = true
-                            //locationOverlay.icon = OverlayImage.fromResource(R.drawable.currentlocation)
-                            //locationOverlay.iconWidth = 100
-                            //locationOverlay.iconHeight = 100
+                            locationOverlay.circleRadius = 100
+                            locationOverlay.icon = OverlayImage.fromResource(R.drawable.currentlocation)
+                            locationOverlay.iconWidth = 100
+                            locationOverlay.iconHeight = 100
                             //locationOverlay.anchor = PointF(0.0f, 0.0f)
                             //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.ic_location_overlay_start)
                             //locationOverlay.subIconWidth = 80
                             //locationOverlay.subIconHeight = 80
-                            //locationOverlay.subAnchor = PointF(-10.0f, 20.0f)
-                            locationOverlay.circleRadius = 100
+                            //locationOverlay.subAnchor = PointF(-0.0f, 0.0f)
                         }
+                        //mapView.visibility = View.VISIBLE
                     }
                 }
             },
@@ -353,11 +406,13 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 //Text(stringResource(id = R.string.pee))
                 IconButton(
                     onClick = {
-                        //if (!isStarted.value) return@IconButton
-                        val marker = marker(context, latLng, R.drawable.marker_pee, Color(0xFFEEBF00))
+                        Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[${isStarted.value}][${markers.size}]")
+                        if (!isStarted.value) return@IconButton
+                        val marker = marker(context, position, R.drawable.marker_pee, Color(0xFFEEBF00))
                         mapView.getMapAsync { naverMap ->
                             marker.map = naverMap
                         }
+                        markers.add(marker)
                     },
                     modifier = Modifier
                         .size(40.dp)
@@ -384,11 +439,13 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 //Text(stringResource(id = R.string.pee))
                 IconButton(
                     onClick = {
-                        //if (!isStarted.value) return@IconButton
-                        val marker = marker(context, latLng, R.drawable.marker_poop, Color(0xFF956A5C))
+                        Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[${isStarted.value}][${markers.size}]")
+                        if (!isStarted.value) return@IconButton
+                        val marker = marker(context, position, R.drawable.marker_poop, Color(0xFF956A5C))
                         mapView.getMapAsync { naverMap ->
                             marker.map = naverMap
                         }
+                        markers.add(marker)
                     },
                     modifier = Modifier
                         .size(40.dp)
@@ -415,11 +472,13 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 //Text(stringResource(id = R.string.pee))
                 IconButton(
                     onClick = {
-                        //if (!isStarted.value) return@IconButton
-                        val marker = marker(context, latLng, R.drawable.icon_marking, Color(0xFF4AB0F5))
+                        Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[${isStarted.value}][${markers.size}]")
+                        if (!isStarted.value) return@IconButton
+                        val marker = marker(context, position, R.drawable.marker_marking, Color(0xFF4AB0F5))
                         mapView.getMapAsync { naverMap ->
                             marker.map = naverMap
                         }
+                        markers.add(marker)
                     },
                     modifier = Modifier
                         .size(40.dp)
@@ -451,11 +510,12 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 .align(Alignment.BottomStart),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            /** list */
+            /** note */
             Row {
                 //Text(stringResource(id = R.string.pee))
                 IconButton(
                     onClick = {
+                        Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[${isStarted.value}][${markers.size}]")
                         if (!isStarted.value) return@IconButton
                     },
                     modifier = Modifier
@@ -481,6 +541,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 //Text(stringResource(id = R.string.pee))
                 IconButton(
                     onClick = {
+                        Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[${isStarted.value}][${markers.size}]")
                         if (!isStarted.value) return@IconButton
                         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         context.startActivity(intent)
@@ -504,7 +565,6 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 }
             }
             Spacer(modifier = Modifier.height(29.dp)) // 아래 마진 추가
-            /** location */
             val locationButton = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
             locationButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 leftMargin = 16.5.dp.toPx().toInt()
@@ -517,7 +577,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 val width = metrics.widthPixels / density
                 val height = metrics.heightPixels / density
                 val right = (width - 64)
-                Log.wtf(__CLASSNAME__, "${getMethodName()}$width, $height, $right")
+                Log.d(__CLASSNAME__, "${getMethodName()}$width, $height, $right")
                 rightMargin = right.dp.toPx().toInt()
             }
         }
@@ -572,12 +632,15 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
 
 @Composable
 private fun Dp.toPx(): Float {
-    return (this.value * LocalDensity.current.density).toFloat()
+    return (this.value * LocalDensity.current.density)
 }
 
 @Composable
-fun rememberMapViewWithLifecycle(context: Context, mapOptions: NaverMapOptions): MapView {
-    Log.i(__CLASSNAME__, "${getMethodName()}...$mapOptions")
+fun rememberMapViewWithLifecycle(
+    context: Context,
+    mapOptions: NaverMapOptions = NaverMapOptions()
+): MapView {
+    Log.i(__CLASSNAME__, "::NaverMapApp${getMethodName()}...$context, $mapOptions")
 
     val mapView = remember {
         MapView(context, mapOptions)
@@ -605,6 +668,7 @@ fun rememberMapViewWithLifecycle(context: Context, mapOptions: NaverMapOptions):
             }
 
             override fun onDestroy(owner: LifecycleOwner) {
+                //lifecycleObserver.value.onDestroy()
                 mapView.onDestroy()
             }
         }

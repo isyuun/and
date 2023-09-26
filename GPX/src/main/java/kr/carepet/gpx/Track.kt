@@ -35,7 +35,7 @@ import android.location.Location
  * @description :
  */
 data class Track(
-    val loc: Location,
+    private val loc: Location,
     val id: String = "",
     val img: Int = -1,
     val pee: Int = 0,
@@ -43,12 +43,11 @@ data class Track(
     val mrk: Int = 0,
 ) {
     fun toText(): String {
-        return if (this != null) {
-            "($latitude, $longitude)"
-        } else {
-            "Unknown location"
-        }
+        return "($latitude, $longitude)"
     }
+
+    val location: Location
+        get() = loc
 
     val latitude: Double
         get() = loc.latitude
