@@ -147,7 +147,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     protected fun dump() {
         Log.e(__CLASSNAME__, "${getMethodName()}...")
-        if (start > 0) write(false)
+        if (_start > 0) write(false)
     }
 
     protected open fun write(clear: Boolean) {
@@ -156,7 +156,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val time = (_tracks.first()?.loc)?.time
         val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
-        Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${_tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this.start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
+        Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${_tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this._start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
         GPXWriter2.write(_tracks, file)
         if (clear) _tracks.clear()
     }
@@ -189,19 +189,20 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         dump()
     }
 
-    private var start = 0L
+    private var _start = 0L
+    var start = _start
+        get() = _start
 
     override fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         super.start()
-        start =
-            System.currentTimeMillis() /*GPX_SIMPLE_TICK_FORMAT.format(Date(System.currentTimeMillis()))*/
+        _start = System.currentTimeMillis() /*GPX_SIMPLE_TICK_FORMAT.format(Date(System.currentTimeMillis()))*/
     }
 
     override fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
         super.stop()
         if (_tracks.size > 0) write(true)
-        start = 0L
+        _start = 0L
     }
 }
