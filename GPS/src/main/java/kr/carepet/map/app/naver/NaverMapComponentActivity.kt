@@ -42,6 +42,7 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.ViewGroup
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -58,6 +59,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -68,7 +70,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -112,6 +113,7 @@ import kr.carepet.gpx.GPX_LONGITUDE_ZERO
 import kr.carepet.map._app._mapcomponentactivity
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
+import java.lang.Integer.min
 
 const val PERMISSION_REQUEST_CODE = 100
 
@@ -187,16 +189,16 @@ private fun getBitmap(drawable: Drawable): Bitmap {
     return bitmap
 }
 
-private fun getRounded(
+fun getRounded(
     source: Bitmap,
-    backgroundColor: Int,
-    outlineWidth: Float,
+    backColor: Int,
+    outline: Float,
     outlineColor: Int
 ): Bitmap {
     val width = source.width
     val height = source.height
 
-    val padding = width / 5
+    val padding = min(width, height) / 5
     val newWidth = width - (padding * 2)
     val newHeight = height - (padding * 2)
 
@@ -206,21 +208,18 @@ private fun getRounded(
     val output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(output)
 
+    val paint = Paint()
+    paint.isAntiAlias = true
+
+    // Draw a solid background with the specified color
+    paint.color = backColor
+    canvas.drawRoundRect(0f, 0f, width.toFloat(), height.toFloat(), width.toFloat(), height.toFloat(), paint)
+
     // Calculate the coordinates to center the scaled bitmap
     val left = (width - newWidth) / 2f
     val top = (height - newHeight) / 2f
 
-    val paint = Paint()
-    paint.isAntiAlias = true
-
-    // Draw a solid background
-    canvas.drawColor(backgroundColor)
-
-    // Calculate the destination rect for drawing the rounded image with padding
-    val rect = RectF(left, top, left + newWidth, top + newHeight)
-
     // Draw the rounded image inside the destination rect using scaledBitmap
-    canvas.drawRoundRect(rect, width.toFloat(), height.toFloat(), paint)
     paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
     canvas.drawBitmap(scaledBitmap, left, top, paint)
 
@@ -228,18 +227,28 @@ private fun getRounded(
     paint.xfermode = null
     paint.color = outlineColor
     paint.style = Paint.Style.STROKE
-    paint.strokeWidth = outlineWidth
+    paint.strokeWidth = outline
 
-    // Calculate the rect for the outer border
-    val outerRect = RectF(1f, 0f, width.toFloat() - 2, height.toFloat() - 2)
+    val outerRect = RectF(1f, 1f, width.toFloat() - 2, height.toFloat() - 2)
     canvas.drawRoundRect(outerRect, width.toFloat(), height.toFloat(), paint)
 
     return output
 }
 
-fun getRounded(context: Context, id: Int): Bitmap {
+fun getRounded(context: Context, id: Int, backColor: Color): Bitmap {
     val source = getBitmap(context.resources.getDrawable(id, null))
-    return getRounded(source, Color.White.toArgb(), 0.3f, Color.Black.toArgb())
+    return getRounded(source, backColor.toArgb(), 0.1f, Color.Black.toArgb())
+}
+
+fun marker(context: Context, latLng: LatLng, id: Int, back: Color = Color.White): Marker {
+    val marker = Marker()
+    marker.position = latLng
+    marker.width = 96
+    marker.height = 96
+    marker.zIndex = 100
+    //marker.icon = OverlayImage.fromResource(R.drawable.icon_pee)
+    marker.icon = OverlayImage.fromBitmap(getRounded(context, id, back))
+    return marker
 }
 
 @Composable
@@ -250,18 +259,14 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
 
     val coords = remember { locations }
 
-    var latLng = remember {
-        LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)
-    }
+    var latLng = remember { LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO) }
     if (locations.isNotEmpty()) {
         val lat = locations.last().latitude
         val lon = locations.last().longitude
         latLng = LatLng(lat, lon)
     }
 
-    val markers = remember {
-        mutableStateListOf<LatLng>()
-    }
+    //val markers = remember { mutableStateListOf<LatLng>() }
 
     Log.i(__CLASSNAME__, "${getMethodName()}[${locations.size}][${coords.size}]${latLng.toText()}, $locations, $coords")
 
@@ -279,6 +284,10 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
             .indoorEnabled(true)
     }
     val mapView = rememberMapViewWithLifecycle(context, mapOptions)
+
+    var isStarted = remember { mutableStateOf(GPSApplication.getInstance().start) }
+    val buttonText = if (isStarted.value) "${getString(context, R.string.track)} ${getString(context, R.string.stop)}" else "${getString(context, R.string.track)} ${getString(context, R.string.start)}"
+    val buttonColor = if (isStarted.value) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.Blue)
 
     LaunchedEffect(latLng, coords) {
         coroutineScope.launch {
@@ -344,17 +353,11 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 //Text(stringResource(id = R.string.pee))
                 IconButton(
                     onClick = {
-                        val marker = Marker()
-                        marker.position = latLng
+                        //if (!isStarted.value) return@IconButton
+                        val marker = marker(context, latLng, R.drawable.marker_pee, Color(0xFFEEBF00))
                         mapView.getMapAsync { naverMap ->
                             marker.map = naverMap
                         }
-                        marker.width = 96
-                        marker.height = 96
-                        marker.zIndex = 100
-                        //marker.icon = OverlayImage.fromResource(R.drawable.icon_pee)
-                        marker.icon = OverlayImage.fromBitmap(getRounded(context, R.drawable.icon_pee))
-                        markers.add(latLng)
                     },
                     modifier = Modifier
                         .size(40.dp)
@@ -369,8 +372,10 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         )
                 ) {
                     Icon(
+                        modifier = Modifier.size(20.dp),
                         imageVector = ImageVector.vectorResource(id = R.drawable.icon_pee),
                         contentDescription = stringResource(R.string.pee),
+                        tint = Color(0xFFEEBF00)
                     )
                 }
             }
@@ -379,17 +384,11 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 //Text(stringResource(id = R.string.pee))
                 IconButton(
                     onClick = {
-                        val marker = Marker()
-                        marker.position = latLng
+                        //if (!isStarted.value) return@IconButton
+                        val marker = marker(context, latLng, R.drawable.marker_poop, Color(0xFF956A5C))
                         mapView.getMapAsync { naverMap ->
                             marker.map = naverMap
                         }
-                        marker.width = 96
-                        marker.height = 96
-                        marker.zIndex = 100
-                        //marker.icon = OverlayImage.fromResource(R.drawable.icon_poop)
-                        marker.icon = OverlayImage.fromBitmap(getRounded(context, R.drawable.icon_poop))
-                        markers.add(latLng)
                     },
                     modifier = Modifier
                         .size(40.dp)
@@ -404,8 +403,10 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         )
                 ) {
                     Icon(
+                        modifier = Modifier.size(20.dp),
                         imageVector = ImageVector.vectorResource(id = R.drawable.icon_poop),
                         contentDescription = stringResource(R.string.poo),
+                        tint = Color(0xFF956A5C)
                     )
                 }
             }
@@ -414,17 +415,11 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 //Text(stringResource(id = R.string.pee))
                 IconButton(
                     onClick = {
-                        val marker = Marker()
-                        marker.position = latLng
+                        //if (!isStarted.value) return@IconButton
+                        val marker = marker(context, latLng, R.drawable.icon_marking, Color(0xFF4AB0F5))
                         mapView.getMapAsync { naverMap ->
                             marker.map = naverMap
                         }
-                        marker.width = 96
-                        marker.height = 96
-                        marker.zIndex = 100
-                        //marker.icon = OverlayImage.fromResource(R.drawable.icon_mark)
-                        marker.icon = OverlayImage.fromBitmap(getRounded(context, R.drawable.icon_mark))
-                        markers.add(latLng)
                     },
                     modifier = Modifier
                         .size(40.dp)
@@ -439,8 +434,10 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                         )
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.icon_mark),
+                        modifier = Modifier.size(20.dp),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.icon_marking),
                         contentDescription = stringResource(R.string.mark),
+                        tint = Color(0xFF4AB0F5)
                     )
                 }
             }
@@ -459,6 +456,7 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 //Text(stringResource(id = R.string.pee))
                 IconButton(
                     onClick = {
+                        if (!isStarted.value) return@IconButton
                     },
                     modifier = Modifier
                         .size(40.dp)
@@ -483,6 +481,9 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 //Text(stringResource(id = R.string.pee))
                 IconButton(
                     onClick = {
+                        if (!isStarted.value) return@IconButton
+                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        context.startActivity(intent)
                     },
                     modifier = Modifier
                         .size(40.dp)
@@ -521,10 +522,6 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
             }
         }
         /** tracking */
-        var isStarted = remember { mutableStateOf(GPSApplication.getInstance().start) }
-        val buttonText = if (isStarted.value) "${getString(context, R.string.track)} ${getString(context, R.string.stop)}" else "${getString(context, R.string.track)} ${getString(context, R.string.start)}"
-        val buttonColor = if (isStarted.value) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.Blue)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$isStarted]$buttonText")
         Button(
             onClick = {
                 if (!isStarted.value) {
@@ -559,13 +556,10 @@ fun NaverMapApp(locationSource: FusedLocationSource, locations: List<LatLng>) {
                 Row {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
-                        //modifier = Modifier
-                        //    .padding(
-                        //        horizontal = 8.dp,
-                        //    ),
                         contentDescription = getString(context, R.string.track),
                         tint = Color.White,
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = buttonText,
                     )
