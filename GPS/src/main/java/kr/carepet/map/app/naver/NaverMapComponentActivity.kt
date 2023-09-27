@@ -272,22 +272,24 @@ fun NaverMapApp(source: FusedLocationSource) {
     val tracks = application.service?.tracks
 
     var coords = remember { mutableListOf<LatLng>() }
-    val pathes = mutableListOf<LatLng>()
-    tracks?.forEach { track ->
-        val lat = track.latitude
-        val lon = track.longitude
-        pathes.add(LatLng(lat, lon))
+    if (application.start) {
+        val pathes = mutableListOf<LatLng>()
+        tracks?.forEach { track ->
+            val lat = track.latitude
+            val lon = track.longitude
+            pathes.add(LatLng(lat, lon))
+        }
+        coords = pathes
     }
-    coords = pathes
 
     var position = remember { LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO) }
-    if (tracks?.isNotEmpty() == true && tracks.last() != null) {
+    if (tracks?.isNotEmpty() == true) {
         val lat = tracks.last().latitude
         val lon = tracks.last().longitude
         position = LatLng(lat, lon)
     }
 
-    Log.w(__CLASSNAME__, "${getMethodName()}[${tracks?.size}][${coords.size}][$source][$position][$tracks][$pathes][$coords]")
+    Log.w(__CLASSNAME__, "${getMethodName()}[${tracks?.size}][${coords.size}][$source?][${position.toText()}][$tracks][$coords]")
 
     val mapOptions = remember {
         NaverMapOptions()
@@ -310,9 +312,9 @@ fun NaverMapApp(source: FusedLocationSource) {
 
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(source, position, coords) {
+    LaunchedEffect(position, coords) {
         coroutineScope.launch {
-            Log.wtf(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${tracks?.size}][${coords.size}][$source][${position}]$coords")
+            Log.w(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${tracks?.size}][${coords.size}][$source][${position}]$coords")
             mapView.getMapAsync { naverMap ->
                 if (coords.isNotEmpty()) {
                     val starter = starter(coords.first())
@@ -329,9 +331,7 @@ fun NaverMapApp(source: FusedLocationSource) {
                         Log.wtf(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${tracks?.size}][${coords.size}][$source][${position}]$coords")
                     }
                 }
-                if (position != null) {
-                    naverMap.locationOverlay.position = position
-                }
+                naverMap.locationOverlay.position = position
             }
         }
     }
@@ -558,6 +558,7 @@ fun NaverMapApp(source: FusedLocationSource) {
                     application.stop()
                 }
                 isStarted.value = application.start
+                coords = mutableListOf()
             },
             elevation = ButtonDefaults.elevatedButtonElevation(
                 defaultElevation = 0.dp,
