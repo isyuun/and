@@ -32,5 +32,4 @@ package kr.carepet.map._app
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-interface __mapinterface {
-}
+interface __mapinterface

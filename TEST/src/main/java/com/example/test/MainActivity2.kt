@@ -20,10 +20,10 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 20.   description...
+ *  isyuun@care-pet.kr             2023. 9. 27.   description...
  */
 
-package kr.carepet.app.navi
+package com.example.test
 
 import android.os.Bundle
 import android.os.Parcelable

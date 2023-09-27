@@ -49,7 +49,7 @@ open class gpsappcompatactivity : AppCompatActivity(), IForegroundOnlyBroadcastR
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private val application: GPSApplication = GPSApplication.getInstance()
-    private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver2
+    private lateinit var receiver: ForegroundOnlyBroadcastReceiver2
 
     internal fun location4Intent(intent: Intent): Location? {
         return application.location4Intent(intent)
@@ -64,7 +64,7 @@ open class gpsappcompatactivity : AppCompatActivity(), IForegroundOnlyBroadcastR
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate(savedInstanceState)
-        foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver2(this)
+        receiver = ForegroundOnlyBroadcastReceiver2(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
@@ -75,17 +75,17 @@ open class gpsappcompatactivity : AppCompatActivity(), IForegroundOnlyBroadcastR
     }
 
     override fun onResume() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$receiver")
         super.onResume()
         application.onResume()
-        application.registerReceiver2(foregroundOnlyBroadcastReceiver)
+        application.registerReceiver2(receiver)
     }
 
     override fun onPause() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$receiver")
         super.onPause()
         application.onPause()
-        application.unregisterReceiver2(foregroundOnlyBroadcastReceiver)
+        application.unregisterReceiver2(receiver)
     }
 
     override fun onStop() {

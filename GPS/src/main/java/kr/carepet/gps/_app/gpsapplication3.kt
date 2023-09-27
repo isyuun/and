@@ -47,7 +47,7 @@ open class gpsapplication3 : gpsapplication2() {
         get() = this._id
         set(id) {
             this._id = id
-            foregroundOnlyLocationService?.id = this._id
+            this.service?.id = this._id
         }
 
     override fun onCreate() {
@@ -56,22 +56,22 @@ open class gpsapplication3 : gpsapplication2() {
         //this.id = ""
     }
 
-    fun pee(id: String) {
+    fun pee(id: String = "") {
         Log.d(__CLASSNAME__, "${getMethodName()}[$id]")
         this.id = id
-        foregroundOnlyLocationService?.pee()
+        this.service?.pee()
     }
 
-    fun poo(id: String) {
+    fun poo(id: String = "") {
         Log.d(__CLASSNAME__, "${getMethodName()}[$id]")
         this.id = id
-        foregroundOnlyLocationService?.poo()
+        this.service?.poo()
     }
 
-    fun mark(id: String) {
+    fun mrk(id: String = "") {
         Log.d(__CLASSNAME__, "${getMethodName()}[$id]")
         this.id = id
-        foregroundOnlyLocationService?.mark()
+        this.service?.mrk()
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -85,7 +85,7 @@ open class gpsapplication3 : gpsapplication2() {
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
-        foregroundOnlyLocationService?.onServiceConnected(name, service)
+        this.service?.onServiceConnected(name, service)
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         //start()    //test
     }
@@ -93,6 +93,6 @@ open class gpsapplication3 : gpsapplication2() {
     override fun onServiceDisconnected(name: ComponentName) {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceDisconnected(name)
-        foregroundOnlyLocationService?.onServiceDisconnected(name)
+        this.service?.onServiceDisconnected(name)
     }
 }

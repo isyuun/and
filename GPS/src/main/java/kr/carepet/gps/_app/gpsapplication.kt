@@ -104,7 +104,9 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     private var foregroundOnlyLocationServiceBound = false
 
     // Provides location updates for while-in-use feature.
-    protected var foregroundOnlyLocationService: ForegroundOnlyLocationService? = null
+    private var foregroundOnlyLocationService: ForegroundOnlyLocationService? = null
+    val service
+        get() = foregroundOnlyLocationService
 
     // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver2.
     //@Deprecated("Use foregroundOnlyBroadcastReceiver instead. ", ReplaceWith("foregroundOnlyBroadcastReceiver"))

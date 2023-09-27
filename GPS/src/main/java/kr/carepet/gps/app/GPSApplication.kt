@@ -52,9 +52,6 @@ open class GPSApplication : gpsapplication3() {
         }
     }
 
-    val service
-        get() = foregroundOnlyLocationService
-
     override fun onCreate() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate()

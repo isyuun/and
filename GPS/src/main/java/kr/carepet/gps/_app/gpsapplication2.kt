@@ -65,33 +65,33 @@ open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver 
     }
 
     private fun registerReceiver() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
-        registerReceiver2(foregroundOnlyBroadcastReceiver)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$receiver")
+        registerReceiver2(receiver)
     }
 
     private fun unregisterReceiver() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
-        unregisterReceiver2(foregroundOnlyBroadcastReceiver)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$receiver")
+        unregisterReceiver2(receiver)
     }
 
     override fun onResume() {
-        Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        Log.w(__CLASSNAME__, "${getMethodName()}$receiver")
         registerReceiver()
     }
 
     override fun onPause() {
-        Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        Log.w(__CLASSNAME__, "${getMethodName()}$receiver")
         unregisterReceiver()
     }
 
     // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver2.
-    private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver2
+    private lateinit var receiver: ForegroundOnlyBroadcastReceiver2
 
     override fun init() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.init()
-        foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver2(this)
-        Log.w(__CLASSNAME__, "${getMethodName()}$foregroundOnlyBroadcastReceiver")
+        receiver = ForegroundOnlyBroadcastReceiver2(this)
+        Log.w(__CLASSNAME__, "${getMethodName()}$receiver")
     }
 
     internal fun location4Intent(intent: Intent): Location? {

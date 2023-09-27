@@ -182,7 +182,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         dump()
     }
 
-    internal fun mark() {
+    internal fun mrk() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
         val track = currentLocation?.let { Track(it, id = id, mrk = 1) }
         track?.let { add(it) }

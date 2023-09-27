@@ -20,29 +20,16 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 4.   description...
+ *  isyuun@care-pet.kr             2023. 9. 27.   description...
  */
 
-package kr.carepet.app.navi
-
-/**import kr.carepet.util.__CLASSNAME__*/
-import android.os.Bundle
-import kr.carepet.map.app.MapComponentActivity
-import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
+package com.example.test
 
 /**
  * @Project     : carepet-android
- * @FileName    : _MainActivity.kt
- * @Date        : 2023. 09. 04.
+ * @FileName    : Application.kt
+ * @Date        : 2023. 09. 27.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class _MainActivity : MapComponentActivity() {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(__CLASSNAME__, "${getMethodName()}savedInstanceState:$savedInstanceState")
-        super.onCreate(savedInstanceState)
-    }
-}
+class Application : kr.carepet.app.Application()
