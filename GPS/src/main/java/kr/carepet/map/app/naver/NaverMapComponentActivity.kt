@@ -324,7 +324,7 @@ fun NaverMapApp(source: FusedLocationSource) {
                         path.coords = coords
                         path.color = 0xA0FFDBDB.toInt()
                         path.outlineColor = 0xA0FF5000.toInt()
-                        path.width = 24
+                        path.width = 18
                         path.globalZIndex = 10
                         path.outlineWidth = 3
                         path.map = naverMap
