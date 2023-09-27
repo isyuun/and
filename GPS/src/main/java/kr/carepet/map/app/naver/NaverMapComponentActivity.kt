@@ -226,7 +226,7 @@ open class NaverMapComponentActivity : _mapcomponentactivity() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${location?.toText()}, $location, $context, $intent")
+        Log.wtf(__CLASSNAME__, "::NaverMapApp${getMethodName()}${location?.toText()}, $location, $context, $intent")
         setContent { NaverMapApp() }
     }
 
@@ -271,13 +271,14 @@ fun NaverMapApp(source: FusedLocationSource) {
     val application = GPSApplication.getInstance()
     val tracks = application.service?.tracks
 
+    var coords = remember { mutableListOf<LatLng>() }
     val pathes = mutableListOf<LatLng>()
     tracks?.forEach { track ->
         val lat = track.latitude
         val lon = track.longitude
         pathes.add(LatLng(lat, lon))
     }
-    val coords = remember { pathes }
+    coords = pathes
 
     var position = remember { LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO) }
     if (tracks?.isNotEmpty() == true && tracks.last() != null) {
@@ -287,8 +288,6 @@ fun NaverMapApp(source: FusedLocationSource) {
     }
 
     Log.w(__CLASSNAME__, "${getMethodName()}[${tracks?.size}][${coords.size}][$source][$position][$tracks][$pathes][$coords]")
-
-    val coroutineScope = rememberCoroutineScope()
 
     val mapOptions = remember {
         NaverMapOptions()
@@ -307,8 +306,9 @@ fun NaverMapApp(source: FusedLocationSource) {
     val buttonText = if (isStarted.value) "${getString(context, R.string.track)} ${getString(context, R.string.stop)}" else "${getString(context, R.string.track)} ${getString(context, R.string.start)}"
     val buttonColor = if (isStarted.value) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.Blue)
 
-    //val markers = remember { mutableStateListOf<LatLng>() }
     val markers = remember { mutableListOf<Marker>() }
+
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(source, position, coords) {
         coroutineScope.launch {
@@ -350,20 +350,21 @@ fun NaverMapApp(source: FusedLocationSource) {
                             cameraPosition = CameraPosition(cameraPosition.target, GPX_CAMERA_ZOOM_ZERO)
                             locationOverlay.isVisible = true
                             locationOverlay.circleRadius = 100
+                            /**locationOverlay.anchor = PointF(0.0f, 0.0f)*/
                             locationOverlay.icon = OverlayImage.fromResource(R.drawable.currentlocation)
                             locationOverlay.iconWidth = 100
                             locationOverlay.iconHeight = 100
-                            /**locationOverlay.anchor = PointF(0.0f, 0.0f)*/
+                            ///**locationOverlay.subAnchor = PointF(-0.0f, 0.0f)*/
                             //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.ic_location_overlay_start)
                             //locationOverlay.subIconWidth = 80
                             //locationOverlay.subIconHeight = 80
-                            ///**locationOverlay.subAnchor = PointF(-0.0f, 0.0f)*/
                         }
                     }
                 }
             },
             modifier = Modifier.fillMaxSize(),
         )
+        /** right */
         Column(
             modifier = Modifier
                 .padding(
@@ -476,6 +477,7 @@ fun NaverMapApp(source: FusedLocationSource) {
                 }
             }
         }
+        /** left */
         Column(
             modifier = Modifier
                 .padding(
@@ -591,7 +593,6 @@ fun NaverMapApp(source: FusedLocationSource) {
                 }
             }
         }
-        /** tracking */
         val zoomControlButton = mapView.findViewById<ZoomControlView>(com.naver.maps.map.R.id.navermap_zoom_control)
         val density = LocalDensity.current.density
         val metrics = context.resources.displayMetrics
@@ -601,7 +602,7 @@ fun NaverMapApp(source: FusedLocationSource) {
         zoomControlButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             rightMargin = right.dp.toPx().toInt()
         }
-        Log.d(__CLASSNAME__, "${getMethodName()}$width, $height, $right")
+        Log.d(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}$width, $height, $right")
     }
 }
 
