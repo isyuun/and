@@ -71,7 +71,7 @@ dependencyResolutionManagement {
 rootProject.name = "and"
 //include ":lvl_sample"
 //include ":lvl_library"
-include(":TEST")
+//include(":TEST")
 include(":_APP")
 include(":APP")
 include(":APP2")
