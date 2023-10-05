@@ -70,14 +70,15 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat.getString
 import androidx.core.view.updateLayoutParams
@@ -103,9 +104,13 @@ import kr.carepet.gps.app.GPSComponentActivity
 import kr.carepet.gpx.GPX_CAMERA_ZOOM_ZERO
 import kr.carepet.gpx.GPX_LATITUDE_ZERO
 import kr.carepet.gpx.GPX_LONGITUDE_ZERO
-import kr.carepet.gpx.Track
-import kr.carepet.gpx.Track.EVENT.*
+import kr.carepet.gpx.Track.EVENT.img
+import kr.carepet.gpx.Track.EVENT.mrk
+import kr.carepet.gpx.Track.EVENT.nnn
+import kr.carepet.gpx.Track.EVENT.pee
+import kr.carepet.gpx.Track.EVENT.poo
 import kr.carepet.map._app.getRounded
+import kr.carepet.map._app.toPx
 import kr.carepet.map._app.toText
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -147,14 +152,30 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
+fun marker(context: Context, position: LatLng?, captionText: String = ""): Marker {
+    val marker = Marker()
+    if (position != null) {
+        marker.position = position
+    }
+    marker.width = (24 * 1.2f).dp.toPx(context).toInt()
+    marker.height = (32 * 1.2f).dp.toPx(context).toInt()
+    //marker.icon = MarkerIcons.BLUE
+    marker.icon = OverlayImage.fromResource(R.drawable.marker_start)
+    marker.captionText = captionText
+    marker.captionColor = Color.White.toArgb()
+    marker.captionHaloColor = Color.Gray.toArgb()
+    marker.captionTextSize = (3.8 * 0.85f).sp.toPx(context)
+    marker.captionOffset = (-32 * 0.9f).dp.toPx(context).toInt()
+    return marker
+}
+
 fun marker(context: Context, position: LatLng?, id: Int, back: Color = Color.White): Marker {
     val marker = Marker()
     if (position != null) {
         marker.position = position
     }
-    marker.width = 96
-    marker.height = 96
-    marker.zIndex = 100
+    marker.width = (32 * 0.9f).dp.toPx(context).toInt()
+    marker.height = (32 * 0.9f).dp.toPx(context).toInt()
     getRounded(context, id, back)?.let { marker.icon = OverlayImage.fromBitmap(it) }
     return marker
 }
@@ -187,18 +208,6 @@ fun img(position: LatLng): Marker {
     return marker
 }
 
-fun starter(position: LatLng?): Marker {
-    val marker = Marker()
-    if (position != null) {
-        marker.position = position
-    }
-    //marker.width = 96
-    //marker.height = 96
-    marker.zIndex = 1
-    //marker.icon = OverlayImage.fromResource(R.drawable.marker_start)
-    return marker
-}
-
 @Composable
 fun NaverMapApp(source: FusedLocationSource) {
     Log.i(__CLASSNAME__, "${getMethodName()}[$source][${source.lastLocation}]")
@@ -207,7 +216,7 @@ fun NaverMapApp(source: FusedLocationSource) {
     val tracks = application.service?.tracks
 
     val markers = remember { mutableListOf<Marker>() }
-    var coords = remember { mutableListOf<LatLng>() }
+    val coords = remember { mutableListOf<LatLng>() }
     if (application.start) {
         markers.clear()
         coords.clear()
@@ -261,7 +270,7 @@ fun NaverMapApp(source: FusedLocationSource) {
             Log.w(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${tracks?.size}][${coords.size}][$source][${position}]$coords")
             mapView.getMapAsync { naverMap ->
                 if (coords.isNotEmpty()) {
-                    val starter = starter(coords.first())
+                    val starter = marker(context = context, position = coords.first(), captionText = getString(context, R.string.departure))
                     starter.map = naverMap
                     if (coords.size > 1) {
                         val path = PathOverlay()
@@ -282,6 +291,9 @@ fun NaverMapApp(source: FusedLocationSource) {
             }
         }
     }
+    val pee = pee(position)
+    val poo = poo(position)
+    val mrk = mrk(position)
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -328,11 +340,10 @@ fun NaverMapApp(source: FusedLocationSource) {
                     onClick = {
                         Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[${isStarted.value}][${markers.size}]")
                         if (!isStarted.value) return@IconButton
-                        val marker = marker(context, position, R.drawable.marker_pee, Color(0xFFEEBF00))
                         mapView.getMapAsync { naverMap ->
-                            marker.map = naverMap
+                            pee.map = naverMap
                         }
-                        markers.add(marker)
+                        markers.add(pee)
                         application.pee("")
                     },
                     modifier = Modifier
@@ -362,11 +373,10 @@ fun NaverMapApp(source: FusedLocationSource) {
                     onClick = {
                         Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[${isStarted.value}][${markers.size}]")
                         if (!isStarted.value) return@IconButton
-                        val marker = marker(context, position, R.drawable.marker_poop, Color(0xFF956A5C))
                         mapView.getMapAsync { naverMap ->
-                            marker.map = naverMap
+                            poo.map = naverMap
                         }
-                        markers.add(marker)
+                        markers.add(poo)
                         application.poo()
                     },
                     modifier = Modifier
@@ -396,11 +406,10 @@ fun NaverMapApp(source: FusedLocationSource) {
                     onClick = {
                         Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[${isStarted.value}][${markers.size}]")
                         if (!isStarted.value) return@IconButton
-                        val marker = marker(context, position, R.drawable.marker_marking, Color(0xFF4AB0F5))
                         mapView.getMapAsync { naverMap ->
-                            marker.map = naverMap
+                            mrk.map = naverMap
                         }
-                        markers.add(marker)
+                        markers.add(mrk)
                         application.mrk()
                     },
                     modifier = Modifier
@@ -491,8 +500,8 @@ fun NaverMapApp(source: FusedLocationSource) {
             Spacer(modifier = Modifier.height(29.dp)) // 아래 마진 추가
             val locationButton = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
             locationButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                leftMargin = 16.5.dp.toPx().toInt()
-                bottomMargin = 63.dp.toPx().toInt()
+                leftMargin = 16.5.dp.toPx(context).toInt()
+                bottomMargin = 63.dp.toPx(context).toInt()
             }
         }
         /** tracking */
@@ -504,8 +513,13 @@ fun NaverMapApp(source: FusedLocationSource) {
                 } else {
                     application.stop()
                 }
+                if (isStarted.value) {
+                    mapView.getMapAsync { naverMap ->
+                        val ender = marker(context = context, position = position, captionText = getString(context, R.string.arrival))
+                        ender.map = naverMap
+                    }
+                }
                 isStarted.value = application.start
-                coords = mutableListOf()
             },
             elevation = ButtonDefaults.elevatedButtonElevation(
                 defaultElevation = 0.dp,
@@ -548,15 +562,10 @@ fun NaverMapApp(source: FusedLocationSource) {
         val height = metrics.heightPixels / density
         val right = (width - 64)
         zoomControlButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            rightMargin = right.dp.toPx().toInt()
+            rightMargin = right.dp.toPx(context).toInt()
         }
         Log.d(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}$width, $height, $right")
     }
-}
-
-@Composable
-private fun Dp.toPx(): Float {
-    return (this.value * LocalDensity.current.density)
 }
 
 @Composable

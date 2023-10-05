@@ -27,7 +27,6 @@ package kr.carepet.gps._app
 import android.content.Context
 import android.location.Location
 import androidx.core.content.edit
-import kr.carepet.gps.R
 
 /**
  * Returns the `location` object as a human readable string.
@@ -54,7 +53,8 @@ internal object SharedPreferenceUtil {
      */
     fun getLocationTrackingPref(context: Context): Boolean =
         context.getSharedPreferences(
-            context.getString(R.string.preference_file_key), Context.MODE_PRIVATE
+            SHARED_PREFERENCE_FILE_KEY,
+            Context.MODE_PRIVATE
         )
             .getBoolean(KEY_FOREGROUND_ENABLED, false)
 
@@ -64,7 +64,7 @@ internal object SharedPreferenceUtil {
      */
     fun saveLocationTrackingPref(context: Context, requestingLocationUpdates: Boolean) =
         context.getSharedPreferences(
-            context.getString(R.string.preference_file_key),
+            SHARED_PREFERENCE_FILE_KEY,
             Context.MODE_PRIVATE
         ).edit {
             putBoolean(KEY_FOREGROUND_ENABLED, requestingLocationUpdates)

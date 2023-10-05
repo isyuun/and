@@ -35,8 +35,11 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.util.TypedValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.core.content.res.ResourcesCompat
 import com.naver.maps.geometry.LatLng
 
@@ -117,7 +120,7 @@ private fun getRounded(source: Bitmap, backColor: Int, outlineColor: Int): Bitma
     paint.xfermode = null
     paint.color = outlineColor
     paint.style = Paint.Style.STROKE
-    paint.strokeWidth = 0.1f
+    paint.strokeWidth = 0.01f
 
     val outerRect = RectF(1f, 1f, width.toFloat() - 2, height.toFloat() - 2)
     canvas.drawRoundRect(outerRect, width.toFloat(), height.toFloat(), paint)
@@ -130,4 +133,12 @@ fun getRounded(context: Context, id: Int, backColor: Color): Bitmap? {
     val drawable = ResourcesCompat.getDrawable(resources, id, null)?.let { getDrawableWithBackgroundColor(it, backColor.toArgb()) }
     val source = drawable?.let { getBitmapFromDrawable(it) }
     return source?.let { getRounded(it, backColor.toArgb(), Color.Black.toArgb()) }
+}
+
+fun Dp.toPx(context: Context): Float {
+    return (this.value * context.resources.displayMetrics.density)
+}
+
+fun TextUnit.toPx(context: Context): Float {
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this.value, context.resources.displayMetrics)
 }

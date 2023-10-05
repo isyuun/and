@@ -40,7 +40,6 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import kr.carepet.app.Application
-import kr.carepet.gps.R
 import kr.carepet.gps.app.ForegroundOnlyLocationService
 import kr.carepet.gps.app.ForegroundOnlyLocationService.LocalBinder
 import kr.carepet.util.Log
@@ -153,7 +152,7 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
         Log.d(__CLASSNAME__, "${getMethodName()}...")
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
         Log.w(__CLASSNAME__, "${getMethodName()}${foregroundOnlyBroadcastReceiver}")
-        sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_FILE_KEY, MODE_PRIVATE)
         Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences")
     }
 
