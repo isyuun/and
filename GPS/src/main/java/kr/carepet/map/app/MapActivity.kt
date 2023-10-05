@@ -23,15 +23,15 @@
  *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
-package kr.carepet.map._app
+package kr.carepet.map.app
 
-import kr.carepet.gps.app.GPSComponentActivity
+import kr.carepet.map.app.naver.NaverMapComponentActivity
 
 /**
  * @Project     : carepet-android
- * @FileName    : _mapcomponentactivity.kt
+ * @FileName    : MapActivity.kt
  * @Date        : 2023. 09. 20.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class _mapcomponentactivity : GPSComponentActivity(), __mapinterface
+open class MapActivity : NaverMapComponentActivity()
