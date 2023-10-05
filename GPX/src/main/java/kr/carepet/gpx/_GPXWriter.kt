@@ -45,7 +45,7 @@ val GPX_SIMPLE_TICK_FORMAT = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.KOREA)
 val GPX_DECIMAL_FORMAT_3 = DecimalFormat("0.000")
 val GPX_DECIMAL_FORMAT_7 = DecimalFormat("0.0000000")
 
-const val GPX_INTERVAL_UPDATE_SECONDS = 0L
+const val GPX_INTERVAL_UPDATE_MIllIS = 0L
 const val GPX_INTERVAL_UPDATE_METERS = 3.0f
 const val GPX_LATITUDE_ZERO = 37.546855      //37.5
 const val GPX_LONGITUDE_ZERO = 127.065330    //127.0

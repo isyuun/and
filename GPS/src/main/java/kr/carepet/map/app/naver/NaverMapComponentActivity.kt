@@ -108,19 +108,20 @@ import kr.carepet.map._app.toText
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
-const val PERMISSION_REQUEST_CODE = 100
-
 open class NaverMapComponentActivity : GPSComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private val application = GPSApplication.getInstance()
 
-    private lateinit var source: FusedLocationSource
+    //private lateinit var fusedLocationSource: FusedLocationSource
+    private val fusedLocationSource: FusedLocationSource by lazy {
+        FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}...")
         super.onCreate(savedInstanceState)
-        source = FusedLocationSource(this, PERMISSION_REQUEST_CODE)
+        //fusedLocationSource = FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
     }
 
     override fun onResume() {
@@ -137,8 +138,8 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
 
     @Composable
     fun NaverMapApp() {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$source][${source.lastLocation}]")
-        NaverMapApp(source)
+        Log.d(__CLASSNAME__, "${getMethodName()}[$fusedLocationSource][${fusedLocationSource.lastLocation}]")
+        NaverMapApp(fusedLocationSource)
     }
 }
 
@@ -172,7 +173,6 @@ fun starter(position: LatLng?): Marker {
 fun NaverMapApp(source: FusedLocationSource) {
     Log.i(__CLASSNAME__, "${getMethodName()}[$source][${source.lastLocation}]")
     val context = LocalContext.current
-
     val application = GPSApplication.getInstance()
     val tracks = application.service?.tracks
 
@@ -188,11 +188,13 @@ fun NaverMapApp(source: FusedLocationSource) {
     }
 
     var position = remember { LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO) }
-    if (tracks?.isNotEmpty() == true) {
-        val lat = tracks.last().latitude
-        val lon = tracks.last().longitude
-        position = LatLng(lat, lon)
-    }
+    //if (tracks?.isNotEmpty() == true) {
+    //    val lat = tracks.last().latitude
+    //    val lon = tracks.last().longitude
+    //    position = LatLng(lat, lon)
+    //}
+    source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }
+    source.isCompassEnabled = true
 
     Log.w(__CLASSNAME__, "${getMethodName()}[${tracks?.size}][${coords.size}][$source?][${position.toText()}][$tracks][$coords]")
 

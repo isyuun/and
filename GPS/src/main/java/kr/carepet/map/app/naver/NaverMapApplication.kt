@@ -35,6 +35,8 @@ import kr.carepet.gps.app.GPSApplication
  * @author      : isyuun@care-pet.kr
  * @description :
  */
+const val NAVERMAP_PERMISSION_REQUEST_CODE = 100
+
 open class NaverMapApplication : GPSApplication() {
     override fun onCreate() {
         super.onCreate()

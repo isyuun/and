@@ -47,9 +47,10 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kr.carepet.gps.R
+import kr.carepet.gpx.GPX_INTERVAL_UPDATE_METERS
+import kr.carepet.gpx.GPX_INTERVAL_UPDATE_MIllIS
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
-import java.util.concurrent.TimeUnit
 
 /**
  * @Project     : carepet-android
@@ -58,10 +59,7 @@ import java.util.concurrent.TimeUnit
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class foregroundonlylocationservice(
-    private var intervalSeconds: Long = INTERVAL_UPDATE_SECONDS,
-    private var minUpdateDistanceMeters: Float = INTERVAL_UPDATE_METERS
-) : _foregroundonlylocationservice() {
+open class foregroundonlylocationservice() : _foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     /*
@@ -116,23 +114,24 @@ open class foregroundonlylocationservice(
         //    // IMPORTANT NOTE: Apps running on Android 8.0 and higher devices (regardless of
         //    // targetSdkVersion) may receive updates less frequently than this interval when the app
         //    // is no longer in the foreground.
-        //    interval = TimeUnit.SECONDS.toMillis(INTERVAL_SECONDS)
+        //    interval = TimeUnit.SECONDS.toMillis(60)
         //
         //    // Sets the fastest rate for active location updates. This interval is exact, and your
         //    // application will never receive updates more frequently than this value.
-        //    fastestInterval = TimeUnit.SECONDS.toMillis(INTERVAL_SECONDS / 2L)
+        //    fastestInterval = TimeUnit.SECONDS.toMillis(30)
         //
         //    // Sets the maximum time when batched location updates are delivered. Updates may be
         //    // delivered sooner than this interval.
         //    maxWaitTime = TimeUnit.MINUTES.toMillis(2)
         //
         //    priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        //}.build()
-        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, TimeUnit.SECONDS.toMillis(intervalSeconds)).apply {
-            setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(intervalSeconds))
-            setMinUpdateDistanceMeters(minUpdateDistanceMeters)
-            setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
-            setWaitForAccurateLocation(true)
+        //}
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, GPX_INTERVAL_UPDATE_MIllIS).apply {
+            //setMinUpdateDistanceMeters(GPX_INTERVAL_UPDATE_METERS)
+            //setIntervalMillis(100)
+            //setMinUpdateIntervalMillis(50)
+            //setGranularity(Granularity.GRANULARITY_FINE)
+            //setWaitForAccurateLocation(true)
         }.build()
 
         // TODO: Step 1.4, Initialize the LocationCallback.
@@ -245,11 +244,6 @@ open class foregroundonlylocationservice(
      * IY:상속시 실행지점을 최종 상속 클래스로 이동한다.
      *
      */
-    private fun startService() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${applicationContext}, ${this::class.java}")
-        startService(Intent(applicationContext, this::class.java))
-    }
-
     private fun subscribeToLocationUpdates() {
         Log.w(__CLASSNAME__, "${getMethodName()}[$serviceRunningInForeground]")        //Log.d(__CLASSNAME__, "subscribeToLocationUpdates()")
 
@@ -258,7 +252,8 @@ open class foregroundonlylocationservice(
         // Binding to this service doesn't actually trigger onStartCommand(). That is needed to
         // ensure this Service can be promoted to a foreground service, i.e., the service needs to
         // be officially started (which we do here).
-        startService()
+        Log.wtf(__CLASSNAME__, "${getMethodName()}${applicationContext}, ${this::class.java}")
+        startService(Intent(applicationContext, this::class.java))
 
         try {
             // TODO: Step 1.5, Subscribe to location changes.

@@ -49,7 +49,7 @@ import java.util.Collections
 open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private fun paths() {
+    private fun paths(): String {
         /* 내부저장소 */
         // 캐시(Cache)
         val fileCacheDir = cacheDir
@@ -72,8 +72,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val getDirectory = Environment.getExternalStorageDirectory().toString()
         Log.i(__CLASSNAME__, "${getMethodName()}$getDirectory")
         // 특정 데이터를 저장
-        val fileDowns =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val fileDowns = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val getDowns = fileDowns.path
         Log.i(__CLASSNAME__, "${getMethodName()}$getDowns")
         /* 외부저장소 - 어플리케이션 고유 영역 */
@@ -84,6 +83,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         // 캐시 데이터를 저장
         val getCache2 = externalCacheDir.toString()
         Log.i(__CLASSNAME__, "${getMethodName()}$getCache2")
+        return getDowns
     }
 
     override fun onCreate() {
@@ -152,9 +152,9 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     protected open fun write(clear: Boolean) {
         if (_tracks.size < 1) return
-        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        //val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val time = _tracks.first()?.time
-        val file = File("$path/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
+        val file = File("${paths()}/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
         Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${_tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this._start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
         GPXWriter2.write(_tracks, file)

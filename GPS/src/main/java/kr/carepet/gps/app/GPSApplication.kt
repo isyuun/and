@@ -25,6 +25,8 @@
 
 package kr.carepet.gps.app
 
+import android.content.ComponentName
+import android.os.IBinder
 import kr.carepet.gps._app.gpsapplication3
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -56,5 +58,11 @@ open class GPSApplication : gpsapplication3() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate()
         singleton = this
+    }
+
+    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+        super.onServiceConnected(name, service)
+        //start()    //test
     }
 }
