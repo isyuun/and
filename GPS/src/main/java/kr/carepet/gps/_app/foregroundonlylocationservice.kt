@@ -127,7 +127,7 @@ open class foregroundonlylocationservice() : _foregroundonlylocationservice() {
         //    priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         //}
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, GPX_INTERVAL_UPDATE_MIllIS).apply {
-            //setMinUpdateDistanceMeters(GPX_INTERVAL_UPDATE_METERS)
+            setMinUpdateDistanceMeters(GPX_INTERVAL_UPDATE_METERS)
             //setIntervalMillis(100)
             //setMinUpdateIntervalMillis(50)
             //setGranularity(Granularity.GRANULARITY_FINE)
