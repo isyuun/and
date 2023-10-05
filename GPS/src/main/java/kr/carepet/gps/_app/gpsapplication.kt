@@ -259,6 +259,13 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
         //        REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
         //    )
         //}
+        getActivity()?.let {
+            ActivityCompat.requestPermissions(
+                it,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
+            )
+        }
     }
 
     // TODO: Step 1.0, Review Permissions: Handles permission result.
@@ -309,11 +316,11 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     }
 
     private fun updateButtonState(trackingLocation: Boolean) {
-        if (trackingLocation) {
-            //foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
-        } else {
-            //foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
-        }
+        //if (trackingLocation) {
+        //    foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
+        //} else {
+        //    foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
+        //}
     }
 
     protected fun logResultsToScreen(output: String) {

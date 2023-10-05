@@ -176,6 +176,7 @@ fun NaverMapApp(source: FusedLocationSource) {
     val application = GPSApplication.getInstance()
     val tracks = application.service?.tracks
 
+    val markers = remember { mutableListOf<Marker>() }
     var coords = remember { mutableListOf<LatLng>() }
     if (application.start) {
         val pathes = mutableListOf<LatLng>()
@@ -196,7 +197,7 @@ fun NaverMapApp(source: FusedLocationSource) {
     source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }
     source.isCompassEnabled = true
 
-    Log.w(__CLASSNAME__, "${getMethodName()}[${tracks?.size}][${coords.size}][$source?][${position.toText()}][$tracks][$coords]")
+    Log.w(__CLASSNAME__, "${getMethodName()}[${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}][$tracks][$coords]")
 
     val mapOptions = remember {
         NaverMapOptions()
@@ -214,8 +215,6 @@ fun NaverMapApp(source: FusedLocationSource) {
     val isStarted = remember { mutableStateOf(application.start) }
     val buttonText = if (isStarted.value) "${getString(context, R.string.track)} ${getString(context, R.string.stop)}" else "${getString(context, R.string.track)} ${getString(context, R.string.start)}"
     val buttonColor = if (isStarted.value) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.Blue)
-
-    val markers = remember { mutableListOf<Marker>() }
 
     val coroutineScope = rememberCoroutineScope()
 
