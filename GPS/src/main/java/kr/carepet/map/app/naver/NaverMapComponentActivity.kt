@@ -103,6 +103,8 @@ import kr.carepet.gps.app.GPSComponentActivity
 import kr.carepet.gpx.GPX_CAMERA_ZOOM_ZERO
 import kr.carepet.gpx.GPX_LATITUDE_ZERO
 import kr.carepet.gpx.GPX_LONGITUDE_ZERO
+import kr.carepet.gpx.Track
+import kr.carepet.gpx.Track.EVENT.*
 import kr.carepet.map._app.getRounded
 import kr.carepet.map._app.toText
 import kr.carepet.util.Log
@@ -157,6 +159,34 @@ fun marker(context: Context, position: LatLng?, id: Int, back: Color = Color.Whi
     return marker
 }
 
+@Composable
+fun pee(position: LatLng): Marker {
+    val context = LocalContext.current
+    val marker = marker(context, position, R.drawable.marker_pee, Color(0xFFEEBF00))
+    return marker
+}
+
+@Composable
+fun poo(position: LatLng): Marker {
+    val context = LocalContext.current
+    val marker = marker(context, position, R.drawable.marker_poop, Color(0xFF956A5C))
+    return marker
+}
+
+@Composable
+fun mrk(position: LatLng): Marker {
+    val context = LocalContext.current
+    val marker = marker(context, position, R.drawable.marker_marking, Color(0xFF4AB0F5))
+    return marker
+}
+
+@Composable
+fun img(position: LatLng): Marker {
+    val context = LocalContext.current
+    val marker = marker(context, position, R.drawable.marker_poop, Color(0xFF956A5C))
+    return marker
+}
+
 fun starter(position: LatLng?): Marker {
     val marker = Marker()
     if (position != null) {
@@ -165,7 +195,7 @@ fun starter(position: LatLng?): Marker {
     //marker.width = 96
     //marker.height = 96
     marker.zIndex = 1
-    marker.icon = OverlayImage.fromResource(R.drawable.marker_start)
+    //marker.icon = OverlayImage.fromResource(R.drawable.marker_start)
     return marker
 }
 
@@ -179,13 +209,21 @@ fun NaverMapApp(source: FusedLocationSource) {
     val markers = remember { mutableListOf<Marker>() }
     var coords = remember { mutableListOf<LatLng>() }
     if (application.start) {
-        val pathes = mutableListOf<LatLng>()
+        markers.clear()
+        coords.clear()
         tracks?.forEach { track ->
             val lat = track.latitude
             val lon = track.longitude
-            pathes.add(LatLng(lat, lon))
+            val pos = LatLng(lat, lon)
+            when (track.event) {
+                nnn -> "TODO()"
+                img -> "TODO()"
+                pee -> markers.add(pee(pos))
+                poo -> markers.add(poo(pos))
+                mrk -> markers.add(mrk(pos))
+            }
+            coords.add(pos)
         }
-        coords = pathes
     }
 
     var position = remember { LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO) }
@@ -238,6 +276,9 @@ fun NaverMapApp(source: FusedLocationSource) {
                     }
                 }
                 naverMap.locationOverlay.position = position
+                markers.forEach {
+                    it.map = naverMap
+                }
             }
         }
     }

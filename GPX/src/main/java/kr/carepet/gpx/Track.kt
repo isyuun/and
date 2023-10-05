@@ -46,6 +46,19 @@ data class Track(
         return "($latitude, $longitude)"
     }
 
+    enum class EVENT {
+        nnn, img, pee, poo, mrk
+    }
+
+    val event : EVENT
+        get() {
+            return if (img > -1) EVENT.img
+            else if (pee > 0) EVENT.pee
+            else if (poo > 0) EVENT.poo
+            else if (mrk > 0) EVENT.mrk
+            else EVENT.nnn
+        }
+
     val location: Location
         get() = loc
 
@@ -63,10 +76,4 @@ data class Track(
 
     val altitude: Double
         get() = loc.altitude
-
-    //companion object {
-    //    fun distanceBetween(lat1: Double, lon1: Double, lat2: Double, lon2: Double, distances: FloatArray) {
-    //        Location.distanceBetween(lat1, lon1, lat2, lon2, distances)
-    //    }
-    //}
 }
