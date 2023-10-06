@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class SggListRes(
     @SerializedName("data")
-    var data: List<kr.carepet.data.SggList>,
+    var data: List<SggList>,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")

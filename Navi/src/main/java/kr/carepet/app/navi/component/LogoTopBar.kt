@@ -63,7 +63,7 @@ import kr.carepet.app.navi.viewmodel.WalkViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogoTopBar(
-    petDetailData: kr.carepet.data.pet.PetDetailData,
+    petDetailData: PetDetailData,
     modifier:Modifier = Modifier,
     openBottomSheet:(Boolean) -> Unit,
     backBtnOn:Boolean,
@@ -161,7 +161,7 @@ fun LogoTopBar(
 
 @Composable
 fun TopbarPetData(
-    petDetailData: kr.carepet.data.pet.PetDetailData,
+    petDetailData: PetDetailData,
     modifier: Modifier,
     bottomSheetState: Unit
 ){

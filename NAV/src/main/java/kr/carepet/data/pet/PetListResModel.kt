@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class PetListResModel(
     @SerializedName("data")
-    var `data`: List<kr.carepet.data.pet.PetListData>,
+    var `data`: List<PetListData>,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")

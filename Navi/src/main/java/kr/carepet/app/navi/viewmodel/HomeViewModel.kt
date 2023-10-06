@@ -22,12 +22,12 @@ import kotlin.coroutines.resume
 
 class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
 
-    val weekRecord: StateFlow<kr.carepet.data.daily.WeekData?> = sharedViewModel.weekRecord
-    fun updatePetInfo(newData: List<kr.carepet.data.pet.PetDetailData>){
+    val weekRecord: StateFlow<WeekData?> = sharedViewModel.weekRecord
+    fun updatePetInfo(newData: List<PetDetailData>){
         sharedViewModel.updatePetInfo(newData)
     }
 
-    fun updateSeletedPet(newData: kr.carepet.data.pet.PetDetailData){
+    fun updateSeletedPet(newData: PetDetailData){
         sharedViewModel.updateSelectPet(newData)
     }
 
@@ -72,11 +72,11 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
     val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
     fun updateShowBottomSheet(newValue: Boolean) { _showBottomSheet.value = newValue }
 
-    private val _petInfo = MutableStateFlow<List<kr.carepet.data.pet.PetDetailData>>(emptyList())
-    val petInfo: StateFlow<List<kr.carepet.data.pet.PetDetailData>> = _petInfo.asStateFlow()
+    private val _petInfo = MutableStateFlow<List<PetDetailData>>(emptyList())
+    val petInfo: StateFlow<List<PetDetailData>> = _petInfo.asStateFlow()
 
-    private val _repPet = MutableStateFlow<List<kr.carepet.data.pet.PetDetailData>>(emptyList())
-    val repPet: StateFlow<List<kr.carepet.data.pet.PetDetailData>> = _repPet.asStateFlow()
+    private val _repPet = MutableStateFlow<List<PetDetailData>>(emptyList())
+    val repPet: StateFlow<List<PetDetailData>> = _repPet.asStateFlow()
 
     //private val _isLoading = MutableStateFlow<Boolean>(true)
     //val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -102,12 +102,12 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
             val apiService = RetrofitClientServer.instance
 
             val data =
-                kr.carepet.data.pet.MyPetListReq(kr.carepet.singleton.MySharedPreference.getUserId())
+                kr.carepet.data.pet.MyPetListReq(MySharedPreference.getUserId())
 
             val call = apiService.myPetList(data)
             return suspendCancellableCoroutine { continuation ->
-                call.enqueue(object : Callback<kr.carepet.data.pet.MyPetListRes>{
-                    override fun onResponse(call: Call<kr.carepet.data.pet.MyPetListRes>, response: Response<kr.carepet.data.pet.MyPetListRes>) {
+                call.enqueue(object : Callback<MyPetListRes>{
+                    override fun onResponse(call: Call<MyPetListRes>, response: Response<MyPetListRes>) {
                         if(response.isSuccessful){
                             val body = response.body()
                             body?.let {
@@ -124,7 +124,7 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
                             }
                         }
                     }
-                    override fun onFailure(call: Call<kr.carepet.data.pet.MyPetListRes>, t: Throwable) {
+                    override fun onFailure(call: Call<MyPetListRes>, t: Throwable) {
                         Log.d("LOG","FAIL"+t.message)
                     }
 

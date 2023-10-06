@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class LoginResModel(
     @SerializedName("data")
-    var `data`: kr.carepet.data.user.Data,
+    var `data`: Data,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")

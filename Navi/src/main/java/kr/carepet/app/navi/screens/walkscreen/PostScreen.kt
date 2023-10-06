@@ -339,7 +339,7 @@ fun BwlMvmNmtmContent(walkViewModel: WalkViewModel){
 }
 
 @Composable
-fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: kr.carepet.data.pet.PetDetailData){
+fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: PetDetailData){
 
     var bwlCount by remember{ mutableIntStateOf(0) }
     var peeCount by remember{ mutableIntStateOf(0) }

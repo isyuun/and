@@ -58,7 +58,11 @@ android {
 
 dependencies {
 
+    //implementation(project(mapOf("path" to ":GPS")))
+    //implementation(project(mapOf("path" to ":_APP")))
+    //implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":NAV")))
+
 
     //기존 implementation
     implementation("androidx.core:core-ktx:1.9.0")

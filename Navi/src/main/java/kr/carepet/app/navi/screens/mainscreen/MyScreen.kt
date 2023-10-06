@@ -356,7 +356,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
 }
 
 @Composable
-fun MyPagePetItem(petDetailData: kr.carepet.data.pet.PetDetailData, sharedViewModel: SharedViewModel, navController: NavHostController, index:Int){
+fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel, navController: NavHostController, index:Int){
     Column (
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -642,7 +642,7 @@ fun MyBottomSheet(
 }
 
 @Composable
-fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewModel, petList : kr.carepet.data.pet.PetDetailData){
+fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewModel, petList : PetDetailData){
 
     val configuration = LocalConfiguration.current
 

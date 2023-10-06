@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class WeekRecordRes(
     @SerializedName("data")
-    var data: kr.carepet.data.daily.WeekData,
+    var data: WeekData,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")
@@ -16,7 +16,7 @@ data class WeekRecordRes(
 
 data class WeekData(
     @SerializedName("dayList")
-    var dayList: List<kr.carepet.data.daily.Day>,
+    var dayList: List<Day>,
     @SerializedName("runClr")
     var runClr: Int, // 200
     @SerializedName("runCnt")
@@ -26,7 +26,7 @@ data class WeekData(
     @SerializedName("runTime")
     var runTime: String, // 02:07:00
     @SerializedName("dailyLifeWalkList")
-    var dailyLifeWalkList: List<kr.carepet.data.daily.DailyLifeWalk>
+    var dailyLifeWalkList: List<DailyLifeWalk>
 )
 
 

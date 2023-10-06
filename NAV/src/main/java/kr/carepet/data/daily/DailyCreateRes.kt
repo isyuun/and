@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class DailyCreateRes(
     @SerializedName("data")
-    var data: kr.carepet.data.daily.DailyResData,
+    var data: DailyResData,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")

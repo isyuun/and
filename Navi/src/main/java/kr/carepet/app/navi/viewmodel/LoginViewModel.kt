@@ -109,10 +109,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
             val call = apiService.sendLoginToServer(loginData)
             return suspendCancellableCoroutine { continuation ->
-                call.enqueue(object : Callback<kr.carepet.data.user.LoginResModel> {
+                call.enqueue(object : Callback<LoginResModel> {
                     override fun onResponse(
-                        call: Call<kr.carepet.data.user.LoginResModel>,
-                        response: Response<kr.carepet.data.user.LoginResModel>
+                        call: Call<LoginResModel>,
+                        response: Response<LoginResModel>
                     ) {
                         // Response 결과
                         if (response.isSuccessful) {
@@ -141,7 +141,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                         }
                     }
 
-                    override fun onFailure(call: Call<kr.carepet.data.user.LoginResModel>, t: Throwable) {
+                    override fun onFailure(call: Call<LoginResModel>, t: Throwable) {
                         Log.d("LOG", "userid : ${userId}, userpw: ${userPw}, " + t.message)
                         continuation.resume(false)
                     }

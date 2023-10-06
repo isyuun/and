@@ -302,7 +302,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel){
 
 
 @Composable
-fun DetailLazyColItem(dailyDetail: kr.carepet.data.daily.DailyDetailData?){
+fun DetailLazyColItem(dailyDetail: DailyDetailData?){
     Box (
         modifier = Modifier
             .padding(horizontal = 20.dp)

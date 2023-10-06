@@ -41,25 +41,25 @@ import retrofit2.http.Part
 
 interface ApiService {
     @POST("api/v1/member/create-user")
-    fun sendUserToServer(@Body data: kr.carepet.data.user.UserDataModel): Call<kr.carepet.data.user.UserDataResponse>
+    fun sendUserToServer(@Body data: UserDataModel): Call<UserDataResponse>
 
     @POST("api/v1/member/login")
-    fun sendLoginToServer(@Body data: kr.carepet.data.user.LoginData): Call<kr.carepet.data.user.LoginResModel>
+    fun sendLoginToServer(@Body data: LoginData): Call<LoginResModel>
 
     @POST("api/v1/member/logOut")
-    fun sendLogout(): Call<kr.carepet.data.user.LogoutRes>
+    fun sendLogout(): Call<LogoutRes>
 
     @POST("api/v1/member/refresh-token")
-    fun sendRefreshToken(@Body refreshToken: kr.carepet.data.RefreshToken): Call<kr.carepet.data.RefreshRes>
+    fun sendRefreshToken(@Body refreshToken: RefreshToken): Call<RefreshRes>
 
     @POST("api/v1/member/refresh-token")
-    fun sendPetDataToServer(@Body data: kr.carepet.data.pet.PetModel): Call<kr.carepet.data.pet.MyPetResModel>
+    fun sendPetDataToServer(@Body data: PetModel): Call<MyPetResModel>
 
     @POST("api/v1/cmm/code-list")
-    fun commonCodeList(@Body data: kr.carepet.data.CommonCodeModel) : Call<kr.carepet.data.CommonCodeResModel>
+    fun commonCodeList(@Body data: CommonCodeModel) : Call<CommonCodeResModel>
 
     @POST("api/v1/cmm/pet-list")
-    fun petList(@Body data: kr.carepet.data.pet.PetListModel) : Call<kr.carepet.data.pet.PetListResModel>
+    fun petList(@Body data: PetListModel) : Call<PetListResModel>
 
     @Multipart
     @POST("api/v1/mypet/create")
@@ -79,41 +79,41 @@ interface ApiService {
         @Part("petMngrYn") petMngrYn: RequestBody,
         @Part("stdgCtpvCd") stdgCtpvCd: RequestBody,
         @Part("wghtVl") wghtVl: Float,
-    ):Call<kr.carepet.data.pet.MyPetResModel>
+    ):Call<MyPetResModel>
 
     @POST("api/v1/mypet/list")
-    fun myPetList(@Body data: kr.carepet.data.pet.MyPetListReq) : Call<kr.carepet.data.pet.MyPetListRes>
+    fun myPetList(@Body data: MyPetListReq) : Call<MyPetListRes>
 
     @Multipart
     @POST("api/v1/daily-life/upload")
-    fun uploadPhoto(@Part photos: List<MultipartBody.Part>): Call<kr.carepet.data.daily.PhotoRes>
+    fun uploadPhoto(@Part photos: List<MultipartBody.Part>): Call<PhotoRes>
 
     @POST("api/v1/daily-life/create")
-    fun uploadDaily(@Body data: kr.carepet.data.daily.DailyCreateReq): Call<kr.carepet.data.daily.DailyCreateRes>
+    fun uploadDaily(@Body data: DailyCreateReq): Call<DailyCreateRes>
 
     @POST("api/v1/cmm/sgg-list")
-    fun getSggList(@Body data: String): Call<kr.carepet.data.SggListRes>
+    fun getSggList(@Body data: String): Call<SggListRes>
 
     @POST("api/v1/cmm/umd-list")
-    fun getUmdList(@Body data: kr.carepet.data.UmdListReq): Call<kr.carepet.data.UmdListRes>
+    fun getUmdList(@Body data: UmdListReq): Call<UmdListRes>
 
     @POST("api/v1/daily-life/week/recode")
-    fun getWeekRecord(@Body data: kr.carepet.data.daily.WeekRecordReq) : Call<kr.carepet.data.daily.WeekRecordRes>
+    fun getWeekRecord(@Body data: WeekRecordReq) : Call<WeekRecordRes>
 
     @POST("api/v1/daily-life/list")
-    fun getWalkList(@Body data: kr.carepet.data.daily.WalkListReq): Call<kr.carepet.data.daily.WalkListRes>
+    fun getWalkList(@Body data: WalkListReq): Call<WalkListRes>
 
     @POST("api/v1/daily-life/view")
-    fun getDailyDetail(@Body data: kr.carepet.data.daily.DailyDetailReq): Call<kr.carepet.data.daily.DailyDetailRes>
+    fun getDailyDetail(@Body data: DailyDetailReq): Call<DailyDetailRes>
 
     @POST("api/v1/daily-life/month/recode")
-    fun getMonthData(@Body data: kr.carepet.data.daily.DailyMonthReq): Call<kr.carepet.data.daily.DailyMonthRes>
+    fun getMonthData(@Body data: DailyMonthReq): Call<DailyMonthRes>
 
     @POST("api/v1/mypet/invtt/create")
-    fun getInviteCode(@Body data: kr.carepet.data.pet.InviteCodeReq): Call<kr.carepet.data.pet.InviteCodeRes>
+    fun getInviteCode(@Body data: InviteCodeReq): Call<InviteCodeRes>
 
     @POST("api/v1/mypet/invtt/create")
-    fun setInviteCode(@Body data: String): Call<kr.carepet.data.pet.InviteCodeRes>
+    fun setInviteCode(@Body data: String): Call<InviteCodeRes>
 
 
 }

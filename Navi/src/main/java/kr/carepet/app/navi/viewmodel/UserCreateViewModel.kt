@@ -58,28 +58,28 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carepet.data.SCDLocalData): ViewModel() {
+class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocalData): ViewModel() {
 
-    val scdList : List<kr.carepet.data.SCD> = scdLocalData.scd
+    val scdList : List<SCD> = scdLocalData.scd
 
-    private val _sggList = MutableStateFlow<List<kr.carepet.data.SggList>>(emptyList()) // 시군구
-    val sggList: StateFlow<List<kr.carepet.data.SggList>> = _sggList.asStateFlow()
+    private val _sggList = MutableStateFlow<List<SggList>>(emptyList()) // 시군구
+    val sggList: StateFlow<List<SggList>> = _sggList.asStateFlow()
 
-    private val _umdList = MutableStateFlow<List<kr.carepet.data.UmdList>>(emptyList()) // 읍면동
-    val umdList: StateFlow<List<kr.carepet.data.UmdList>> = _umdList.asStateFlow()
-    fun updateUmdList(newValue: List<kr.carepet.data.UmdList>) { _umdList.value = newValue }
+    private val _umdList = MutableStateFlow<List<UmdList>>(emptyList()) // 읍면동
+    val umdList: StateFlow<List<UmdList>> = _umdList.asStateFlow()
+    fun updateUmdList(newValue: List<UmdList>) { _umdList.value = newValue }
 
-    private val _selectedItem1 = MutableStateFlow(kr.carepet.data.SCD("", "", "")) // 시도
-    val selectedItem1: StateFlow<kr.carepet.data.SCD> = _selectedItem1.asStateFlow()
-    fun updateSelectedItem1(newValue: kr.carepet.data.SCD) { _selectedItem1.value = newValue }
+    private val _selectedItem1 = MutableStateFlow(SCD("", "", "")) // 시도
+    val selectedItem1: StateFlow<SCD> = _selectedItem1.asStateFlow()
+    fun updateSelectedItem1(newValue: SCD) { _selectedItem1.value = newValue }
 
-    private val _selectedItem2 = MutableStateFlow(kr.carepet.data.SggList("", "")) // 시군구
-    val selectedItem2: StateFlow<kr.carepet.data.SggList> = _selectedItem2.asStateFlow() // state 노출
-    fun updateSelectedItem2(newValue: kr.carepet.data.SggList) { _selectedItem2.value = newValue }
+    private val _selectedItem2 = MutableStateFlow(SggList("", "")) // 시군구
+    val selectedItem2: StateFlow<SggList> = _selectedItem2.asStateFlow() // state 노출
+    fun updateSelectedItem2(newValue: SggList) { _selectedItem2.value = newValue }
 
-    private val _selectedItem3 = MutableStateFlow(kr.carepet.data.UmdList("", "")) // 읍면동
-    val selectedItem3: StateFlow<kr.carepet.data.UmdList> = _selectedItem3.asStateFlow() // state 노출
-    fun updateSelectedItem3(newValue: kr.carepet.data.UmdList) { _selectedItem3.value = newValue }
+    private val _selectedItem3 = MutableStateFlow(UmdList("", "")) // 읍면동
+    val selectedItem3: StateFlow<UmdList> = _selectedItem3.asStateFlow() // state 노출
+    fun updateSelectedItem3(newValue: UmdList) { _selectedItem3.value = newValue }
 
     private val _toKindScreen = MutableStateFlow<Boolean>(true)
     val toKindScreen: StateFlow<Boolean> = _toKindScreen.asStateFlow()
@@ -164,16 +164,16 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
     private val _imageFile = MutableStateFlow<File?>(null)
     val imageFile: StateFlow<File?> = _imageFile.asStateFlow()
 
-    private val _sDog = MutableStateFlow<List<kr.carepet.data.pet.PetListData>>(emptyList())
-    val sDog: StateFlow<List<kr.carepet.data.pet.PetListData>> = _sDog.asStateFlow()
+    private val _sDog = MutableStateFlow<List<PetListData>>(emptyList())
+    val sDog: StateFlow<List<PetListData>> = _sDog.asStateFlow()
 
-    private val _mDog = MutableStateFlow<List<kr.carepet.data.pet.PetListData>>(emptyList())
-    val mDog: StateFlow<List<kr.carepet.data.pet.PetListData>> = _mDog.asStateFlow()
+    private val _mDog = MutableStateFlow<List<PetListData>>(emptyList())
+    val mDog: StateFlow<List<PetListData>> = _mDog.asStateFlow()
 
-    private val _lDog = MutableStateFlow<List<kr.carepet.data.pet.PetListData>>(emptyList())
-    val lDog: StateFlow<List<kr.carepet.data.pet.PetListData>> = _lDog.asStateFlow()
+    private val _lDog = MutableStateFlow<List<PetListData>>(emptyList())
+    val lDog: StateFlow<List<PetListData>> = _lDog.asStateFlow()
 
-    private val _petKind = MutableStateFlow<kr.carepet.data.pet.PetListData>(
+    private val _petKind = MutableStateFlow<PetListData>(
         kr.carepet.data.pet.PetListData(
             "",
             "",
@@ -182,7 +182,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
             ""
         )
     )
-    val petKind: StateFlow<kr.carepet.data.pet.PetListData> = _petKind.asStateFlow()
+    val petKind: StateFlow<PetListData> = _petKind.asStateFlow()
 
     private val _year = MutableStateFlow<PickerState>(PickerState())
     val year: StateFlow<PickerState> = _year.asStateFlow()
@@ -201,7 +201,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
     fun updateAddress(newValue: String) { _address.value = newValue }
 
 
-    private val _userResponse = MutableStateFlow<kr.carepet.data.user.UserDataResponse>(
+    private val _userResponse = MutableStateFlow<UserDataResponse>(
         kr.carepet.data.user.UserDataResponse(
             null,
             null,
@@ -209,11 +209,11 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
             null
         )
     )
-    val userResponse: StateFlow<kr.carepet.data.user.UserDataResponse> = _userResponse.asStateFlow()
+    val userResponse: StateFlow<UserDataResponse> = _userResponse.asStateFlow()
 
 
-    private val _myPetResModel = MutableStateFlow<kr.carepet.data.pet.MyPetResModel?>(null)
-    val myPetResModel: StateFlow<kr.carepet.data.pet.MyPetResModel?> = _myPetResModel.asStateFlow()
+    private val _myPetResModel = MutableStateFlow<MyPetResModel?>(null)
+    val myPetResModel: StateFlow<MyPetResModel?> = _myPetResModel.asStateFlow()
 
     // 검색어를 담는 MutableStateFlow를 생성
     private val _searchText = MutableStateFlow("")
@@ -231,7 +231,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
 
 
     // 전체 pets 리스트를 MutableStateFlow로 생성
-    private val _pets = MutableStateFlow<List<kr.carepet.data.pet.PetListData>>(emptyList())
+    private val _pets = MutableStateFlow<List<PetListData>>(emptyList())
     // 검색어, pets 리스트의 조합을 통해 검색 결과를 생성하는 로직
     val pets = searchText
         .debounce(0L) // 검색어 입력 후 1초 동안 대기
@@ -258,7 +258,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
             _pets.value // 초기값으로 _pets의 현재 값을 사용
         )
 
-    fun doesPetMatchSearchQuery(pet: kr.carepet.data.pet.PetListData, query: String): Boolean {
+    fun doesPetMatchSearchQuery(pet: PetListData, query: String): Boolean {
         return pet.petNm.contains(query, ignoreCase = true)
     }
 
@@ -274,10 +274,10 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
             val petData = kr.carepet.data.pet.PetListModel(petSize, "001")
 
             val call=apiService.petList(petData)
-            call.enqueue(object : Callback<kr.carepet.data.pet.PetListResModel>{
+            call.enqueue(object : Callback<PetListResModel>{
                 override fun onResponse(
-                    call: Call<kr.carepet.data.pet.PetListResModel>,
-                    response: Response<kr.carepet.data.pet.PetListResModel>
+                    call: Call<PetListResModel>,
+                    response: Response<PetListResModel>
                 ) {
                     if(response.isSuccessful){
                         var petListBody = response.body()
@@ -296,7 +296,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
                     }
                 }
 
-                override fun onFailure(call: Call<kr.carepet.data.pet.PetListResModel>, t: Throwable) {
+                override fun onFailure(call: Call<PetListResModel>, t: Throwable) {
                     Log.d("LOG", "통신실패")
                 }
 
@@ -309,7 +309,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
         callPetListApi("003")
     }
 
-    fun updatePetKind(newPetKind: kr.carepet.data.pet.PetListData){
+    fun updatePetKind(newPetKind: PetListData){
         _petKind.value = newPetKind
     }
 
@@ -362,10 +362,10 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
 
         val call= apiService.sendUserToServer(userData)
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<kr.carepet.data.user.UserDataResponse>{
+            call.enqueue(object : Callback<UserDataResponse>{
                 override fun onResponse(
-                    call: Call<kr.carepet.data.user.UserDataResponse>,
-                    response: Response<kr.carepet.data.user.UserDataResponse>
+                    call: Call<UserDataResponse>,
+                    response: Response<UserDataResponse>
                 ) {
                     if(response.isSuccessful){
                         // 200을 제외한 code 는 detail message 를 노출하는 식으로 처리
@@ -385,7 +385,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
                     }
                 }
 
-                override fun onFailure(call: Call<kr.carepet.data.user.UserDataResponse>, t: Throwable) {
+                override fun onFailure(call: Call<UserDataResponse>, t: Throwable) {
 
                     continuation.resume(false)
                 }
@@ -407,8 +407,8 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
         val call = apiService.getSggList(sidoCd)
 
         viewModelScope.launch {
-            call.enqueue(object: Callback<kr.carepet.data.SggListRes>{
-                override fun onResponse(call: Call<kr.carepet.data.SggListRes>, response: Response<kr.carepet.data.SggListRes>) {
+            call.enqueue(object: Callback<SggListRes>{
+                override fun onResponse(call: Call<SggListRes>, response: Response<SggListRes>) {
                     if(response.isSuccessful){
                         val body = response.body()
                         body?.let {
@@ -417,7 +417,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
                     }
                 }
 
-                override fun onFailure(call: Call<kr.carepet.data.SggListRes>, t: Throwable) {
+                override fun onFailure(call: Call<SggListRes>, t: Throwable) {
                     TODO("Not yet implemented")
                 }
             })
@@ -432,8 +432,8 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
         val call = apiService.getUmdList(data)
 
         viewModelScope.launch {
-            call.enqueue(object: Callback<kr.carepet.data.UmdListRes>{
-                override fun onResponse(call: Call<kr.carepet.data.UmdListRes>, response: Response<kr.carepet.data.UmdListRes>) {
+            call.enqueue(object: Callback<UmdListRes>{
+                override fun onResponse(call: Call<UmdListRes>, response: Response<UmdListRes>) {
                     if(response.isSuccessful){
                         val body = response.body()
                         body?.let {
@@ -441,7 +441,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
                         }
                     }
                 }
-                override fun onFailure(call: Call<kr.carepet.data.UmdListRes>, t: Throwable) {
+                override fun onFailure(call: Call<UmdListRes>, t: Throwable) {
 
                 }
 
@@ -491,8 +491,8 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
 
             val response = apiService.createPet(petRelCd, petNm, petRegNo, stdgSggCd, petInfoUnqNo,petBrthYmd, delYn, stdgUmdCd, filePart, petRprsYn, ntrTypCd, sexTypCd, petMngrYn, stdgCtpvCd, wghtVl)
 
-            response.enqueue(object : Callback<kr.carepet.data.pet.MyPetResModel>{
-                override fun onResponse(call: Call<kr.carepet.data.pet.MyPetResModel>, response: Response<kr.carepet.data.pet.MyPetResModel>) {
+            response.enqueue(object : Callback<MyPetResModel>{
+                override fun onResponse(call: Call<MyPetResModel>, response: Response<MyPetResModel>) {
                     if(response.isSuccessful){
                         val body = response.body()
                         body?.let {
@@ -510,7 +510,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
                     }
                 }
 
-                override fun onFailure(call: Call<kr.carepet.data.pet.MyPetResModel>, t: Throwable) {
+                override fun onFailure(call: Call<MyPetResModel>, t: Throwable) {
                     Log.d("LOG","실패"+t.toString())
                     continuation.resume(false)
                 }
@@ -524,10 +524,10 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
 
         val call = apiService.sendLoginToServer(loginData)
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<kr.carepet.data.user.LoginResModel> {
+            call.enqueue(object : Callback<LoginResModel> {
                 override fun onResponse(
-                    call: Call<kr.carepet.data.user.LoginResModel>,
-                    response: Response<kr.carepet.data.user.LoginResModel>
+                    call: Call<LoginResModel>,
+                    response: Response<LoginResModel>
                 ) {
                     // Response 결과
                     if (response.isSuccessful) {
@@ -563,7 +563,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: kr.carep
                     }
                 }
 
-                override fun onFailure(call: Call<kr.carepet.data.user.LoginResModel>, t: Throwable) {
+                override fun onFailure(call: Call<LoginResModel>, t: Throwable) {
                     continuation.resume(false)
                 }
             })

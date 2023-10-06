@@ -37,13 +37,13 @@ object RetrofitClientServer {
     // 서버쪽 retrofit 싱글톤 객체
 
     private const val BASE_URL = "http://carepet.hopto.org:8020/"
-    private val tokenInterceptor = kr.carepet.service.TokenInterceptor()
+    private val tokenInterceptor = TokenInterceptor()
 
     val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY // 로깅 레벨 설정
     }
 
-    val instance : kr.carepet.service.ApiService by lazy {
+    val instance : ApiService by lazy {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
@@ -59,7 +59,7 @@ object RetrofitClientServer {
             .build()
     }
 
-    val apiInstanceForToken : kr.carepet.service.ApiService by lazy {
+    val apiInstanceForToken : ApiService by lazy {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -74,13 +74,13 @@ fun setTokenReceivedTime() {
 }
 
 fun isTokenExpired(): Boolean {
-    if (kr.carepet.singleton.G.tokenReceivedTime == null) {
+    if (G.tokenReceivedTime == null) {
         // 토큰을 아직 받지 않았거나 시간을 초기화하지 않은 경우
         return true
     }
 
     val currentTime = Date()
-    val elapsedMinutes = Duration.between(kr.carepet.singleton.G.tokenReceivedTime!!.toInstant(), currentTime.toInstant()).toMinutes()
+    val elapsedMinutes = Duration.between(G.tokenReceivedTime!!.toInstant(), currentTime.toInstant()).toMinutes()
 
     return elapsedMinutes >= 30
 }
@@ -91,10 +91,10 @@ class TokenManager {
 
         val refreshToken = kr.carepet.singleton.G.refreshToken
 
-        val call = apiService.sendRefreshToken(kr.carepet.data.RefreshToken(refreshToken))
+        val call = apiService.sendRefreshToken(RefreshToken(refreshToken))
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<kr.carepet.data.RefreshRes> {
-                override fun onResponse(call: Call<kr.carepet.data.RefreshRes>, response: Response<kr.carepet.data.RefreshRes>) {
+            call.enqueue(object : Callback<RefreshRes> {
+                override fun onResponse(call: Call<RefreshRes>, response: Response<RefreshRes>) {
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
@@ -119,7 +119,7 @@ class TokenManager {
                         }
                     }
                 }
-                override fun onFailure(call: Call<kr.carepet.data.RefreshRes>, t: Throwable) {
+                override fun onFailure(call: Call<RefreshRes>, t: Throwable) {
                     continuation.resume("")
                 }
             })

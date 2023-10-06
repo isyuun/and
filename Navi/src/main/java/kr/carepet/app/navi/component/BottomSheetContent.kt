@@ -118,7 +118,7 @@ fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel){
 }
 
 @Composable
-fun BottomSheetItem(viewModel: SharedViewModel, petList : kr.carepet.data.pet.PetDetailData){
+fun BottomSheetItem(viewModel: SharedViewModel, petList : PetDetailData){
 
     val configuration = LocalConfiguration.current
 

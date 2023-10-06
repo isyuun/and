@@ -45,16 +45,16 @@ import kotlin.coroutines.resume
 
 class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {
 
-    val weekRecord: StateFlow<kr.carepet.data.daily.WeekData?> = sharedViewModel.weekRecord
-    fun updatePetInfo(newData: List<kr.carepet.data.pet.PetDetailData>){
+    val weekRecord: StateFlow<WeekData?> = sharedViewModel.weekRecord
+    fun updatePetInfo(newData: List<PetDetailData>){
         sharedViewModel.updatePetInfo(newData)
     }
     suspend fun callGetWeekRecord(ownrPetUnqNo: String, searchDay: String){
         sharedViewModel.getWeekRecord(ownrPetUnqNo, searchDay)
     }
 
-    private val _dailyMonth = MutableStateFlow<kr.carepet.data.daily.DailyMonthData?>(null)
-    val dailyMonth: StateFlow<kr.carepet.data.daily.DailyMonthData?> = _dailyMonth.asStateFlow()
+    private val _dailyMonth = MutableStateFlow<DailyMonthData?>(null)
+    val dailyMonth: StateFlow<DailyMonthData?> = _dailyMonth.asStateFlow()
 
     private val _toDetail = MutableStateFlow(false)
     // 검색 중인지 여부를 StateFlow로 노출
@@ -70,26 +70,26 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {
         _toMonthCalendar.value = newValue
     }
 
-    private val _walkListItem = MutableStateFlow<kr.carepet.data.daily.DailyLifeWalk?>(null)
-    val walkListItem: StateFlow<kr.carepet.data.daily.DailyLifeWalk?> = _walkListItem.asStateFlow()
-    fun updateWalkListItem(newValue: kr.carepet.data.daily.DailyLifeWalk){
+    private val _walkListItem = MutableStateFlow<DailyLifeWalk?>(null)
+    val walkListItem: StateFlow<DailyLifeWalk?> = _walkListItem.asStateFlow()
+    fun updateWalkListItem(newValue: DailyLifeWalk){
         _walkListItem.value = newValue
     }
 
-    val petInfo: StateFlow<List<kr.carepet.data.pet.PetDetailData>> = sharedViewModel.petInfo
+    val petInfo: StateFlow<List<PetDetailData>> = sharedViewModel.petInfo
 
-    private val _walkList = MutableStateFlow<List<kr.carepet.data.daily.DailyLifeWalk>>(emptyList())
-    val walkList: StateFlow<List<kr.carepet.data.daily.DailyLifeWalk>> = _walkList.asStateFlow()
+    private val _walkList = MutableStateFlow<List<DailyLifeWalk>>(emptyList())
+    val walkList: StateFlow<List<DailyLifeWalk>> = _walkList.asStateFlow()
 
-    private val _page = MutableStateFlow<kr.carepet.data.daily.Paginate?>(null)
-    val page: StateFlow<kr.carepet.data.daily.Paginate?> = _page.asStateFlow()
+    private val _page = MutableStateFlow<Paginate?>(null)
+    val page: StateFlow<Paginate?> = _page.asStateFlow()
 
-    private val _dailyDetail = MutableStateFlow<kr.carepet.data.daily.DailyDetailData?>(null)
-    val dailyDetail: StateFlow<kr.carepet.data.daily.DailyDetailData?> = _dailyDetail.asStateFlow()
+    private val _dailyDetail = MutableStateFlow<DailyDetailData?>(null)
+    val dailyDetail: StateFlow<DailyDetailData?> = _dailyDetail.asStateFlow()
 
-    private val _selectPet = MutableStateFlow<List<kr.carepet.data.pet.PetDetailData>>(emptyList())
-    val selectPet: StateFlow<List<kr.carepet.data.pet.PetDetailData>> = _selectPet.asStateFlow()
-    fun updateSelectPet(newValue: List<kr.carepet.data.pet.PetDetailData>) { _selectPet.value = newValue }
+    private val _selectPet = MutableStateFlow<List<PetDetailData>>(emptyList())
+    val selectPet: StateFlow<List<PetDetailData>> = _selectPet.asStateFlow()
+    fun updateSelectPet(newValue: List<PetDetailData>) { _selectPet.value = newValue }
 
     private val _isLoading = MutableStateFlow(false)
     // 검색 중인지 여부를 StateFlow로 노출
@@ -159,8 +159,8 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {
 
         val call = apiService.getWalkList(data)
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<kr.carepet.data.daily.WalkListRes>{
-                override fun onResponse(call: Call<kr.carepet.data.daily.WalkListRes>, response: Response<kr.carepet.data.daily.WalkListRes>) {
+            call.enqueue(object : Callback<WalkListRes>{
+                override fun onResponse(call: Call<WalkListRes>, response: Response<WalkListRes>) {
                     if(response.isSuccessful){
                         val body = response.body()
                         body?.let {
@@ -175,7 +175,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {
                         }
                     }
                 }
-                override fun onFailure(call: Call<kr.carepet.data.daily.WalkListRes>, t: Throwable) {
+                override fun onFailure(call: Call<WalkListRes>, t: Throwable) {
                     continuation.resume(true)
                 }
             })
@@ -189,10 +189,10 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {
 
         val call = apiService.getDailyDetail(data)
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object :Callback<kr.carepet.data.daily.DailyDetailRes>{
+            call.enqueue(object :Callback<DailyDetailRes>{
                 override fun onResponse(
-                    call: Call<kr.carepet.data.daily.DailyDetailRes>,
-                    response: Response<kr.carepet.data.daily.DailyDetailRes>
+                    call: Call<DailyDetailRes>,
+                    response: Response<DailyDetailRes>
                 ) {
                     if(response.isSuccessful){
                         val body = response.body()
@@ -209,7 +209,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {
                     }
                 }
 
-                override fun onFailure(call: Call<kr.carepet.data.daily.DailyDetailRes>, t: Throwable) {
+                override fun onFailure(call: Call<DailyDetailRes>, t: Throwable) {
                     continuation.resume(false)
                 }
 
@@ -224,10 +224,10 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {
 
         val call = apiService.getMonthData(data)
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object :Callback<kr.carepet.data.daily.DailyMonthRes>{
+            call.enqueue(object :Callback<DailyMonthRes>{
                 override fun onResponse(
-                    call: Call<kr.carepet.data.daily.DailyMonthRes>,
-                    response: Response<kr.carepet.data.daily.DailyMonthRes>
+                    call: Call<DailyMonthRes>,
+                    response: Response<DailyMonthRes>
                 ) {
                     if(response.isSuccessful){
                         val body = response.body()
@@ -239,7 +239,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {
                         continuation.resume(false)
                     }
                 }
-                override fun onFailure(call: Call<kr.carepet.data.daily.DailyMonthRes>, t: Throwable) {
+                override fun onFailure(call: Call<DailyMonthRes>, t: Throwable) {
                     continuation.resume(false)
                 }
             })

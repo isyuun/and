@@ -28,21 +28,21 @@ import kotlin.coroutines.resume
 
 class SharedViewModel:ViewModel(){
 
-    private val _weekRecord = MutableStateFlow<kr.carepet.data.daily.WeekData?>(null)
-    val weekRecord: StateFlow<kr.carepet.data.daily.WeekData?> = _weekRecord.asStateFlow()
-    fun updateWeekRecord(newData: kr.carepet.data.daily.WeekData) {
+    private val _weekRecord = MutableStateFlow<WeekData?>(null)
+    val weekRecord: StateFlow<WeekData?> = _weekRecord.asStateFlow()
+    fun updateWeekRecord(newData: WeekData) {
         _weekRecord.value = newData
     }
 
-    private val _petInfo = MutableStateFlow<List<kr.carepet.data.pet.PetDetailData>>(emptyList())
-    val petInfo: StateFlow<List<kr.carepet.data.pet.PetDetailData>> = _petInfo.asStateFlow()
-    fun updatePetInfo(newData: List<kr.carepet.data.pet.PetDetailData>) {
+    private val _petInfo = MutableStateFlow<List<PetDetailData>>(emptyList())
+    val petInfo: StateFlow<List<PetDetailData>> = _petInfo.asStateFlow()
+    fun updatePetInfo(newData: List<PetDetailData>) {
         _petInfo.value = newData
     }
 
-    private val _selectPet = MutableStateFlow<kr.carepet.data.pet.PetDetailData?>(null)
-    val selectPet: StateFlow<kr.carepet.data.pet.PetDetailData?> = _selectPet.asStateFlow()
-    fun updateSelectPet(newValue: kr.carepet.data.pet.PetDetailData) { _selectPet.value = newValue }
+    private val _selectPet = MutableStateFlow<PetDetailData?>(null)
+    val selectPet: StateFlow<PetDetailData?> = _selectPet.asStateFlow()
+    fun updateSelectPet(newValue: PetDetailData) { _selectPet.value = newValue }
 
 
     fun parseBirthday(birthdayString: String): LocalDate? {
@@ -84,10 +84,10 @@ class SharedViewModel:ViewModel(){
 
         val refreshToken = kr.carepet.singleton.MySharedPreference.getRefreshToken()
 
-        val call = apiService.sendRefreshToken(kr.carepet.data.RefreshToken(refreshToken))
+        val call = apiService.sendRefreshToken(RefreshToken(refreshToken))
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<kr.carepet.data.RefreshRes>{
-                override fun onResponse(call: Call<kr.carepet.data.RefreshRes>, response: Response<kr.carepet.data.RefreshRes>) {
+            call.enqueue(object : Callback<RefreshRes>{
+                override fun onResponse(call: Call<RefreshRes>, response: Response<RefreshRes>) {
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
@@ -111,7 +111,7 @@ class SharedViewModel:ViewModel(){
                     }
                 }
 
-                override fun onFailure(call: Call<kr.carepet.data.RefreshRes>, t: Throwable) {
+                override fun onFailure(call: Call<RefreshRes>, t: Throwable) {
 
                     continuation.resume(false)
                 }
@@ -127,10 +127,10 @@ class SharedViewModel:ViewModel(){
 
         val call=apiService.getWeekRecord(data)
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<kr.carepet.data.daily.WeekRecordRes>{
+            call.enqueue(object : Callback<WeekRecordRes>{
                 override fun onResponse(
-                    call: Call<kr.carepet.data.daily.WeekRecordRes>,
-                    response: Response<kr.carepet.data.daily.WeekRecordRes>
+                    call: Call<WeekRecordRes>,
+                    response: Response<WeekRecordRes>
                 ) {
                     val body = response.body()
                     body?.let {
@@ -142,7 +142,7 @@ class SharedViewModel:ViewModel(){
                         }
                     }
                 }
-                override fun onFailure(call: Call<kr.carepet.data.daily.WeekRecordRes>, t: Throwable) {
+                override fun onFailure(call: Call<WeekRecordRes>, t: Throwable) {
                     continuation.resume(false)
                 }
             })

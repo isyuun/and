@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class WalkListRes(
     @SerializedName("data")
-    var data: kr.carepet.data.daily.WalkListResData,
+    var data: WalkListResData,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")
@@ -16,9 +16,9 @@ data class WalkListRes(
 
 data class WalkListResData(
     @SerializedName("dailyLifeWalkList")
-    var dailyLifeWalkList: List<kr.carepet.data.daily.DailyLifeWalk>,
+    var dailyLifeWalkList: List<DailyLifeWalk>,
     @SerializedName("paginate")
-    var paginate: kr.carepet.data.daily.Paginate
+    var paginate: Paginate
 )
 
 data class DailyLifeWalk(

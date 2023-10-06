@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class InviteCodeReq(
     @SerializedName("pet")
-    var pet: List<kr.carepet.data.pet.Pet>,
+    var pet: List<Pet>,
     @SerializedName("relBgngDt")
     var relBgngDt: String, // 202310050918
     @SerializedName("relEndDt")

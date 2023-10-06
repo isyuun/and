@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class InviteCodeRes(
     @SerializedName("data")
-    var data: kr.carepet.data.pet.InviteData,
+    var data: InviteData,
     @SerializedName("detailMessage")
     var detailMessage: String, // null
     @SerializedName("resultMessage")

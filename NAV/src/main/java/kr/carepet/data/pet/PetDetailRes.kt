@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class PetDetailRes(
     @SerializedName("data")
-    var petDetailData: kr.carepet.data.pet.PetDetailData,
+    var petDetailData: PetDetailData,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")
@@ -18,7 +18,7 @@ data class PetDetailData(
     @SerializedName("endDt")
     var endDt: String,
     @SerializedName("memberList")
-    var memberList: List<kr.carepet.data.pet.Member>,
+    var memberList: List<Member>,
     @SerializedName("mngrType")
     var mngrType: String, // M
     @SerializedName("ntrTypCd")

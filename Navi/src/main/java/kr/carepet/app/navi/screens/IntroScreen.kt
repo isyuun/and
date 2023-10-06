@@ -43,7 +43,7 @@ fun IntroScreen(modifier: Modifier = Modifier, navController: NavHostController,
 
     LaunchedEffect(Unit) {
         delay(SplashWaitTime)
-        if (kr.carepet.singleton.MySharedPreference.getIsLogin()) {
+        if (MySharedPreference.getIsLogin()) {
             val result = viewModel.sendRFToken()
             if (result) {
                 navController.navigate(Screen.MainScreen.route) {

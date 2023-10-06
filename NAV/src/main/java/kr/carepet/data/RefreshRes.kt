@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class RefreshRes(
     @SerializedName("data")
-    var data: kr.carepet.data.TokenData,
+    var data: TokenData,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")

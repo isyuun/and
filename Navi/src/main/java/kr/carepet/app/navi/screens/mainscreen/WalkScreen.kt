@@ -240,7 +240,7 @@ fun WalkListContent(walkViewModel: WalkViewModel, backBtnOn: (Boolean) -> Unit) 
 }
 
 @Composable
-fun WalkListContentItem(walk: kr.carepet.data.daily.DailyLifeWalk, walkViewModel: WalkViewModel, backBtnOn: (Boolean) -> Unit) {
+fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, backBtnOn: (Boolean) -> Unit) {
 
     Column (
         modifier = Modifier
@@ -550,7 +550,7 @@ fun WeekContent(
 }
 
 @Composable
-fun WeekItem(day : kr.carepet.data.daily.Day){
+fun WeekItem(day : Day){
 
     val currentDate = getTodayDayOfWeek()
 
@@ -1065,7 +1065,7 @@ fun WalkBottomSheetEnd(viewModel: WalkViewModel, bottomSheetState: ModalBottomSh
 }
 
 @Composable
-fun WalkBottomSheetItem(viewModel: WalkViewModel, petList : kr.carepet.data.pet.PetDetailData){
+fun WalkBottomSheetItem(viewModel: WalkViewModel, petList : PetDetailData){
 
     val configuration = LocalConfiguration.current
 

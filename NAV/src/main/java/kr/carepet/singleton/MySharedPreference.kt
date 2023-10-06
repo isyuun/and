@@ -16,7 +16,7 @@ object MySharedPreference {
     private lateinit var sharedPreferences: SharedPreferences
 
     fun init(context: Context) {
-        kr.carepet.singleton.MySharedPreference.sharedPreferences = context.getSharedPreferences(kr.carepet.singleton.MySharedPreference.DATA, Context.MODE_PRIVATE)
+        kr.carepet.singleton.MySharedPreference.sharedPreferences = context.getSharedPreferences(MySharedPreference.DATA, Context.MODE_PRIVATE)
     }
 
     fun getTodayData(): Boolean {

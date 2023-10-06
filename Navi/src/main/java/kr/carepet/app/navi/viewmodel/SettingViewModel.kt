@@ -38,12 +38,12 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
     val endCheck: StateFlow<Boolean> = _endCheck.asStateFlow() // state 노출
     fun updateEndCheck(newValue: Boolean) { _endCheck.value = newValue }
 
-    val selectedPet = mutableListOf<kr.carepet.data.pet.PetDetailData>()
+    val selectedPet = mutableListOf<PetDetailData>()
 
-    private val _selectedPetSave = MutableStateFlow<List<kr.carepet.data.pet.PetDetailData>>(emptyList())
-    val selectedPetSave: StateFlow<List<kr.carepet.data.pet.PetDetailData>> = _selectedPetSave.asStateFlow()
+    private val _selectedPetSave = MutableStateFlow<List<PetDetailData>>(emptyList())
+    val selectedPetSave: StateFlow<List<PetDetailData>> = _selectedPetSave.asStateFlow()
 
-    fun updateSelectedPetSave(newValue: List<kr.carepet.data.pet.PetDetailData>): Boolean {
+    fun updateSelectedPetSave(newValue: List<PetDetailData>): Boolean {
         _selectedPetSave.value = newValue
         Log.d("ViewModel", _selectedPetSave.value.size.toString())
         return true // 값을 업데이트하는 데 성공했음을 나타내는 불리언 값을 반환합니다.
@@ -144,8 +144,8 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
 
         val call = apiService.sendLogout()
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<kr.carepet.data.user.LogoutRes>{
-                override fun onResponse(call: Call<kr.carepet.data.user.LogoutRes>, response: Response<kr.carepet.data.user.LogoutRes>) {
+            call.enqueue(object : Callback<LogoutRes>{
+                override fun onResponse(call: Call<LogoutRes>, response: Response<LogoutRes>) {
                     if(response.isSuccessful){
                         val body = response.body()
                         body?.let {
@@ -157,7 +157,7 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
                         }
                     }
                 }
-                override fun onFailure(call: Call<kr.carepet.data.user.LogoutRes>, t: Throwable) {
+                override fun onFailure(call: Call<LogoutRes>, t: Throwable) {
                     continuation.resume(false)
                 }
 
@@ -182,7 +182,7 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
     suspend fun getInviteCode():Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val petList:List<kr.carepet.data.pet.Pet> = selectedPetSave.value.map { petDetailData ->
+        val petList:List<Pet> = selectedPetSave.value.map { petDetailData ->
             kr.carepet.data.pet.Pet(
                 ownrPetUnqNo = petDetailData.ownrPetUnqNo,
                 petNm = petDetailData.petNm
@@ -194,10 +194,10 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
 
         val call = apiService.getInviteCode(data)
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<kr.carepet.data.pet.InviteCodeRes>{
+            call.enqueue(object : Callback<InviteCodeRes>{
                 override fun onResponse(
-                    call: Call<kr.carepet.data.pet.InviteCodeRes>,
-                    response: Response<kr.carepet.data.pet.InviteCodeRes>
+                    call: Call<InviteCodeRes>,
+                    response: Response<InviteCodeRes>
                 ) {
                     if(response.isSuccessful){
                         val body = response.body()
@@ -210,7 +210,7 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
                     }
                 }
 
-                override fun onFailure(call: Call<kr.carepet.data.pet.InviteCodeRes>, t: Throwable) {
+                override fun onFailure(call: Call<InviteCodeRes>, t: Throwable) {
                     continuation.resume(false)
                 }
 

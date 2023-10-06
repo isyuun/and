@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
     private val loginViewModel:LoginViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             AppTheme {
                 Surface {
@@ -77,7 +78,7 @@ fun MyApp(viewModel: LoginViewModel){
 @Composable
 fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
 
-    val scdLocalData = remember { kr.carepet.data.SCDLocalData() }
+    val scdLocalData = remember { SCDLocalData() }
 
     val userCreateViewModel = remember{UserCreateViewModel(scdLocalData)}
     val sharedViewModel = remember{ SharedViewModel() }

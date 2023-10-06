@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class CommonCodeResModel(
     @SerializedName("data")
-    var `data`: List<kr.carepet.data.CcData>,
+    var `data`: List<CcData>,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")
@@ -25,7 +25,7 @@ data class CdDetail(
 
 data class CcData(
     @SerializedName("cdDetailList")
-    var cdDetailList: List<kr.carepet.data.CdDetail>,
+    var cdDetailList: List<CdDetail>,
     @SerializedName("cdId")
     var cdId: String, // REL
     @SerializedName("cdNm")

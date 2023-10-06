@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class DailyMonthRes(
     @SerializedName("data")
-    var data: kr.carepet.data.daily.DailyMonthData,
+    var data: DailyMonthData,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")
@@ -16,7 +16,7 @@ data class DailyMonthRes(
 
 data class DailyMonthData(
     @SerializedName("dayList")
-    var dayList: List<kr.carepet.data.daily.MonthDay>,
+    var dayList: List<MonthDay>,
     @SerializedName("runClr")
     var runClr: Int, // 1040
     @SerializedName("runCnt")

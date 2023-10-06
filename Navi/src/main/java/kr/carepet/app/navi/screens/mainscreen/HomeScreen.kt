@@ -941,7 +941,7 @@ fun BottomSheetContent(
 }
 
 @Composable
-fun BottomSheetItem(viewModel: HomeViewModel, petList: kr.carepet.data.pet.PetDetailData){
+fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData){
 
     val petName:String = petList.petNm
     val imageUri:String = petList.petRprsImgAddr

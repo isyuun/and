@@ -285,7 +285,7 @@ fun CalendarMonthItem(walkViewModel: WalkViewModel){
 }
 
 @Composable
-fun CalendarDay(day: kr.carepet.data.daily.MonthDay){
+fun CalendarDay(day: MonthDay){
 
     val formChangeDay = extractDayFromDate(day.date)
 

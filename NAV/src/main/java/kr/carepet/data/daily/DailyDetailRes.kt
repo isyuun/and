@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class DailyDetailRes(
     @SerializedName("data")
-    var data: kr.carepet.data.daily.DailyDetailData,
+    var data: DailyDetailData,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")
@@ -26,13 +26,13 @@ data class DailyDetailData(
     @SerializedName("cmntUseYn")
     var cmntUseYn: String, // Y
     @SerializedName("dailyLifeFileList")
-    var dailyLifeFileList: List<kr.carepet.data.daily.DailyLifeFile>,
+    var dailyLifeFileList: List<DailyLifeFile>,
     @SerializedName("dailyLifePetList")
-    var dailyLifePetList: List<kr.carepet.data.daily.DailyLifePet>,
+    var dailyLifePetList: List<DailyLifePet>,
     @SerializedName("dailyLifeSchHashTagList")
-    var dailyLifeSchHashTagList: List<kr.carepet.data.daily.DailyLifeSchHashTag>,
+    var dailyLifeSchHashTagList: List<DailyLifeSchHashTag>,
     @SerializedName("dailyLifeSchSeList")
-    var dailyLifeSchSeList: List<kr.carepet.data.daily.DailyLifeSchSe>,
+    var dailyLifeSchSeList: List<DailyLifeSchSe>,
     @SerializedName("delYn")
     var delYn: String, // N
     @SerializedName("nrcmdtnCnt")

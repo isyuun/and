@@ -9,11 +9,11 @@ data class DailyCreateReq(
     @SerializedName("cmntUseYn")
     var cmntUseYn: String, // Y
     @SerializedName("files")
-    var files: List<kr.carepet.data.daily.PhotoData>,
+    var files: List<PhotoData>,
     @SerializedName("hashTag")
     var hashTag: List<String>,
     @SerializedName("pet")
-    var pet: List<kr.carepet.data.daily.Pet>,
+    var pet: List<Pet>,
     @SerializedName("rcmdtnYn")
     var rcmdtnYn: String, // Y
     @SerializedName("rlsYn")

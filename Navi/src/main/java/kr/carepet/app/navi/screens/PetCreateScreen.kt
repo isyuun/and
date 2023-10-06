@@ -203,7 +203,7 @@ fun PetCreateScreen(
                     modifier= Modifier
                         .padding(end = 20.dp)
                         .clickable {
-                            if (kr.carepet.singleton.MySharedPreference.getIsLogin()) {
+                            if (MySharedPreference.getIsLogin()) {
                                 navController.navigate(Screen.MainScreen.route) {
                                     popUpTo(0)
                                 }
@@ -817,7 +817,7 @@ fun PetCreateScreen(
 
                         if (IntegrityCheck(viewModel, context)){
                             // 로그인 된 상태면 펫 생성만
-                            if (kr.carepet.singleton.MySharedPreference.getIsLogin()){
+                            if (MySharedPreference.getIsLogin()){
                                 val petCreateSuccess = viewModel.createPet()
                                 if(petCreateSuccess){
                                     navController.navigate(Screen.MainScreen.route){
@@ -1018,7 +1018,7 @@ fun PetKindContent(
 }
 
 @Composable
-fun petKindItem(viewModel: UserCreateViewModel, pet: kr.carepet.data.pet.PetListData, focusRequester:FocusRequester){
+fun petKindItem(viewModel: UserCreateViewModel, pet: PetListData, focusRequester:FocusRequester){
 
     val focusManager = LocalFocusManager.current
 
@@ -1288,7 +1288,7 @@ fun LocationPickContent(
 }
 
 @Composable
-fun addressItem1(viewModel: UserCreateViewModel, address: kr.carepet.data.SCD, focusRequester:FocusRequester){
+fun addressItem1(viewModel: UserCreateViewModel, address: SCD, focusRequester:FocusRequester){
 
     val focusManager = LocalFocusManager.current
 
@@ -1307,8 +1307,8 @@ fun addressItem1(viewModel: UserCreateViewModel, address: kr.carepet.data.SCD, f
                 viewModel.updateSelectedItem1(address)
 
                 // 시군구, 읍면동 초기화
-                viewModel.updateSelectedItem2(kr.carepet.data.SggList("", ""))
-                viewModel.updateSelectedItem3(kr.carepet.data.UmdList("", ""))
+                viewModel.updateSelectedItem2(SggList("", ""))
+                viewModel.updateSelectedItem3(UmdList("", ""))
                 viewModel.updateUmdList(emptyList())
 
                 viewModel.sggListLoad(address.cdld)
@@ -1329,7 +1329,7 @@ fun addressItem1(viewModel: UserCreateViewModel, address: kr.carepet.data.SCD, f
 }
 
 @Composable
-fun addressItem2(viewModel: UserCreateViewModel, address: kr.carepet.data.SggList, focusRequester:FocusRequester){
+fun addressItem2(viewModel: UserCreateViewModel, address: SggList, focusRequester:FocusRequester){
 
     val focusManager = LocalFocusManager.current
 
@@ -1346,7 +1346,7 @@ fun addressItem2(viewModel: UserCreateViewModel, address: kr.carepet.data.SggLis
             )
             .clickable {
                 viewModel.updateSelectedItem2(address)
-                viewModel.updateSelectedItem3(kr.carepet.data.UmdList("", ""))
+                viewModel.updateSelectedItem3(UmdList("", ""))
                 viewModel.umdListLoad(address.sggCd)
                 focusManager.clearFocus()
             },
@@ -1365,7 +1365,7 @@ fun addressItem2(viewModel: UserCreateViewModel, address: kr.carepet.data.SggLis
 }
 
 @Composable
-fun addressItem3(viewModel: UserCreateViewModel, address: kr.carepet.data.UmdList, focusRequester:FocusRequester){
+fun addressItem3(viewModel: UserCreateViewModel, address: UmdList, focusRequester:FocusRequester){
 
     val focusManager = LocalFocusManager.current
 
