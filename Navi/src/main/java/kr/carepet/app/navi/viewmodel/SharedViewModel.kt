@@ -11,6 +11,8 @@ import kr.carepet.data.RefreshToken
 import kr.carepet.data.daily.WeekData
 import kr.carepet.data.daily.WeekRecordReq
 import kr.carepet.data.daily.WeekRecordRes
+import kr.carepet.data.pet.MyPetListReq
+import kr.carepet.data.pet.MyPetListRes
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
 import kr.carepet.singleton.MySharedPreference
@@ -76,6 +78,39 @@ class SharedViewModel:ViewModel(){
         return returnBirth
     }
 
+
+    suspend fun loadPetInfo():Boolean{
+
+        val apiService = RetrofitClientServer.instance
+
+        val data = MyPetListReq(MySharedPreference.getUserId())
+
+        val call = apiService.myPetList(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<MyPetListRes>{
+                override fun onResponse(call: Call<MyPetListRes>, response: Response<MyPetListRes>) {
+                    if(response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if(body.petDetailData.isEmpty()){
+                                _petInfo.value= arrayListOf(emptyPet)
+                                updatePetInfo(arrayListOf(emptyPet))
+                            }else{
+                                _petInfo.value=body.petDetailData
+                                updatePetInfo(body.petDetailData)
+                            }
+                            Log.d("LOG",_petInfo.value.toString())
+                            continuation.resume(false)
+                        }
+                    }
+                }
+                override fun onFailure(call: Call<MyPetListRes>, t: Throwable) {
+                    Log.d("LOG","FAIL"+t.message)
+                }
+
+            })
+        }
+    }
 
 
     //refresh token 던지고, 결과 Boolean으로 반환
@@ -148,5 +183,34 @@ class SharedViewModel:ViewModel(){
             })
         }
     }
+
+    val emptyPet = kr.carepet.data.pet.PetDetailData(
+        ownrPetUnqNo = "",
+        petBrthYmd = "",
+        petInfoUnqNo = 0,
+        petKindNm = "웨스트 하이랜드 화이트 테리어",
+        petMngrYn = "",
+        petNm = "배추",
+        petRegNo = "",
+        petRelCd = "",
+        petRelNm = "",
+        petRelUnqNo = 0,
+        petRprsImgAddr = "",
+        petRprsYn = "Y",
+        sexTypCd = "",
+        sexTypNm = "수컷",
+        stdgCtpvCd = "",
+        stdgCtpvNm = "",
+        stdgSggCd = "",
+        stdgSggNm = "",
+        stdgUmdCd = "",
+        stdgUmdNm = "",
+        wghtVl = 0.0f,
+        ntrTypCd = "",
+        ntrTypNm = "",
+        endDt = "",
+        mngrType = "",
+        memberList = emptyList()
+    )
 }
 

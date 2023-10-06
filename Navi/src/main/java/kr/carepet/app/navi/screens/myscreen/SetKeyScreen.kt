@@ -1,6 +1,7 @@
 package kr.carepet.app.navi.screens.myscreen
 
 import android.content.ClipData
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,15 +29,21 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -44,11 +51,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.BackspaceCommand
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.ui.theme.design_CBE8F3
@@ -61,9 +71,12 @@ import kr.carepet.app.navi.ui.theme.design_sharp
 import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
+import kr.carepet.app.navi.viewmodel.SettingViewModel
 
 @Composable
-fun SetKeyScreen(navController:NavHostController){
+fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewModel){
+
+    val scope = rememberCoroutineScope()
 
     Scaffold (
         topBar = { BackTopBar(title = "초대코드 등록하기", navController = navController) }
@@ -113,12 +126,24 @@ fun SetKeyScreen(navController:NavHostController){
 
                 Spacer(modifier = Modifier.padding(top = 20.dp))
 
-                SetKey()
+                SetKey(settingViewModel = settingViewModel)
 
                 Spacer(modifier = Modifier.padding(top = 40.dp))
 
                 Button(
-                    onClick = {  },
+                    onClick = {
+                        settingViewModel.viewModelScope.launch {
+                            val result = settingViewModel.setInviteCode()
+
+                            if (result){
+                                settingViewModel.updatePetInfo()
+                                navController.popBackStack()
+                            }else{
+                                Log.d("LOG","등록실패")
+                            }
+                        }
+
+                    },
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
@@ -144,16 +169,15 @@ fun SetKeyScreen(navController:NavHostController){
 }
 
 @Composable
-fun SetKey(){
+fun SetKey(settingViewModel: SettingViewModel){
 
-    var combinedText by remember { mutableStateOf("") }
 
-    var text1 by remember { mutableStateOf("") }
-    var text2 by remember { mutableStateOf("") }
-    var text3 by remember { mutableStateOf("") }
-    var text4 by remember { mutableStateOf("") }
-    var text5 by remember { mutableStateOf("") }
-    var text6 by remember { mutableStateOf("") }
+    val text1 by settingViewModel.setInviteCode1.collectAsState()
+    val text2 by settingViewModel.setInviteCode2.collectAsState()
+    val text3 by settingViewModel.setInviteCode3.collectAsState()
+    val text4 by settingViewModel.setInviteCode4.collectAsState()
+    val text5 by settingViewModel.setInviteCode5.collectAsState()
+    val text6 by settingViewModel.setInviteCode6.collectAsState()
 
     val focusManager = LocalFocusManager.current
 
@@ -180,13 +204,13 @@ fun SetKey(){
                 value = text1,
                 onValueChange = {
                     if (it.length <= 1){
-                        text1 = it
+                        settingViewModel.updateSetInviteCode1(it)
                         focusManager.moveFocus(FocusDirection.Next)
                     }
                 },
                 singleLine = true,
                 textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-                    .plus(TextStyle(color = design_login_text, fontSize = 24.sp, lineHeight = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold))))
+                    .plus(TextStyle(color = design_login_text, fontSize = 24.sp, lineHeight = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)))),
             )
         }
 
@@ -204,7 +228,7 @@ fun SetKey(){
                 value = text2,
                 onValueChange = {
                     if (it.length <= 1){
-                        text2 = it
+                        settingViewModel.updateSetInviteCode2(it)
                         focusManager.moveFocus(FocusDirection.Next)
                     }
                 },
@@ -228,7 +252,7 @@ fun SetKey(){
                 value = text3,
                 onValueChange = {
                     if (it.length <= 1){
-                        text3 = it
+                        settingViewModel.updateSetInviteCode3(it)
                         focusManager.moveFocus(FocusDirection.Next)
                     }
                 },
@@ -257,7 +281,7 @@ fun SetKey(){
                 value = text4,
                 onValueChange = {
                     if (it.length <= 1){
-                        text4 = it
+                        settingViewModel.updateSetInviteCode4(it)
                         focusManager.moveFocus(FocusDirection.Next)
                     }
                 },
@@ -281,7 +305,7 @@ fun SetKey(){
                 value = text5,
                 onValueChange = {
                     if (it.length <= 1){
-                        text5 = it
+                        settingViewModel.updateSetInviteCode5(it)
                         focusManager.moveFocus(FocusDirection.Next)
                     }
                 },
@@ -305,7 +329,7 @@ fun SetKey(){
                 value = text6,
                 onValueChange = {
                     if (it.length <= 1){
-                        text6 = it
+                        settingViewModel.updateSetInviteCode6(it)
                     }
                 },
                 singleLine = true,

@@ -2,6 +2,7 @@ package kr.carepet.app.navi.viewmodel
 
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,6 +20,7 @@ import kr.carepet.data.pet.InviteCodeReq
 import kr.carepet.data.pet.InviteCodeRes
 import kr.carepet.data.pet.Pet
 import kr.carepet.data.pet.PetDetailData
+import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.LogoutRes
 import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
@@ -31,7 +33,11 @@ import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
+class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(){
+
+    fun updatePetInfo(){
+        sharedViewModel.viewModelScope.launch { sharedViewModel.loadPetInfo() }
+    }
 
     // -------------------My Screen--------------------------
     private val _endCheck = MutableStateFlow(false) // Data 저장
@@ -45,7 +51,6 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
 
     fun updateSelectedPetSave(newValue: List<PetDetailData>): Boolean {
         _selectedPetSave.value = newValue
-        Log.d("ViewModel", _selectedPetSave.value.size.toString())
         return true // 값을 업데이트하는 데 성공했음을 나타내는 불리언 값을 반환합니다.
     }
 
@@ -53,8 +58,33 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
     val inviteCode: StateFlow<String> = _inviteCode.asStateFlow() // state 노출
     fun updateInviteCode(newValue: String) { _inviteCode.value = newValue }
 
+    private val _setInviteCode = MutableStateFlow("") // Data 저장
+    val setInviteCode: StateFlow<String> = _setInviteCode.asStateFlow() // state 노출
+    fun updateSetInviteCode(newValue: String) { _setInviteCode.value = newValue }
 
+    private val _setInviteCode1 = MutableStateFlow("") // Data 저장
+    val setInviteCode1: StateFlow<String> = _setInviteCode1.asStateFlow() // state 노출
+    fun updateSetInviteCode1(newValue: String) { _setInviteCode1.value = newValue }
 
+    private val _setInviteCode2 = MutableStateFlow("") // Data 저장
+    val setInviteCode2: StateFlow<String> = _setInviteCode2.asStateFlow() // state 노출
+    fun updateSetInviteCode2(newValue: String) { _setInviteCode2.value = newValue }
+
+    private val _setInviteCode3 = MutableStateFlow("") // Data 저장
+    val setInviteCode3: StateFlow<String> = _setInviteCode3.asStateFlow() // state 노출
+    fun updateSetInviteCode3(newValue: String) { _setInviteCode3.value = newValue }
+
+    private val _setInviteCode4 = MutableStateFlow("") // Data 저장
+    val setInviteCode4: StateFlow<String> = _setInviteCode4.asStateFlow() // state 노출
+    fun updateSetInviteCode4(newValue: String) { _setInviteCode4.value = newValue }
+
+    private val _setInviteCode5 = MutableStateFlow("") // Data 저장
+    val setInviteCode5: StateFlow<String> = _setInviteCode5.asStateFlow() // state 노출
+    fun updateSetInviteCode5(newValue: String) { _setInviteCode5.value = newValue }
+
+    private val _setInviteCode6 = MutableStateFlow("") // Data 저장
+    val setInviteCode6: StateFlow<String> = _setInviteCode6.asStateFlow() // state 노출
+    fun updateSetInviteCode6(newValue: String) { _setInviteCode6.value = newValue }
     // -------------------My Screen--------------------------
 
 
@@ -169,11 +199,11 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
         suspendCoroutine { continuation ->
             UserApiClient.instance.logout { error ->
                 if (error != null) {
-                    Log.e(LoginViewModel.TAG, "로그아웃 실패. SDK에서 토큰 삭제됨", error)
+                    //Log.e(LoginViewModel.TAG, "로그아웃 실패. SDK에서 토큰 삭제됨", error)
                     continuation.resume(false)
                 }
                 else {
-                    Log.i(LoginViewModel.TAG, "로그아웃 성공. SDK에서 토큰 삭제됨")
+                    //Log.i(LoginViewModel.TAG, "로그아웃 성공. SDK에서 토큰 삭제됨")
                     continuation.resume(true)
                 }
             }
@@ -183,14 +213,13 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
         val apiService = RetrofitClientServer.instance
 
         val petList:List<Pet> = selectedPetSave.value.map { petDetailData ->
-            kr.carepet.data.pet.Pet(
+            Pet(
                 ownrPetUnqNo = petDetailData.ownrPetUnqNo,
                 petNm = petDetailData.petNm
             )
         }
 
-        val data =
-            kr.carepet.data.pet.InviteCodeReq(pet = petList, getCurrentDateTime(), "202510101010")
+        val data = InviteCodeReq(pet = petList, getCurrentDateTime(), "202510101010")
 
         val call = apiService.getInviteCode(data)
         return suspendCancellableCoroutine { continuation ->
@@ -219,35 +248,45 @@ class SettingViewModel(sharedViewModel: SharedViewModel) :ViewModel(){
 
     }
 
-    //suspend fun setInviteCode():Boolean{
-    //    val apiService = RetrofitClientServer.instance
-    //
-    //    val call = apiService.getInviteCode(data)
-    //    return suspendCancellableCoroutine { continuation ->
-    //        call.enqueue(object : Callback<InviteCodeRes>{
-    //            override fun onResponse(
-    //                call: Call<InviteCodeRes>,
-    //                response: Response<InviteCodeRes>
-    //            ) {
-    //                if(response.isSuccessful){
-    //                    val body = response.body()
-    //                    body?.let {
-    //                        updateInviteCode(body.data.invttKeyVl)
-    //                        continuation.resume(true)
-    //                    }
-    //                }else{
-    //                    continuation.resume(false)
-    //                }
-    //            }
-    //
-    //            override fun onFailure(call: Call<InviteCodeRes>, t: Throwable) {
-    //                continuation.resume(false)
-    //            }
-    //
-    //        })
-    //    }
-    //
-    //}
+    suspend fun setInviteCode():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        _setInviteCode.value = buildString {
+            append(_setInviteCode1.value)
+            append(_setInviteCode2.value)
+            append(_setInviteCode3.value)
+            append(_setInviteCode4.value)
+            append(_setInviteCode5.value)
+            append(_setInviteCode6.value)
+        }
+
+        val call = apiService.setInviteCode(_setInviteCode.value)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<SetInviteCodeRes>{
+                override fun onResponse(
+                    call: Call<SetInviteCodeRes>,
+                    response: Response<SetInviteCodeRes>
+                ) {
+                    if(response.isSuccessful){
+                        val body = response.body()
+                        if (body?.statusCode == 200){
+                            continuation.resume(true)
+                        }else{
+                            continuation.resume(false)
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<SetInviteCodeRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+
+    }
+
+
 }
 
 fun getCurrentDateTime(): String {

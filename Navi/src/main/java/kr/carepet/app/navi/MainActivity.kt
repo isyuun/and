@@ -179,7 +179,7 @@ fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
             InviteScreen(navController = navController, settingViewModel = settingViewModel)
         }
         composable("setKeyScreen"){
-            SetKeyScreen(navController = navController)
+            SetKeyScreen(navController = navController, settingViewModel = settingViewModel)
         }
     }
 }

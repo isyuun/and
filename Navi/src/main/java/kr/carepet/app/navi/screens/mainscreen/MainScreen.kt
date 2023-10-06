@@ -3,6 +3,7 @@
 package kr.carepet.app.navi.screens.mainscreen
 
 import android.app.Activity
+import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -66,6 +67,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kr.carepet.app.navi.BottomNav
+import kr.carepet.app.navi.MapActivity
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
@@ -110,6 +112,8 @@ fun MainScreen(
     // backTopbar back on/off
     var backBtnOnBT by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+
     LaunchedEffect(Unit){
         if (init){
             delay(500)
@@ -139,7 +143,9 @@ fun MainScreen(
             ) {
                 FloatingActionButton(
                     onClick = {
-                        navController.navigate(Screen.WalkWithMap.route)
+                        //navController.navigate(Screen.WalkWithMap.route)
+                              val intent = Intent(context,MapActivity::class.java)
+                        context.startActivity(intent)
                     },
                     modifier = Modifier
                         .padding(16.dp)

@@ -101,8 +101,7 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
 
             val apiService = RetrofitClientServer.instance
 
-            val data =
-                kr.carepet.data.pet.MyPetListReq(MySharedPreference.getUserId())
+            val data = MyPetListReq(MySharedPreference.getUserId())
 
             val call = apiService.myPetList(data)
             return suspendCancellableCoroutine { continuation ->

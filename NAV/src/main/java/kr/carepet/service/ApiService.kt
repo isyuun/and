@@ -26,6 +26,7 @@ import kr.carepet.data.pet.MyPetResModel
 import kr.carepet.data.pet.PetListModel
 import kr.carepet.data.pet.PetListResModel
 import kr.carepet.data.pet.PetModel
+import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.LoginData
 import kr.carepet.data.user.LoginResModel
 import kr.carepet.data.user.LogoutRes
@@ -112,8 +113,8 @@ interface ApiService {
     @POST("api/v1/mypet/invtt/create")
     fun getInviteCode(@Body data: InviteCodeReq): Call<InviteCodeRes>
 
-    @POST("api/v1/mypet/invtt/create")
-    fun setInviteCode(@Body data: String): Call<InviteCodeRes>
+    @POST("api/v1/mypet/invtt/setKey")
+    fun setInviteCode(@Body data: String): Call<SetInviteCodeRes>
 
 
 }
