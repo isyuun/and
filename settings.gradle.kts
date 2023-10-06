@@ -74,7 +74,7 @@ rootProject.name = "and"
 //include(":TEST")
 include(":_APP")
 include(":APP")
-include(":APP2")
+include(":NAV")
 //include(":GPL")
 include(":GPS")
 include(":GPX")
