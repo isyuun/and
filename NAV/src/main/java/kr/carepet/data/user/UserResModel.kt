@@ -12,7 +12,7 @@
 package kr.carepet.data.user
 
 data class UserDataResponse(
-    val data: UserData?,
+    val data: kr.carepet.data.user.UserData?,
     val statusCode: Int?,
     val resultMessage: String?,
     val detailMessage: String?

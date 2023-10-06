@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class UmdListRes(
     @SerializedName("data")
-    var data: List<UmdList>,
+    var data: List<kr.carepet.data.UmdList>,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")

@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">CarePetDemo</string>
+    <string name="search_count">%1d items</string>
+    <string name="search_no_matches">No matches for “%1s”</string>
+    <string name="search_no_matches_retry">Try broadening your search</string>
+</resources>

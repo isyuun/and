@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class PhotoRes(
     @SerializedName("data")
-    var data: List<PhotoData>,
+    var data: List<kr.carepet.data.daily.PhotoData>,
     @SerializedName("detailMessage")
     var detailMessage: Any?, // null
     @SerializedName("resultMessage")

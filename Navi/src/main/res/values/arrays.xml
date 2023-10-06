@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="dog">
+        <item>소형견</item>
+        <item>중형견</item>
+        <item>대형견</item>
+    </string-array>
+</resources>

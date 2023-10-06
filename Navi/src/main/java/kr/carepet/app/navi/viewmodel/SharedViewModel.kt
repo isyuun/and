@@ -1,0 +1,152 @@
+package kr.carepet.app.navi.viewmodel
+
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kr.carepet.data.RefreshRes
+import kr.carepet.data.RefreshToken
+import kr.carepet.data.daily.WeekData
+import kr.carepet.data.daily.WeekRecordReq
+import kr.carepet.data.daily.WeekRecordRes
+import kr.carepet.data.pet.PetDetailData
+import kr.carepet.singleton.G
+import kr.carepet.singleton.MySharedPreference
+import kr.carepet.singleton.RetrofitClientServer
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.time.Duration
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import kotlin.coroutines.resume
+
+
+class SharedViewModel:ViewModel(){
+
+    private val _weekRecord = MutableStateFlow<kr.carepet.data.daily.WeekData?>(null)
+    val weekRecord: StateFlow<kr.carepet.data.daily.WeekData?> = _weekRecord.asStateFlow()
+    fun updateWeekRecord(newData: kr.carepet.data.daily.WeekData) {
+        _weekRecord.value = newData
+    }
+
+    private val _petInfo = MutableStateFlow<List<kr.carepet.data.pet.PetDetailData>>(emptyList())
+    val petInfo: StateFlow<List<kr.carepet.data.pet.PetDetailData>> = _petInfo.asStateFlow()
+    fun updatePetInfo(newData: List<kr.carepet.data.pet.PetDetailData>) {
+        _petInfo.value = newData
+    }
+
+    private val _selectPet = MutableStateFlow<kr.carepet.data.pet.PetDetailData?>(null)
+    val selectPet: StateFlow<kr.carepet.data.pet.PetDetailData?> = _selectPet.asStateFlow()
+    fun updateSelectPet(newValue: kr.carepet.data.pet.PetDetailData) { _selectPet.value = newValue }
+
+
+    fun parseBirthday(birthdayString: String): LocalDate? {
+        val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+        return try {
+            LocalDate.parse(birthdayString, formatter)
+        } catch (e: Exception) {
+            null // 파싱에 실패하면 null 반환 또는 에러 처리
+        }
+    }
+
+    fun changeBirth(birth:String):String{
+        val birthday = parseBirthday(birth)
+        val currentDate = LocalDate.now() // 현재 날짜
+
+        val period = Period.between(birthday, currentDate) // 두 날짜 간의 기간 계산
+
+        val years = period.years // 연 차이
+        val months = period.months // 월 차이
+
+        val returnBirth = if (years > 0) {
+            if (months > 0) {
+                "$years 년 $months 개월"
+            } else {
+                "$years 년"
+            }
+        } else {
+            "$months 개월"
+        }
+
+        return returnBirth
+    }
+
+
+
+    //refresh token 던지고, 결과 Boolean으로 반환
+    suspend fun sendRFToken():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val refreshToken = kr.carepet.singleton.MySharedPreference.getRefreshToken()
+
+        val call = apiService.sendRefreshToken(kr.carepet.data.RefreshToken(refreshToken))
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<kr.carepet.data.RefreshRes>{
+                override fun onResponse(call: Call<kr.carepet.data.RefreshRes>, response: Response<kr.carepet.data.RefreshRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (it.statusCode==200){
+                                kr.carepet.singleton.G.accessToken = it.data.accessToken
+                                kr.carepet.singleton.G.refreshToken = it.data.refreshToken
+                                kr.carepet.singleton.G.userId = it.data.userId
+
+                                kr.carepet.singleton.MySharedPreference.setAccessToken(it.data.accessToken)
+                                kr.carepet.singleton.MySharedPreference.setRefreshToken(it.data.refreshToken)
+                                kr.carepet.singleton.MySharedPreference.setUserId(it.data.userId)
+                                Log.d(
+                                    "Token",
+                                    "access: ${it.data.accessToken}, refresh: ${it.data.refreshToken}"
+                                )
+                                continuation.resume(true)
+                            }else{
+                                continuation.resume(false)
+                            }
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<kr.carepet.data.RefreshRes>, t: Throwable) {
+
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = kr.carepet.data.daily.WeekRecordReq(ownrPetUnqNo, searchDay)
+
+        val call=apiService.getWeekRecord(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<kr.carepet.data.daily.WeekRecordRes>{
+                override fun onResponse(
+                    call: Call<kr.carepet.data.daily.WeekRecordRes>,
+                    response: Response<kr.carepet.data.daily.WeekRecordRes>
+                ) {
+                    val body = response.body()
+                    body?.let {
+                        if (body.statusCode==200){
+                            _weekRecord.value=body.data
+                            continuation.resume(true)
+                        }else{
+                            continuation.resume(false)
+                        }
+                    }
+                }
+                override fun onFailure(call: Call<kr.carepet.data.daily.WeekRecordRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+            })
+        }
+    }
+}
+
