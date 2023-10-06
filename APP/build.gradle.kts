@@ -53,9 +53,6 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-        buildConfig = true
-    }
-    buildFeatures {
         compose = true
     }
     composeOptions {
@@ -80,7 +77,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.appcompat)
-    //implementation("com.google.android.material:material:1.9.0")
     implementation(libs.material)
     testImplementation(libs.junit4)
     androidTestImplementation(libs.junit)
