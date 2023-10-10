@@ -1,5 +1,6 @@
 package kr.carepet.app.navi.screens.myscreen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -58,6 +60,8 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
     val userPhoneNum by settingViewModel.userPhoneNum.collectAsState()
     val userPw by settingViewModel.userPw.collectAsState()
     val userPwCheck by settingViewModel.userPwCheck.collectAsState()
+
+    val context = LocalContext.current
 
     Scaffold (
         topBar = { BackTopBar(title = "개인 정보 수정", navController = navController) }
@@ -216,7 +220,17 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
             )
 
             Button(
-                onClick = { },
+                onClick = {
+                          if (userPw==""){
+                              Toast.makeText(context, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
+                          }else{
+                              if (userPw==userPwCheck){
+
+                              }else{
+                                  Toast.makeText(context, "비밀번호가 일치하지 않습니다", Toast.LENGTH_SHORT).show()
+                              }
+                          }
+                },
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .fillMaxWidth()

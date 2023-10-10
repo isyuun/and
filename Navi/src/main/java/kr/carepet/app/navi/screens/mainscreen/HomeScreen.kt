@@ -17,6 +17,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -74,6 +75,9 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -121,6 +125,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+import kotlin.math.abs
 import kotlin.math.absoluteValue
 
 
@@ -138,14 +143,14 @@ fun HomeScreen(
 ){
 
     val petInfo by viewModel.petInfo.collectAsState()
+    val currentPetInfo by viewModel.currentPetInfo.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     val pagerState = rememberPagerState(pageCount = { petInfo.size })
 
     var refresh by rememberSaveable { mutableStateOf(true) }
 
-    val bottomSheetState =
-        androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val context = LocalContext.current
     val density = LocalDensity.current.density
@@ -157,10 +162,10 @@ fun HomeScreen(
         0.dp
     }
 
-    LaunchedEffect(key1 = pagerState.currentPage, key2 = petInfo){
-        if (petInfo.isNotEmpty()){
-            viewModel.callGetWeekRecord(petInfo[pagerState.currentPage].ownrPetUnqNo, getFormattedTodayDate())
-            viewModel.updateSeletedPet(petInfo[pagerState.currentPage])
+    LaunchedEffect(key1 = pagerState.currentPage, key2 = currentPetInfo){
+        if (currentPetInfo.isNotEmpty()){
+            viewModel.callGetWeekRecord(currentPetInfo[pagerState.currentPage].ownrPetUnqNo, getFormattedTodayDate())
+            viewModel.updateSeletedPet(currentPetInfo[pagerState.currentPage])
         }
     }
 
@@ -198,14 +203,16 @@ fun HomeScreen(
                     shape = RoundedCornerShape(100.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = design_btn_border),
-                    onClick = {  bottomNavController.navigate("commu") {
-                        navController.graph.startDestinationRoute?.let {
-                            popUpTo(it) { saveState = true }
+                    onClick = {
+                        sharedViewModel.updateMoreStoryClick(true)
+                        bottomNavController.navigate("commu") {
+                            bottomNavController.graph.startDestinationRoute?.let {
+                                popUpTo(it) { saveState = true }
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
-                        }
                 ) {
                     Text(
                         text = "스토리 더보기",
@@ -232,7 +239,10 @@ fun HomeScreen(
                 ) {
                     Column {
                         CustomBottomSheet(viewModel = sharedViewModel,  title = "나의 반려동물을 선택하여 주세요.", btnText = "확인")
-                        Spacer(modifier = Modifier.height(navigationBarHeight).fillMaxWidth().background(color = design_white))
+                        Spacer(modifier = Modifier
+                            .height(navigationBarHeight)
+                            .fillMaxWidth()
+                            .background(color = design_white))
                     }
                 }
             }
@@ -270,6 +280,7 @@ fun ProfileContent(
     val dustIcon= R.drawable.dust_good
 
     val petInfo by viewModel.petInfo.collectAsState()
+    val currentPetInfo by viewModel.currentPetInfo.collectAsState()
 
     Column (modifier = Modifier
         .fillMaxWidth()
@@ -364,14 +375,14 @@ fun ProfileContent(
                         .fillMaxSize()
                         , contentAlignment = Alignment.Center) {
 
-                        CircleImage(size = 180, imageUri = petInfo[page].petRprsImgAddr)
+                        CircleImage(size = 180, imageUri = currentPetInfo[page].petRprsImgAddr)
                     }
                 }
 
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
                 Text(
-                    text = petInfo[pagerState.currentPage].petKindNm,
+                    text = currentPetInfo[pagerState.currentPage].petKindNm,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
@@ -381,7 +392,7 @@ fun ProfileContent(
                 //Spacer(modifier = Modifier.padding(top = 8.dp))
 
                 Text(
-                    text = petInfo[pagerState.currentPage].petNm,
+                    text = currentPetInfo[pagerState.currentPage].petNm,
                     fontSize = 30.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     letterSpacing = (-0.7).sp,
@@ -404,10 +415,10 @@ fun ProfileContent(
                     }
 
                     Text(
-                        text = if (petInfo[pagerState.currentPage].petBrthYmd==""){
+                        text = if (currentPetInfo[pagerState.currentPage].age==""){
                             "미상"
                         }else{
-                            viewModel.changeBirth(petInfo[pagerState.currentPage].petBrthYmd)
+                            currentPetInfo[pagerState.currentPage].age
                         },
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -429,7 +440,11 @@ fun ProfileContent(
                     }
 
                     Text(
-                        text = petInfo[pagerState.currentPage].sexTypNm,
+                        text = if(currentPetInfo[pagerState.currentPage].sexTypNm == ""){
+                            "모름"
+                        }else{
+                            currentPetInfo[pagerState.currentPage].sexTypNm
+                        },
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -450,7 +465,7 @@ fun ProfileContent(
                     }
 
                     Text(
-                        text = "${petInfo[pagerState.currentPage].wghtVl}kg",
+                        text = "${currentPetInfo[pagerState.currentPage].wghtVl}kg",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -522,13 +537,16 @@ fun ProfileContent(
             onDismissRequest = { openBottomSheet = false },
             sheetState = bottomSheetState,
             containerColor = Color.Transparent,
-            dragHandle = {}
+            dragHandle = null
         ) {
             Column {
                 BottomSheetContent(viewModel = viewModel, navController = navController) { newValue ->
                     openBottomSheet = newValue
                 }
-                Spacer(modifier = Modifier.height(navigationBarHeight).fillMaxWidth().background(color = design_white))
+                Spacer(modifier = Modifier
+                    .height(navigationBarHeight)
+                    .fillMaxWidth()
+                    .background(color = design_white))
             }
         }
     }
@@ -542,7 +560,7 @@ fun PagerState.calculateCurrentOffsetForPage(page: Int): Float {
 @Composable
 fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
 
-    val petInfo by viewModel.petInfo.collectAsState()
+    val currentPetInfo by viewModel.currentPetInfo.collectAsState()
     val weekRecord by viewModel.weekRecord.collectAsState()
 
     Box (
@@ -554,7 +572,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
             
             Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
                 Text(
-                    text = petInfo[pagerState.currentPage].petNm,
+                    text = currentPetInfo[pagerState.currentPage].petNm,
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 20.sp,
                     letterSpacing = (-1.0).sp,
@@ -841,6 +859,12 @@ fun BottomSheetContent(
     
     val petList by viewModel.petInfo.collectAsState()
 
+    LaunchedEffect(Unit){
+        viewModel.updatePetListSelect(petList[0].ownrPetUnqNo)
+    }
+
+
+
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -902,7 +926,7 @@ fun BottomSheetContent(
                 colors = ButtonDefaults.buttonColors(containerColor = design_btn_border),
                 onClick = {
                     onDisMiss(false)
-                    navController.navigate(Screen.PetCreateScreen.route)
+                    navController.navigate(Screen.AddPetScreen.route)
                 }
             ) {
                 Text(
@@ -1292,9 +1316,3 @@ fun getTodayDayOfWeek(): String {
 }
 
 data class StoryList(val imageUri: Any?,val title: String, val petName: String, val likeCount: String, val commentCount: String)
-
-
-
-
-
-

@@ -1,7 +1,5 @@
 package kr.carepet.app.navi.viewmodel
 
-import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -9,38 +7,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.daily.DailyDetailData
-import kr.carepet.data.daily.DailyDetailReq
 import kr.carepet.data.daily.DailyDetailRes
 import kr.carepet.data.daily.DailyLifeWalk
 import kr.carepet.data.daily.DailyMonthData
-import kr.carepet.data.daily.DailyMonthReq
 import kr.carepet.data.daily.DailyMonthRes
 import kr.carepet.data.daily.Paginate
-import kr.carepet.data.daily.PhotoData
-import kr.carepet.data.daily.WalkListReq
 import kr.carepet.data.daily.WalkListRes
 import kr.carepet.data.daily.WeekData
-import kr.carepet.data.pet.MyPetListReq
-import kr.carepet.data.pet.MyPetListRes
 import kr.carepet.data.pet.PetDetailData
-import kr.carepet.singleton.G
 import kr.carepet.singleton.RetrofitClientServer
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.File
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlin.coroutines.resume
 
 class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {

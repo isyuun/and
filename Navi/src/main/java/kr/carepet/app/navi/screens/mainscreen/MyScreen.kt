@@ -255,7 +255,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
             }
 
             Button(
-                onClick = { },
+                onClick = { navController.navigate(Screen.AddPetScreen.route) },
                 modifier = Modifier
                     .padding(top = 20.dp)
                     .fillMaxWidth()

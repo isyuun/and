@@ -33,6 +33,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -65,15 +67,24 @@ import kr.carepet.app.navi.ui.theme.design_login_text
 import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.CommunityViewModel
+import kr.carepet.app.navi.viewmodel.SharedViewModel
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun CommuScreen(navController: NavHostController, communityViewModel: CommunityViewModel){
+fun CommuScreen(navController: NavHostController, communityViewModel: CommunityViewModel, sharedViewModel: SharedViewModel){
 
     val pagerState = rememberPagerState(initialPage = 0)
     val coroutineScope = rememberCoroutineScope()
     var tabVisible by remember { mutableFloatStateOf(1f) }
 
+    val moreStoryClick by sharedViewModel.moreStoryClick.collectAsState()
+
+    LaunchedEffect(key1 = sharedViewModel.moreStoryClick){
+        if (moreStoryClick){
+            pagerState.animateScrollToPage(page = 0)
+            sharedViewModel.updateMoreStoryClick(false)
+        }
+    }
 
     Scaffold (
         modifier = Modifier.fillMaxSize()

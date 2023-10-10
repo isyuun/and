@@ -9,10 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.daily.WeekData
+import kr.carepet.data.pet.CurrentPetData
+import kr.carepet.data.pet.CurrentPetRes
 import kr.carepet.data.pet.MyPetListReq
 import kr.carepet.data.pet.MyPetListRes
 import kr.carepet.data.pet.PetDetailData
-import kr.carepet.singleton.G
 import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
 import retrofit2.Call
@@ -27,7 +28,11 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
         sharedViewModel.updatePetInfo(newData)
     }
 
-    fun updateSeletedPet(newData: PetDetailData){
+    fun updateCurrentPetInfo(newData: List<CurrentPetData>){
+        sharedViewModel.updateCurrentPetInfo(newData)
+    }
+
+    fun updateSeletedPet(newData: CurrentPetData){
         sharedViewModel.updateSelectPet(newData)
     }
 
@@ -39,7 +44,7 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
         return sharedViewModel.changeBirth(birth)
     }
 
-    val emptyPet = kr.carepet.data.pet.PetDetailData(
+    val emptyPet = PetDetailData(
         ownrPetUnqNo = "",
         petBrthYmd = "",
         petInfoUnqNo = 0,
@@ -68,66 +73,32 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
         memberList = emptyList()
     )
 
+    val emptyCurrentPet = CurrentPetData(
+        age = "0살",
+        petNm = "펫을 등록해주세요",
+        ownrPetUnqNo = "",
+        petKindNm = "",
+        petRprsImgAddr = "",
+        sexTypNm = "",
+        wghtVl =0.0f
+    )
+
     private val _showBottomSheet = MutableStateFlow<Boolean>(false)
     val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
     fun updateShowBottomSheet(newValue: Boolean) { _showBottomSheet.value = newValue }
 
-    private val _petInfo = MutableStateFlow<List<PetDetailData>>(emptyList())
-    val petInfo: StateFlow<List<PetDetailData>> = _petInfo.asStateFlow()
+    val currentPetInfo = sharedViewModel.currentPetInfo
+
+    val petInfo = sharedViewModel.petInfo
 
     private val _repPet = MutableStateFlow<List<PetDetailData>>(emptyList())
     val repPet: StateFlow<List<PetDetailData>> = _repPet.asStateFlow()
 
-    //private val _isLoading = MutableStateFlow<Boolean>(true)
-    //val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-    //suspend fun updateIsLoading(newValue: Boolean){
-    //    _isLoading.value = newValue
-    //}
-
     val isLoading = MutableStateFlow<Boolean>(true)
+    fun updateIsLoading(newValue: Boolean){isLoading.value = newValue}
 
     private val _petListSelect = MutableStateFlow("")
     val petListSelect: StateFlow<String> = _petListSelect.asStateFlow()
     fun updatePetListSelect(newValue: String) { _petListSelect.value = newValue }
 
-    fun isLoadingSuccess() {
-        viewModelScope.launch {
-            // 결과물을 날리기
-            isLoading.emit(loadPetInfo())
-        }
-    }
-
-    suspend fun loadPetInfo():Boolean{
-
-            val apiService = RetrofitClientServer.instance
-
-            val data = MyPetListReq(MySharedPreference.getUserId())
-
-            val call = apiService.myPetList(data)
-            return suspendCancellableCoroutine { continuation ->
-                call.enqueue(object : Callback<MyPetListRes>{
-                    override fun onResponse(call: Call<MyPetListRes>, response: Response<MyPetListRes>) {
-                        if(response.isSuccessful){
-                            val body = response.body()
-                            body?.let {
-                                if(body.petDetailData.isEmpty()){
-                                    _petInfo.value= arrayListOf(emptyPet)
-                                    updatePetInfo(arrayListOf(emptyPet))
-                                }else{
-                                    _petInfo.value=body.petDetailData
-                                    _repPet.value=body.petDetailData.filter { petDetailData -> petDetailData.petRprsYn=="Y" }
-                                    updatePetInfo(body.petDetailData)
-                                }
-                                Log.d("LOG",_petInfo.value.toString())
-                                continuation.resume(false)
-                            }
-                        }
-                    }
-                    override fun onFailure(call: Call<MyPetListRes>, t: Throwable) {
-                        Log.d("LOG","FAIL"+t.message)
-                    }
-
-                })
-            }
-    }
 }

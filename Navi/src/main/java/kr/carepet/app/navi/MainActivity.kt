@@ -32,6 +32,7 @@ import kr.carepet.app.navi.screens.commuscreen.StoryDetail
 import kr.carepet.app.navi.screens.mainscreen.MainScreen
 import kr.carepet.app.navi.screens.mainscreen.SettingScreen
 import kr.carepet.app.navi.screens.mainscreen.WalkWithMap
+import kr.carepet.app.navi.screens.myscreen.AddPetScreen
 import kr.carepet.app.navi.screens.myscreen.InquiryDetail
 import kr.carepet.app.navi.screens.myscreen.InviteScreen
 import kr.carepet.app.navi.screens.myscreen.NotiDetail
@@ -181,6 +182,9 @@ fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
         composable("setKeyScreen"){
             SetKeyScreen(navController = navController, settingViewModel = settingViewModel)
         }
+        composable("addPetScreen"){
+            AddPetScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)
+        }
     }
 }
 
@@ -208,6 +212,7 @@ sealed class Screen(val route: String) {
     object UserInfoScreen : Screen("userInfoScreen")
     object InviteScreen : Screen("inviteScreen")
     object SetKeyScreen : Screen("setKeyScreen")
+    object AddPetScreen : Screen("addPetScreen")
     object PetProfileScreen : Screen("petProfileScreen/{index}")
 }
 

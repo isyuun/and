@@ -117,7 +117,9 @@ fun MainScreen(
     LaunchedEffect(Unit){
         if (init){
             delay(500)
-            homeViewModel.isLoadingSuccess()
+            val result = sharedViewModel.loadCurrentPetInfo()
+            sharedViewModel.loadPetInfo()
+            homeViewModel.updateIsLoading(!result)
             init = false
         }
     }
@@ -144,7 +146,7 @@ fun MainScreen(
                 FloatingActionButton(
                     onClick = {
                         //navController.navigate(Screen.WalkWithMap.route)
-                              val intent = Intent(context,MapActivity::class.java)
+                        val intent = Intent(context,MapActivity::class.java)
                         context.startActivity(intent)
                     },
                     modifier = Modifier
@@ -188,7 +190,7 @@ fun MainScreen(
             when(topBarChange){
                 "home","walk" ->
                     LogoTopBar(
-                        selectedPet?:homeViewModel.emptyPet,
+                        petDetailData = selectedPet?:homeViewModel.emptyCurrentPet,
                         openBottomSheet = {newValue -> openBottomSheet = newValue},
                         backBtnOn = backBtnOnLT,
                         walkViewModel = walkViewModel,
@@ -235,7 +237,8 @@ fun MainScreen(
                 composable(BottomNav.CommuScreen.route) {
                     CommuScreen(
                         navController = navController,
-                        communityViewModel = communityViewModel
+                        communityViewModel = communityViewModel,
+                        sharedViewModel = sharedViewModel
                     )
                 }
                 composable(BottomNav.MyScreen.route) {

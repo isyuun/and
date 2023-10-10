@@ -59,11 +59,12 @@ import kr.carepet.app.navi.ui.theme.design_login_text
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.WalkViewModel
+import kr.carepet.data.pet.CurrentPetData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogoTopBar(
-    petDetailData: PetDetailData,
+    petDetailData: CurrentPetData,
     modifier:Modifier = Modifier,
     openBottomSheet:(Boolean) -> Unit,
     backBtnOn:Boolean,

@@ -13,7 +13,7 @@ class TokenInterceptor() : Interceptor {
         // 원래의 요청을 가져옵니다.
         val originalRequest = chain.request()
 
-        val token = kr.carepet.singleton.G.accessToken
+        val token = G.accessToken
         val requestWithToken = originalRequest.newBuilder()
             .header("Authorization", token)
             .build()

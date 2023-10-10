@@ -4,7 +4,7 @@ import java.util.Date
 
 object G {
     var userId:String = ""
-    var userEmail:String = ""
+    var userNickName:String = ""
 
     var accessToken:String = ""
     var refreshToken:String = ""

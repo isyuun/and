@@ -286,6 +286,10 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
 
     }
 
+    //suspend fun resetPw():Boolean{
+    //    val apiService = RetrofitClientServer.instance
+    //}
+
 
 }
 

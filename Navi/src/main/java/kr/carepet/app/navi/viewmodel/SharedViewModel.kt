@@ -11,6 +11,8 @@ import kr.carepet.data.RefreshToken
 import kr.carepet.data.daily.WeekData
 import kr.carepet.data.daily.WeekRecordReq
 import kr.carepet.data.daily.WeekRecordRes
+import kr.carepet.data.pet.CurrentPetData
+import kr.carepet.data.pet.CurrentPetRes
 import kr.carepet.data.pet.MyPetListReq
 import kr.carepet.data.pet.MyPetListRes
 import kr.carepet.data.pet.PetDetailData
@@ -20,15 +22,19 @@ import kr.carepet.singleton.RetrofitClientServer
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.time.Duration
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
-import java.util.Date
 import kotlin.coroutines.resume
 
 
 class SharedViewModel:ViewModel(){
+
+    private val _moreStoryClick = MutableStateFlow<Boolean>(false)
+    val moreStoryClick:StateFlow<Boolean> = _moreStoryClick.asStateFlow()
+    fun updateMoreStoryClick(newValue: Boolean){
+        _moreStoryClick.value = newValue
+    }
 
     private val _weekRecord = MutableStateFlow<WeekData?>(null)
     val weekRecord: StateFlow<WeekData?> = _weekRecord.asStateFlow()
@@ -42,9 +48,15 @@ class SharedViewModel:ViewModel(){
         _petInfo.value = newData
     }
 
-    private val _selectPet = MutableStateFlow<PetDetailData?>(null)
-    val selectPet: StateFlow<PetDetailData?> = _selectPet.asStateFlow()
-    fun updateSelectPet(newValue: PetDetailData) { _selectPet.value = newValue }
+    private val _currentPetInfo = MutableStateFlow<List<CurrentPetData>>(emptyList())
+    val currentPetInfo: StateFlow<List<CurrentPetData>> = _currentPetInfo.asStateFlow()
+    fun updateCurrentPetInfo(newData: List<CurrentPetData>) {
+        _currentPetInfo.value = newData
+    }
+
+    private val _selectPet = MutableStateFlow<CurrentPetData?>(null)
+    val selectPet: StateFlow<CurrentPetData?> = _selectPet.asStateFlow()
+    fun updateSelectPet(newValue: CurrentPetData) { _selectPet.value = newValue }
 
 
     fun parseBirthday(birthdayString: String): LocalDate? {
@@ -100,18 +112,54 @@ class SharedViewModel:ViewModel(){
                                 updatePetInfo(body.petDetailData)
                             }
                             Log.d("LOG",_petInfo.value.toString())
-                            continuation.resume(false)
+                            continuation.resume(true)
                         }
                     }
                 }
                 override fun onFailure(call: Call<MyPetListRes>, t: Throwable) {
                     Log.d("LOG","FAIL"+t.message)
+                    continuation.resume(false)
                 }
 
             })
         }
     }
 
+    suspend fun loadCurrentPetInfo():Boolean{
+
+        val apiService = RetrofitClientServer.instance
+
+        val data = MyPetListReq(MySharedPreference.getUserId())
+
+        val call = apiService.myPetListCurrent(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object :Callback<CurrentPetRes>{
+                override fun onResponse(
+                    call: Call<CurrentPetRes>,
+                    response: Response<CurrentPetRes>
+                ) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if(body.data.isEmpty()){
+                                _currentPetInfo.value= arrayListOf(emptyCurrentPet)
+                                updateCurrentPetInfo(arrayListOf(emptyCurrentPet))
+                            }else{
+                                _currentPetInfo.value=body.data
+                                updateCurrentPetInfo(body.data)
+                            }
+                            continuation.resume(true)
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<CurrentPetRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
 
     //refresh token 던지고, 결과 Boolean으로 반환
     suspend fun sendRFToken():Boolean{
@@ -127,13 +175,13 @@ class SharedViewModel:ViewModel(){
                         val body = response.body()
                         body?.let {
                             if (it.statusCode==200){
-                                kr.carepet.singleton.G.accessToken = it.data.accessToken
-                                kr.carepet.singleton.G.refreshToken = it.data.refreshToken
-                                kr.carepet.singleton.G.userId = it.data.userId
+                                G.accessToken = it.data.accessToken
+                                G.refreshToken = it.data.refreshToken
+                                G.userId = it.data.userId
 
-                                kr.carepet.singleton.MySharedPreference.setAccessToken(it.data.accessToken)
-                                kr.carepet.singleton.MySharedPreference.setRefreshToken(it.data.refreshToken)
-                                kr.carepet.singleton.MySharedPreference.setUserId(it.data.userId)
+                                MySharedPreference.setAccessToken(it.data.accessToken)
+                                MySharedPreference.setRefreshToken(it.data.refreshToken)
+                                MySharedPreference.setUserId(it.data.userId)
                                 Log.d(
                                     "Token",
                                     "access: ${it.data.accessToken}, refresh: ${it.data.refreshToken}"
@@ -158,7 +206,7 @@ class SharedViewModel:ViewModel(){
     suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String):Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val data = kr.carepet.data.daily.WeekRecordReq(ownrPetUnqNo, searchDay)
+        val data = WeekRecordReq(ownrPetUnqNo, searchDay)
 
         val call=apiService.getWeekRecord(data)
         return suspendCancellableCoroutine { continuation ->
@@ -183,6 +231,16 @@ class SharedViewModel:ViewModel(){
             })
         }
     }
+
+    val emptyCurrentPet = CurrentPetData(
+        age = "0살",
+        petNm = "펫을 등록해주세요",
+        ownrPetUnqNo = "",
+        petKindNm = "",
+        petRprsImgAddr = "",
+        sexTypNm = "",
+        wghtVl =0.0f
+    )
 
     val emptyPet = kr.carepet.data.pet.PetDetailData(
         ownrPetUnqNo = "",

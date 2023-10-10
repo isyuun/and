@@ -18,6 +18,7 @@ import kr.carepet.data.daily.WalkListReq
 import kr.carepet.data.daily.WalkListRes
 import kr.carepet.data.daily.WeekRecordReq
 import kr.carepet.data.daily.WeekRecordRes
+import kr.carepet.data.pet.CurrentPetRes
 import kr.carepet.data.pet.InviteCodeReq
 import kr.carepet.data.pet.InviteCodeRes
 import kr.carepet.data.pet.MyPetListReq
@@ -84,6 +85,9 @@ interface ApiService {
 
     @POST("api/v1/mypet/list")
     fun myPetList(@Body data: MyPetListReq) : Call<MyPetListRes>
+
+    @POST("/api/v1/daily-life/pet/list")
+    fun myPetListCurrent(@Body data: MyPetListReq) : Call<CurrentPetRes>
 
     @Multipart
     @POST("api/v1/daily-life/upload")

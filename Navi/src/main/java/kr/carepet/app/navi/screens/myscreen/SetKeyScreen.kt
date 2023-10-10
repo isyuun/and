@@ -171,7 +171,6 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
 @Composable
 fun SetKey(settingViewModel: SettingViewModel){
 
-
     val text1 by settingViewModel.setInviteCode1.collectAsState()
     val text2 by settingViewModel.setInviteCode2.collectAsState()
     val text3 by settingViewModel.setInviteCode3.collectAsState()
@@ -203,6 +202,10 @@ fun SetKey(settingViewModel: SettingViewModel){
             BasicTextField(
                 value = text1,
                 onValueChange = {
+                    //if (it.length <= 1){
+                    //    settingViewModel.updateSetInviteCode1(it)
+                    //    focusManager.moveFocus(FocusDirection.Next)
+                    //}
                     if (it.length <= 1){
                         settingViewModel.updateSetInviteCode1(it)
                         focusManager.moveFocus(FocusDirection.Next)
