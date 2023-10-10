@@ -1,5 +1,6 @@
 package kr.carepet.singleton
 
+import kr.carepet.data.pet.CurrentPetData
 import java.util.Date
 
 object G {
@@ -10,6 +11,8 @@ object G {
     var refreshToken:String = ""
 
     var tokenReceivedTime: Date? = null
+
+    var mapPetInfo:List<CurrentPetData> = emptyList()
 
 }
 

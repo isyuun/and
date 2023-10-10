@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -64,7 +63,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,8 +90,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
-import kr.carepet.app.navi.component.CustomBottomSheet
 import kr.carepet.app.navi.component.CircleImageTopBar
+import kr.carepet.app.navi.component.CustomBottomSheet
 import kr.carepet.app.navi.component.MonthCalendar
 import kr.carepet.app.navi.component.WalkTimeNDis
 import kr.carepet.app.navi.screens.walkscreen.WalkDetailContent
@@ -210,7 +208,10 @@ fun WalkScreen(
             ) {
                 Column {
                     CustomBottomSheet(viewModel = sharedViewModel,  title = "나의 반려동물을 선택하여 주세요.", btnText = "확인")
-                    Spacer(modifier = Modifier.height(navigationBarHeight).fillMaxWidth().background(color = design_white))
+                    Spacer(modifier = Modifier
+                        .height(navigationBarHeight)
+                        .fillMaxWidth()
+                        .background(color = design_white))
                 }
             }
         }
@@ -255,7 +256,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, backB
             .clip(RoundedCornerShape(12.dp))
     ){
         Spacer(modifier = Modifier.padding(top = 20.dp))
-        
+
         Row (
             modifier = Modifier
                 .padding(horizontal = 20.dp)
@@ -544,7 +545,7 @@ fun WeekContent(
                     backBtnOn(true)
                 }
         )
-        
+
         Spacer(modifier = Modifier.padding(bottom = 16.dp))
     }
 }
@@ -661,7 +662,8 @@ fun WalkWithMap(viewModel: WalkViewModel, navController: NavHostController){
                     .fillMaxSize()
                     .background(design_skip)
             ){
-                Text(text = "Map 들어갈 자리", modifier = Modifier.align(Alignment.Center))
+                //Text(text = "Map 들어갈 자리", modifier = Modifier.align(Alignment.Center))
+
             }
 
             Column (modifier = Modifier
