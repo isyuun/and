@@ -43,7 +43,7 @@ object RetrofitClientServer {
         level = HttpLoggingInterceptor.Level.BODY // 로깅 레벨 설정
     }
 
-    val instance : ApiService by lazy {
+    val instance: ApiService by lazy {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
@@ -52,14 +52,14 @@ object RetrofitClientServer {
         retrofit.create()
     }
 
-    val okHttpClient : OkHttpClient by lazy {
+    val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(tokenInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()
     }
 
-    val apiInstanceForToken : ApiService by lazy {
+    val apiInstanceForToken: ApiService by lazy {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -70,7 +70,7 @@ object RetrofitClientServer {
 }
 
 fun setTokenReceivedTime() {
-    kr.carepet.singleton.G.tokenReceivedTime = Date()
+    G.tokenReceivedTime = Date()
 }
 
 fun isTokenExpired(): Boolean {
@@ -86,39 +86,40 @@ fun isTokenExpired(): Boolean {
 }
 
 class TokenManager {
-    suspend fun refreshAccessToken():String{
+    suspend fun refreshAccessToken(): String {
         val apiService = RetrofitClientServer.instance
 
-        val refreshToken = kr.carepet.singleton.G.refreshToken
+        val refreshToken = G.refreshToken
 
         val call = apiService.sendRefreshToken(RefreshToken(refreshToken))
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<RefreshRes> {
                 override fun onResponse(call: Call<RefreshRes>, response: Response<RefreshRes>) {
-                    if (response.isSuccessful){
+                    if (response.isSuccessful) {
                         val body = response.body()
                         body?.let {
-                            if (it.statusCode==200){
-                                kr.carepet.singleton.G.accessToken = it.data.accessToken
-                                kr.carepet.singleton.G.refreshToken = it.data.refreshToken
-                                kr.carepet.singleton.G.userId = it.data.userId
+                            if (it.statusCode == 200) {
+                                G.accessToken = it.data.accessToken
+                                G.refreshToken = it.data.refreshToken
+                                G.userId = it.data.userId
                                 setTokenReceivedTime()
 
-                                kr.carepet.singleton.MySharedPreference.setAccessToken(it.data.accessToken)
-                                kr.carepet.singleton.MySharedPreference.setRefreshToken(it.data.refreshToken)
-                                kr.carepet.singleton.MySharedPreference.setUserId(it.data.userId)
+                                MySharedPreference.setAccessToken(it.data.accessToken)
+                                MySharedPreference.setRefreshToken(it.data.refreshToken)
+                                MySharedPreference.setUserId(it.data.userId)
                                 Log.d(
                                     "Token",
                                     "access: ${it.data.accessToken}, refresh: ${it.data.refreshToken}"
                                 )
 
                                 continuation.resume(it.data.accessToken)
-                            }else{
+                            } else {
                                 continuation.resume("")
                             }
                         }
                     }
                 }
+
                 override fun onFailure(call: Call<RefreshRes>, t: Throwable) {
                     continuation.resume("")
                 }

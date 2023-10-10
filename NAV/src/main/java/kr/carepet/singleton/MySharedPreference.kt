@@ -16,76 +16,78 @@ object MySharedPreference {
     private lateinit var sharedPreferences: SharedPreferences
 
     fun init(context: Context) {
-        kr.carepet.singleton.MySharedPreference.sharedPreferences = context.getSharedPreferences(MySharedPreference.DATA, Context.MODE_PRIVATE)
+        sharedPreferences = context.getSharedPreferences(MySharedPreference.DATA, Context.MODE_PRIVATE)
     }
 
     fun getTodayData(): Boolean {
         //today key값의 데이터를 호출, 없으면 false 반환
         val today = LocalDate.now().toString()
-        Log.d("today",today)
-        return kr.carepet.singleton.MySharedPreference.sharedPreferences.getBoolean(today, false)
+        Log.d("today", today)
+        return sharedPreferences.getBoolean(today, false)
     }
 
 
     fun setTodayData() {
         //today key값을 true로 설정
         val today = LocalDate.now().toString()
-        kr.carepet.singleton.MySharedPreference.sharedPreferences.edit().putBoolean(today, true).apply()
-        Log.d("today","성공")
+        sharedPreferences.edit().putBoolean(today, true).apply()
+        Log.d("today", "성공")
     }
 
-    fun setFcmToken(fcmToken:String){
-        kr.carepet.singleton.MySharedPreference.sharedPreferences.edit().putString("FcmToken", fcmToken).apply()
+    fun setFcmToken(fcmToken: String) {
+        sharedPreferences.edit().putString("FcmToken", fcmToken).apply()
     }
 
-    fun getFcmToken():String{
-        return kr.carepet.singleton.MySharedPreference.sharedPreferences.getString("FcmToken","").toString()
+    fun getFcmToken(): String {
+        return sharedPreferences.getString("FcmToken", "").toString()
     }
 
-    fun setAccessToken(accessToken :String){
-        kr.carepet.singleton.MySharedPreference.sharedPreferences.edit().putString("AccessToken",accessToken).apply()
+    fun setAccessToken(accessToken: String) {
+        sharedPreferences.edit().putString("AccessToken", accessToken).apply()
     }
 
-    fun getAccessToken():String{
-        return kr.carepet.singleton.MySharedPreference.sharedPreferences.getString("AccessToken","").toString()
+    fun getAccessToken(): String {
+        return sharedPreferences.getString("AccessToken", "").toString()
     }
 
-    fun setRefreshToken(refreshToken:String){
-        kr.carepet.singleton.MySharedPreference.sharedPreferences.edit().putString("RefreshToken",refreshToken).apply()
+    fun setRefreshToken(refreshToken: String) {
+        sharedPreferences.edit().putString("RefreshToken", refreshToken).apply()
     }
 
-    fun getRefreshToken():String{
-        return kr.carepet.singleton.MySharedPreference.sharedPreferences.getString("RefreshToken"," ").toString()
+    fun getRefreshToken(): String {
+        return sharedPreferences.getString("RefreshToken", " ").toString()
     }
 
-    fun setIsLogin(loggined:Boolean){
-        kr.carepet.singleton.MySharedPreference.sharedPreferences.edit().putBoolean("isLogin",loggined).apply()
-    }
-    fun getIsLogin():Boolean{
-        return kr.carepet.singleton.MySharedPreference.sharedPreferences.getBoolean("isLogin",false)
+    fun setIsLogin(loggined: Boolean) {
+        sharedPreferences.edit().putBoolean("isLogin", loggined).apply()
     }
 
-    fun setLastLoginMethod(method:String){
-        kr.carepet.singleton.MySharedPreference.sharedPreferences.edit().putString("lastLoginMethod",method).apply()
-    }
-    fun getLastLoginMethod():String{
-        return kr.carepet.singleton.MySharedPreference.sharedPreferences.getString("lastLoginMethod","").toString()
+    fun getIsLogin(): Boolean {
+        return sharedPreferences.getBoolean("isLogin", false)
     }
 
-
-    fun setProfileImage(imageUri:Uri?){
-        kr.carepet.singleton.MySharedPreference.sharedPreferences.edit().putString("imageUri",imageUri.toString()).apply()
+    fun setLastLoginMethod(method: String) {
+        sharedPreferences.edit().putString("lastLoginMethod", method).apply()
     }
 
-    fun getProfileImage():String?{
-        return kr.carepet.singleton.MySharedPreference.sharedPreferences.getString("imageUri","")
+    fun getLastLoginMethod(): String {
+        return sharedPreferences.getString("lastLoginMethod", "").toString()
     }
 
-    fun setUserId(userId:String){
-        kr.carepet.singleton.MySharedPreference.sharedPreferences.edit().putString("userId",userId).apply()
+
+    fun setProfileImage(imageUri: Uri?) {
+        sharedPreferences.edit().putString("imageUri", imageUri.toString()).apply()
     }
 
-    fun getUserId():String{
-        return kr.carepet.singleton.MySharedPreference.sharedPreferences.getString("userId","").toString()
+    fun getProfileImage(): String? {
+        return sharedPreferences.getString("imageUri", "")
+    }
+
+    fun setUserId(userId: String) {
+        sharedPreferences.edit().putString("userId", userId).apply()
+    }
+
+    fun getUserId(): String {
+        return sharedPreferences.getString("userId", "").toString()
     }
 }
