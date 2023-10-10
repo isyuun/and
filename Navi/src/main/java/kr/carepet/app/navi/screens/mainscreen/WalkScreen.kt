@@ -663,6 +663,7 @@ fun WalkWithMap(viewModel: WalkViewModel, navController: NavHostController){
                     .background(design_skip)
             ){
                 //Text(text = "Map 들어갈 자리", modifier = Modifier.align(Alignment.Center))
+
             }
 
             Column (modifier = Modifier

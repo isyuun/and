@@ -126,7 +126,8 @@ fun LogoTopBar(
                     modifier = modifier
                         .align(Alignment.CenterEnd)
                         .fillMaxHeight()
-                        .wrapContentWidth(),
+                        .wrapContentWidth()
+                        .clickable { openBottomSheet(true) },
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     CircleImageTopBar(size = 35, imageUri = petDetailData.petRprsImgAddr)
@@ -149,7 +150,6 @@ fun LogoTopBar(
                         Icon(painter = painterResource(id = R.drawable.arrow_select), contentDescription = "",
                             modifier= Modifier
                                 .padding(start = 4.dp)
-                                .clickable { openBottomSheet(true) }
                             ,
                             tint = design_login_text
                         )

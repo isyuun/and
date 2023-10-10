@@ -24,7 +24,7 @@ data class CurrentPetData(
     @SerializedName("petNm")
     var petNm: String, // 이슬
     @SerializedName("petRprsImgAddr")
-    var petRprsImgAddr: String?, // http://carepet.hopto.org/img/mypet/20230908/ca353742cf7e4408bf69edef9cb70332.JPEG
+    var petRprsImgAddr: String, // http://carepet.hopto.org/img/mypet/20230908/ca353742cf7e4408bf69edef9cb70332.JPEG
     @SerializedName("sexTypNm")
     var sexTypNm: String, // 남아
     @SerializedName("wghtVl")

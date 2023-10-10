@@ -81,6 +81,7 @@ import kr.carepet.app.navi.viewmodel.HomeViewModel
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
+import kr.carepet.singleton.G
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -105,6 +106,7 @@ fun MainScreen(
     var init by rememberSaveable { mutableStateOf(true) }
 
     val selectedPet by sharedViewModel.selectPet.collectAsState()
+    val currentPet by sharedViewModel.currentPetInfo.collectAsState()
 
     // logoTopbar back on/off
     var backBtnOnLT by remember { mutableStateOf(false) }
@@ -146,6 +148,7 @@ fun MainScreen(
                 FloatingActionButton(
                     onClick = {
                         //navController.navigate(Screen.WalkWithMap.route)
+                        G.mapPetInfo = currentPet
                         val intent = Intent(context,MapActivity::class.java)
                         context.startActivity(intent)
                     },
