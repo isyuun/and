@@ -25,6 +25,11 @@
 
 package kr.carepet.app.navi
 
+import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import kr.carepet.app.navi.viewmodel.LoginViewModel
+
 /**
  * @Project     : carepet-android
  * @FileName    : MapActivity.kt
@@ -32,4 +37,8 @@ package kr.carepet.app.navi
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class MapActivity : kr.carepet.map.app.MapActivity()
+class MapActivity : kr.carepet.map.app.MapActivity() {
+    override fun onResume() {
+        super.onResume()
+    }
+}
