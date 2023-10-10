@@ -25,10 +25,8 @@
 
 package kr.carepet.app.navi
 
-import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import kr.carepet.app.navi.viewmodel.LoginViewModel
+import androidx.compose.foundation.layout.Box
 
 /**
  * @Project     : carepet-android
@@ -38,7 +36,12 @@ import kr.carepet.app.navi.viewmodel.LoginViewModel
  * @description :
  */
 class MapActivity : kr.carepet.map.app.MapActivity() {
-    override fun onResume() {
-        super.onResume()
+    override fun setContent() {
+        setContent {
+            NaverMapApp()
+            Box {
+
+            }
+        }
     }
 }

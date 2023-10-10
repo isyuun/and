@@ -132,12 +132,16 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
     override fun onResume() {
         Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}...")
         super.onResume()
-        setContent { NaverMapApp() }
+        setContent()
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         Log.wtf(__CLASSNAME__, "::NaverMapApp${getMethodName()}${location?.toText()}, $location, $context, $intent")
+        setContent()
+    }
+
+    protected open fun setContent() {
         setContent { NaverMapApp() }
     }
 
