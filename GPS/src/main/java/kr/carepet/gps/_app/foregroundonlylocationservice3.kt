@@ -25,6 +25,7 @@
 
 package kr.carepet.gps._app
 
+import android.Manifest
 import android.app.Notification
 import android.content.ComponentName
 import android.content.ContentResolver
@@ -34,6 +35,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
+import androidx.annotation.RequiresPermission
 import kr.carepet.gps.app.CameraContentObserver
 import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
 import kr.carepet.gpx.Track
@@ -70,7 +72,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
     private lateinit var cameraContentObserver: CameraContentObserver
     private val handler: Handler = Handler(Looper.getMainLooper())
 
-    //@RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
+    @RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
     override fun onCreate() {
         super.onCreate()
 
@@ -160,7 +162,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
         if (uri != null) {
             val path = path(uri)
             val time = time(uri)
-            //Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
+            Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
             if (path == null || time == null) return
             val file = File(path)
             val name = file.name

@@ -26,6 +26,7 @@
 package kr.carepet.gpx
 
 import android.location.Location
+import android.net.Uri
 
 /**
  * @Project     : carepet-android
@@ -41,6 +42,7 @@ data class Track(
     val pee: Int = 0,
     val poo: Int = 0,
     val mrk: Int = 0,
+    val uri: Uri? = null,
 ) {
     fun toText(): String {
         return "($latitude, $longitude)"

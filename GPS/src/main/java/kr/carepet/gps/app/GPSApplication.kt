@@ -25,6 +25,7 @@
 
 package kr.carepet.gps.app
 
+import android.Manifest
 import android.content.ComponentName
 import android.os.IBinder
 import kr.carepet.gps._app.gpsapplication3
@@ -52,6 +53,13 @@ open class GPSApplication : gpsapplication3() {
                 }
             }
         }
+
+        val permissions: Array<String> = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_VIDEO,
+        )
     }
 
     override fun onCreate() {

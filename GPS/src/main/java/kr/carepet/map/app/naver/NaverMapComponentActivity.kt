@@ -118,8 +118,6 @@ import kr.carepet.util.getMethodName
 open class NaverMapComponentActivity : GPSComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private val application = GPSApplication.getInstance()
-
     //private lateinit var fusedLocationSource: FusedLocationSource
     private val fusedLocationSource: FusedLocationSource by lazy {
         FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
