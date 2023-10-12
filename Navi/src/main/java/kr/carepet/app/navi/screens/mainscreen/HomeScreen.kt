@@ -166,6 +166,7 @@ fun HomeScreen(
     LaunchedEffect(key1 = G.toPost){
         if(G.toPost){
             navController.navigate(Screen.PostScreen.route)
+            G.toPost = false
         }
     }
 
