@@ -66,6 +66,7 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
 import kr.carepet.data.SCDLocalData
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostController, viewModel: UserCreateViewModel){
 

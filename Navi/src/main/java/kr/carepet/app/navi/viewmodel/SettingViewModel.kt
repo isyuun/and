@@ -22,6 +22,7 @@ import kr.carepet.data.pet.Pet
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.LogoutRes
+import kr.carepet.singleton.G
 import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
 import retrofit2.Call
@@ -151,7 +152,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     val userName: StateFlow<String> = _userName.asStateFlow() // state 노출
     fun updateUserName(newValue: String) { _userName.value = newValue }
 
-    private val _userNickName = MutableStateFlow("YJ22") // Data 저장
+    private val _userNickName = MutableStateFlow(G.userNickName) // Data 저장
     val userNickName: StateFlow<String> = _userNickName.asStateFlow() // state 노출
     fun updateUserNickName(newValue: String) { _userNickName.value = newValue }
 
@@ -286,8 +287,11 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
 
     }
 
+    //
     //suspend fun resetPw():Boolean{
     //    val apiService = RetrofitClientServer.instance
+    //
+    //    val data =
     //}
 
 

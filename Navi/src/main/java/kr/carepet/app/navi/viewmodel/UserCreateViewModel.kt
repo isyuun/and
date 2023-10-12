@@ -347,7 +347,6 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
         val appKey = kr.carepet.singleton.MySharedPreference.getFcmToken()
         val appOs = "001"
         val appTypNm = Build.MODEL.toString()
-        val snsLogin = ""
 
         val userData= kr.carepet.data.user.UserDataModel(
             appKey = appKey,

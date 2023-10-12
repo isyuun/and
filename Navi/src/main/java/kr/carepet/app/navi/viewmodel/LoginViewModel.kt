@@ -12,19 +12,29 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.model.KakaoSdkError
 import com.kakao.sdk.user.UserApiClient
+import com.navercorp.nid.NaverIdLoginSDK
+import com.navercorp.nid.oauth.NidOAuthLogin
+import com.navercorp.nid.oauth.OAuthLoginCallback
+import com.navercorp.nid.profile.NidProfileCallback
+import com.navercorp.nid.profile.data.NidProfileResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kr.carepet.data.cmm.NidUserInfoResponse
 import kr.carepet.data.user.LoginData
 import kr.carepet.data.user.LoginResModel
+import kr.carepet.service.ApiService
 import kr.carepet.singleton.G
 import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -118,26 +128,32 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                         if (response.isSuccessful) {
                             val body = response.body()
                             body?.let {
-                                if (it.statusCode.toString() == "200") { // status code 200 검증
+                                if (it.statusCode == 200) { // status code 200 검증
                                     // 200이면 login 처리, access/refresh token G 및 shared 에 저장
 
-                                    kr.carepet.singleton.G.accessToken = it.data.accessToken
-                                    kr.carepet.singleton.G.refreshToken = it.data.refreshToken
-                                    kr.carepet.singleton.G.userId = it.data.userId
+                                    G.accessToken = it.data.accessToken
+                                    G.refreshToken = it.data.refreshToken
+                                    G.userId = it.data.userId
+                                    G.userNickName = it.data.nckNm
+                                    G.userEmail = it.data.email
+
                                     // shared에 저장
-                                    kr.carepet.singleton.MySharedPreference.setAccessToken(it.data.accessToken)
-                                    kr.carepet.singleton.MySharedPreference.setRefreshToken(it.data.refreshToken)
-                                    kr.carepet.singleton.MySharedPreference.setUserId(it.data.userId)
-                                    kr.carepet.singleton.MySharedPreference.setLastLoginMethod(loginMethod)
-                                    kr.carepet.singleton.MySharedPreference.setIsLogin(true)
+                                    MySharedPreference.setAccessToken(it.data.accessToken)
+                                    MySharedPreference.setRefreshToken(it.data.refreshToken)
+                                    MySharedPreference.setUserId(it.data.userId)
+                                    MySharedPreference.setLastLoginMethod(loginMethod)
+                                    MySharedPreference.setIsLogin(true)
 
 
                                     continuation.resume(true)
                                 } else {
-
+                                    Log.d("onlogin","else")
                                     continuation.resume(false)
                                 }
                             }
+                        }else{
+                            Log.d("onlogin","response 실패")
+                            continuation.resume(false)
                         }
                     }
 
@@ -246,5 +262,61 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
         }
     }
+    suspend fun naverLogin(context: Context):Boolean=
+        suspendCancellableCoroutine { continuation ->
+
+            NaverIdLoginSDK.initialize(context, "fk5tuUBi3UzTVQRcBMGK", "kbSHyo7KeQ", "CarePet")
+
+            val oAuthLoginCallback = object : OAuthLoginCallback{
+                override fun onError(errorCode: Int, message: String) {
+                    Log.d("NAVER","error : ${message}")
+                    continuation.resume(false)
+                }
+
+                override fun onFailure(httpStatus: Int, message: String) {
+                    Log.d("NAVER","failure : ${message}")
+                    continuation.resume(false)
+                }
+
+                override fun onSuccess() {
+                    NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse>{
+                        override fun onError(errorCode: Int, message: String) {
+                            Log.d("NAVER","suc -> error : ${message}")
+                            continuation.resume(false)
+                        }
+
+                        override fun onFailure(httpStatus: Int, message: String) {
+                            Log.d("NAVER","suc -> failure : ${message}")
+                            continuation.resume(false)
+                        }
+
+                        override fun onSuccess(result: NidProfileResponse) {
+                            _email.value = result.profile?.email?: ""
+                            _unqId.value = result.profile?.id?: ""
+                            _nickName.value = result.profile?.nickname?: ""
+
+                            Log.d("NAVER","${_email.value} ${_unqId.value} ${_nickName.value}")
+                            continuation.resume(true)
+                        }
+
+                    })
+                }
+
+            }
+
+            NaverIdLoginSDK.authenticate(context,oAuthLoginCallback)
+    }
 }
 
+class RetrofitHelper {
+    companion object{
+        fun getRetrofitInstance(baseUrl:String): Retrofit {
+            val retrofit= Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            return retrofit
+        }
+    }
+}

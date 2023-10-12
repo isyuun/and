@@ -1,6 +1,7 @@
 package kr.carepet.app.navi.screens.mainscreen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -91,6 +92,7 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.pet.PetDetailData
+import kr.carepet.singleton.G
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -140,7 +142,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 20.dp))
 
                     Text(
-                        text = "YJ22",
+                        text = G.userNickName,
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 20.sp, letterSpacing = (-1.0).sp,
                         color = design_login_text, modifier = Modifier.padding(start = 12.dp)
@@ -403,7 +405,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                 modifier= Modifier
                     .padding(end = 12.dp)
                     .border(
-                        when(petDetailData.mngrType){
+                        when (petDetailData.mngrType) {
                             "M" -> 0.dp
                             "I" -> 1.dp
                             "G" -> 0.dp
@@ -414,7 +416,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                     )
                     .background(
                         color =
-                        when(petDetailData.mngrType){
+                        when (petDetailData.mngrType) {
                             "M" -> design_button_bg
                             "I" -> design_white
                             "G" -> design_DDDDDD
@@ -519,6 +521,8 @@ fun MyBottomSheet(
     val selectedPet = settingViewModel.selectedPet
     val selectedPetSave by settingViewModel.selectedPetSave.collectAsState()
 
+    val context = LocalContext.current
+
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit){
@@ -619,13 +623,13 @@ fun MyBottomSheet(
                     if (settingViewModel.updateSelectedPetSave(selectedPet)) {
                         scope.launch {
                             if (settingViewModel.getInviteCode()){
-                                Log.d("CloseBT", selectedPetSave.size.toString())
                                 openBottomSheet(false)
                                 navController.navigate(Screen.InviteScreen.route)
                         } }
                     }
+                }else{
+                    Toast.makeText(context, "펫을 선택해주세요", Toast.LENGTH_SHORT).show()
                 }
-                Log.d("LOG",selectedPetSave.size.toString())
                       },
             modifier = Modifier
                 .fillMaxWidth()
@@ -652,7 +656,6 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
     val imageUri:String = petList.petRprsImgAddr
 
     val selectedPet = settingViewModel.selectedPet
-    Log.d("LOG",selectedPet.toString())
 
     var isSeleted by rememberSaveable { mutableStateOf(false) }
 

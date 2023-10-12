@@ -136,8 +136,7 @@ fun LogoTopBar(
                         modifier
                             .padding(end = 20.dp)
                             .wrapContentHeight()
-                            .wrapContentHeight()
-                            .clickable { },
+                            .wrapContentHeight(),
                         verticalAlignment = Alignment.CenterVertically){
                         Text(
                             text = petDetailData.petNm,

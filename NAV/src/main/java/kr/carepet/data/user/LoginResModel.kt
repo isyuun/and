@@ -30,7 +30,11 @@ data class Data(
     @SerializedName("tokenType")
     var tokenType: String, // Bearer
     @SerializedName("userId")
-    var userId: String //
+    var userId: String, //
+    @SerializedName("nckNm")
+    var nckNm: String, //
+    @SerializedName("email")
+    var email: String //
 )
 
 data class LoginData(

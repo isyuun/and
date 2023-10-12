@@ -19,6 +19,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.RefreshRes
 import kr.carepet.data.RefreshToken
 import kr.carepet.service.ApiService
+import kr.carepet.service.OAuthAuthenticator
 import kr.carepet.service.TokenInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -59,71 +60,7 @@ object RetrofitClientServer {
             .build()
     }
 
-    val apiInstanceForToken: ApiService by lazy {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        retrofit.create()
-    }
-
 }
 
-fun setTokenReceivedTime() {
-    G.tokenReceivedTime = Date()
-}
 
-fun isTokenExpired(): Boolean {
-    if (G.tokenReceivedTime == null) {
-        // 토큰을 아직 받지 않았거나 시간을 초기화하지 않은 경우
-        return true
-    }
 
-    val currentTime = Date()
-    val elapsedMinutes = Duration.between(G.tokenReceivedTime!!.toInstant(), currentTime.toInstant()).toMinutes()
-
-    return elapsedMinutes >= 30
-}
-
-class TokenManager {
-    suspend fun refreshAccessToken(): String {
-        val apiService = RetrofitClientServer.instance
-
-        val refreshToken = G.refreshToken
-
-        val call = apiService.sendRefreshToken(RefreshToken(refreshToken))
-        return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<RefreshRes> {
-                override fun onResponse(call: Call<RefreshRes>, response: Response<RefreshRes>) {
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        body?.let {
-                            if (it.statusCode == 200) {
-                                G.accessToken = it.data.accessToken
-                                G.refreshToken = it.data.refreshToken
-                                G.userId = it.data.userId
-                                setTokenReceivedTime()
-
-                                MySharedPreference.setAccessToken(it.data.accessToken)
-                                MySharedPreference.setRefreshToken(it.data.refreshToken)
-                                MySharedPreference.setUserId(it.data.userId)
-                                Log.d(
-                                    "Token",
-                                    "access: ${it.data.accessToken}, refresh: ${it.data.refreshToken}"
-                                )
-
-                                continuation.resume(it.data.accessToken)
-                            } else {
-                                continuation.resume("")
-                            }
-                        }
-                    }
-                }
-
-                override fun onFailure(call: Call<RefreshRes>, t: Throwable) {
-                    continuation.resume("")
-                }
-            })
-        }
-    }
-}

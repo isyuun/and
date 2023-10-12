@@ -60,8 +60,6 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
     val name by settingViewModel.name.collectAsState()
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
-    Log.d("InviteCode",inviteCode+"왜 안떠?")
-
     Scaffold (
         topBar = { BackTopBar(title = "초대하기", navController = navController) }
     ) { paddingValues ->

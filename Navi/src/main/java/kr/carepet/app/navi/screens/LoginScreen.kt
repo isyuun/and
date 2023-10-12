@@ -3,6 +3,7 @@
 package kr.carepet.app.navi.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -302,7 +303,28 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel){
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
                 }
             }
-            Button(onClick = { navController.navigate(Screen.EasyRegScreen.route) },
+            Button(onClick = {
+                             scope.launch {
+                                 val naverLoginResult = viewModel.naverLogin(context)
+                                 // naver Login 성공
+                                 if (naverLoginResult){
+
+                                     val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "NAVER")
+                                     // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
+                                     if (loginResult){
+                                         navController.navigate(Screen.MainScreen.route){
+                                             popUpTo(0)
+                                         }
+                                     }else{
+                                         viewModel.updateLoginMethod("NAVER")
+                                         navController.navigate(Screen.EasyRegScreen.route)
+                                     }
+
+                                 }else{
+                                     Toast.makeText(context, "Naver 로그인 실패", Toast.LENGTH_SHORT).show()
+                                 }
+                             }
+            },
                 modifier = Modifier
                     .padding(top = 8.dp)
                     .fillMaxWidth()
@@ -349,6 +371,9 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
 @Composable
 fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, userCreateViewModel: UserCreateViewModel){
 
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(color = design_white)
+
     val allCheck by viewModel.allCheck.collectAsState()
     val memberCheck by viewModel.memberCheck.collectAsState()
     val personCheck by viewModel.personCheck.collectAsState()
@@ -357,6 +382,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     val snsLogin by viewModel.loginMethod.collectAsState()
     val unqId by viewModel.unqId.collectAsState()
     val email by viewModel.email.collectAsState()
+    Log.d("snsLogin", snsLogin)
 
     val countTrue = listOf(memberCheck, personCheck, marketingCheck).count { true }
 

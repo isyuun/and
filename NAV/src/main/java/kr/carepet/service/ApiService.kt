@@ -7,6 +7,7 @@ import kr.carepet.data.RefreshToken
 import kr.carepet.data.SggListRes
 import kr.carepet.data.UmdListReq
 import kr.carepet.data.UmdListRes
+import kr.carepet.data.cmm.NidUserInfoResponse
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
 import kr.carepet.data.daily.DailyDetailReq
@@ -37,6 +38,8 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -120,5 +123,7 @@ interface ApiService {
     @POST("api/v1/mypet/invtt/setKey")
     fun setInviteCode(@Body data: String): Call<SetInviteCodeRes>
 
+    @GET("/v1/nid/me")
+    fun getNidUserInfo(@Header("Authorization") authorization:String): Call<NidUserInfoResponse>
 
 }

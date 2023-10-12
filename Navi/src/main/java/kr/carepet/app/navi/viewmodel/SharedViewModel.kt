@@ -188,6 +188,7 @@ class SharedViewModel:ViewModel(){
                                 )
                                 continuation.resume(true)
                             }else{
+
                                 continuation.resume(false)
                             }
                         }
@@ -195,10 +196,8 @@ class SharedViewModel:ViewModel(){
                 }
 
                 override fun onFailure(call: Call<RefreshRes>, t: Throwable) {
-
                     continuation.resume(false)
                 }
-
             })
         }
     }

@@ -7,9 +7,9 @@ data class RefreshRes(
     @SerializedName("data")
     var data: TokenData,
     @SerializedName("detailMessage")
-    var detailMessage: Any?, // null
+    var detailMessage: String, // null
     @SerializedName("resultMessage")
-    var resultMessage: Any?, // null
+    var resultMessage: String, // null
     @SerializedName("statusCode")
     var statusCode: Int // 200
 )
@@ -18,9 +18,9 @@ data class TokenData(
     @SerializedName("accessToken")
     var accessToken: String,
     @SerializedName("failReason")
-    var failReason: Any?, // null
+    var failReason: String, // null
     @SerializedName("message")
-    var message: Any?, // null
+    var message: String, // null
     @SerializedName("refreshToken")
     var refreshToken: String,
     @SerializedName("status")
