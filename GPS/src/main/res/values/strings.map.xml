@@ -12,8 +12,18 @@
     <string name="poo">응가</string>
     <string name="mark">마킹</string>
 
-    <string name="track">산책</string>
+    <string name="track">트랙</string>
     <string name="note">노트</string>
     <string name="location">위치</string>
     <string name="photo">사진</string>
+
+    <string name="walk_button_start">산책하기</string>
+    <string name="walk_button_end">산책종료</string>
+    <string name="walk_title_duration">산책시간</string>
+    <string name="walk_title_distance">산책거리</string>
+    <string name="walk_title_select">누구랑 산책할까요?</string>
+    <string name="walk_check_select">계속 이 아이와 산책할게요</string>
+    <string name="walk_title_end">산책을 종료할까요?</string>
+    <string name="walk_button_finish">네,종료할게요</string>
+    <string name="walk_button_resume">조금 더 할게요</string>
 </resources>

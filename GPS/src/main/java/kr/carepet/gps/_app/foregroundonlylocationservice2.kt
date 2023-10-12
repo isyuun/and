@@ -34,6 +34,7 @@ import kr.carepet.gpx.GPXWriter2
 import kr.carepet.gpx.GPX_INTERVAL_UPDATE_METERS
 import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
 import kr.carepet.gpx.Track
+import kr.carepet.gpx._GPXWriter
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.io.File
@@ -46,6 +47,7 @@ import java.util.Collections
  * @author      : isyuun@care-pet.kr
  * @description :
  */
+
 open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
@@ -94,7 +96,6 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     private val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
-
     val tracks: MutableList<Track>
         get() = _tracks
 
@@ -205,4 +206,10 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         if (_tracks.size > 0) write(true)
         _start = 0L
     }
+
+    val duration
+        get() = _GPXWriter.calculateDuration(_tracks)
+
+    val distance
+        get() = _GPXWriter.calculateTotalDistance(_tracks)
 }

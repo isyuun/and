@@ -157,7 +157,7 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     }
 
     var start = false
-        get() = (foregroundOnlyLocationService?.start ?: 0L > 0L)
+        get() = ((foregroundOnlyLocationService?.start ?: 0L > 0L) && !(foregroundOnlyLocationService?.tracks?.isEmpty() ?: true))
 
     fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()}, $foregroundOnlyLocationService")

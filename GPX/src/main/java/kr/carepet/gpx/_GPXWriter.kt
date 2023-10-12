@@ -46,7 +46,7 @@ val GPX_DECIMAL_FORMAT_3 = DecimalFormat("0.000")
 val GPX_DECIMAL_FORMAT_7 = DecimalFormat("0.0000000")
 
 const val GPX_INTERVAL_UPDATE_MIllIS = 0L
-const val GPX_INTERVAL_UPDATE_METERS = 3.0f
+const val GPX_INTERVAL_UPDATE_METERS = 0.0f
 const val GPX_LATITUDE_ZERO = 37.546855      //37.5
 const val GPX_LONGITUDE_ZERO = 127.065330    //127.0
 //const val GPX_LATITUDE_ZERO = 37.5      //37.5
@@ -56,19 +56,7 @@ const val GPX_CAMERA_ZOOM_ZERO = 16.8
 open class _GPXWriter {
     companion object {
         @JvmStatic
-        protected fun calculateTotalDistance(tracks: List<Track>): String {
-            var totalDistance = 0.0
-            for (i in 1 until tracks.size) {
-                val prevLocation = tracks[i - 1]
-                val currentLocation = tracks[i]
-                val distance = prevLocation.location.distanceTo(currentLocation.location)
-                totalDistance += distance
-            }
-            return String.format("%.2f km", totalDistance / 1000)
-        }
-
-        @JvmStatic
-        protected fun calculateDuration(tracks: List<Track>): String {
+        fun calculateDuration(tracks: List<Track>): String {
             if (tracks.isEmpty()) {
                 return "N/A"
             }
@@ -83,7 +71,23 @@ open class _GPXWriter {
         }
 
         @JvmStatic
-        protected fun calculateMaxAltitudeGap(tracks: List<Track>): String {
+        fun calculateTotalDistance(tracks: List<Track>): String {
+            if (tracks.isEmpty()) {
+                return "N/A"
+            }
+
+            var totalDistance = 0.0
+            for (i in 1 until tracks.size) {
+                val prevLocation = tracks[i - 1]
+                val currentLocation = tracks[i]
+                val distance = prevLocation.location.distanceTo(currentLocation.location)
+                totalDistance += distance
+            }
+            return String.format("%.2f km", totalDistance / 1000)
+        }
+
+        @JvmStatic
+        fun calculateMaxAltitudeGap(tracks: List<Track>): String {
             if (tracks.isEmpty()) {
                 return "N/A"
             }
@@ -101,7 +105,7 @@ open class _GPXWriter {
         }
 
         @JvmStatic
-        protected fun calculateMaxSpeed(tracks: List<Track>): String {
+        fun calculateMaxSpeed(tracks: List<Track>): String {
             if (tracks.isEmpty()) {
                 return "N/A"
             }
@@ -116,7 +120,7 @@ open class _GPXWriter {
         }
 
         @JvmStatic
-        protected fun calculateAvgSpeed(tracks: List<Track>): String {
+        fun calculateAvgSpeed(tracks: List<Track>): String {
             if (tracks.isEmpty()) {
                 return "N/A"
             }
