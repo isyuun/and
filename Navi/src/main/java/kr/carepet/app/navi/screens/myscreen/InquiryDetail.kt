@@ -34,8 +34,6 @@ import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_f1f1f1
 import kr.carepet.app.navi.ui.theme.design_login_text
-import kr.carepet.app.navi.ui.theme.design_select_btn_bg
-import kr.carepet.app.navi.ui.theme.design_select_btn_text
 import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white

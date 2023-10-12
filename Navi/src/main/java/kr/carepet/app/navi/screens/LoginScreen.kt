@@ -4,6 +4,8 @@ package kr.carepet.app.navi.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -41,7 +43,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -62,18 +63,22 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CustomTextField
+import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_intro_bg
 import kr.carepet.app.navi.ui.theme.design_login_bg
@@ -89,7 +94,6 @@ import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.LoginViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
-import kr.carepet.singleton.MySharedPreference
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,6 +113,40 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel){
     val snsUnqId by viewModel.unqId.collectAsState()
 
     val emailLoginSuccess by viewModel.loginSuccess.collectAsState()
+
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken("985887161836-gj9pqql898d85483bc1ik53a5t1kg6du.apps.googleusercontent.com")
+        .requestServerAuthCode("985887161836-gj9pqql898d85483bc1ik53a5t1kg6du.apps.googleusercontent.com")
+        .requestEmail()
+        .build()
+
+    val mGoogleSignInClient = GoogleSignIn.getClient(context,gso)
+    val googleAuthLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+
+        try {
+            val account = task.getResult(ApiException::class.java)
+            viewModel.updateEmail(account?.email.toString())
+            viewModel.updateUnqId(account?.id.toString())
+            viewModel.updateNickName(account?.displayName.toString())
+
+            scope.launch {
+                val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "GOOGLE")
+                // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
+                if (loginResult){
+                    navController.navigate(Screen.MainScreen.route){
+                        popUpTo(0)
+                    }
+                }else{
+                    viewModel.updateLoginMethod("GOOGLE")
+                    navController.navigate(Screen.EasyRegScreen.route)
+                }
+            }
+
+        } catch (e: ApiException){
+            Log.e("Google account","signInResult:failed Code = " + e.statusCode)
+        }
+    }
 
     Log.d("LOG","login composing")
 
@@ -276,15 +314,23 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel){
 
             Button(onClick = {
                 scope.launch {
+                    val kakaoLoginResult = viewModel.kakaoLogin(context)
+                    // naver Login 성공
+                    if (kakaoLoginResult){
 
-                    when(viewModel.kakaoLogin(context)){
-                        "신규" -> {
+                        val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "KAKAO")
+                        // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
+                        if (loginResult){
+                            navController.navigate(Screen.MainScreen.route){
+                                popUpTo(0)
+                            }
+                        }else{
                             viewModel.updateLoginMethod("KAKAO")
-                            navController.navigate(Screen.EasyRegScreen.route) }
-                        "기존" -> {
-                            viewModel.login(snsEmail, snsUnqId, "KAKAO")
+                            navController.navigate(Screen.EasyRegScreen.route)
                         }
-                        "실패" -> Log.d("LOG","실패")
+
+                    }else{
+                        Toast.makeText(context, "Kakao 로그인 실패", Toast.LENGTH_SHORT).show()
                     }
                 }
                              },
@@ -294,15 +340,17 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel){
                     .height(48.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_login_kakaobtn, contentColor = Color.Black)
+                colors = ButtonDefaults.buttonColors(containerColor = design_login_kakaobtn, contentColor = design_login_text)
             ) {
                 Box (modifier = Modifier.fillMaxSize()){
-                    Icon(painter = painterResource(id = R.mipmap.icon_kakao), contentDescription = "",
-                        modifier = Modifier.align(Alignment.CenterStart))
+                    Icon(painter = painterResource(id = R.drawable.icon_kakao), contentDescription = "",
+                        modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
                     Text(text = "카카오톡으로 로그인", modifier = Modifier.align(Alignment.Center),
-                        fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)))
                 }
             }
+
             Button(onClick = {
                              scope.launch {
                                  val naverLoginResult = viewModel.naverLogin(context)
@@ -334,12 +382,14 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel){
                 colors = ButtonDefaults.buttonColors(containerColor = design_login_naverbtn, contentColor = design_white)
             ) {
                 Box (modifier = Modifier.fillMaxSize()){
-                    Icon(painter = painterResource(id = R.mipmap.icon_naver), contentDescription = "",
-                        modifier = Modifier.align(Alignment.CenterStart))
+                    Icon(painter = painterResource(id = R.drawable.icon_naver), contentDescription = "",
+                        modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
                     Text(text = "네이버로 로그인", modifier = Modifier.align(Alignment.Center),
-                        fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)))
                 }
             }
+
             Button(onClick = { /*TODO 네이버*/ },
                 modifier = Modifier
                     .padding(top = 8.dp)
@@ -350,12 +400,60 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel){
                 colors = ButtonDefaults.buttonColors(containerColor = design_login_facebookbtn, contentColor = design_white)
             ) {
                 Box (modifier = Modifier.fillMaxSize()){
-                    Icon(painter = painterResource(id = R.mipmap.icon_facebook), contentDescription = "",
-                        modifier = Modifier.align(Alignment.CenterStart))
+                    Icon(painter = painterResource(id = R.drawable.icon_facebook), contentDescription = "",
+                        modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
                     Text(text = "페이스북으로 로그인", modifier = Modifier.align(Alignment.Center),
-                        fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)))
                 }
             }
+
+            Button(onClick = {
+                scope.launch {
+                    val signInIntent = mGoogleSignInClient.signInIntent
+                    googleAuthLauncher.launch(signInIntent)
+                }
+                             },
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 8.dp)
+                    .border(
+                        width = 1.dp,
+                        color = design_btn_border,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = design_white, contentColor = design_login_text)
+            ) {
+                Box (modifier = Modifier.fillMaxSize()){
+                    Icon(painter = painterResource(id = R.drawable.icon_google), contentDescription = "",
+                        modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
+                    Text(text = "구글로 로그인", modifier = Modifier.align(Alignment.Center),
+                        fontSize = 14.sp,letterSpacing = (-0.7).sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                }
+            }
+
+            //Button(onClick = { /*TODO 애플*/ },
+            //    modifier = Modifier
+            //        .padding(top = 8.dp)
+            //        .fillMaxWidth()
+            //        .height(48.dp)
+            //        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
+            //    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            //    colors = ButtonDefaults.buttonColors(containerColor = design_dark, contentColor = design_white)
+            //) {
+            //    Box (modifier = Modifier.fillMaxSize()){
+            //        Icon(painter = painterResource(id = R.drawable.icon_apple), contentDescription = "",
+            //            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
+            //        Text(text = "애플로 로그인", modifier = Modifier.align(Alignment.Center),
+            //            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+            //            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+            //    }
+            //}
         }
     }
 }
@@ -382,7 +480,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     val snsLogin by viewModel.loginMethod.collectAsState()
     val unqId by viewModel.unqId.collectAsState()
     val email by viewModel.email.collectAsState()
-    Log.d("snsLogin", snsLogin)
+    val context = LocalContext.current
 
     val countTrue = listOf(memberCheck, personCheck, marketingCheck).count { true }
 
@@ -525,12 +623,16 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
 
                 Button(
                     onClick = {
-                        userCreateViewModel.updateUserNickName(nickname)
-                        userCreateViewModel.updateUserID(email)
-                        userCreateViewModel.updateUserName(nickname)
-                        userCreateViewModel.updateSnsLogin(snsLogin)
-                        userCreateViewModel.updateUserPW(unqId)
-                        navController.navigate(Screen.PetCreateScreen.route)
+                        if(allCheck){
+                            userCreateViewModel.updateUserNickName(nickname)
+                            userCreateViewModel.updateUserID(email)
+                            userCreateViewModel.updateUserName(nickname)
+                            userCreateViewModel.updateSnsLogin(snsLogin)
+                            userCreateViewModel.updateUserPW(unqId)
+                            navController.navigate(Screen.PetCreateScreen.route)
+                        }else{
+                            Toast.makeText(context, "약관에 동의해주세요", Toast.LENGTH_SHORT).show()
+                        }
                               },
                     modifier = Modifier
                         .padding(top = 16.dp)
@@ -631,12 +733,3 @@ fun AgreeComponent(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun LoginPreview(){
-
-    val navController:NavController= rememberNavController()
-
-    //LoginScreen(navController, viewModel = viewModel)
-
-}

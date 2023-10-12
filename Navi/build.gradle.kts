@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
     //kotlin("kapt")
     //id("com.google.dagger.hilt.android")
 }
@@ -75,6 +76,7 @@ dependencies {
     implementation("com.google.android.datatransport:transport-runtime:3.1.9")
     implementation("androidx.wear.compose:compose-material:1.2.0")
     implementation("androidx.paging:paging-common-ktx:3.2.1")
+    implementation(libs.firebase.auth.ktx)
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -105,7 +107,7 @@ dependencies {
 
     //구글 SDK
     implementation("com.google.android.gms:play-services-auth:20.6.0")
-    implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics-ktx")
 
     //네이버 SDK

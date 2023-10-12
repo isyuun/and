@@ -106,14 +106,16 @@ class SharedViewModel:ViewModel(){
                         body?.let {
                             if(body.petDetailData.isEmpty()){
                                 _petInfo.value= arrayListOf(emptyPet)
-                                updatePetInfo(arrayListOf(emptyPet))
+                                //updatePetInfo(arrayListOf(emptyPet))
                             }else{
                                 _petInfo.value=body.petDetailData
-                                updatePetInfo(body.petDetailData)
+                                //updatePetInfo(body.petDetailData)
                             }
                             Log.d("LOG",_petInfo.value.toString())
                             continuation.resume(true)
                         }
+                    }else{
+                        continuation.resume(false)
                     }
                 }
                 override fun onFailure(call: Call<MyPetListRes>, t: Throwable) {
@@ -150,6 +152,8 @@ class SharedViewModel:ViewModel(){
                             }
                             continuation.resume(true)
                         }
+                    }else{
+                        continuation.resume(false)
                     }
                 }
 
@@ -178,6 +182,8 @@ class SharedViewModel:ViewModel(){
                                 G.accessToken = it.data.accessToken
                                 G.refreshToken = it.data.refreshToken
                                 G.userId = it.data.userId
+                                G.userNickName = it.data.nckNm
+                                G.userEmail = it.data.email
 
                                 MySharedPreference.setAccessToken(it.data.accessToken)
                                 MySharedPreference.setRefreshToken(it.data.refreshToken)
@@ -216,14 +222,18 @@ class SharedViewModel:ViewModel(){
                     call: Call<WeekRecordRes>,
                     response: Response<WeekRecordRes>
                 ) {
-                    val body = response.body()
-                    body?.let {
-                        if (body.statusCode==200){
-                            _weekRecord.value=body.data
-                            continuation.resume(true)
-                        }else{
-                            continuation.resume(false)
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (body.statusCode==200){
+                                _weekRecord.value=body.data
+                                continuation.resume(true)
+                            }else{
+                                continuation.resume(false)
+                            }
                         }
+                    }else{
+                        continuation.resume(false)
                     }
                 }
                 override fun onFailure(call: Call<WeekRecordRes>, t: Throwable) {
@@ -268,7 +278,7 @@ class SharedViewModel:ViewModel(){
         ntrTypCd = "",
         ntrTypNm = "",
         endDt = "",
-        mngrType = "",
+        mngrType = "M",
         memberList = emptyList()
     )
 }

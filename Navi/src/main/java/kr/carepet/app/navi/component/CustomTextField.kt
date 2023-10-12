@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 
 @ExperimentalMaterial3Api
 @Composable

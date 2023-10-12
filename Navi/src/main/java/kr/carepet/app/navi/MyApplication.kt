@@ -4,7 +4,6 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
-import com.navercorp.nid.NaverIdLoginSDK
 
 class MyApplication : kr.carepet.map.app.MapApplication() {
     override fun onCreate() {

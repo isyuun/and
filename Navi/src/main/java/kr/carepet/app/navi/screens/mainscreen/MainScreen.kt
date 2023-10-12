@@ -69,7 +69,6 @@ import kotlinx.coroutines.delay
 import kr.carepet.app.navi.BottomNav
 import kr.carepet.app.navi.MapActivity
 import kr.carepet.app.navi.R
-import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.LogoTopBar
 import kr.carepet.app.navi.ui.theme.design_bottomnav_text

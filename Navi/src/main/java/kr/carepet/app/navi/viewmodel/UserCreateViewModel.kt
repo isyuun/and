@@ -4,11 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.util.Log
-import android.util.Patterns
-import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,21 +26,14 @@ import kr.carepet.data.SCDLocalData
 import kr.carepet.data.SggList
 import kr.carepet.data.SggListRes
 import kr.carepet.data.UmdList
-import kr.carepet.data.UmdListReq
 import kr.carepet.data.UmdListRes
 import kr.carepet.data.pet.MyPetResModel
 import kr.carepet.data.pet.PetListData
-import kr.carepet.data.pet.PetListModel
 import kr.carepet.data.pet.PetListResModel
-import kr.carepet.data.user.LoginData
 import kr.carepet.data.user.LoginResModel
-import kr.carepet.data.user.UserDataModel
 import kr.carepet.data.user.UserDataResponse
-import kr.carepet.singleton.G
-import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -380,7 +370,6 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                         }
                     }else{
                         continuation.resume(false)
-                        Log.d("USER","else로 진입")
                     }
                 }
 
@@ -559,6 +548,8 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                                 continuation.resume(false)
                             }
                         }
+                    }else{
+                        continuation.resume(false)
                     }
                 }
 

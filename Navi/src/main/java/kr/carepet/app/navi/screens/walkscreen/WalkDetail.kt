@@ -15,12 +15,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -49,7 +46,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.CircleImageTopBar
-import kr.carepet.app.navi.screens.mainscreen.CircleImage
 import kr.carepet.app.navi.screens.mainscreen.calculateCurrentOffsetForPage
 import kr.carepet.app.navi.ui.theme.design_DDDDDD
 import kr.carepet.app.navi.ui.theme.design_intro_bg
@@ -60,7 +56,6 @@ import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.DailyDetailData
-import kr.carepet.data.daily.WalkListRes
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
