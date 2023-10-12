@@ -35,90 +35,17 @@ package kr.carepet.map.app.naver
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.provider.MediaStore
-import android.view.ViewGroup
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat.getString
-import androidx.core.view.updateLayoutParams
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.CameraPosition
-import com.naver.maps.map.LocationTrackingMode
-import com.naver.maps.map.MapView
-import com.naver.maps.map.NaverMap
-import com.naver.maps.map.NaverMapOptions
-import com.naver.maps.map.overlay.Marker
-import com.naver.maps.map.overlay.OverlayImage
-import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.FusedLocationSource
-import com.naver.maps.map.widget.LocationButtonView
-import com.naver.maps.map.widget.ZoomControlView
-import kotlinx.coroutines.launch
-import kr.carepet.gps.R
 import kr.carepet.gps._app.toText
-import kr.carepet.gps.app.GPSApplication
 import kr.carepet.gps.app.GPSComponentActivity
-import kr.carepet.gpx.GPX_CAMERA_ZOOM_ZERO
-import kr.carepet.gpx.GPX_LATITUDE_ZERO
-import kr.carepet.gpx.GPX_LONGITUDE_ZERO
-import kr.carepet.gpx.Track.EVENT.img
-import kr.carepet.gpx.Track.EVENT.mrk
-import kr.carepet.gpx.Track.EVENT.nnn
-import kr.carepet.gpx.Track.EVENT.pee
-import kr.carepet.gpx.Track.EVENT.poo
-import kr.carepet.map._app.getRounded
-import kr.carepet.map._app.toPx
-import kr.carepet.map._app.toText
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
 open class NaverMapComponentActivity : GPSComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    //private lateinit var fusedLocationSource: FusedLocationSource
     private val fusedLocationSource: FusedLocationSource by lazy {
         FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
     }
@@ -126,7 +53,16 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}...")
         super.onCreate(savedInstanceState)
-        //fusedLocationSource = FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
+    }
+
+    protected open fun setContent() {
+        setContent { NaverMapApp() }
+    }
+
+    @Composable
+    fun NaverMapApp() {
+        Log.d(__CLASSNAME__, "${getMethodName()}[$fusedLocationSource][${fusedLocationSource.lastLocation}]")
+        NaverMapApp(fusedLocationSource)
     }
 
     override fun onResume() {
@@ -139,15 +75,5 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
         super.onReceive(context, intent)
         Log.wtf(__CLASSNAME__, "::NaverMapApp${getMethodName()}${location?.toText()}, $location, $context, $intent")
         setContent()
-    }
-
-    protected open fun setContent() {
-        setContent { NaverMapApp() }
-    }
-
-    @Composable
-    fun NaverMapApp() {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$fusedLocationSource][${fusedLocationSource.lastLocation}]")
-        NaverMapApp(fusedLocationSource)
     }
 }

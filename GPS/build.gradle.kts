@@ -112,9 +112,11 @@ dependencies {
     implementation(project(mapOf("path" to ":_APP")))
     implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":GPX")))
+    implementation(project(mapOf("path" to ":NAV")))
 
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.naver.maps:map-sdk:3.17.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
     implementation(libs.androidx.appcompat)
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
