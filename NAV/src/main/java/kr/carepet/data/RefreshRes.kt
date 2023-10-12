@@ -26,8 +26,11 @@ data class TokenData(
     @SerializedName("status")
     var status: Boolean, // true
     @SerializedName("userId")
-    var userId: String //
-
+    var userId: String, //
+    @SerializedName("nckNm")
+    var nckNm: String, //
+    @SerializedName("email")
+    var email: String, //
 )
 
 data class RefreshToken(

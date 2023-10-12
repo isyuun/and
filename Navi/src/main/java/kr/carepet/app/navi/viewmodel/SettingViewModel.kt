@@ -2,7 +2,6 @@ package kr.carepet.app.navi.viewmodel
 
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,8 +11,6 @@ import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.pet.InviteCodeReq
@@ -23,7 +20,6 @@ import kr.carepet.data.pet.PetDetailData
 import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.LogoutRes
 import kr.carepet.singleton.G
-import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
 import retrofit2.Call
 import retrofit2.Callback

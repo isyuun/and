@@ -108,6 +108,7 @@ val design_EEEEEE = Color(0xFFEEEEEE)
 val design_999999 = Color(0xFF999999)
 val design_FCE9B3 = Color(0xFFFCE9B3)
 val design_CBE8F3 = Color(0xFFCBE8F3)
+val design_dark = Color(0xFF000000)
 val design_ = Color(0x00000000)
 
 

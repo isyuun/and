@@ -6,11 +6,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
-import com.kakao.sdk.common.model.KakaoSdkError
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
@@ -22,10 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kr.carepet.data.cmm.NidUserInfoResponse
-import kr.carepet.data.user.LoginData
 import kr.carepet.data.user.LoginResModel
-import kr.carepet.service.ApiService
 import kr.carepet.singleton.G
 import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
@@ -34,10 +29,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -173,48 +165,13 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     val isLoggedIn = MutableStateFlow<Boolean>(false)
 
-    // 카카오 로그인
-    suspend fun kakaoLogin(context:Context):String=
-        suspendCoroutine { continuation ->
-
-            if (AuthApiClient.instance.hasToken()){
-
-                UserApiClient.instance.accessTokenInfo { _, error ->
-                    if (error != null) {
-                        if (error is KakaoSdkError && error.isInvalidTokenError() == true) {
-                            Toast.makeText(context, error.msg, Toast.LENGTH_SHORT).show()
-                            kakaoNew(context,continuation, "기존")
-                        }
-                        else {
-                            continuation.resume("실패")
-                        }
-                    }
-                    else {
-                        //토큰 유효성 체크 성공(필요 시 토큰 갱신됨)
-                        UserApiClient.instance.me { user, error ->
-                            if(user!=null){
-                                _email.value = user.kakaoAccount?.email ?: ""
-                                _unqId.value = user.id.toString()
-                                _nickName.value = user.kakaoAccount?.profile?.nickname ?: ""
-
-                                continuation.resume("기존")
-                            }
-                        }
-                    }
-                }
-
-            }else{
-                kakaoNew(context,continuation, "신규")
-            }
-
-    }
-
-    fun kakaoNew(context: Context, continuation: Continuation<String>, newOr: String){
+    suspend fun kakaoLogin(context: Context):Boolean=
+        suspendCancellableCoroutine{ continuation ->
         // 카카오 계정으로 로그인을 위한 콜백
         val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) {
                 Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show()
-                continuation.resume("실패")
+                continuation.resume(false)
             } else if (token != null) {
                 Log.i(TAG, "카카오계정으로 로그인 성공 ${token.accessToken}")
 
@@ -224,7 +181,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                         _unqId.value = user.id.toString()
                         _nickName.value = user.kakaoAccount?.profile?.nickname ?: ""
 
-                        continuation.resume(newOr)
+                        continuation.resume(true)
                     }
                 }
             }
@@ -253,7 +210,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                             _unqId.value = user.id.toString()
                             _nickName.value = user.kakaoAccount?.profile?.nickname ?: ""
 
-                            continuation.resume(newOr)
+                            continuation.resume(true)
                         }
                     }
                 }
@@ -305,6 +262,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             NaverIdLoginSDK.authenticate(context,oAuthLoginCallback)
+    }
+
+    suspend fun googleLogin(){
+
+
     }
 }
 

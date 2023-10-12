@@ -1,25 +1,12 @@
 package kr.carepet.app.navi.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.daily.WeekData
 import kr.carepet.data.pet.CurrentPetData
-import kr.carepet.data.pet.CurrentPetRes
-import kr.carepet.data.pet.MyPetListReq
-import kr.carepet.data.pet.MyPetListRes
 import kr.carepet.data.pet.PetDetailData
-import kr.carepet.singleton.MySharedPreference
-import kr.carepet.singleton.RetrofitClientServer
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import kotlin.coroutines.resume
 
 class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
 

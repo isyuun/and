@@ -49,7 +49,6 @@ import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
-import kr.carepet.data.MapRepository
 import kr.carepet.data.SCDLocalData
 
 class MainActivity : ComponentActivity() {
