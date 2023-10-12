@@ -192,6 +192,8 @@ class SharedViewModel:ViewModel(){
                                 continuation.resume(false)
                             }
                         }
+                    }else{
+                        continuation.resume(false)
                     }
                 }
 
