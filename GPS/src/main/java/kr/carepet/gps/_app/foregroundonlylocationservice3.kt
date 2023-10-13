@@ -148,12 +148,12 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
     }
 
     private fun img(path: String) {
-        if (imgs.size > 0 && imgs.contains(path)) return
-        imgs.add(path)
+        if (_imgs.size > 0 && _imgs.contains(path)) return
+        _imgs.add(path)
         val loc = currentLocation
-        val img = if (imgs.size > 0) imgs.size - 1 else -1
-        val trk = loc?.let { Track(it, id = this.id, img = img) }
-        Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${imgs.size}], ${imgs[img]}, $trk")
+        val img = if (_imgs.size > 0) _imgs.size - 1 else -1
+        val trk = loc?.let { Track(it, no = this.no, img = img) }
+        Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${_imgs.size}], ${_imgs[img]}, $trk")
         trk?.let { add(it) }
         dump()
     }
@@ -167,7 +167,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
             val file = File(path)
             val name = file.name
             val exists = file.exists()
-            val camera = exists && camera(uri) && !imgs.contains(path) && !name.startsWith(".")
+            val camera = exists && camera(uri) && !_imgs.contains(path) && !name.startsWith(".")
             if (camera) {
                 Log.i(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][$name]: path:$path, time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}")
                 img(path)
@@ -175,9 +175,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
         }
     }
 
-    private val imgs = Collections.synchronizedList(ArrayList<String>()) // The list of Tracks
-    override fun write(clear: Boolean) {
-        super.write(clear)
-        if (clear) imgs.clear()
-    }
+    private val _imgs = Collections.synchronizedList(ArrayList<String>()) // The list of Tracks
+    internal val imgs
+        get() = _imgs
 }

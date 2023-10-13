@@ -37,7 +37,7 @@ import androidx.activity.compose.setContent
 class MapActivity : kr.carepet.map.app.MapActivity() {
     override fun setContent() {
         setContent {
-            NaverMapApp()
+            MapApp()
         }
     }
 }

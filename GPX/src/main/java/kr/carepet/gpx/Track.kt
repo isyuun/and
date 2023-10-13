@@ -35,15 +35,26 @@ import android.net.Uri
  * @author      : isyuun@care-pet.kr
  * @description :
  */
+const val TRACK_ZERO_NO = "Pnnnnnnnnnnnnnn"
+const val TRACK_ZERO_IMG = -1
+const val TRACK_ZERO_PEE = 0
+const val TRACK_ZERO_POO = 0
+const val TRACK_ZERO_MRK = 0
+val TRACK_ZERO_URI = Uri.parse("")!!
+
 data class Track(
     private val loc: Location,
-    val id: String = "",
-    val img: Int = -1,
-    val pee: Int = 0,
-    val poo: Int = 0,
-    val mrk: Int = 0,
-    val uri: Uri? = null,
+    val no: String = TRACK_ZERO_NO,
+    val img: Int = TRACK_ZERO_IMG,
+    val pee: Int = TRACK_ZERO_PEE,
+    val poo: Int = TRACK_ZERO_POO,
+    val mrk: Int = TRACK_ZERO_MRK,
+    val uri: Uri = TRACK_ZERO_URI,
 ) {
+    companion object {
+
+    }
+
     fun toText(): String {
         return "($latitude, $longitude)"
     }
@@ -52,12 +63,12 @@ data class Track(
         nnn, img, pee, poo, mrk
     }
 
-    val event : EVENT
+    val event: EVENT
         get() {
-            return if (img > -1) EVENT.img
-            else if (pee > 0) EVENT.pee
-            else if (poo > 0) EVENT.poo
-            else if (mrk > 0) EVENT.mrk
+            return if (img > TRACK_ZERO_IMG) EVENT.img
+            else if (pee > TRACK_ZERO_PEE) EVENT.pee
+            else if (poo > TRACK_ZERO_POO) EVENT.poo
+            else if (mrk > TRACK_ZERO_MRK) EVENT.mrk
             else EVENT.nnn
         }
 
