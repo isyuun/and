@@ -51,6 +51,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -93,6 +94,7 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.pet.PetDetailData
+import kr.carepet.singleton.G
 
 @Composable
 fun PostScreen(viewModel:WalkViewModel, navController: NavHostController){
@@ -119,6 +121,9 @@ fun PostScreen(viewModel:WalkViewModel, navController: NavHostController){
         showDiagLog = true
     }
 
+    SideEffect {
+        G.toPost = false
+    }
 
     LaunchedEffect(key1 = state.listOfSelectedImages){
         if (state.listOfSelectedImages.size>6){

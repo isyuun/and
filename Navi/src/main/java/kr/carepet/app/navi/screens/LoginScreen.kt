@@ -467,6 +467,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel,sharedVi
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, userCreateViewModel: UserCreateViewModel){
 

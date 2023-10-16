@@ -582,7 +582,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
             )
 
             Text(
-                text = "",
+                text = petDetailData.sexTypNm?:"",
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                 color = design_skip,modifier = Modifier.alignByBaseline()
@@ -734,13 +734,24 @@ fun MyBottomSheet(
 
                         val sdfTime = SimpleDateFormat("HHmm")
                         val sdfDate = SimpleDateFormat("yyyyMMdd")
+                        val sdfCurrentDate = SimpleDateFormat("yyyyMMddHHmm")
 
                         val selectedTime = sdfTime.format(calendar.time)
                         val selectedDate = sdfDate.format(dateState.selectedDateMillis)
 
-                        val currentDate = sdfDate.format(Date().time)
+                        val currentDate = sdfCurrentDate.format(Date().time)
 
-                        Log.Companion.d("LOG",currentDate.toString()+selectedDate+selectedTime)
+                        if(currentDate > selectedDate+selectedTime){
+                            Toast.makeText(context, "이미 만료된 시간입니다", Toast.LENGTH_SHORT).show()
+                        }else{
+                            if (settingViewModel.updateSelectedPetSave(selectedPet)) {
+                                scope.launch {
+                                    if (settingViewModel.getInviteCode()){
+                                        openBottomSheet(false)
+                                        navController.navigate(Screen.InviteScreen.route)
+                                    } }
+                            }
+                        }
                     }
                 }else{
                     Toast.makeText(context, "펫을 선택해주세요", Toast.LENGTH_SHORT).show()

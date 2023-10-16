@@ -445,13 +445,7 @@ fun ProfileContent(
                     }
 
                     Text(
-                        text =  ""
-                        //if(currentPetInfo[pagerState.currentPage].sexTypNm == ""){
-                        //    "모름"
-                        //}else{
-                        //    currentPetInfo[pagerState.currentPage].sexTypNm
-                        //}
-                        ,
+                        text = currentPetInfo[pagerState.currentPage].sexTypNm ?: "",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
