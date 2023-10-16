@@ -104,7 +104,7 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
 
     // Provides location updates for while-in-use feature.
     private var foregroundOnlyLocationService: ForegroundOnlyLocationService? = null
-    val service
+    internal val service
         get() = foregroundOnlyLocationService
 
     // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver2.
@@ -157,9 +157,9 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     }
 
     var start = false
-        get() = ((foregroundOnlyLocationService?.start ?: 0L > 0L) && !(foregroundOnlyLocationService?.tracks?.isEmpty() ?: true))
+        get() = foregroundOnlyLocationService?.start ?: false
 
-    fun start() {
+    open fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()}, $foregroundOnlyLocationService")
         // TODO: Step 1.0, Review Permissions: Checks and requests if needed.
         if (foregroundPermissionApproved()) {
@@ -169,7 +169,7 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
         }
     }
 
-    fun stop() {
+    open fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()},${foregroundOnlyLocationService}")
         foregroundOnlyLocationService?.stop()
     }

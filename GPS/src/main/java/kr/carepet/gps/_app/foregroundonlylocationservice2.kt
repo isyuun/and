@@ -52,51 +52,38 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private fun paths(): String {
-        /* 내부저장소 */
-        // 캐시(Cache)
-        val fileCacheDir = cacheDir
-        val getCacheDir = fileCacheDir.path
-        Log.i(__CLASSNAME__, "${getMethodName()}$getCacheDir")
-        // 데이터베이스(Database)
-        val fileDataBase = getDatabasePath("...")
-        val getDatabasePath = fileDataBase.path
-        Log.i(__CLASSNAME__, "${getMethodName()}$getDatabasePath")
-        // 일반 파일
-        val fileFile = filesDir
-        val getFile = fileFile.path
-        Log.i(__CLASSNAME__, "${getMethodName()}$getFile")
-        // 일반 파일 폴더
-        val fileFileName = getFileStreamPath("...")
-        val getFileName = fileFileName.path
-        Log.i(__CLASSNAME__, "${getMethodName()}$getFileName")
-        /* 외부저장소 - 공용 영역 */
-        // 최상위 경로
-        val getDirectory = Environment.getExternalStorageDirectory().toString()
-        Log.i(__CLASSNAME__, "${getMethodName()}$getDirectory")
-        // 특정 데이터를 저장
-        val fileDowns = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val getDowns = fileDowns.path
-        Log.i(__CLASSNAME__, "${getMethodName()}$getDowns")
-        /* 외부저장소 - 어플리케이션 고유 영역 */
-        // 특정 데이터를 저장
-        val fileDowns2 = getExternalFilesDirs(Environment.DIRECTORY_DOWNLOADS)
-        val getDowns2 = fileDowns2[0].path
-        Log.i(__CLASSNAME__, "${getMethodName()}$getDowns2")
-        // 캐시 데이터를 저장
-        val getCache2 = externalCacheDir.toString()
-        Log.i(__CLASSNAME__, "${getMethodName()}$getCache2")
-        return getDowns
+        /** 내부저장소 */
+        ///* 캐시(Cache)*/
+        //val ret = cacheDir.path
+        ///* 데이터베이스(Database)*/
+        //val ret = getDatabasePath("...").path
+        ///* 일반 파일*/
+        //val ret = filesDir.path
+        ///* 일반 파일 폴더*/
+        //val ret = getFileStreamPath("...").path
+        /** 외부저장소 - 공용 영역 */
+        ///* 최상위 경로*/
+        //val ret = Environment.getExternalStorageDirectory().toString()
+        /* 특정 데이터를 저장*/
+        val ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
+        /** 외부저장소 - 어플리케이션 고유 영역 */
+        ///* 특정 데이터를 저장*/
+        //val ret = getExternalFilesDirs(Environment.DIRECTORY_DOWNLOADS)[0].path
+        ///* 캐시 데이터를 저장*/
+        //val ret = externalCacheDir.toString()
+        Log.w(__CLASSNAME__, "${getMethodName()}$ret")
+        return ret
     }
 
     override fun onCreate() {
-        Log.d(__CLASSNAME__, "${getMethodName()}$tracks")
+        Log.d(__CLASSNAME__, "${getMethodName()}$_tracks")
         super.onCreate()
         _tracks.clear()
         paths()
     }
 
     private val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
-    val tracks: MutableList<Track>
+    internal val tracks: MutableList<Track>
         get() = _tracks
 
     /** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-tracks-in-metre">Calculate distance between two tracks in metre</a> */
@@ -148,63 +135,62 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     protected fun dump() {
         Log.e(__CLASSNAME__, "${getMethodName()}...")
-        if (_start > 0) write(false)
+        write()
     }
 
-    protected open fun write(clear: Boolean) {
-        if (_tracks.size < 1) return
-        //val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    protected open fun write() {
+        if (_tracks.isEmpty()) return
         val time = _tracks.first()?.time
         val file = File("${paths()}/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
-        Log.w(__CLASSNAME__, "${getMethodName()}$clear, ${_tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this._start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
+        Log.w(__CLASSNAME__, "${getMethodName()}${_tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this._start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
         GPXWriter2.write(_tracks, file)
-        if (clear) _tracks.clear()
     }
 
-    private var _id = ""
-    internal var id: String
-        get() = this._id
-        set(id) {
-            this._id = id
+    private var _no = ""
+    internal var no: String
+        get() = this._no
+        set(no) {
+            this._no = no
         }
 
     internal fun pee() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = currentLocation?.let { Track(it, id = id, pee = 1) }
+        val track = currentLocation?.let { Track(it, no = no, pee = 1) }
         track?.let { add(it) }
         dump()
     }
 
     internal fun poo() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = currentLocation?.let { Track(it, id = id, poo = 1) }
+        val track = currentLocation?.let { Track(it, no = no, poo = 1) }
         track?.let { add(it) }
         dump()
     }
 
     internal fun mrk() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = currentLocation?.let { Track(it, id = id, mrk = 1) }
+        val track = currentLocation?.let { Track(it, no = no, mrk = 1) }
         track?.let { add(it) }
         dump()
     }
 
     private var _start = 0L
-    val start
-        get() = this._start
+    var start = false
+        get() = (_start > 0L) && _tracks.isNotEmpty()
 
     override fun start() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
+        _start = System.currentTimeMillis()
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start], ${currentLocation.toText()}, $currentLocation")
         super.start()
-        _start = System.currentTimeMillis() /*GPX_SIMPLE_TICK_FORMAT.format(Date(System.currentTimeMillis()))*/
+        _tracks.clear()
     }
 
     override fun stop() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${currentLocation.toText()}, $currentLocation")
-        super.stop()
-        if (_tracks.size > 0) write(true)
         _start = 0L
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start], ${currentLocation.toText()}, $currentLocation")
+        super.stop()
+        write()
     }
 
     val duration
