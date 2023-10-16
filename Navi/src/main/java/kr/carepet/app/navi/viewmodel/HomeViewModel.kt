@@ -1,5 +1,6 @@
 package kr.carepet.app.navi.viewmodel
 
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,20 +35,35 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.TextButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
+import androidx.compose.material3.TimePickerState
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -65,6 +81,8 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -78,6 +96,7 @@ import kr.carepet.app.navi.ui.theme.design_DDDDDD
 import kr.carepet.app.navi.ui.theme.design_EFECFE
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
+import kr.carepet.app.navi.ui.theme.design_intro_bg
 import kr.carepet.app.navi.ui.theme.design_login_bg
 import kr.carepet.app.navi.ui.theme.design_login_text
 import kr.carepet.app.navi.ui.theme.design_select_btn_bg
@@ -90,6 +109,10 @@ import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
+import kr.carepet.util.Log
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -115,7 +138,15 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
 
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
 
+    val timePickerState = rememberTimePickerState()
+    val datePickerState = rememberDatePickerState()
+    val snackState = remember { SnackbarHostState() }
+    SnackbarHost(hostState = snackState, Modifier)
+    var openDialog by remember { mutableStateOf(false) }
+    var openTimePicker by remember { mutableStateOf(false) }
+
     Scaffold (
+        snackbarHost = {SnackbarHost(hostState = snackState, Modifier)}
     ){ paddingValues ->
         Column (
             modifier= Modifier
@@ -124,6 +155,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                 .background(design_white)
                 .verticalScroll(rememberScrollState())
         ){
+
             Row (
                 modifier = Modifier
                     .background(color = design_login_bg)
@@ -342,14 +374,76 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                     MyBottomSheet(
                         sharedViewModel = sharedViewModel,
                         settingViewModel = viewModel,
-                        navController = navController
-                    ) { newValue -> openBottomSheet = newValue }
+                        navController = navController,
+                        openDatePicker = {newValue -> openDialog = newValue},
+                        openBottomSheet = { newValue -> openBottomSheet = newValue },
+                        dateState = datePickerState,
+                        timeState = timePickerState
+                    )
                     Spacer(modifier = Modifier
                         .height(navigationBarHeight)
                         .fillMaxWidth()
                         .background(color = design_white))
                 }
             }
+        }
+
+        if (openDialog) {
+            val confirmEnabled = remember{derivedStateOf { datePickerState.selectedDateMillis != null }}
+            DatePickerDialog(
+                onDismissRequest = {
+                    // Dismiss the dialog when the user clicks outside the dialog or on the back
+                    // button. If you want to disable that functionality, simply use an empty
+                    // onDismissRequest.
+                    openDialog = false
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            val sdfDate = SimpleDateFormat("yyyyMMdd")
+                            val date =  sdfDate.format(Date(datePickerState.selectedDateMillis?:0))
+
+                            viewModel.updateSelectedDate(date)
+                            openDialog = false
+                            openTimePicker = true
+                        },
+                        enabled = confirmEnabled.value
+                    ) {
+                        Text(text = "OK", color = design_intro_bg)
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            openDialog = false
+                        }
+                    ) {
+                        Text(text = "Cancel", color = design_intro_bg)
+                    }
+                },
+                colors = DatePickerDefaults.colors(
+                    containerColor = design_white
+
+                )
+            ) {
+                DatePicker(
+                    state = datePickerState,
+                    colors = DatePickerDefaults.colors(
+                        selectedDayContainerColor = design_intro_bg,
+                        selectedDayContentColor = design_white,
+                        todayDateBorderColor = design_intro_bg,
+                        todayContentColor = design_intro_bg
+                    )
+                )
+            }
+        }
+
+        if (openTimePicker){
+            TimePickerDialog(
+                onCancel = { newValue -> openTimePicker =newValue},
+                state = timePickerState,
+                onConfirm = {newValue -> viewModel.updateSelectedTime(newValue)}
+            )
         }
     }
 }
@@ -488,7 +582,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
             )
 
             Text(
-                text = petDetailData.sexTypNm,
+                text = "",
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                 color = design_skip,modifier = Modifier.alignByBaseline()
@@ -505,12 +599,16 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
     }//col
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyBottomSheet(
     sharedViewModel: SharedViewModel,
     settingViewModel: SettingViewModel,
     navController: NavHostController,
-    openBottomSheet: (Boolean) -> Unit
+    openBottomSheet: (Boolean) -> Unit,
+    openDatePicker: (Boolean) -> Unit,
+    dateState: DatePickerState,
+    timeState: TimePickerState
 ){
 
     val petList by sharedViewModel.petInfo.collectAsState()
@@ -521,6 +619,9 @@ fun MyBottomSheet(
     val context = LocalContext.current
 
     val scope = rememberCoroutineScope()
+
+    val sdfDate = SimpleDateFormat("yyyy.MM.dd")
+    val formattedDate = sdfDate.format(Date(dateState.selectedDateMillis?:Date().time))
 
     LaunchedEffect(Unit){
         selectedPet.clear()
@@ -585,7 +686,8 @@ fun MyBottomSheet(
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
-                        .background(color = design_select_btn_bg),
+                        .background(color = design_select_btn_bg)
+                        .clickable { openDatePicker(true) },
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Icon(painter = painterResource(id = R.drawable.input_calendar),
@@ -600,7 +702,7 @@ fun MyBottomSheet(
                     )
 
                     Text(
-                        text = "2023.11.12 13:00",
+                        text = "${formattedDate}  ${if(timeState.hour<10) "0"+timeState.hour else timeState.hour}:${if(timeState.minute<10) "0"+timeState.minute else timeState.minute}",
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                         color = design_login_text, modifier = Modifier.padding(start = 12.dp)
@@ -617,12 +719,28 @@ fun MyBottomSheet(
         Button(
             onClick = {
                 if (selectedPet.isNotEmpty()){
-                    if (settingViewModel.updateSelectedPetSave(selectedPet)) {
-                        scope.launch {
-                            if (settingViewModel.getInviteCode()){
-                                openBottomSheet(false)
-                                navController.navigate(Screen.InviteScreen.route)
-                        } }
+                    if (!endCheck){
+                        if (settingViewModel.updateSelectedPetSave(selectedPet)) {
+                            scope.launch {
+                                if (settingViewModel.getInviteCode()){
+                                    openBottomSheet(false)
+                                    navController.navigate(Screen.InviteScreen.route)
+                                } }
+                        }
+                    }else{
+                        val calendar = Calendar.getInstance()
+                        calendar.set(Calendar.HOUR_OF_DAY, timeState.hour)
+                        calendar.set(Calendar.MINUTE, timeState.minute)
+
+                        val sdfTime = SimpleDateFormat("HHmm")
+                        val sdfDate = SimpleDateFormat("yyyyMMdd")
+
+                        val selectedTime = sdfTime.format(calendar.time)
+                        val selectedDate = sdfDate.format(dateState.selectedDateMillis)
+
+                        val currentDate = sdfDate.format(Date().time)
+
+                        Log.Companion.d("LOG",currentDate.toString()+selectedDate+selectedTime)
                     }
                 }else{
                     Toast.makeText(context, "펫을 선택해주세요", Toast.LENGTH_SHORT).show()
@@ -732,6 +850,100 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
                 letterSpacing = (-0.8).sp,
                 color = design_login_text
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimePickerDialog(
+    title: String = "시간 선택",
+    onCancel: (Boolean) -> Unit,
+    onConfirm: (String) -> Unit,
+    toggle: @Composable () -> Unit = {},
+    state: TimePickerState
+) {
+    Dialog(
+        onDismissRequest = {onCancel(false)},
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        ),
+    ) {
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            tonalElevation = 6.dp,
+            modifier = Modifier
+                .width(IntrinsicSize.Min)
+                .height(IntrinsicSize.Min)
+                .background(
+                    shape = RoundedCornerShape(20.dp),
+                    color = design_white
+                ),
+            color = design_white
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp),
+                    text = title,
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    fontSize = 16.sp, letterSpacing = (-0.8).sp
+                )
+                TimePicker(
+                    state = state,
+                    colors = TimePickerDefaults.colors(
+                        containerColor = design_white,
+                        timeSelectorSelectedContainerColor = design_intro_bg,
+                        timeSelectorSelectedContentColor = design_white,
+                        selectorColor = design_intro_bg,
+                        clockDialColor = design_textFieldOutLine,
+                        timeSelectorUnselectedContainerColor = design_textFieldOutLine,
+                        timeSelectorUnselectedContentColor = design_login_text,
+                        periodSelectorSelectedContainerColor = design_intro_bg,
+                        periodSelectorSelectedContentColor = design_white
+                    )
+                )
+                Row(
+                    modifier = Modifier
+                        .height(40.dp)
+                        .fillMaxWidth()
+                ) {
+                    toggle()
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(
+                        onClick = {onCancel(false)}
+                    ) {
+                        Text(
+                            text = "Cancel",
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 16.sp
+                        )
+                    }
+                    TextButton(
+                        onClick = {
+                            val calendar = Calendar.getInstance()
+                            calendar.set(Calendar.HOUR_OF_DAY, state.hour)
+                            calendar.set(Calendar.MINUTE, state.minute)
+
+                            val sdfTime = SimpleDateFormat("HHmm")
+                            val time = sdfTime.format(calendar.time)
+
+                            onConfirm(time)
+                            onCancel(false)
+                        }
+                    ) {
+                        Text(
+                            text = "Ok",
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            }
         }
     }
 }

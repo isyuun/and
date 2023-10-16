@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -45,8 +46,11 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kr.carepet.app.navi.R
+import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.screens.mainscreen.CircleImage
+import kr.carepet.app.navi.ui.theme.design_999999
+import kr.carepet.app.navi.ui.theme.design_DDDDDD
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_icon_bg
@@ -55,19 +59,21 @@ import kr.carepet.app.navi.ui.theme.design_login_bg
 import kr.carepet.app.navi.ui.theme.design_login_text
 import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_white
+import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
+import kr.carepet.data.pet.Member
 
 @Composable
-fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedViewModel, index: String?){
+fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedViewModel, settingViewModel: SettingViewModel,index: String?){
 
     val petInfo by sharedViewModel.petInfo.collectAsState()
     val index = index?.toInt() ?: 0
-    
-    val list = arrayListOf(
-        dummy("YJ22",true),
-        dummy("포챠코엄마",false),
-        dummy("펫시터",false)
-    )
+
+    val memberList by settingViewModel.memberList.collectAsState()
+
+    LaunchedEffect(Unit){
+        settingViewModel.getPetInfoDetail(petInfo[index])
+    }
 
     Scaffold (
         topBar = { BackTopBar(title = "${petInfo[index].petNm} 프로필", navController = navController) }
@@ -141,7 +147,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 }
 
                 Text(
-                    text = petInfo[index].sexTypNm,
+                    text = petInfo[index].sexTypNm?:"",
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
@@ -175,12 +181,13 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Button(
-                onClick = {  },
+                onClick = { navController.navigate(Screen.ModifyPetInfoScreen.route) },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = design_white
                 ),
                 border = BorderStroke(width = 1.dp, color = design_btn_border),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp, pressedElevation = 0.dp),
                 contentPadding = PaddingValues(0.dp),
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
@@ -212,13 +219,15 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
                 Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
-                LazyColumn(
-                    state = rememberLazyListState(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.heightIn(max = 300.dp)
-                ){
-                    items(list){ item ->
-                        GroupItem(item = item)
+                if (memberList.isNotEmpty()){
+                    LazyColumn(
+                        state = rememberLazyListState(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.heightIn(max = 300.dp)
+                    ){
+                        items(memberList){ item ->
+                            GroupItem(item = item)
+                        }
                     }
                 }
 
@@ -229,7 +238,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 }
 
 @Composable
-fun GroupItem(item:dummy){
+fun GroupItem(item:Member){
     Row (
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -253,7 +262,7 @@ fun GroupItem(item:dummy){
                 contentScale = ContentScale.Crop
             )
 
-            if (item.yn){
+            if (item.mngrType=="M"){
                 Box(modifier = Modifier
                     .size(12.dp)
                     .clip(shape = RoundedCornerShape(4.dp))
@@ -269,7 +278,7 @@ fun GroupItem(item:dummy){
         }
         
         Text(
-            text = item.name,
+            text = item.nckNm,
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp, letterSpacing = (-0.8).sp,
             color = design_login_text,
@@ -278,44 +287,50 @@ fun GroupItem(item:dummy){
 
         Box (
             modifier= Modifier
-                .width(60.dp)
-                .height(20.dp)
+                .padding(end = 12.dp)
                 .border(
-                    width = if (item.yn) {
-                        0.dp
-                    } else {
-                        1.dp
+                    when (item.mngrType) {
+                        "M" -> 0.dp
+                        "I" -> 1.dp
+                        "C" -> 0.dp
+                        else -> 0.dp
                     },
                     color = design_btn_border,
                     shape = RoundedCornerShape(10.dp)
                 )
                 .background(
-                    color = if (item.yn) {
-                        design_button_bg
-                    } else {
-                        design_white
-                    }, shape = RoundedCornerShape(10.dp)
+                    color =
+                    when (item.mngrType) {
+                        "M" -> design_button_bg
+                        "I" -> design_white
+                        "C" -> design_DDDDDD
+                        else -> design_DDDDDD
+                    },
+                    shape = RoundedCornerShape(10.dp)
                 ),
             contentAlignment = Alignment.Center
         ){
             Text(
-                text = if (item.yn){
-                    "관리자"
-                }else{
-                    "동참중단"
+                text =
+                when(item.mngrType){
+                    "M" -> "관리중"
+                    "I" -> "참여중"
+                    "C" -> "동참중단"
+                    else -> "에러"
                 },
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 12.sp,
                 letterSpacing = (-0.6).sp,
-                color = if(item.yn){
-                    design_white
-                }else{
-                    design_login_text
+                color =
+                when(item.mngrType){
+                    "M" -> design_white
+                    "I" -> design_btn_border
+                    "C" -> design_999999
+                    else -> design_DDDDDD
                 },
-                modifier = Modifier.offset(y = (-3).dp)
+                modifier = Modifier.padding(horizontal = 9.dp, vertical = 2.dp)
             )
         }
     }// row
 }
 
-data class dummy(val name:String, val yn:Boolean)

@@ -123,6 +123,7 @@ import kr.carepet.app.navi.ui.theme.design_shadow
 import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
+import kr.carepet.app.navi.viewmodel.LoginViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
 import kr.carepet.data.SCD
 import kr.carepet.data.SggList
@@ -135,7 +136,8 @@ import java.util.Calendar
 fun PetCreateScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: UserCreateViewModel
+    viewModel: UserCreateViewModel,
+    loginViewModel: LoginViewModel
 ){
 
     val scdList by remember { mutableStateOf(viewModel.scdList) }
@@ -181,6 +183,10 @@ fun PetCreateScreen(
 
     val address by viewModel.address.collectAsState()
 
+    val userId by viewModel.userID.collectAsState()
+    val userPw by viewModel.userPW.collectAsState()
+    val snsLogin by viewModel.snsLogin.collectAsState()
+
     Log.d("LOG","petCreate composing")
 
     Scaffold (
@@ -209,7 +215,8 @@ fun PetCreateScreen(
                                 scope.launch {
                                     val userCreateSuccess = viewModel.sendUserToServer()
                                     if (userCreateSuccess) {
-                                        val loginSuccess = viewModel.login()
+                                        val loginSuccess =
+                                            loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)
                                         if (loginSuccess) {
                                             navController.navigate(Screen.MainScreen.route) {
                                                 popUpTo(0)
@@ -827,7 +834,7 @@ fun PetCreateScreen(
                             }else{ // 회원가입시에 하는거면 가입, 로그인, 펫 생성까지
                                 val userCreateSuccess = viewModel.sendUserToServer()
                                 if (userCreateSuccess){
-                                    val loginSuccess = viewModel.login()
+                                    val loginSuccess = loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)
                                     if (loginSuccess){
                                         val petCreateSuccess = viewModel.createPet()
                                         if(petCreateSuccess){
@@ -1490,16 +1497,6 @@ fun rememberPickerState() = remember { PickerState() }
 
 class PickerState {
     var selectedItem by mutableStateOf("")
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PetScreenPreview(){
-    val navController = rememberNavController()
-
-    val scdLocalData = kr.carepet.data.SCDLocalData()
-    val userCreateViewModel = UserCreateViewModel(scdLocalData)
-    PetCreateScreen(navController = navController, viewModel = userCreateViewModel)
 }
 
 fun IntegrityCheck(viewModel: UserCreateViewModel,context: Context):Boolean{

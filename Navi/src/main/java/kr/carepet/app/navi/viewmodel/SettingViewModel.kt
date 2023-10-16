@@ -1,7 +1,6 @@
 package kr.carepet.app.navi.viewmodel
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,14 +12,23 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kr.carepet.data.cmm.commonRes
 import kr.carepet.data.pet.InviteCodeReq
 import kr.carepet.data.pet.InviteCodeRes
+import kr.carepet.data.pet.Member
 import kr.carepet.data.pet.Pet
 import kr.carepet.data.pet.PetDetailData
+import kr.carepet.data.pet.PetDetailReq
+import kr.carepet.data.pet.PetDetailRes
 import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.LogoutRes
+import kr.carepet.data.user.NickNameCheckRes
+import kr.carepet.data.user.ResetNickNameReq
+import kr.carepet.data.user.ResetPwReq
 import kr.carepet.singleton.G
+import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
+import kr.carepet.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -82,8 +90,22 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     private val _setInviteCode6 = MutableStateFlow("") // Data 저장
     val setInviteCode6: StateFlow<String> = _setInviteCode6.asStateFlow() // state 노출
     fun updateSetInviteCode6(newValue: String) { _setInviteCode6.value = newValue }
+
+    private val _selectedDate = MutableStateFlow("") // Data 저장
+    val selectedDate: StateFlow<String> = _selectedDate.asStateFlow() // state 노출
+    fun updateSelectedDate(newValue: String) { _selectedDate.value = newValue }
+
+    private val _selectedTime = MutableStateFlow("") // Data 저장
+    val selectedTime: StateFlow<String> = _selectedTime.asStateFlow() // state 노출
+    fun updateSelectedTime(newValue: String) { _selectedTime.value = newValue }
     // -------------------My Screen--------------------------
 
+    // -------------------PetInfo Screen---------------------
+
+    private val _memberList = MutableStateFlow<List<Member>>(emptyList()) // Data 저장
+    val memberList: StateFlow<List<Member>> = _memberList.asStateFlow() // state 노출
+
+    // -------------------PetInfo Screen---------------------
 
     // -----------------Setting Screen------------------------
     val inquiryKindList = arrayListOf(
@@ -144,13 +166,9 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     // -----------------Setting Screen------------------------
 
     // -----------------UserInfo Screen------------------------
-    private val _userName = MutableStateFlow("케어펫") // Data 저장
-    val userName: StateFlow<String> = _userName.asStateFlow() // state 노출
-    fun updateUserName(newValue: String) { _userName.value = newValue }
-
-    private val _userNickName = MutableStateFlow(G.userNickName) // Data 저장
-    val userNickName: StateFlow<String> = _userNickName.asStateFlow() // state 노출
-    fun updateUserNickName(newValue: String) { _userNickName.value = newValue }
+    private val _userNickNamePass = MutableStateFlow("") // Data 저장
+    val userNickNamePass: StateFlow<String> = _userNickNamePass.asStateFlow() // state 노출
+    fun updateUserNickNamePass(newValue: String) { _userNickNamePass.value = newValue }
 
     private val _userPhoneNum = MutableStateFlow("01012345678") // Data 저장
     val userPhoneNum: StateFlow<String> = _userPhoneNum.asStateFlow() // state 노출
@@ -177,14 +195,46 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                         val body = response.body()
                         body?.let {
                             if (body.statusCode==200){
-                                Log.d("LOG", "로그아웃 성공")
-                                kr.carepet.singleton.MySharedPreference.setIsLogin(false)
+                                sharedViewModel.clear()
+                                MySharedPreference.setIsLogin(false)
                                 continuation.resume(true)
+                            }else{
+                                continuation.resume(false)
                             }
                         }
                     }
                 }
                 override fun onFailure(call: Call<LogoutRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun withdraw():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.withdraw()
+        return suspendCancellableCoroutine {  continuation ->
+            call.enqueue(object : Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if(response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (body.statusCode == 200){
+                                sharedViewModel.clear()
+                                MySharedPreference.setIsLogin(false)
+                                continuation.resume(true)
+                            }else{
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
                     continuation.resume(false)
                 }
 
@@ -216,7 +266,13 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
             )
         }
 
-        val data = InviteCodeReq(pet = petList, getCurrentDateTime(), "202510101010")
+        val relEndDt = if (_endCheck.value){
+            _selectedDate.value+_selectedTime.value
+        }else{
+            "299912311159"
+        }
+
+        val data = InviteCodeReq(pet = petList, getDateTime(Date()), relEndDt)
 
         val call = apiService.getInviteCode(data)
         return suspendCancellableCoroutine { continuation ->
@@ -283,20 +339,140 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
 
     }
 
-    //
-    //suspend fun resetPw():Boolean{
-    //    val apiService = RetrofitClientServer.instance
-    //
-    //    val data =
-    //}
+    suspend fun nickNameCheck(nickName : String):Boolean{
+        val apiService = RetrofitClientServer.instance
 
+        val call = apiService.nickNameCheck(nickName)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<NickNameCheckRes>{
+                override fun onResponse(
+                    call: Call<NickNameCheckRes>,
+                    response: Response<NickNameCheckRes>
+                ) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        if (body?.statusCode == 200){
+                            continuation.resume(true)
+                        }else{
+                            continuation.resume(false)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<NickNameCheckRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun resetNickName():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = ResetNickNameReq(_userNickNamePass.value, G.userId)
+
+        val call = apiService.resetNickName(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object :Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if(response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (body.statusCode == 200){
+                                G.userNickName = _userNickNamePass.value
+                                continuation.resume(true)
+                            }else{
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun resetPw():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = ResetPwReq(G.userEmail, _userPw.value)
+
+        val call = apiService.resetPw(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object :Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (body.statusCode == 200){
+                                continuation.resume(true)
+                            }else{
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun getPetInfoDetail(petDetailData: PetDetailData):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = PetDetailReq(
+            ownrPetUnqNo = petDetailData.ownrPetUnqNo,
+            petRprsYn = petDetailData.petRprsYn,
+            userId = G.userId
+        )
+
+        val call = apiService.myPetDetail(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<PetDetailRes>{
+                override fun onResponse(
+                    call: Call<PetDetailRes>,
+                    response: Response<PetDetailRes>
+                ) {
+                    if(response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _memberList.value = body.petDetailData.memberList
+                        }
+
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<PetDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+
+        }
+    }
 
 }
 
-fun getCurrentDateTime(): String {
+fun getDateTime(date: Date): String {
     val dateFormat = SimpleDateFormat("yyyyMMddHHmm", Locale.getDefault())
-    val currentTime = Date()
-    return dateFormat.format(currentTime)
+    return dateFormat.format(date)
 }
 data class InquiryKindList(val kind:String)
 

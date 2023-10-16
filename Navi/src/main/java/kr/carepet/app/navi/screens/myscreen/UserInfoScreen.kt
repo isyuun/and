@@ -1,10 +1,12 @@
 package kr.carepet.app.navi.screens.myscreen
 
-import android.widget.Toast
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,26 +24,33 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
+import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CustomTextField
-import kr.carepet.app.navi.ui.theme.design_999999
-import kr.carepet.app.navi.ui.theme.design_EEEEEE
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_login_text
 import kr.carepet.app.navi.ui.theme.design_placeHolder
@@ -48,21 +58,29 @@ import kr.carepet.app.navi.ui.theme.design_sharp
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
+import kr.carepet.singleton.G
+import kr.carepet.singleton.MySharedPreference
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingViewModel){
 
-    val userName by settingViewModel.userName.collectAsState()
-    val userNickName by settingViewModel.userNickName.collectAsState()
     val userPhoneNum by settingViewModel.userPhoneNum.collectAsState()
     val userPw by settingViewModel.userPw.collectAsState()
     val userPwCheck by settingViewModel.userPwCheck.collectAsState()
+    var nickName by remember { mutableStateOf(G.userNickName) }
+    val passedNick by settingViewModel.userNickNamePass.collectAsState()
 
+    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
+
+
 
     Scaffold (
-        topBar = { BackTopBar(title = "개인 정보 수정", navController = navController) }
+        topBar = { BackTopBar(title = "개인 정보 수정", navController = navController) },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         Column (
             modifier = Modifier
@@ -71,32 +89,6 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 .background(design_white)
         ){
             Spacer(modifier = Modifier.padding(top = 20.dp))
-
-            Text(text = "이름", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier=Modifier.padding(start = 20.dp), color = design_login_text
-            )
-            Box (
-                modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp, top = 8.dp)
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .background(color = design_EEEEEE, shape = RoundedCornerShape(4.dp))
-                    .clip(RoundedCornerShape(4.dp))
-                    .border(
-                        width = 1.dp,
-                        color = design_textFieldOutLine,
-                        shape = RoundedCornerShape(4.dp)
-                    ),
-                contentAlignment = Alignment.CenterStart
-            ){
-                Text(text = userName,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                    color = design_999999, modifier = Modifier.padding(start = 16.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.padding(top = 16.dp))
             
             Row (Modifier.fillMaxWidth()){
                 Text(text = "닉네임", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
@@ -109,8 +101,8 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 )
             }
             CustomTextField(
-                value = userNickName,
-                onValueChange = {settingViewModel.updateUserNickName(it)},
+                value = nickName,
+                onValueChange = { nickName = it},
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -128,7 +120,55 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     unfocusedContainerColor = design_white,
                     focusedContainerColor = design_white),
                 shape = RoundedCornerShape(4.dp),
-                innerPadding = PaddingValues(start=16.dp)
+                innerPadding = PaddingValues(start=16.dp),
+                trailingIcon = {
+                    AnimatedVisibility(
+                        visible = nickName.isNotEmpty(),
+                        enter = scaleIn(),
+                        exit = scaleOut()
+                    ) {
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    val result = settingViewModel.nickNameCheck(nickName)
+                                    if (result){
+                                        settingViewModel.updateUserNickNamePass(nickName)
+                                        focusManager.clearFocus()
+                                        snackbarHostState.showSnackbar(
+                                            message = "사용하실 수 있는 닉네임입니다",
+                                            actionLabel = "확인",
+                                            duration = SnackbarDuration.Short,
+                                            withDismissAction = true
+                                        )
+                                    }else{
+                                        focusManager.clearFocus()
+                                        snackbarHostState.showSnackbar(
+                                            message = "이미 사용중인 닉네임입니다",
+                                            actionLabel = "확인",
+                                            duration = SnackbarDuration.Short,
+                                            withDismissAction = true
+                                        )
+                                    }
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = design_white),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 0.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            border = BorderStroke(1.dp, color = design_login_text),
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(60.dp, 32.dp),
+                            contentPadding = PaddingValues(horizontal = 0.dp)
+                        ) {
+                            Text(
+                                text = "중복확인",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 12.sp, letterSpacing = (-0.6).sp,
+                                color = design_login_text
+                            )
+                        }
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
@@ -176,8 +216,9 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 onValueChange = {settingViewModel.updateUserPw(it)},
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next),
+                visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                     .fillMaxWidth()
@@ -199,8 +240,9 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 onValueChange = {settingViewModel.updateUserPwCheck(it)},
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next),
+                visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                     .fillMaxWidth()
@@ -219,15 +261,63 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
             Button(
                 onClick = {
-                          if (userPw==""){
-                              Toast.makeText(context, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
-                          }else{
-                              if (userPw==userPwCheck){
+                    scope.launch {
+                        if (G.userNickName == nickName){
+                            Log.d("userInfo","변경안함")
+                        }else if( nickName != passedNick ){
+                            snackbarHostState.showSnackbar(
+                                message = "닉네임 중복확인을 해주세요",
+                                actionLabel = "확인",
+                                duration = SnackbarDuration.Short,
+                                withDismissAction = true
+                            )
+                        }else if (nickName == passedNick){
+                            val result = settingViewModel.resetNickName()
+                            if (result){
+                                snackbarHostState.showSnackbar(
+                                    message = "닉네임을 변경했습니다",
+                                    actionLabel = "확인",
+                                    duration = SnackbarDuration.Short,
+                                    withDismissAction = true
+                                )
+                            }else{
+                                snackbarHostState.showSnackbar(
+                                    message = "닉네임 변경에 실패했습니다",
+                                    actionLabel = "확인",
+                                    duration = SnackbarDuration.Short,
+                                    withDismissAction = true
+                                )
+                            }
+                        }
 
-                              }else{
-                                  Toast.makeText(context, "비밀번호가 일치하지 않습니다", Toast.LENGTH_SHORT).show()
-                              }
-                          }
+                        if (userPw == ""){
+                            Log.d("userInfo","변경x")
+                        }else if( userPw != userPwCheck){
+                            snackbarHostState.showSnackbar(
+                                message = "비밀번호가 일치하지 않습니다",
+                                actionLabel = "확인",
+                                duration = SnackbarDuration.Short,
+                                withDismissAction = true
+                            )
+                        }else if (userPw == userPwCheck){
+                            val result = settingViewModel.resetPw()
+                            if (result){
+                                snackbarHostState.showSnackbar(
+                                    message = "비밀번호가 변경되었습니다",
+                                    actionLabel = "확인",
+                                    duration = SnackbarDuration.Short,
+                                    withDismissAction = true
+                                )
+                            }else{
+                                snackbarHostState.showSnackbar(
+                                    message = "비밀번호변경에 실패했습니다",
+                                    actionLabel = "확인",
+                                    duration = SnackbarDuration.Short,
+                                    withDismissAction = true
+                                )
+                            }
+                        }
+                    }
                 },
                 modifier = Modifier
                     .padding(top = 16.dp)
@@ -250,7 +340,44 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 horizontalArrangement = Arrangement.End
             ){
                 Button(
-                    onClick = {},
+                    onClick = {
+                              scope.launch {
+                                  val result = settingViewModel.withdraw()
+                                  if (result){
+
+                                      G.userEmail = ""
+                                      G.userId = ""
+                                      G.refreshToken = ""
+                                      G.accessToken = ""
+
+                                      MySharedPreference.setUserId("")
+                                      MySharedPreference.setRefreshToken("")
+                                      MySharedPreference.setAccessToken("")
+                                      MySharedPreference.setLastLoginMethod("")
+                                      MySharedPreference.setIsLogin(false)
+
+                                      snackbarHostState.showSnackbar(
+                                          message = "회원탈퇴를 완료했습니다",
+                                          actionLabel = "확인",
+                                          duration = SnackbarDuration.Short,
+                                          withDismissAction = true
+                                      )
+
+                                      navController.navigate(Screen.Login.route){
+                                          popUpTo(0)
+                                      }
+
+
+                                  }else{
+                                      snackbarHostState.showSnackbar(
+                                          message = "회원탈퇴를 실패해습니다",
+                                          actionLabel = "확인",
+                                          duration = SnackbarDuration.Short,
+                                          withDismissAction = true
+                                      )
+                                  }
+                              }
+                    },
                     modifier = Modifier
                         .padding(end = 20.dp)
                         .height(30.dp)

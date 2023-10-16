@@ -88,19 +88,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     fun updateMarketingCheck(newValue: Boolean) { _marketingCheck.value = newValue }
 
 
-
-    val loginSuccess = MutableStateFlow<Boolean>(false)
-    fun updateLoginSuccess(newValue: Boolean){
-        loginSuccess.value = newValue
-    }
-
-    fun login(userId: String, userPw: String, loginMethod: String) {
-        viewModelScope.launch {
-            // 결과물을 날리기
-            loginSuccess.emit(onLoginButtonClick(userId, userPw, loginMethod))
-        }
-    }
-
     // 이메일 로그인
     suspend fun onLoginButtonClick(userId: String, userPw: String, loginMethod: String): Boolean {
         if (userId.isNotEmpty() && userPw.isNotEmpty()) {
@@ -139,12 +126,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
                                     continuation.resume(true)
                                 } else {
-                                    Log.d("onlogin","else")
                                     continuation.resume(false)
                                 }
                             }
                         }else{
-                            Log.d("onlogin","response 실패")
                             continuation.resume(false)
                         }
                     }
@@ -156,7 +141,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 })
             }
         } else {
-            Log.d("LOG", "공란이라고??")
             return false
         }
     }

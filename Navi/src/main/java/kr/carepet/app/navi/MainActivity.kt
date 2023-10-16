@@ -35,6 +35,7 @@ import kr.carepet.app.navi.screens.mainscreen.WalkWithMap
 import kr.carepet.app.navi.screens.myscreen.AddPetScreen
 import kr.carepet.app.navi.screens.myscreen.InquiryDetail
 import kr.carepet.app.navi.screens.myscreen.InviteScreen
+import kr.carepet.app.navi.screens.myscreen.ModifyPetInfoScreen
 import kr.carepet.app.navi.screens.myscreen.NotiDetail
 import kr.carepet.app.navi.screens.myscreen.OneNOneScreen
 import kr.carepet.app.navi.screens.myscreen.PetProfileScreen
@@ -94,7 +95,7 @@ fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
             IntroScreen(navController = navController, viewModel = sharedViewModel, loginViewModel = viewModel)
         }
         composable("login"){
-            LoginScreen(navController = navController, viewModel)
+            LoginScreen(navController = navController, viewModel, sharedViewModel)
         }
         composable("idFindScreen"){
 
@@ -114,7 +115,7 @@ fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
         }
         composable("petCreateScreen"){
 
-            PetCreateScreen(navController = navController, viewModel = userCreateViewModel)
+            PetCreateScreen(navController = navController, viewModel = userCreateViewModel, loginViewModel = viewModel)
         }
         composable("petKindContent"){
 
@@ -174,7 +175,7 @@ fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
             UserInfoScreen(navController = navController, settingViewModel = settingViewModel)
         }
         composable("petProfileScreen/{index}"){ backStackEntry ->
-            PetProfileScreen(navController = navController, sharedViewModel = sharedViewModel, backStackEntry.arguments?.getString("index"))
+            PetProfileScreen(navController = navController, sharedViewModel = sharedViewModel, settingViewModel,backStackEntry.arguments?.getString("index"))
         }
         composable("inviteScreen"){
             InviteScreen(navController = navController, settingViewModel = settingViewModel)
@@ -184,6 +185,9 @@ fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
         }
         composable("addPetScreen"){
             AddPetScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)
+        }
+        composable("modifyPetInfoScreen"){
+            ModifyPetInfoScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)
         }
     }
 }
@@ -213,6 +217,7 @@ sealed class Screen(val route: String) {
     object InviteScreen : Screen("inviteScreen")
     object SetKeyScreen : Screen("setKeyScreen")
     object AddPetScreen : Screen("addPetScreen")
+    object ModifyPetInfoScreen : Screen("modifyPetInfoScreen")
     object PetProfileScreen : Screen("petProfileScreen/{index}")
 }
 

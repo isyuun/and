@@ -8,6 +8,7 @@ import kr.carepet.data.SggListRes
 import kr.carepet.data.UmdListReq
 import kr.carepet.data.UmdListRes
 import kr.carepet.data.cmm.NidUserInfoResponse
+import kr.carepet.data.cmm.commonRes
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
 import kr.carepet.data.daily.DailyDetailReq
@@ -25,6 +26,8 @@ import kr.carepet.data.pet.InviteCodeRes
 import kr.carepet.data.pet.MyPetListReq
 import kr.carepet.data.pet.MyPetListRes
 import kr.carepet.data.pet.MyPetResModel
+import kr.carepet.data.pet.PetDetailReq
+import kr.carepet.data.pet.PetDetailRes
 import kr.carepet.data.pet.PetListModel
 import kr.carepet.data.pet.PetListResModel
 import kr.carepet.data.pet.PetModel
@@ -32,6 +35,9 @@ import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.LoginData
 import kr.carepet.data.user.LoginResModel
 import kr.carepet.data.user.LogoutRes
+import kr.carepet.data.user.NickNameCheckRes
+import kr.carepet.data.user.ResetNickNameReq
+import kr.carepet.data.user.ResetPwReq
 import kr.carepet.data.user.UserDataModel
 import kr.carepet.data.user.UserDataResponse
 import okhttp3.MultipartBody
@@ -45,6 +51,10 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 
 interface ApiService {
+
+    @POST("/api/v1/member/chk-ncknm")
+    fun nickNameCheck(@Body data: String): Call<NickNameCheckRes>
+
     @POST("api/v1/member/create-user")
     fun sendUserToServer(@Body data: UserDataModel): Call<UserDataResponse>
 
@@ -54,11 +64,11 @@ interface ApiService {
     @POST("api/v1/member/logOut")
     fun sendLogout(): Call<LogoutRes>
 
-    @POST("api/v1/member/refresh-token")
-    fun sendRefreshToken(@Body refreshToken: RefreshToken): Call<RefreshRes>
+    @POST("/api/v1/member/withdraw")
+    fun withdraw(): Call<commonRes>
 
     @POST("api/v1/member/refresh-token")
-    fun sendPetDataToServer(@Body data: PetModel): Call<MyPetResModel>
+    fun sendRefreshToken(@Body refreshToken: RefreshToken): Call<RefreshRes>
 
     @POST("api/v1/cmm/code-list")
     fun commonCodeList(@Body data: CommonCodeModel) : Call<CommonCodeResModel>
@@ -88,6 +98,9 @@ interface ApiService {
 
     @POST("api/v1/mypet/list")
     fun myPetList(@Body data: MyPetListReq) : Call<MyPetListRes>
+
+    @POST("/api/v1/mypet/detail")
+    fun myPetDetail(@Body data: PetDetailReq) : Call<PetDetailRes>
 
     @POST("/api/v1/daily-life/pet/list")
     fun myPetListCurrent(@Body data: MyPetListReq) : Call<CurrentPetRes>
@@ -126,4 +139,9 @@ interface ApiService {
     @GET("/v1/nid/me")
     fun getNidUserInfo(@Header("Authorization") authorization:String): Call<NidUserInfoResponse>
 
+    @POST("api/v1/member/reset-ncknm")
+    fun resetNickName(@Body data: ResetNickNameReq): Call<commonRes>
+
+    @POST("api/v1/member/reset-password")
+    fun resetPw(@Body data : ResetPwReq) : Call<commonRes>
 }

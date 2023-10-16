@@ -42,9 +42,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +60,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -93,11 +98,13 @@ import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.LoginViewModel
+import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
+import kr.carepet.singleton.MySharedPreference
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginContent(navController: NavController,viewModel: LoginViewModel){
+fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedViewModel: SharedViewModel){
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(color = design_intro_bg)
@@ -112,7 +119,8 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel){
     val snsEmail by viewModel.email.collectAsState()
     val snsUnqId by viewModel.unqId.collectAsState()
 
-    val emailLoginSuccess by viewModel.loginSuccess.collectAsState()
+    var snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
+    val focusManager = LocalFocusManager.current
 
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken("985887161836-gj9pqql898d85483bc1ik53a5t1kg6du.apps.googleusercontent.com")
@@ -134,6 +142,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel){
                 val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "GOOGLE")
                 // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
                 if (loginResult){
+                    sharedViewModel.updateInit(true)
                     navController.navigate(Screen.MainScreen.route){
                         popUpTo(0)
                     }
@@ -148,321 +157,313 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel){
         }
     }
 
-    Log.d("LOG","login composing")
+    Scaffold (
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ){ paddingValues ->
 
-    LaunchedEffect(key1 = emailLoginSuccess){
-        if (emailLoginSuccess){
-            navController.navigate(Screen.MainScreen.route){
-                popUpTo(0)}
-            viewModel.updateLoginSuccess(false)
-        }
-    }
+        Column(modifier = Modifier
+            .padding(paddingValues)
+            .fillMaxSize()
+            .background(color = design_intro_bg)
+            , horizontalAlignment = Alignment.CenterHorizontally) {
 
-    LaunchedEffect(Unit){
-        // LoginScreen으로 접근하면 로그인상태 false로 만들기
-        kr.carepet.singleton.MySharedPreference.setIsLogin(false)
-    }
+            Image(painter = painterResource(id = R.drawable.logo_login), contentDescription = "logo", modifier = Modifier
+                .padding(top = 40.dp, bottom = 40.dp)
+                .width(100.dp))
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(color = design_intro_bg)
-        , horizontalAlignment = Alignment.CenterHorizontally) {
-
-        Image(painter = painterResource(id = R.drawable.logo_login), contentDescription = "logo", modifier = Modifier
-            .padding(top = 40.dp, bottom = 40.dp)
-            .width(100.dp))
-
-        Column (modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .background(
-                color = design_login_bg,
-                shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
-            )
-            ,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "로그인",modifier= Modifier
-                .padding(top = 40.dp, bottom = 20.dp)
-                , textAlign = TextAlign.Center,
-                fontSize = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                color = design_login_text
-            )
-
-
-            CustomTextField(
-                value = id,
-                onValueChange = {id = it },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next),
-                modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp)
-                    .fillMaxWidth()
-                    .height(48.dp),
-                placeholder = { Text(text = "Email", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                leadingIcon = { Icon(painter = painterResource(id = R.drawable.icon_email), contentDescription = "")},
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text),
-                shape = RoundedCornerShape(4.dp)
-            )
-
-            CustomTextField(
-                value = password,
-                onValueChange = {password = it},
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = {scope.launch { viewModel.login(
-                    id,
-                    password,
-                    "KAKAO"
-                )}}),
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp, top = 8.dp)
-                    .fillMaxWidth()
-                    .height(48.dp),
-                placeholder = { Text(text = "PassWord",fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                leadingIcon = { Icon(painter = painterResource(id = R.drawable.icon_password), contentDescription = "")},
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text),
-                shape = RoundedCornerShape(4.dp)
-            )
-
-            Button(
-                onClick = {
-                    scope.launch {
-                        viewModel.login(userId = id, userPw = password, loginMethod = "EMAIL")
-                } },
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
-            )
-            {
-                Text(text = "로그인", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-            }
-
-            Row (modifier = Modifier
+            Column (modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
-                Text(
-                    text = "아이디 찾기", 
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_login_text,
-                    modifier = Modifier.clickable { navController.navigate(route = Screen.IdPwSearch.route+"/0") })
+                .fillMaxHeight()
+                .background(
+                    color = design_login_bg,
+                    shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                )
+                ,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "로그인",modifier= Modifier
+                    .padding(top = 40.dp, bottom = 20.dp)
+                    , textAlign = TextAlign.Center,
+                    fontSize = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    color = design_login_text
+                )
 
-                Spacer(modifier = Modifier
-                    .padding(horizontal = 9.dp)
-                    .size(2.dp, 8.dp)
-                    .background(color = design_login_text))
 
-                Text(
-                    text = "비밀번호 찾기",
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_login_text,
-                    modifier = Modifier.clickable {  navController.navigate(route = Screen.IdPwSearch.route+"/1") })
-                
-                Spacer(modifier = Modifier
-                    .padding(horizontal = 9.dp)
-                    .size(2.dp, 8.dp)
-                    .background(color = design_login_text))
-                
-                Text(
-                    text = "회원가입",
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_login_text,
-                    modifier = Modifier.clickable {
-                        navController.navigate(Screen.UserCreate.route)
-                    })
-            }
+                CustomTextField(
+                    value = id,
+                    onValueChange = {id = it },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next),
+                    modifier = Modifier
+                        .padding(start = 20.dp, end = 20.dp)
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    placeholder = { Text(text = "Email", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                    leadingIcon = { Icon(painter = painterResource(id = R.drawable.icon_email), contentDescription = "")},
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedPlaceholderColor = design_placeHolder,
+                        focusedPlaceholderColor = design_placeHolder,
+                        unfocusedBorderColor = design_textFieldOutLine,
+                        focusedBorderColor = design_login_text,
+                        unfocusedContainerColor = design_white,
+                        focusedContainerColor = design_white,
+                        unfocusedLeadingIconColor = design_placeHolder,
+                        focusedLeadingIconColor = design_login_text),
+                    shape = RoundedCornerShape(4.dp)
+                )
 
-            Row (modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                Divider(modifier=Modifier.size(92.dp,1.dp), color = design_textFieldOutLine)
-                Text(text = " SNS 계정으로 로그인 ", modifier = Modifier.padding(horizontal = 14.dp),
-                    fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_login_text)
-                Divider(modifier=Modifier.size(92.dp,1.dp), color = design_textFieldOutLine)
-            }
+                CustomTextField(
+                    value = password,
+                    onValueChange = {password = it},
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = {
+                        scope.launch { viewModel.onLoginButtonClick(
+                            id,
+                            password,
+                            "EMAIL"
+                        )}}),
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier
+                        .padding(start = 20.dp, end = 20.dp, top = 8.dp)
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    placeholder = { Text(text = "PassWord",fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                    leadingIcon = { Icon(painter = painterResource(id = R.drawable.icon_password), contentDescription = "")},
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedPlaceholderColor = design_placeHolder,
+                        focusedPlaceholderColor = design_placeHolder,
+                        unfocusedBorderColor = design_textFieldOutLine,
+                        focusedBorderColor = design_login_text,
+                        unfocusedContainerColor = design_white,
+                        focusedContainerColor = design_white,
+                        unfocusedLeadingIconColor = design_placeHolder,
+                        focusedLeadingIconColor = design_login_text),
+                    shape = RoundedCornerShape(4.dp)
+                )
 
-            // viewModel에 있는 stateFlow를 추적 시작
-            val isLoggedIn = viewModel.isLoggedIn.collectAsState()
-            val loginStatusInfo = if(isLoggedIn.value) "로그인 상태" else "로그아웃 상태"
-
-            Button(onClick = {
-                scope.launch {
-                    val kakaoLoginResult = viewModel.kakaoLogin(context)
-                    // naver Login 성공
-                    if (kakaoLoginResult){
-
-                        val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "KAKAO")
-                        // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
-                        if (loginResult){
-                            navController.navigate(Screen.MainScreen.route){
-                                popUpTo(0)
+                Button(
+                    onClick = {
+                        scope.launch {
+                            val result = viewModel.onLoginButtonClick(userId = id, userPw = password, loginMethod = "EMAIL")
+                            if (result){
+                                sharedViewModel.updateInit(true)
+                                navController.navigate(Screen.MainScreen.route){
+                                    popUpTo(0)
+                                }
+                            }else{
+                                focusManager.clearFocus()
+                                snackbarHostState.showSnackbar(
+                                    message = "아이디 및 패스워드를 확인해주세요.",
+                                    actionLabel = "확인",
+                                    duration = SnackbarDuration.Short,
+                                    withDismissAction = false
+                                )
                             }
-                        }else{
-                            viewModel.updateLoginMethod("KAKAO")
-                            navController.navigate(Screen.EasyRegScreen.route)
-                        }
+                        } },
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
+                )
+                {
+                    Text(text = "로그인", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                }
 
-                    }else{
-                        Toast.makeText(context, "Kakao 로그인 실패", Toast.LENGTH_SHORT).show()
+                Row (modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
+                    Text(
+                        text = "아이디 찾기",
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        color = design_login_text,
+                        modifier = Modifier.clickable { navController.navigate(route = Screen.IdPwSearch.route+"/0") })
+
+                    Spacer(modifier = Modifier
+                        .padding(horizontal = 9.dp)
+                        .size(2.dp, 8.dp)
+                        .background(color = design_login_text))
+
+                    Text(
+                        text = "비밀번호 찾기",
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        color = design_login_text,
+                        modifier = Modifier.clickable {  navController.navigate(route = Screen.IdPwSearch.route+"/1") })
+
+                    Spacer(modifier = Modifier
+                        .padding(horizontal = 9.dp)
+                        .size(2.dp, 8.dp)
+                        .background(color = design_login_text))
+
+                    Text(
+                        text = "회원가입",
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        color = design_login_text,
+                        modifier = Modifier.clickable {
+                            navController.navigate(Screen.UserCreate.route)
+                        })
+                }
+
+                Row (modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                    Divider(modifier=Modifier.size(92.dp,1.dp), color = design_textFieldOutLine)
+                    Text(text = " SNS 계정으로 로그인 ", modifier = Modifier.padding(horizontal = 14.dp),
+                        fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_login_text)
+                    Divider(modifier=Modifier.size(92.dp,1.dp), color = design_textFieldOutLine)
+                }
+
+                // viewModel에 있는 stateFlow를 추적 시작
+                val isLoggedIn = viewModel.isLoggedIn.collectAsState()
+                val loginStatusInfo = if(isLoggedIn.value) "로그인 상태" else "로그아웃 상태"
+
+                Button(onClick = {
+                    scope.launch {
+                        val kakaoLoginResult = viewModel.kakaoLogin(context)
+                        // naver Login 성공
+                        if (kakaoLoginResult){
+
+                            val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "KAKAO")
+                            // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
+                            if (loginResult){
+                                sharedViewModel.updateInit(true)
+                                navController.navigate(Screen.MainScreen.route){
+                                    popUpTo(0)
+                                }
+                            }else{
+                                viewModel.updateLoginMethod("KAKAO")
+                                navController.navigate(Screen.EasyRegScreen.route)
+                            }
+
+                        }else{
+                            Toast.makeText(context, "Kakao 로그인 실패", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = design_login_kakaobtn, contentColor = design_login_text)
+                ) {
+                    Box (modifier = Modifier.fillMaxSize()){
+                        Icon(painter = painterResource(id = R.drawable.icon_kakao), contentDescription = "",
+                            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
+                        Text(text = "카카오톡으로 로그인", modifier = Modifier.align(Alignment.Center),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
                     }
                 }
-                             },
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_login_kakaobtn, contentColor = design_login_text)
-            ) {
-                Box (modifier = Modifier.fillMaxSize()){
-                    Icon(painter = painterResource(id = R.drawable.icon_kakao), contentDescription = "",
-                        modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
-                    Text(text = "카카오톡으로 로그인", modifier = Modifier.align(Alignment.Center),
-                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+
+                Button(onClick = {
+                    scope.launch {
+                        val naverLoginResult = viewModel.naverLogin(context)
+                        // naver Login 성공
+                        if (naverLoginResult){
+
+                            val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "NAVER")
+                            // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
+                            if (loginResult){
+                                sharedViewModel.updateInit(true)
+                                navController.navigate(Screen.MainScreen.route){
+                                    popUpTo(0)
+                                }
+                            }else{
+                                viewModel.updateLoginMethod("NAVER")
+                                navController.navigate(Screen.EasyRegScreen.route)
+                            }
+
+                        }else{
+                            Toast.makeText(context, "Naver 로그인 실패", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = design_login_naverbtn, contentColor = design_white)
+                ) {
+                    Box (modifier = Modifier.fillMaxSize()){
+                        Icon(painter = painterResource(id = R.drawable.icon_naver), contentDescription = "",
+                            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
+                        Text(text = "네이버로 로그인", modifier = Modifier.align(Alignment.Center),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                    }
                 }
+
+                Button(onClick = { /*TODO 네이버*/ },
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = design_login_facebookbtn, contentColor = design_white)
+                ) {
+                    Box (modifier = Modifier.fillMaxSize()){
+                        Icon(painter = painterResource(id = R.drawable.icon_facebook), contentDescription = "",
+                            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
+                        Text(text = "페이스북으로 로그인", modifier = Modifier.align(Alignment.Center),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                    }
+                }
+
+                Button(onClick = {
+                    scope.launch {
+                        val signInIntent = mGoogleSignInClient.signInIntent
+                        googleAuthLauncher.launch(signInIntent)
+                    }
+                },
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 8.dp)
+                        .border(
+                            width = 1.dp,
+                            color = design_btn_border,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = design_white, contentColor = design_login_text)
+                ) {
+                    Box (modifier = Modifier.fillMaxSize()){
+                        Icon(painter = painterResource(id = R.drawable.icon_google), contentDescription = "",
+                            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
+                        Text(text = "구글로 로그인", modifier = Modifier.align(Alignment.Center),
+                            fontSize = 14.sp,letterSpacing = (-0.7).sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                    }
+                }
+
             }
-
-            Button(onClick = {
-                             scope.launch {
-                                 val naverLoginResult = viewModel.naverLogin(context)
-                                 // naver Login 성공
-                                 if (naverLoginResult){
-
-                                     val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "NAVER")
-                                     // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
-                                     if (loginResult){
-                                         navController.navigate(Screen.MainScreen.route){
-                                             popUpTo(0)
-                                         }
-                                     }else{
-                                         viewModel.updateLoginMethod("NAVER")
-                                         navController.navigate(Screen.EasyRegScreen.route)
-                                     }
-
-                                 }else{
-                                     Toast.makeText(context, "Naver 로그인 실패", Toast.LENGTH_SHORT).show()
-                                 }
-                             }
-            },
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_login_naverbtn, contentColor = design_white)
-            ) {
-                Box (modifier = Modifier.fillMaxSize()){
-                    Icon(painter = painterResource(id = R.drawable.icon_naver), contentDescription = "",
-                        modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
-                    Text(text = "네이버로 로그인", modifier = Modifier.align(Alignment.Center),
-                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-                }
-            }
-
-            Button(onClick = { /*TODO 네이버*/ },
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_login_facebookbtn, contentColor = design_white)
-            ) {
-                Box (modifier = Modifier.fillMaxSize()){
-                    Icon(painter = painterResource(id = R.drawable.icon_facebook), contentDescription = "",
-                        modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
-                    Text(text = "페이스북으로 로그인", modifier = Modifier.align(Alignment.Center),
-                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-                }
-            }
-
-            Button(onClick = {
-                scope.launch {
-                    val signInIntent = mGoogleSignInClient.signInIntent
-                    googleAuthLauncher.launch(signInIntent)
-                }
-                             },
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 8.dp)
-                    .border(
-                        width = 1.dp,
-                        color = design_btn_border,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_white, contentColor = design_login_text)
-            ) {
-                Box (modifier = Modifier.fillMaxSize()){
-                    Icon(painter = painterResource(id = R.drawable.icon_google), contentDescription = "",
-                        modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
-                    Text(text = "구글로 로그인", modifier = Modifier.align(Alignment.Center),
-                        fontSize = 14.sp,letterSpacing = (-0.7).sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-                }
-            }
-
-            //Button(onClick = { /*TODO 애플*/ },
-            //    modifier = Modifier
-            //        .padding(top = 8.dp)
-            //        .fillMaxWidth()
-            //        .height(48.dp)
-            //        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-            //    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-            //    colors = ButtonDefaults.buttonColors(containerColor = design_dark, contentColor = design_white)
-            //) {
-            //    Box (modifier = Modifier.fillMaxSize()){
-            //        Icon(painter = painterResource(id = R.drawable.icon_apple), contentDescription = "",
-            //            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
-            //        Text(text = "애플로 로그인", modifier = Modifier.align(Alignment.Center),
-            //            fontSize = 14.sp, letterSpacing = (-0.7).sp,
-            //            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-            //    }
-            //}
         }
     }
+
 }
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
+fun LoginScreen(navController: NavController, viewModel: LoginViewModel,sharedViewModel: SharedViewModel) {
 
     Box(modifier = Modifier.fillMaxSize()){
-        LoginContent(navController = navController, viewModel = viewModel)
+        LoginContent(navController = navController, viewModel = viewModel, sharedViewModel)
     }
 }
 
@@ -496,7 +497,8 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
         modifier = Modifier.fillMaxSize(),
         topBar = {
             BackTopBar(title = "회원가입", navController = navController)
-        }
+        },
+        //snackbarHost =
     ) { paddingValues ->
 
         Box (modifier = Modifier

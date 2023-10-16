@@ -4,6 +4,7 @@ import kr.carepet.data.pet.CurrentPetData
 import java.util.Date
 
 object G {
+    var userName: String = ""
     var userId:String = ""
     var userNickName:String = ""
     var userEmail:String = ""

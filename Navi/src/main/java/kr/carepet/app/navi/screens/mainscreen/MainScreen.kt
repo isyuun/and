@@ -81,6 +81,7 @@ import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.singleton.G
+import kr.carepet.util.Log
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -102,7 +103,7 @@ fun MainScreen(
     var topBarChange by rememberSaveable { mutableStateOf("") }
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-    var init by rememberSaveable { mutableStateOf(true) }
+    val init by sharedViewModel.init.collectAsState()
 
     val selectedPet by sharedViewModel.selectPet.collectAsState()
     val currentPet by sharedViewModel.currentPetInfo.collectAsState()
@@ -115,21 +116,16 @@ fun MainScreen(
 
     val context = LocalContext.current
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(key1 = init){
         if (init){
+            homeViewModel.updateIsLoading(true)
             delay(500)
             val result = sharedViewModel.loadCurrentPetInfo()
             sharedViewModel.loadPetInfo()
             homeViewModel.updateIsLoading(!result)
-            init = false
+            sharedViewModel.updateInit(false)
         }
     }
-
-    val bottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = false
-    )
-    val scope = rememberCoroutineScope()
 
     BackOnPressed()
     Scaffold(

@@ -60,6 +60,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -116,6 +117,7 @@ import kr.carepet.app.navi.viewmodel.HomeViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
+import kr.carepet.util.Log
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -140,7 +142,8 @@ fun HomeScreen(
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    val pagerState = rememberPagerState(pageCount = { petInfo.size })
+    //petInfo.size가 갱신되기 전에, 뷰가 만들어지면서 에러발생
+    var pagerState = rememberPagerState(pageCount = { petInfo.size })
 
     var refresh by rememberSaveable { mutableStateOf(true) }
 
@@ -166,7 +169,6 @@ fun HomeScreen(
     LaunchedEffect(key1 = G.toPost){
         if(G.toPost){
             navController.navigate(Screen.PostScreen.route)
-            G.toPost = false
         }
     }
 
@@ -282,6 +284,8 @@ fun ProfileContent(
 
     val petInfo by viewModel.petInfo.collectAsState()
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
+
+    Log.d("LOG",currentPetInfo.isEmpty().toString())
 
     Column (modifier = Modifier
         .fillMaxWidth()
@@ -441,11 +445,13 @@ fun ProfileContent(
                     }
 
                     Text(
-                        text = if(currentPetInfo[pagerState.currentPage].sexTypNm == ""){
-                            "모름"
-                        }else{
-                            currentPetInfo[pagerState.currentPage].sexTypNm
-                        },
+                        text =  ""
+                        //if(currentPetInfo[pagerState.currentPage].sexTypNm == ""){
+                        //    "모름"
+                        //}else{
+                        //    currentPetInfo[pagerState.currentPage].sexTypNm
+                        //}
+                        ,
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -976,7 +982,7 @@ fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData){
     }else{
         viewModel.changeBirth(petList.petBrthYmd)
     }
-    val petGender:String = petList.sexTypNm
+    val petGender:String = petList.sexTypNm?:""
 
     val selectPet by viewModel.petListSelect.collectAsState()
 
@@ -1249,7 +1255,7 @@ fun CircularProgressAnimated(){
         initialValue = 0.0f,
         targetValue = progressValue,animationSpec = infiniteRepeatable(animation = tween(900)))
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+    Box(modifier = Modifier.fillMaxSize().background(color = design_white), contentAlignment = Alignment.Center){
         CircularProgressIndicator(progress = progressAnimationValue, color = design_intro_bg)
     }
 

@@ -31,6 +31,7 @@ import kr.carepet.data.pet.MyPetResModel
 import kr.carepet.data.pet.PetListData
 import kr.carepet.data.pet.PetListResModel
 import kr.carepet.data.user.LoginResModel
+import kr.carepet.data.user.NickNameCheckRes
 import kr.carepet.data.user.UserDataResponse
 import kr.carepet.singleton.RetrofitClientServer
 import okhttp3.MediaType.Companion.toMediaType
@@ -71,15 +72,6 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     val selectedItem3: StateFlow<UmdList> = _selectedItem3.asStateFlow() // state 노출
     fun updateSelectedItem3(newValue: UmdList) { _selectedItem3.value = newValue }
 
-    private val _toKindScreen = MutableStateFlow<Boolean>(true)
-    val toKindScreen: StateFlow<Boolean> = _toKindScreen.asStateFlow()
-    fun updateToKindScreen(newValue: Boolean) { _toKindScreen.value = newValue}
-
-    private val _toLocationScreen = MutableStateFlow<Boolean>(true)
-    val toLocationScreen: StateFlow<Boolean> = _toLocationScreen.asStateFlow()
-    fun updateToLocationScreen(newValue: Boolean) { _toLocationScreen.value = newValue}
-
-
     // --------------   User   -----------------------
     private val _userID = MutableStateFlow<String>("")
     val userID: StateFlow<String> = _userID.asStateFlow()
@@ -92,6 +84,10 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     private val _userNickName = MutableStateFlow<String>("")
     val userNickName: StateFlow<String> = _userNickName.asStateFlow()
     fun updateUserNickName(newValue: String) { _userNickName.value = newValue }
+
+    private val _userNickNamePass = MutableStateFlow<String>("")
+    val userNickNamePass: StateFlow<String> = _userNickNamePass.asStateFlow()
+    fun updateUserNickNamePass(newValue: String) { _userNickNamePass.value = newValue }
 
     private val _userPW = MutableStateFlow<String>("")
     val userPW: StateFlow<String> = _userPW.asStateFlow()
@@ -331,7 +327,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     }
 
 
-    suspend fun sendUserToServer(snsLogin:String=""):Boolean{
+    suspend fun sendUserToServer():Boolean{
         val apiService = RetrofitClientServer.instance
 
         val appKey = kr.carepet.singleton.MySharedPreference.getFcmToken()
@@ -343,7 +339,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
             appOs = appOs,
             appTypNm = appTypNm,
             ncknm = _userNickName.value,
-            snsLogin = snsLogin,
+            snsLogin = _snsLogin.value,
             userID = _userID.value,
             userName = _userNickName.value,
             userPW = _userPW.value
@@ -437,6 +433,35 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
         }
     }
 
+    suspend fun nickNameCheck():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.nickNameCheck(_userNickName.value)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<NickNameCheckRes>{
+                override fun onResponse(
+                    call: Call<NickNameCheckRes>,
+                    response: Response<NickNameCheckRes>
+                ) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        if (body?.statusCode == 200){
+                            continuation.resume(true)
+                        }else{
+                            continuation.resume(false)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<NickNameCheckRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
 
     suspend fun createPet():Boolean=
         suspendCoroutine<Boolean> { continuation ->
@@ -486,6 +511,25 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                         body?.let {
                             if (body.statusCode==200){
                                 _myPetResModel.value = it
+
+                                //---- 초기화 ----
+                                _petKind.value = PetListData("", "", 0, "사이즈/품종 선택", "")
+                                _selectedItem1.value = SCD("", "", "")
+                                _selectedItem2.value = SggList("", "") // 시군구
+                                _selectedItem3.value = UmdList("", "") // 읍면동
+                                _sggList.value = emptyList()
+                                _umdList.value = emptyList()
+                                _address.value = "주소 선택"
+                                _petName.value = ""
+                                _year.value =PickerState()
+                                _petBirth.value = ""
+                                _petBirthUnknown.value = false
+                                _petWght.value = ""
+                                _petGender.value = "남아"
+                                _petNtr.value = "했어요"
+                                _imageUri.value = null
+                                //---- 초기화 ----
+
                                 continuation.resume(true)
                             }else{
                                 _myPetResModel.value = it
@@ -521,7 +565,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                     if (response.isSuccessful) {
                         val body = response.body()
                         body?.let {
-                            if (it.statusCode.toString().equals("200")) { // status code 200 검증
+                            if (it.statusCode == 200) { // status code 200 검증
                                 // 200이면 login 처리, access/refresh token G 및 shared 에 저장
 
                                 kr.carepet.singleton.G.accessToken = it.data.accessToken

@@ -30,6 +30,14 @@ import kotlin.coroutines.resume
 
 class SharedViewModel:ViewModel(){
 
+    private val _nickName = MutableStateFlow<String>("")
+    val nickName:StateFlow<String> = _nickName.asStateFlow()
+    fun updateNickName(newValue: String){ _nickName.value = newValue}
+
+    private val _init = MutableStateFlow<Boolean>(true)
+    val init:StateFlow<Boolean> = _init.asStateFlow()
+    fun updateInit(newValue: Boolean){ _init.value = newValue }
+
     private val _moreStoryClick = MutableStateFlow<Boolean>(false)
     val moreStoryClick:StateFlow<Boolean> = _moreStoryClick.asStateFlow()
     fun updateMoreStoryClick(newValue: Boolean){
@@ -42,14 +50,14 @@ class SharedViewModel:ViewModel(){
         _weekRecord.value = newData
     }
 
-    private val _petInfo = MutableStateFlow<List<PetDetailData>>(emptyList())
-    val petInfo: StateFlow<List<PetDetailData>> = _petInfo.asStateFlow()
+    private var _petInfo = MutableStateFlow<List<PetDetailData>>(emptyList())
+    var petInfo: StateFlow<List<PetDetailData>> = _petInfo.asStateFlow()
     fun updatePetInfo(newData: List<PetDetailData>) {
         _petInfo.value = newData
     }
 
-    private val _currentPetInfo = MutableStateFlow<List<CurrentPetData>>(emptyList())
-    val currentPetInfo: StateFlow<List<CurrentPetData>> = _currentPetInfo.asStateFlow()
+    private var _currentPetInfo = MutableStateFlow<List<CurrentPetData>>(emptyList())
+    var currentPetInfo: StateFlow<List<CurrentPetData>> = _currentPetInfo.asStateFlow()
     fun updateCurrentPetInfo(newData: List<CurrentPetData>) {
         _currentPetInfo.value = newData
     }
@@ -185,13 +193,12 @@ class SharedViewModel:ViewModel(){
                                 G.userNickName = it.data.nckNm
                                 G.userEmail = it.data.email
 
+                                _nickName.value = it.data.nckNm
+
                                 MySharedPreference.setAccessToken(it.data.accessToken)
                                 MySharedPreference.setRefreshToken(it.data.refreshToken)
                                 MySharedPreference.setUserId(it.data.userId)
-                                Log.d(
-                                    "Token",
-                                    "access: ${it.data.accessToken}, refresh: ${it.data.refreshToken}"
-                                )
+
                                 continuation.resume(true)
                             }else{
 
@@ -281,5 +288,14 @@ class SharedViewModel:ViewModel(){
         mngrType = "M",
         memberList = emptyList()
     )
+
+    fun clear(){
+        _moreStoryClick.value =false
+        _weekRecord.value = null
+        _petInfo.value = emptyList()
+        _currentPetInfo.value = emptyList()
+        _selectPet.value = null
+        Log.d("CLEAR","shared init")
+    }
 }
 

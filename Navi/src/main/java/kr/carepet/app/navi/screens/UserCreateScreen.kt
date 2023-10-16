@@ -4,6 +4,9 @@ package kr.carepet.app.navi.screens
 
 import android.util.Patterns
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -15,14 +18,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,6 +75,7 @@ import kr.carepet.app.navi.ui.theme.design_sharp
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_weather_4
 import kr.carepet.app.navi.ui.theme.design_white
+import kr.carepet.app.navi.viewmodel.LoginViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,7 +93,9 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
     val nickName by viewModel.userNickName.collectAsState()
     val phoneNum by viewModel.userPhone.collectAsState()
     val certiNum by viewModel.certiNum.collectAsState()
+    val nickNamePass by viewModel.userNickNamePass.collectAsState()
 
+    var snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
     var countTime by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -100,7 +116,8 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
         modifier = modifier.fillMaxSize(),
         topBar = {
             BackTopBar(title = "회원가입", navController = navController)
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
     ) {paddingValues ->
         Column(
             modifier= modifier
@@ -243,7 +260,55 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                     unfocusedLeadingIconColor = design_placeHolder,
                     focusedLeadingIconColor = design_login_text),
                 shape = RoundedCornerShape(4.dp),
-                innerPadding = PaddingValues(start=16.dp)
+                innerPadding = PaddingValues(start=16.dp),
+                trailingIcon = {
+                    AnimatedVisibility(
+                        visible = nickName.isNotEmpty(),
+                        enter = scaleIn(),
+                        exit = scaleOut()
+                    ) {
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    val result = viewModel.nickNameCheck()
+                                    if (result){
+                                        focusManager.clearFocus()
+                                        snackbarHostState.showSnackbar(
+                                            message = "사용하실 수 있는 닉네임입니다",
+                                            actionLabel = "확인",
+                                            duration = SnackbarDuration.Short,
+                                            withDismissAction = true
+                                        )
+                                        viewModel.updateUserNickNamePass(nickName)
+                                    }else{
+                                        focusManager.clearFocus()
+                                        snackbarHostState.showSnackbar(
+                                            message = "이미 사용중인 닉네임입니다",
+                                            actionLabel = "확인",
+                                            duration = SnackbarDuration.Short,
+                                            withDismissAction = true
+                                        )
+                                    }
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = design_white),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 0.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            border = BorderStroke(1.dp, color = design_login_text),
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(60.dp, 32.dp),
+                            contentPadding = PaddingValues(horizontal = 0.dp)
+                        ) {
+                            Text(
+                                text = "중복확인",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 12.sp, letterSpacing = (-0.6).sp,
+                                color = design_login_text
+                            )
+                        }
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
@@ -350,20 +415,48 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
 
             Button(
                 onClick = {
-                    if (!Patterns.EMAIL_ADDRESS.matcher(id).matches()) {
-                        Toast.makeText(context, "올바른 이메일 형식이 아닙니다", Toast.LENGTH_SHORT).show()
-                    } else if (pw.isEmpty()) {
-                        Toast.makeText(context, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
-                    } else if (pw != pwCheck) {
-                        Toast.makeText(context, "비밀번호가 일치하지 않습니다", Toast.LENGTH_SHORT).show()
-                    } else if (nickName.isEmpty()) {
-                        Toast.makeText(context, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
-                    } else {
-                        scope.launch {
+                    scope.launch {
+                        if (!Patterns.EMAIL_ADDRESS.matcher(id).matches()) {
+                            snackbarHostState.showSnackbar(
+                                message = "올바른 이메일형식이 아닙니다",
+                                actionLabel = "확인",
+                                duration = SnackbarDuration.Short,
+                                withDismissAction = true
+                            )
+                        } else if (pw.isEmpty()) {
+                            snackbarHostState.showSnackbar(
+                                message = "비밀번호를 입력해주세요",
+                                actionLabel = "확인",
+                                duration = SnackbarDuration.Short,
+                                withDismissAction = true
+                            )
+                        } else if (pw != pwCheck) {
+                            snackbarHostState.showSnackbar(
+                                message = "비밀번호가 일치하지 않습니다",
+                                actionLabel = "확인",
+                                duration = SnackbarDuration.Short,
+                                withDismissAction = true
+                            )
+                        } else if (nickName.isEmpty()) {
+                            snackbarHostState.showSnackbar(
+                                message = "닉네임을 입력해주세요",
+                                actionLabel = "확인",
+                                duration = SnackbarDuration.Short,
+                                withDismissAction = true
+                            )
+                        } else if ( nickName != nickNamePass ) {
+                            snackbarHostState.showSnackbar(
+                                message = "닉네임 중복확인을 해주세요",
+                                actionLabel = "확인",
+                                duration = SnackbarDuration.Short,
+                                withDismissAction = true
+                            )
+                        } else {
                             viewModel.updateSnsLogin("EMAIL")
                             navController.navigate(Screen.PetCreateScreen.route)
                         }
                     }
+
                 },
                 modifier = Modifier
                     .padding(top = 16.dp)
@@ -404,14 +497,5 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
         }
     }
 }
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun UserCreatePreview(){
-    val navController = rememberNavController()
-    val scdLocalData = kr.carepet.data.SCDLocalData()
-    val viewModel = UserCreateViewModel(scdLocalData)
-    UserCreateScreen(navController = navController, viewModel = viewModel)
-}
-
 
 

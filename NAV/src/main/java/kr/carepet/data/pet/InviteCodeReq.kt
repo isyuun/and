@@ -9,7 +9,7 @@ data class InviteCodeReq(
     @SerializedName("relBgngDt")
     var relBgngDt: String, // 202310050918
     @SerializedName("relEndDt")
-    var relEndDt: String // 299912311159
+    var relEndDt: String? // 299912311159
 )
 
 data class Pet(

@@ -7,7 +7,7 @@ data class PetDetailRes(
     @SerializedName("data")
     var petDetailData: PetDetailData,
     @SerializedName("detailMessage")
-    var detailMessage: Any?, // null
+    var detailMessage: String?, // null
     @SerializedName("resultMessage")
     var resultMessage: String, // 펫조회 완료
     @SerializedName("statusCode")
@@ -16,15 +16,15 @@ data class PetDetailRes(
 
 data class PetDetailData(
     @SerializedName("endDt")
-    var endDt: String,
+    var endDt: String?,
     @SerializedName("memberList")
     var memberList: List<Member>,
     @SerializedName("mngrType")
-    var mngrType: String, // M
+    var mngrType: String?, // M
     @SerializedName("ntrTypCd")
     var ntrTypCd: String, // 001
     @SerializedName("ntrTypNm")
-    var ntrTypNm: String, // 했어요
+    var ntrTypNm: String?, // 했어요
     @SerializedName("ownrPetUnqNo")
     var ownrPetUnqNo: String, // P20230922000033
     @SerializedName("petBrthYmd")
@@ -42,7 +42,7 @@ data class PetDetailData(
     @SerializedName("petRelCd")
     var petRelCd: String, // 001
     @SerializedName("petRelNm")
-    var petRelNm: String, // 엄마
+    var petRelNm: String?, // 엄마
     @SerializedName("petRelUnqNo")
     var petRelUnqNo: Int, // 30
     @SerializedName("petRprsImgAddr")
@@ -52,7 +52,7 @@ data class PetDetailData(
     @SerializedName("sexTypCd")
     var sexTypCd: String, // 002
     @SerializedName("sexTypNm")
-    var sexTypNm: String, // 남아
+    var sexTypNm: String?, // 남아
     @SerializedName("stdgCtpvCd")
     var stdgCtpvCd: String, // 11
     @SerializedName("stdgCtpvNm")
@@ -76,6 +76,15 @@ data class Member(
     var mngrType: String, // M
     @SerializedName("nckNm")
     var nckNm: String, // dal
+    @SerializedName("userId")
+    var userId: String // 9d70ff46-c9e6-4b29-b69a-f9f3829c7eb0
+)
+
+data class PetDetailReq(
+    @SerializedName("ownrPetUnqNo")
+    var ownrPetUnqNo: String, // P20231010000039
+    @SerializedName("petRprsYn")
+    var petRprsYn: String, // Y
     @SerializedName("userId")
     var userId: String // 9d70ff46-c9e6-4b29-b69a-f9f3829c7eb0
 )
