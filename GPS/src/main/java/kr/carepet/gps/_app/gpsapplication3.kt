@@ -49,14 +49,6 @@ open class gpsapplication3 : gpsapplication2() {
         super.onCreate()
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
-        Log.i(__CLASSNAME__, "${getMethodName()}...")
-        super.onReceive(context, intent)
-        //post { pee("") }    //test
-        //post { poo("") }    //test
-        //post { mark("") }    //test
-    }
-
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
@@ -69,9 +61,19 @@ open class gpsapplication3 : gpsapplication2() {
         this.service?.onServiceDisconnected(name)
     }
 
+    override fun onReceive(context: Context, intent: Intent) {
+        Log.i(__CLASSNAME__, "${getMethodName()}...")
+        super.onReceive(context, intent)
+        //post { pee("") }    //test
+        //post { poo("") }    //test
+        //post { mark("") }    //test
+    }
+
     override fun start() {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
         super.start()
+        tracks?.clear()
+        images?.clear()
     }
 
     override fun stop() {
@@ -80,10 +82,13 @@ open class gpsapplication3 : gpsapplication2() {
     }
 
     fun end() {
-        tracks?.clear()
-        images?.clear()
-        pets.clear()
     }
+
+    val path
+        get() = this.service?.path
+
+    val file
+        get() = this.service?.file
 
     val images
         get() = this.service?.imgs
@@ -107,11 +112,11 @@ open class gpsapplication3 : gpsapplication2() {
 
     fun select(pet: CurrentPetData) {
         if (pets.contains(pet)) no = pet.ownrPetUnqNo
-        Log.w(__CLASSNAME__, "${getMethodName()}[${pets.contains(pet)}][$no]$pet$pets")
+        //Log.w(__CLASSNAME__, "${getMethodName()}[${pets.contains(pet)}][$no]$pet$pets")
     }
 
     fun contains(pet: CurrentPetData): Boolean {
-        Log.w(__CLASSNAME__, "${getMethodName()}[${pets.contains(pet)}][$no]$pet$pets")
+        //Log.w(__CLASSNAME__, "${getMethodName()}[${pets.contains(pet)}][$no]$pet$pets")
         return pets.contains(pet)
     }
 

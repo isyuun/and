@@ -24,7 +24,7 @@
     <string name="walk_title_distance">산책거리</string>
     <string name="walk_title_select">누구랑 산책할까요?</string>
     <string name="walk_check_select">계속 이 아이와 산책할게요.</string>
-    <string name="walk_check_select_all">모두 함께 땡겨요.</string>
+    <string name="walk_check_select_all">모두 함께 댕겨요.</string>
     <string name="walk_title_end">산책을 종료할까요?</string>
     <string name="walk_button_finish">네,종료할게요.</string>
     <string name="walk_button_resume">조금 더 할게요.</string>

@@ -152,10 +152,10 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
         _imgs.add(path)
         val loc = currentLocation
         val img = if (_imgs.size > 0) _imgs.size - 1 else -1
-        val trk = loc?.let { Track(it, no = this.no, img = img) }
+        val trk = loc?.let { Track(it/*, no = this.no*/, img = img, uri = Uri.parse(path)) }
         Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${_imgs.size}], ${_imgs[img]}, $trk")
         trk?.let { add(it) }
-        dump()
+        write()
     }
 
     fun onChange(selfChange: Boolean, uri: Uri?) {

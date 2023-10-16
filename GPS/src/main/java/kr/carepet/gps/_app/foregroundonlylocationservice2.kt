@@ -51,7 +51,7 @@ import java.util.Collections
 open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private fun paths(): String {
+    private fun path(): String {
         /** 내부저장소 */
         ///* 캐시(Cache)*/
         //val ret = cacheDir.path
@@ -79,7 +79,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         Log.d(__CLASSNAME__, "${getMethodName()}$_tracks")
         super.onCreate()
         _tracks.clear()
-        paths()
+        path()
     }
 
     private val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
@@ -119,29 +119,30 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         if (exit) return
         super.onLocationResult(locationResult)
         currentLocation?.let { add(Track(it)) }
+        /*if (_tracks.size == 1) */this.write()
     }
 
     override fun onUnbind(intent: Intent): Boolean {
         Log.i(__CLASSNAME__, "${getMethodName()}$intent")
-        post { dump() }
+        post { this.write() }
         return super.onUnbind(intent)
     }
 
     override fun onRebind(intent: Intent) {
         Log.i(__CLASSNAME__, "${getMethodName()}$intent")
         super.onRebind(intent)
-        post { dump() }
+        post { this.write() }
     }
 
-    protected fun dump() {
-        Log.e(__CLASSNAME__, "${getMethodName()}...")
-        write()
-    }
+    internal val path
+        get() = path()
+    internal val file
+        get() = File("${path}/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(_tracks.first()?.time)}.gpx")
 
-    protected open fun write() {
+    protected fun write() {
         if (_tracks.isEmpty()) return
         val time = _tracks.first()?.time
-        val file = File("${paths()}/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
+        val file = File("${path}/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
         file.parentFile?.mkdirs()
         Log.w(__CLASSNAME__, "${getMethodName()}${_tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this._start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
         GPXWriter2.write(_tracks, file)
@@ -158,21 +159,21 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
         val track = currentLocation?.let { Track(it, no = no, pee = 1) }
         track?.let { add(it) }
-        dump()
+        this.write()
     }
 
     internal fun poo() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
         val track = currentLocation?.let { Track(it, no = no, poo = 1) }
         track?.let { add(it) }
-        dump()
+        this.write()
     }
 
     internal fun mrk() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
         val track = currentLocation?.let { Track(it, no = no, mrk = 1) }
         track?.let { add(it) }
-        dump()
+        this.write()
     }
 
     private var _start = 0L
@@ -190,7 +191,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         _start = 0L
         Log.wtf(__CLASSNAME__, "${getMethodName()}[$start], ${currentLocation.toText()}, $currentLocation")
         super.stop()
-        write()
+        this.write()
     }
 
     val duration
