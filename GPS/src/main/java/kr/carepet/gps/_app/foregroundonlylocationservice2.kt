@@ -28,7 +28,6 @@ package kr.carepet.gps._app
 /**import kr.carepet.util.__CLASSNAME__*/
 import android.content.Intent
 import android.location.Location
-import android.os.Environment
 import com.google.android.gms.location.LocationResult
 import kr.carepet.gpx.GPXWriter2
 import kr.carepet.gpx.GPX_INTERVAL_UPDATE_METERS
@@ -58,14 +57,14 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         ///* 데이터베이스(Database)*/
         //val ret = getDatabasePath("...").path
         ///* 일반 파일*/
-        //val ret = filesDir.path
+        val ret = filesDir.path
         ///* 일반 파일 폴더*/
         //val ret = getFileStreamPath("...").path
         /** 외부저장소 - 공용 영역 */
         ///* 최상위 경로*/
         //val ret = Environment.getExternalStorageDirectory().toString()
         /* 특정 데이터를 저장*/
-        val ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
+        //val ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
         /** 외부저장소 - 어플리케이션 고유 영역 */
         ///* 특정 데이터를 저장*/
         //val ret = getExternalFilesDirs(Environment.DIRECTORY_DOWNLOADS)[0].path
@@ -136,6 +135,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     internal val path
         get() = path()
+
     internal val file
         get() = File("${path}/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(_tracks.first()?.time)}.gpx")
 
@@ -177,7 +177,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     }
 
     private var _start = 0L
-    var start = false
+    val start
         get() = (_start > 0L) && _tracks.isNotEmpty()
 
     override fun start() {
