@@ -26,6 +26,7 @@
 package kr.carepet.app.navi
 
 import androidx.activity.compose.setContent
+import kr.carepet.app.navi.ui.theme.AppTheme
 
 /**
  * @Project     : carepet-android
@@ -37,6 +38,8 @@ import androidx.activity.compose.setContent
 class MapActivity : kr.carepet.map.app.MapActivity() {
     override fun setContent() {
         setContent {
+            AppTheme {
+            }
             MapApp()
         }
     }

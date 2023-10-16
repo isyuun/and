@@ -29,6 +29,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.provider.MediaStore
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -262,7 +263,7 @@ fun IconButton(
     drawable: ImageVector,
     description: String,
     shape: Shape = RectangleShape,
-    color: Color = LocalContentColor.current,
+    color: Color = MaterialTheme.colorScheme.onBackground,
     back: Color = MaterialTheme.colorScheme.background,
     border: Color = MaterialTheme.colorScheme.tertiary,
     size: Dp = 0.dp
@@ -570,7 +571,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center,
                         ) {
-                            Log.i(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet::Walk${getMethodName()}[${application.pets.isNotEmpty()}]")
+                            Log.w(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet::Walk${getMethodName()}[${application.pets.isNotEmpty()}]")
                             Button(
                                 enabled = application.pets.isNotEmpty(),
                                 onClick = {
@@ -828,6 +829,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         zoomControlButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             rightMargin = right.dp.toPx(context).toInt()
         }
+        mapView.getMapAsync {naverMap ->
+            naverMap.uiSettings.isZoomGesturesEnabled = (zoomControlButton.visibility != View.VISIBLE)
+        }
     }
 
     /** right */
@@ -997,7 +1001,7 @@ fun WalkInfo() {
             .fillMaxWidth()
             .clip(shape = RoundedCornerShape(20.dp))
             .background(
-                color = Color.LightGray,
+                color = MaterialTheme.colorScheme.onPrimary,
                 shape = RoundedCornerShape(20.dp),
             ),
         horizontalArrangement = Arrangement.Center,
@@ -1016,6 +1020,7 @@ fun WalkInfo() {
                 text = "$duration",
                 fontSize = 22.sp,
                 modifier = Modifier.padding(top = 4.dp),
+                fontWeight = FontWeight.Bold,
             )
         }
         Column(
@@ -1031,6 +1036,7 @@ fun WalkInfo() {
                 text = "$distance",
                 fontSize = 22.sp,
                 modifier = Modifier.padding(top = 4.dp),
+                fontWeight = FontWeight.Bold,
             )
         }
     }

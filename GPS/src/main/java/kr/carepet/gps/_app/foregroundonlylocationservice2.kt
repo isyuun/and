@@ -50,41 +50,6 @@ import java.util.Collections
 open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private fun path(): String {
-        /** 내부저장소 */
-        ///* 캐시(Cache)*/
-        //val ret = cacheDir.path
-        ///* 데이터베이스(Database)*/
-        //val ret = getDatabasePath("...").path
-        ///* 일반 파일*/
-        val ret = filesDir.path
-        ///* 일반 파일 폴더*/
-        //val ret = getFileStreamPath("...").path
-        /** 외부저장소 - 공용 영역 */
-        ///* 최상위 경로*/
-        //val ret = Environment.getExternalStorageDirectory().toString()
-        /* 특정 데이터를 저장*/
-        //val ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
-        /** 외부저장소 - 어플리케이션 고유 영역 */
-        ///* 특정 데이터를 저장*/
-        //val ret = getExternalFilesDirs(Environment.DIRECTORY_DOWNLOADS)[0].path
-        ///* 캐시 데이터를 저장*/
-        //val ret = externalCacheDir.toString()
-        Log.w(__CLASSNAME__, "${getMethodName()}$ret")
-        return ret
-    }
-
-    override fun onCreate() {
-        Log.d(__CLASSNAME__, "${getMethodName()}$_tracks")
-        super.onCreate()
-        _tracks.clear()
-        path()
-    }
-
-    private val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
-    internal val tracks: MutableList<Track>
-        get() = _tracks
-
     /** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-tracks-in-metre">Calculate distance between two tracks in metre</a> */
     //https://stackoverflow.com/questions/43080343/calculate-distance-between-two-locations-in-metre
     private fun distance(trk1: Track?, trk2: Track?): Float {
@@ -133,18 +98,35 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         post { this.write() }
     }
 
+
+    private fun path(): String {
+        //val ret = "${filesDir.path}/.GPX"
+        val ret = getExternalFilesDirs(".GPX")[0].path
+        Log.w(__CLASSNAME__, "${getMethodName()}$ret")
+        return ret
+    }
+
+    override fun onCreate() {
+        Log.d(__CLASSNAME__, "${getMethodName()}$_tracks")
+        super.onCreate()
+        _tracks.clear()
+    }
+
+    private val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
+    internal val tracks: MutableList<Track>
+        get() = _tracks
+
     internal val path
         get() = path()
 
     internal val file
-        get() = File("${path}/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(_tracks.first()?.time)}.gpx")
+        get() = File("${path}/${GPX_SIMPLE_TICK_FORMAT.format(_tracks.first()?.time)}.gpx")
 
     protected fun write() {
         if (_tracks.isEmpty()) return
-        val time = _tracks.first()?.time
-        val file = File("${path}/.GPX/${GPX_SIMPLE_TICK_FORMAT.format(time)}.gpx")
+        val file = this.file
         file.parentFile?.mkdirs()
-        Log.w(__CLASSNAME__, "${getMethodName()}${_tracks.size}, ${GPX_SIMPLE_TICK_FORMAT.format(this._start)}, ${GPX_SIMPLE_TICK_FORMAT.format(time)}, $file")
+        Log.w(__CLASSNAME__, "${getMethodName()}$file")
         GPXWriter2.write(_tracks, file)
     }
 
