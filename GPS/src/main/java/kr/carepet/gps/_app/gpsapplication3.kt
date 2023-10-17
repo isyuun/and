@@ -99,25 +99,39 @@ open class gpsapplication3 : gpsapplication2() {
     val pets = ArrayList<CurrentPetData>()
 
     fun add(pet: CurrentPetData) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${pets.contains(pet)}][$no]$pet$pets")
-        if (!pets.contains(pet)) pets.add(pet)
-        if (!pets.isEmpty()) select(pets.last()) else no = TRACK_ZERO_NO
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.pets.contains(pet)}][$no]$pet$pets")
+        if (!this.pets.contains(pet)) this.pets.add(pet)
+        select()
+    }
+
+    fun add(pets: List<CurrentPetData>) {
+        Log.i(__CLASSNAME__, "${getMethodName()}$pets")
+        this.pets.clear(); this.pets.addAll(pets)
+        select()
     }
 
     fun remove(pet: CurrentPetData) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${pets.contains(pet)}][$no]$pet$pets")
-        if (pets.contains(pet)) pets.remove(pet)
-        if (!pets.isEmpty()) select(pets.last()) else no = TRACK_ZERO_NO
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.pets.contains(pet)}][$no]$pet$pets")
+        if (this.pets.contains(pet)) this.pets.remove(pet)
+        select()
     }
 
-    fun select(pet: CurrentPetData) {
-        if (pets.contains(pet)) no = pet.ownrPetUnqNo
-        //Log.w(__CLASSNAME__, "${getMethodName()}[${pets.contains(pet)}][$no]$pet$pets")
+    fun remove() {
+        Log.i(__CLASSNAME__, "${getMethodName()}$pets")
+        this.pets.clear()
+        select()
+    }
+
+    private fun select() {
+        if (!this.pets.isEmpty()) select(this.pets.last()) else no = TRACK_ZERO_NO
+    }
+
+    private fun select(pet: CurrentPetData) {
+        if (this.pets.contains(pet)) no = pet.ownrPetUnqNo
     }
 
     fun contains(pet: CurrentPetData): Boolean {
-        //Log.w(__CLASSNAME__, "${getMethodName()}[${pets.contains(pet)}][$no]$pet$pets")
-        return pets.contains(pet)
+        return this.pets.contains(pet)
     }
 
     private var no: String
@@ -126,17 +140,20 @@ open class gpsapplication3 : gpsapplication2() {
             this.service?.no = no
         }
 
-    fun pee() {
+    fun pee(pet: CurrentPetData) {
+        select(pet)
         Log.d(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
         this.service?.pee()
     }
 
-    fun poo() {
+    fun poo(pet: CurrentPetData) {
+        select(pet)
         Log.d(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
         this.service?.poo()
     }
 
-    fun mrk() {
+    fun mrk(pet: CurrentPetData) {
+        select(pet)
         Log.d(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
         this.service?.mrk()
     }

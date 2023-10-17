@@ -147,13 +147,19 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
         return mimeType?.startsWith("image/") == true
     }
 
+
+    override fun start() {
+        super.start()
+        _imgs.clear()
+    }
+
     private fun img(path: String) {
         if (_imgs.size > 0 && _imgs.contains(path)) return
         _imgs.add(path)
         val loc = currentLocation
-        val img = if (_imgs.size > 0) _imgs.size - 1 else -1
+        val img = _imgs.size
         val trk = loc?.let { Track(it/*, no = this.no*/, img = img, uri = Uri.parse(path)) }
-        Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${_imgs.size}], ${_imgs[img]}, $trk")
+        Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${_imgs.size}], ${_imgs[img-1]}, $trk")
         trk?.let { add(it) }
         write()
     }
@@ -162,7 +168,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
         if (uri != null) {
             val path = path(uri)
             val time = time(uri)
-            Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
+            //Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
             if (path == null || time == null) return
             val file = File(path)
             val name = file.name

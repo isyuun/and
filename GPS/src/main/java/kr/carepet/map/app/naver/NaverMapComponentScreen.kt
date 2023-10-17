@@ -441,7 +441,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-    var checked by remember { mutableStateOf(false) }
+    var checkedAll by rememberSaveable { mutableStateOf(false) }
+    var checkedSel by rememberSaveable { mutableStateOf(false) }
     var event by remember { mutableStateOf(Track.EVENT.nnn) }
     var showPetsSheet by remember { mutableStateOf(false) }
 
@@ -474,8 +475,10 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         )
     }
 
-    /** right/left/walk */
+    /** bottom/right/left/walk */
     Box(modifier = Modifier.fillMaxSize()) {
+        Log.i(__CLASSNAME__, "::NaverMapApp@Box${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+        /** bottom */
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
@@ -505,16 +508,23 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             fontWeight = FontWeight.Bold,
                         )
                         Spacer(modifier = Modifier.padding(top = 10.dp))
+                        R.string.walk_check_select_all
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { checked = !checked },
+                                .clickable {
+                                    checkedAll = !checkedAll
+                                    if (checkedAll) application.add(pets) else application.remove()
+                                },
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Start,
                         ) {
                             Checkbox(
-                                checked = checked,
-                                onCheckedChange = { checked = it },
+                                checked = checkedAll,
+                                onCheckedChange = {
+                                    checkedAll = it
+                                    if (checkedAll) application.add(pets) else application.remove()
+                                },
                             )
                             Text(
                                 text = stringResource(id = R.string.walk_check_select_all),
@@ -524,8 +534,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         }
                         LazyRow(modifier = Modifier.fillMaxWidth()) {
                             items(pets) { pet ->
+                                Log.w(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[${application.contains(pet)}][${pet}]")
                                 Box() {
-                                    WalkPet(
+                                    WalkPetButton(
                                         pet = pet,
                                         checked = application.contains(pet),
                                         onCheckedChange = { checked ->
@@ -541,21 +552,17 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             }
                         }
                         Spacer(modifier = Modifier.padding(top = 4.dp))
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                        ) {
-                        }
+                        R.string.walk_check_select
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { checked = !checked },
+                                .clickable { checkedSel = !checkedSel },
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.End,
                         ) {
                             Checkbox(
-                                checked = checked,
-                                onCheckedChange = { checked = it },
+                                checked = checkedSel,
+                                onCheckedChange = { checkedSel = it },
                             )
                             Text(
                                 text = stringResource(id = R.string.walk_check_select),
@@ -571,7 +578,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center,
                         ) {
-                            Log.w(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet::Walk${getMethodName()}[${application.pets.isNotEmpty()}]")
                             Button(
                                 enabled = application.pets.isNotEmpty(),
                                 onClick = {
@@ -616,7 +622,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                         )
-                        WalkInfo()
+                        WalkInfoSheet()
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth(),
@@ -688,7 +694,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 }
             }
         }
-        Log.i(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+        Log.w(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
         /** right */
         AnimatedVisibility(
             visible = !showPetsSheet,
@@ -829,7 +835,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         zoomControlButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             rightMargin = right.dp.toPx(context).toInt()
         }
-        mapView.getMapAsync {naverMap ->
+        mapView.getMapAsync { naverMap ->
             naverMap.uiSettings.isZoomGesturesEnabled = (zoomControlButton.visibility != View.VISIBLE)
         }
     }
@@ -881,7 +887,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             onClick = {
                                 Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                                 if (!start) return@ImageButton    //test
-                                application.select(pet)
                                 showPetsSheet = false
                                 var mark: Marker? = null
                                 when (event) {
@@ -889,17 +894,17 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                     Track.EVENT.img -> {}
                                     Track.EVENT.pee -> {
                                         mark = pee
-                                        application.pee()
+                                        application.pee(pet)
                                     }
 
                                     Track.EVENT.poo -> {
                                         mark = poo
-                                        application.poo()
+                                        application.poo(pet)
                                     }
 
                                     Track.EVENT.mrk -> {
                                         mark = mrk
-                                        application.mrk()
+                                        application.mrk(pet)
                                     }
                                 }
                                 mark?.let {
@@ -921,19 +926,20 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 }
 
 @Composable
-fun WalkPet(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    //Log.wtf(__CLASSNAME__, "${getMethodName()} $pet, $checked, $onCheckedChange")
+fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     val petNm: String = pet.petNm
     val petRprsImgAddr: String = pet.petRprsImgAddr
 
-    var checked by rememberSaveable { mutableStateOf(checked) }
+    var check by rememberSaveable { mutableStateOf(checked) }; check = checked
     val width = (LocalConfiguration.current.screenWidthDp.dp - 60.dp) / 3
     val height = width/* - 9.dp*/
 
+    Log.wtf(__CLASSNAME__, "${getMethodName()}[$check]$pet, $checked, $onCheckedChange")
+
     Button(
         onClick = {
-            checked = !checked
-            onCheckedChange(checked)
+            check = !check
+            onCheckedChange(check)
         },
         modifier = Modifier
             .size(
@@ -969,8 +975,8 @@ fun WalkPet(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) ->
                 )
             }
             Row(
-                modifier = Modifier
-                    .clickable { checked = !checked },
+                //modifier = Modifier
+                //    .clickable { check = !check },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -979,10 +985,10 @@ fun WalkPet(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) ->
                     color = Color.Gray
                 )
                 Checkbox(
-                    checked = checked,
+                    checked = check,
                     onCheckedChange = {
-                        checked = it
-                        onCheckedChange(checked)
+                        check = it
+                        onCheckedChange(check)
                     },
                 )
             }
@@ -991,7 +997,7 @@ fun WalkPet(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) ->
 }
 
 @Composable
-fun WalkInfo() {
+fun WalkInfoSheet() {
     val application = GPSApplication.getInstance()
     val duration = remember { application.service?.duration }
     val distance = remember { application.service?.distance }
