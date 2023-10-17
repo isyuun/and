@@ -37,80 +37,81 @@ fun getMethodName(): String {
 
 class Log {
     companion object {
-        const val ASSERT = 7
-        const val DEBUG = 3
-        const val ERROR = 6
-        const val INFO = 4
-        const val VERBOSE = 2
-        const val WARN = 5
+        //const val ASSERT = 7
+        //const val DEBUG = 3
+        //const val ERROR = 6
+        //const val INFO = 4
+        //const val VERBOSE = 2
+        //const val WARN = 5
+        private val DEBUG = kr.carepet.BuildConfig.DEBUG
 
         private fun Log() { /* compiled code */
         }
 
         fun v(tag: String?, msg: String): Int { /* compiled code */
-            return android.util.Log.v(tag, msg)
+            return if (DEBUG) android.util.Log.v(tag, msg) else -1
         }
 
         fun v(tag: String?, msg: String?, tr: Throwable?): Int { /* compiled code */
-            return android.util.Log.v(tag, msg, tr)
+            return if (DEBUG) android.util.Log.v(tag, msg, tr) else -1
         }
 
         fun d(tag: String?, msg: String): Int { /* compiled code */
-            return android.util.Log.d(tag, msg)
+            return if (DEBUG) android.util.Log.d(tag, msg) else -1
         }
 
         fun d(tag: String?, msg: String?, tr: Throwable?): Int { /* compiled code */
-            return android.util.Log.d(tag, msg, tr)
+            return if (DEBUG) android.util.Log.d(tag, msg, tr) else -1
         }
 
         fun i(tag: String?, msg: String): Int { /* compiled code */
-            return android.util.Log.i(tag, msg)
+            return if (DEBUG) android.util.Log.i(tag, msg) else -1
         }
 
         fun i(tag: String?, msg: String?, tr: Throwable?): Int { /* compiled code */
-            return android.util.Log.i(tag, msg, tr)
+            return if (DEBUG) android.util.Log.i(tag, msg, tr) else -1
         }
 
         fun w(tag: String?, msg: String): Int { /* compiled code */
-            return android.util.Log.w(tag, msg)
+            return if (DEBUG) android.util.Log.w(tag, msg) else -1
         }
 
         fun w(tag: String?, msg: String?, tr: Throwable?): Int { /* compiled code */
-            return android.util.Log.w(tag, msg, tr)
+            return if (DEBUG) android.util.Log.w(tag, msg, tr) else -1
         }
 
         external fun isLoggable(s: String?, i: Int): Boolean
 
         fun w(tag: String?, tr: Throwable?): Int { /* compiled code */
-            return android.util.Log.w(tag, tr)
+            return if (DEBUG) android.util.Log.w(tag, tr) else -1
         }
 
         fun e(tag: String?, msg: String): Int { /* compiled code */
-            return android.util.Log.e(tag, msg)
+            return if (DEBUG) android.util.Log.e(tag, msg) else -1
         }
 
         fun e(tag: String?, msg: String?, tr: Throwable?): Int { /* compiled code */
-            return android.util.Log.e(tag, msg, tr)
+            return if (DEBUG) android.util.Log.e(tag, msg, tr) else -1
         }
 
         fun wtf(tag: String?, msg: String?): Int { /* compiled code */
-            return android.util.Log.wtf(tag, msg)
+            return if (DEBUG) android.util.Log.wtf(tag, msg) else -1
         }
 
         fun wtf(tag: String?, tr: Throwable): Int { /* compiled code */
-            return android.util.Log.wtf(tag, tr)
+            return if (DEBUG) android.util.Log.wtf(tag, tr) else -1
         }
 
         fun wtf(tag: String?, msg: String?, tr: Throwable?): Int { /* compiled code */
-            return android.util.Log.wtf(tag, msg, tr)
+            return if (DEBUG) android.util.Log.wtf(tag, msg, tr) else -1
         }
 
         fun getStackTraceString(tr: Throwable?): String { /* compiled code */
-            return android.util.Log.getStackTraceString(tr)
+            return if (DEBUG) android.util.Log.getStackTraceString(tr) else ""
         }
 
         fun println(priority: Int, tag: String?, msg: String): Int { /* compiled code */
-            return android.util.Log.println(priority, tag, msg)
+            return if (DEBUG) android.util.Log.println(priority, tag, msg) else -1
         }
 
     }
