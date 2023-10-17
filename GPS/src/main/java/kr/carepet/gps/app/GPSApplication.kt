@@ -66,6 +66,7 @@ open class GPSApplication : gpsapplication3() {
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.CAMERA,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
             )
         }
     }

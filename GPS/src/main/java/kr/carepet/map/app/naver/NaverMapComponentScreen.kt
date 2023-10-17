@@ -26,8 +26,10 @@
 package kr.carepet.map.app.naver
 
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
@@ -778,8 +780,20 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 onClick = {
                     Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@IconButton
-                    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    context.startActivity(intent)
+                    //val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    //context.startActivity(intent)
+                    val i = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    try {
+                        val pm: PackageManager = context.packageManager
+                        val info = pm.resolveActivity(i, 0)?.activityInfo
+                        val intent = Intent()
+                        intent.component = info?.let { ComponentName(it.packageName, it.name) }
+                        intent.action = Intent.ACTION_MAIN
+                        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+                        context.startActivity(intent)
+                    } catch (e: java.lang.Exception) {
+                        e.printStackTrace()
+                    }
                 },
                 drawable = ImageVector.vectorResource(id = R.drawable.icon_camera_map),
                 description = stringResource(R.string.photo),
