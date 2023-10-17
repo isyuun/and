@@ -402,14 +402,14 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val buttonText = if (start) stringResource(id = R.string.walk_button_end) else stringResource(R.string.walk_button_start)
     val buttonColors = if (start) ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary) else ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
 
-    val coroutineScope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     val departure = stringResource(id = R.string.departure)
     val arrival = stringResource(id = R.string.arrival)
 
     var refresh by remember { mutableStateOf(false) }
     LaunchedEffect(refresh, position, coords) {
-        coroutineScope.launch {
+        scope.launch {
             Log.w(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
             mapView.getMapAsync { naverMap ->
                 if (coords.isNotEmpty()) {
@@ -442,8 +442,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
     var checkedAll by rememberSaveable { mutableStateOf(false) }
+    checkedAll = (application.pets == pets)
     var checkedSel by rememberSaveable { mutableStateOf(false) }
     var event by remember { mutableStateOf(Track.EVENT.nnn) }
     var showPetsSheet by remember { mutableStateOf(false) }
@@ -537,18 +537,15 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         }
                         LazyRow(modifier = Modifier.fillMaxWidth()) {
                             items(pets) { pet ->
-                                Log.w(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[${application.contains(pet)}][${pet}]")
+                                Log.i(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[${application.contains(pet)}][${pet}]")
                                 Box() {
                                     WalkPetButton(
                                         pet = pet,
                                         checked = application.contains(pet),
                                         onCheckedChange = { checked ->
                                             refresh = !refresh
-                                            if (checked) {
-                                                application.add(pet)
-                                            } else {
-                                                application.remove(pet)
-                                            }
+                                            if (checked) application.add(pet) else application.remove(pet)
+                                            Log.wtf(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[$checked][$refresh][${application.contains(pet)}][${application.pets}]")
                                         }
                                     )
                                 }
@@ -945,7 +942,7 @@ fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boole
     val width = (LocalConfiguration.current.screenWidthDp.dp - 60.dp) / 3
     val height = width/* - 9.dp*/
 
-    Log.wtf(__CLASSNAME__, "${getMethodName()}[$check]$pet, $checked, $onCheckedChange")
+    Log.w(__CLASSNAME__, "${getMethodName()}[$check][$checked]$pet, $checked, $onCheckedChange")
 
     Button(
         onClick = {
