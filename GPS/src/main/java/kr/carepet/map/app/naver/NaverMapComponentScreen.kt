@@ -34,8 +34,11 @@ import android.os.Build
 import android.provider.MediaStore
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -83,6 +86,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -476,6 +480,10 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             },
             modifier = Modifier.fillMaxSize(),
         )
+    }
+
+    Box {
+        WalkInfoNavi(pet = pets[0], start = start)
     }
 
     /** bottom/right/left/walk */
@@ -1055,5 +1063,141 @@ fun WalkInfoSheet() {
                 fontWeight = FontWeight.Bold,
             )
         }
+    }
+}
+
+@Composable
+fun WalkInfoNavi(pet: CurrentPetData, start: Boolean) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        AnimatedVisibility(
+            visible = !start,
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+                    )
+            ) {
+                Spacer(modifier = Modifier.padding(top = 16.dp))
+                Row(
+                    modifier = Modifier
+                        .padding(start = 20.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(painter = painterResource(id = R.drawable.icon_bulb), contentDescription = "", tint = Color.Unspecified)
+                    Text(
+                        text = "소소한 산책 TIP",
+                        fontSize = 12.sp,
+                        letterSpacing = (-0.6).sp,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.padding(top = 4.dp))
+                Text(
+                    text = "슬개골 건강에는 비탈길, 계단보다 평지가 좋아요~",
+                    fontSize = 14.sp,
+                    letterSpacing = (-0.7).sp,
+                    modifier = Modifier.padding(start = 20.dp)
+                )
+                Spacer(modifier = Modifier.padding(top = 16.dp))
+            }
+        }
+        AnimatedVisibility(
+            visible = start,
+            enter = expandVertically(),
+            //enter = expandVertically(
+            //    animationSpec = tween(delayMillis = 500)
+            //),
+            exit = shrinkVertically()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+                    )
+            ) {
+                Spacer(modifier = Modifier.padding(top = 16.dp))
+
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircleImageTopBar(size = 40, imageUri = pet.petRprsImgAddr)
+
+                        Column(
+                            modifier = Modifier
+                                .padding(start = 12.dp)
+                        ) {
+                            Text(
+                                text = "행복한 산책중",
+                                fontSize = 12.sp,
+                                letterSpacing = (-0.6).sp,
+                                fontWeight = FontWeight.Normal
+                            )
+
+                            Text(
+                                text = "01:20:54",
+                                fontSize = 22.sp,
+                                letterSpacing = (-0.0).sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    //Text(
+                    //    text = "반려동물 변경",
+                    //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    //    fontSize = 14.sp,
+                    //    letterSpacing = (-0.6).sp,
+                    //    textDecoration = TextDecoration.Underline,
+                    //    color = design_skip,
+                    //    modifier = Modifier.clickable {
+                    //        viewModel.updateSheetChange("change")
+                    //        scope.launch { bottomSheetState.show() }
+                    //    }
+                    //)
+                }
+                Spacer(modifier = Modifier.padding(top = 16.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun CircleImageTopBar(size: Int, imageUri: String?) {
+
+    Box(
+        modifier = Modifier
+            .size(size.dp)
+            .border(shape = CircleShape, border = BorderStroke(3.dp, color = MaterialTheme.colorScheme.background))
+            .shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
+            .clip(CircleShape)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUri)
+                .crossfade(true)
+                .build(),
+            contentDescription = "",
+            placeholder = painterResource(id = R.drawable.profile_default),
+            error = painterResource(id = R.drawable.profile_default),
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
     }
 }
