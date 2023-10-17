@@ -870,9 +870,10 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         vertical = 100.dp,
                     )
                     .align(Alignment.BottomEnd),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.End
             ) {
-                var item =
+                val item =
                     when (event) {
                         Track.EVENT.nnn -> stringResource(id = R.string.nnn)
                         Track.EVENT.img -> stringResource(id = R.string.nnn)
@@ -887,7 +888,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     color = MaterialTheme.colorScheme.onPrimary
                 )
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(application.pets) { pet ->
                         ImageButton(
@@ -925,6 +926,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             drawable = ImageVector.vectorResource(id = R.drawable.walk_active),
                             description = stringResource(R.string.mark),
                             shape = CircleShape,
+                            //size = 40.dp,
                         )
                     }
                 }
