@@ -57,6 +57,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,8 +73,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.CircleImageTopBar
 import kr.carepet.app.navi.component.CustomTextField
@@ -94,10 +97,16 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.pet.PetDetailData
+import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.G
 
 @Composable
 fun PostScreen(viewModel:WalkViewModel, navController: NavHostController){
+    val application = GPSApplication.getInstance()
+
+    val tracks = application.tracks
+    val file = application.file
+    val images = application.images
 
     val walkMemo by viewModel.walkMemo.collectAsState()
     val postStory by viewModel.postStory.collectAsState()
@@ -108,6 +117,7 @@ fun PostScreen(viewModel:WalkViewModel, navController: NavHostController){
     var showDiagLog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     AnimatedVisibility(
         visible = showDiagLog,
@@ -294,7 +304,10 @@ fun PostScreen(viewModel:WalkViewModel, navController: NavHostController){
 
         Button(
             onClick = {
-                share(context, state.listOfSelectedImages[0], "shareText")
+                //share(context, state.listOfSelectedImages[0], "shareText")
+                      scope.launch {
+                          viewModel.photoUpload()
+                      }
                       },
             modifier = Modifier
                 .fillMaxWidth()
@@ -522,6 +535,7 @@ fun PhotoItem(uri: Uri, index:Int, onClick: () -> Unit){
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.6).sp,
+                        lineHeight = 12.sp,
                         modifier = Modifier.align(Alignment.Center),
                         color = design_white)
                 }

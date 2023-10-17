@@ -102,6 +102,7 @@ fun MainScreen(
     var isFABVisible by rememberSaveable { mutableStateOf(true) }
     var topBarChange by rememberSaveable { mutableStateOf("") }
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     val init by sharedViewModel.init.collectAsState()
 
@@ -143,9 +144,13 @@ fun MainScreen(
                 FloatingActionButton(
                     onClick = {
                         //navController.navigate(Screen.WalkWithMap.route)
-                        G.mapPetInfo = currentPet
-                        val intent = Intent(context,MapActivity::class.java)
-                        context.startActivity(intent)
+                        if (currentPet[0].ownrPetUnqNo==""){
+                            showDialog = true
+                        }else{
+                            G.mapPetInfo = currentPet
+                            val intent = Intent(context,MapActivity::class.java)
+                            context.startActivity(intent)
+                        }
                     },
                     modifier = Modifier
                         .padding(16.dp)
@@ -219,7 +224,9 @@ fun MainScreen(
                         backChange = { newValue -> backBtnOnLT = newValue },
                         openBottomSheet = openBottomSheet,
                         onDissMiss = {newValue -> openBottomSheet = newValue},
-                        bottomNavController = bottomNavController
+                        bottomNavController = bottomNavController,
+                        showDialog = showDialog,
+                        showDialogChange = {newValue -> showDialog = newValue}
                     )
                 }
                 composable(BottomNav.WalkScreen.route) {

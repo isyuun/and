@@ -6,10 +6,13 @@ package kr.carepet.app.navi.screens.mainscreen
 
 import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -35,6 +38,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
@@ -60,7 +64,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -98,6 +101,7 @@ import coil.request.ImageRequest
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.CustomBottomSheet
+import kr.carepet.app.navi.component.CustomDialog
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_grad_end
 import kr.carepet.app.navi.ui.theme.design_icon_5E6D7B
@@ -135,15 +139,15 @@ fun HomeScreen(
     backChange: (Boolean) -> Unit,
     openBottomSheet: Boolean,
     onDissMiss: (Boolean) -> Unit,
-    bottomNavController: NavHostController
+    bottomNavController: NavHostController,
+    showDialog: Boolean,
+    showDialogChange : (Boolean) -> Unit
 ){
-
-    val petInfo by viewModel.petInfo.collectAsState()
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     //petInfo.size가 갱신되기 전에, 뷰가 만들어지면서 에러발생
-    var pagerState = rememberPagerState(pageCount = { petInfo.size })
+    var pagerState = rememberPagerState(pageCount = { currentPetInfo.size })
 
     var refresh by rememberSaveable { mutableStateOf(true) }
 
@@ -177,6 +181,17 @@ fun HomeScreen(
     }
 
     if(!isLoading){
+
+        AnimatedVisibility(
+            visible = showDialog,
+            enter = scaleIn(),
+            exit = scaleOut()
+        ) {
+            CustomDialog(
+                onDismiss = { newValue -> showDialogChange(newValue) },
+                navController = navController
+            )
+        }
 
         Column (modifier = Modifier
             .fillMaxSize()
@@ -490,11 +505,11 @@ fun ProfileContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ){
-            if(petInfo.size>=2){
-                CircleImageOffset(imageUri = petInfo[1].petRprsImgAddr, index = 1)
+            if(currentPetInfo.size>=2){
+                CircleImageOffset(imageUri = currentPetInfo[1].petRprsImgAddr, index = 1)
             }
-            if(petInfo.size>=1 && petInfo[0].petInfoUnqNo!=0){
-                CircleImageOffset(imageUri = petInfo[0].petRprsImgAddr, index = 0)
+            if(currentPetInfo.size>=1 && currentPetInfo[0].sexTypNm != ""){
+                CircleImageOffset(imageUri = currentPetInfo[0].petRprsImgAddr, index = 0)
             }
 
             Box(
@@ -859,9 +874,11 @@ fun BottomSheetContent(
     onDisMiss: (Boolean) -> Unit ){
     
     val petList by viewModel.petInfo.collectAsState()
+    val index by viewModel.petListSelectIndex.collectAsState()
 
     LaunchedEffect(Unit){
         viewModel.updatePetListSelect(petList[0].ownrPetUnqNo)
+        viewModel.updatePetListSelectIndex("0")
     }
 
 
@@ -891,8 +908,8 @@ fun BottomSheetContent(
                     .heightIn(max = 300.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ){
-                items(petList){ petList ->
-                    BottomSheetItem(viewModel = viewModel, petList)
+                itemsIndexed(petList){ index, petList ->
+                    BottomSheetItem(viewModel = viewModel, petList, index)
                 }
             }
         }else{
@@ -949,7 +966,10 @@ fun BottomSheetContent(
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = design_white),
                 border = BorderStroke(1.dp, design_btn_border),
-                onClick = {     }
+                onClick = {
+                    onDisMiss(false)
+                    navController.navigate("petProfileScreen/${index.toString()}")
+                }
             ) {
                 Text(
                     text = "반려동물 관리하기",
@@ -966,7 +986,7 @@ fun BottomSheetContent(
 }
 
 @Composable
-fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData){
+fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData, index: Int){
 
     val petName:String = petList.petNm
     val imageUri:String = petList.petRprsImgAddr
@@ -981,7 +1001,10 @@ fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData){
     val selectPet by viewModel.petListSelect.collectAsState()
 
     Button(
-        onClick = { viewModel.updatePetListSelect(petList.ownrPetUnqNo) },
+        onClick = {
+            viewModel.updatePetListSelect(petList.ownrPetUnqNo)
+            viewModel.updatePetListSelectIndex(index.toString())
+                  },
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp)
             .fillMaxWidth()
@@ -1105,14 +1128,6 @@ fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData){
     }
 }
 
-@Preview
-@Composable
-fun preView(){
-    val sharedViewModel = SharedViewModel()
-    val viewModel = HomeViewModel(sharedViewModel)
-
-    BottomSheetItem(viewModel = viewModel, petList = viewModel.emptyPet)
-}
 
 @Composable
 fun BottomInfo(){
@@ -1249,7 +1264,9 @@ fun CircularProgressAnimated(){
         initialValue = 0.0f,
         targetValue = progressValue,animationSpec = infiniteRepeatable(animation = tween(900)))
 
-    Box(modifier = Modifier.fillMaxSize().background(color = design_white), contentAlignment = Alignment.Center){
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(color = design_white), contentAlignment = Alignment.Center){
         CircularProgressIndicator(progress = progressAnimationValue, color = design_intro_bg)
     }
 

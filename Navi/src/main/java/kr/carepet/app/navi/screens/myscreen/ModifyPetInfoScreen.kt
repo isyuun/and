@@ -89,6 +89,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -113,6 +114,7 @@ import kr.carepet.app.navi.ui.theme.design_placeHolder
 import kr.carepet.app.navi.ui.theme.design_select_btn_bg
 import kr.carepet.app.navi.ui.theme.design_select_btn_text
 import kr.carepet.app.navi.ui.theme.design_shadow
+import kr.carepet.app.navi.ui.theme.design_sharp
 import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
@@ -790,7 +792,7 @@ fun ModifyPetInfoScreen(
                     }
                 },
                 modifier = Modifier
-                    .padding(top = 16.dp, bottom = 40.dp)
+                    .padding(top = 16.dp, bottom = 20.dp)
                     .fillMaxWidth()
                     .height(48.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
@@ -798,11 +800,20 @@ fun ModifyPetInfoScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
             )
             {
-                Text(text = "등록하기", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(
+                Text(text = "수정하기", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(
                     Font(R.font.pretendard_regular)
                 )
                 )
             }
+
+            Text(
+                text = "반려동물 등록 정보 삭제",
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                textDecoration = TextDecoration.Underline,
+                color = design_sharp,
+                modifier = Modifier.padding(end = 20.dp, bottom = 20.dp).align(Alignment.End)
+            )
         }// Column
     }
 

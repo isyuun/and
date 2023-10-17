@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.cmm.commonRes
+import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.pet.InviteCodeReq
 import kr.carepet.data.pet.InviteCodeRes
 import kr.carepet.data.pet.Member
@@ -49,12 +50,12 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     val endCheck: StateFlow<Boolean> = _endCheck.asStateFlow() // state 노출
     fun updateEndCheck(newValue: Boolean) { _endCheck.value = newValue }
 
-    val selectedPet = mutableListOf<PetDetailData>()
+    val selectedPet = mutableListOf<CurrentPetData>()
 
-    private val _selectedPetSave = MutableStateFlow<List<PetDetailData>>(emptyList())
-    val selectedPetSave: StateFlow<List<PetDetailData>> = _selectedPetSave.asStateFlow()
+    private val _selectedPetSave = MutableStateFlow<List<CurrentPetData>>(emptyList())
+    val selectedPetSave: StateFlow<List<CurrentPetData>> = _selectedPetSave.asStateFlow()
 
-    fun updateSelectedPetSave(newValue: List<PetDetailData>): Boolean {
+    fun updateSelectedPetSave(newValue: List<CurrentPetData>): Boolean {
         _selectedPetSave.value = newValue
         return true // 값을 업데이트하는 데 성공했음을 나타내는 불리언 값을 반환합니다.
     }
@@ -202,6 +203,10 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                                 continuation.resume(false)
                             }
                         }
+                    }else{
+                        sharedViewModel.clear()
+                        MySharedPreference.setIsLogin(false)
+                        continuation.resume(true)
                     }
                 }
                 override fun onFailure(call: Call<LogoutRes>, t: Throwable) {
@@ -259,10 +264,10 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     suspend fun getInviteCode():Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val petList:List<Pet> = selectedPetSave.value.map { petDetailData ->
+        val petList:List<Pet> = selectedPetSave.value.map { currentPetData ->
             Pet(
-                ownrPetUnqNo = petDetailData.ownrPetUnqNo,
-                petNm = petDetailData.petNm
+                ownrPetUnqNo = currentPetData.ownrPetUnqNo,
+                petNm = currentPetData.petNm
             )
         }
 
@@ -455,11 +460,13 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                         }
 
                     }else{
+                        _memberList.value = emptyList()
                         continuation.resume(false)
                     }
                 }
 
                 override fun onFailure(call: Call<PetDetailRes>, t: Throwable) {
+                    _memberList.value = emptyList()
                     continuation.resume(false)
                 }
 
