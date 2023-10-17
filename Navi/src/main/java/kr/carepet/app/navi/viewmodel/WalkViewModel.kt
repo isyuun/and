@@ -23,13 +23,19 @@ import kr.carepet.data.daily.DailyLifeWalk
 import kr.carepet.data.daily.DailyMonthData
 import kr.carepet.data.daily.DailyMonthRes
 import kr.carepet.data.daily.Paginate
+import kr.carepet.data.daily.PhotoRes
 import kr.carepet.data.daily.WalkListRes
 import kr.carepet.data.daily.WeekData
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.RetrofitClientServer
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 import kotlin.coroutines.resume
 
 class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {
@@ -231,6 +237,41 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) :ViewModel() {
                 override fun onFailure(call: Call<DailyMonthRes>, t: Throwable) {
                     continuation.resume(false)
                 }
+            })
+        }
+    }
+
+    suspend fun photoUpload():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val parts = ArrayList<MultipartBody.Part>()
+
+        for (fileUri in state.listOfSelectedImages){
+            val file = File(fileUri.path)
+            val requestFile = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
+            val part = MultipartBody.Part.createFormData("files",file.name, requestFile)
+            parts.add(part)
+        }
+
+        val call = apiService.uploadPhoto(parts)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<PhotoRes>{
+                override fun onResponse(call: Call<PhotoRes>, response: Response<PhotoRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            Log.d("PHOTO",body.data.toString())
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<PhotoRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
             })
         }
     }

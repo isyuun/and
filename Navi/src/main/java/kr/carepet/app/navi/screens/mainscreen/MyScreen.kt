@@ -107,6 +107,7 @@ import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
+import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
@@ -611,10 +612,9 @@ fun MyBottomSheet(
     timeState: TimePickerState
 ){
 
-    val petList by sharedViewModel.petInfo.collectAsState()
+    val currentPetList by sharedViewModel.currentPetInfo.collectAsState()
     val endCheck by settingViewModel.endCheck.collectAsState()
     val selectedPet = settingViewModel.selectedPet
-    val selectedPetSave by settingViewModel.selectedPetSave.collectAsState()
 
     val context = LocalContext.current
 
@@ -622,6 +622,8 @@ fun MyBottomSheet(
 
     val sdfDate = SimpleDateFormat("yyyy.MM.dd")
     val formattedDate = sdfDate.format(Date(dateState.selectedDateMillis?:Date().time))
+
+    val selectedTime by settingViewModel.selectedTime.collectAsState()
 
     LaunchedEffect(Unit){
         selectedPet.clear()
@@ -648,11 +650,11 @@ fun MyBottomSheet(
 
         LazyRow(
             modifier = Modifier
-                .padding(horizontal = 20.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.Center,
+            contentPadding = PaddingValues(horizontal = 20.dp)
         ){
-            items(petList){ petList ->
+            items(currentPetList){ petList ->
                 MyBottomSheetItem(viewModel = sharedViewModel, settingViewModel= settingViewModel, petList = petList)
             }
         }
@@ -702,7 +704,10 @@ fun MyBottomSheet(
                     )
 
                     Text(
-                        text = "${formattedDate}  ${if(timeState.hour<10) "0"+timeState.hour else timeState.hour}:${if(timeState.minute<10) "0"+timeState.minute else timeState.minute}",
+                        text = "${formattedDate}  " +
+                               if (selectedTime != ""){
+                                   "${if(timeState.hour<10) "0"+timeState.hour else timeState.hour}:${if(timeState.minute<10) "0"+timeState.minute else timeState.minute}"
+                               }else{""},
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                         color = design_login_text, modifier = Modifier.padding(start = 12.dp)
@@ -727,16 +732,14 @@ fun MyBottomSheet(
                                     navController.navigate(Screen.InviteScreen.route)
                                 } }
                         }
-                    }else{
+                    }else if(dateState.selectedDateMillis != null && selectedTime !=""){
                         val calendar = Calendar.getInstance()
                         calendar.set(Calendar.HOUR_OF_DAY, timeState.hour)
                         calendar.set(Calendar.MINUTE, timeState.minute)
 
-                        val sdfTime = SimpleDateFormat("HHmm")
                         val sdfDate = SimpleDateFormat("yyyyMMdd")
                         val sdfCurrentDate = SimpleDateFormat("yyyyMMddHHmm")
 
-                        val selectedTime = sdfTime.format(calendar.time)
                         val selectedDate = sdfDate.format(dateState.selectedDateMillis)
 
                         val currentDate = sdfCurrentDate.format(Date().time)
@@ -752,6 +755,8 @@ fun MyBottomSheet(
                                     } }
                             }
                         }
+                    }else{
+                        Toast.makeText(context, "종료 시간을 선택해주세요", Toast.LENGTH_SHORT).show()
                     }
                 }else{
                     Toast.makeText(context, "펫을 선택해주세요", Toast.LENGTH_SHORT).show()
@@ -772,7 +777,7 @@ fun MyBottomSheet(
 }
 
 @Composable
-fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewModel, petList : PetDetailData){
+fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewModel, petList : CurrentPetData){
 
     val configuration = LocalConfiguration.current
 
@@ -795,6 +800,7 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
             }
                   },
         modifier = Modifier
+            .padding(horizontal = 4.dp)
             .size(width = screenWidth / 3, height = screenWidth / 3 - 9.dp)
             .shadow(ambientColor = design_shadow, elevation = 0.dp)
         ,

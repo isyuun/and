@@ -89,4 +89,8 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
     val petListSelect: StateFlow<String> = _petListSelect.asStateFlow()
     fun updatePetListSelect(newValue: String) { _petListSelect.value = newValue }
 
+    private val _petListSelectIndex = MutableStateFlow("0")
+    val petListSelectIndex: StateFlow<String> = _petListSelectIndex.asStateFlow()
+    fun updatePetListSelectIndex(newValue: String) { _petListSelectIndex.value = newValue }
+
 }
