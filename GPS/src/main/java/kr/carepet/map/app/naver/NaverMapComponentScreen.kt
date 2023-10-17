@@ -30,8 +30,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.provider.MediaStore
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -456,6 +456,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     getMapAsync { naverMap ->
                         Log.wtf(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                         naverMap.apply {
+                            uiSettings.isZoomGesturesEnabled = !uiSettings.isZoomControlEnabled
                             locationSource = source
                             locationTrackingMode = LocationTrackingMode.Follow
                             cameraPosition = CameraPosition(cameraPosition.target, GPX_CAMERA_ZOOM_ZERO)
@@ -780,10 +781,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 onClick = {
                     Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@IconButton
-                    //val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    //context.startActivity(intent)
-                    val i = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        context.startActivity(intent)
+                    } else {
+                        val i = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         val pm: PackageManager = context.packageManager
                         val info = pm.resolveActivity(i, 0)?.activityInfo
                         val intent = Intent()
@@ -791,8 +793,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         intent.action = Intent.ACTION_MAIN
                         intent.addCategory(Intent.CATEGORY_LAUNCHER)
                         context.startActivity(intent)
-                    } catch (e: java.lang.Exception) {
-                        e.printStackTrace()
                     }
                 },
                 drawable = ImageVector.vectorResource(id = R.drawable.icon_camera_map),
@@ -848,9 +848,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         val right = (width - 64)
         zoomControlButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             rightMargin = right.dp.toPx(context).toInt()
-        }
-        mapView.getMapAsync { naverMap ->
-            naverMap.uiSettings.isZoomGesturesEnabled = (zoomControlButton.visibility != View.VISIBLE)
         }
     }
 
