@@ -7,6 +7,7 @@ package kr.carepet.app.navi.screens.mainscreen
 import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -64,6 +65,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -98,6 +100,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.CustomBottomSheet
@@ -256,7 +259,7 @@ fun HomeScreen(
                     dragHandle = {}
                 ) {
                     Column {
-                        CustomBottomSheet(viewModel = sharedViewModel,  title = "나의 반려동물을 선택하여 주세요.", btnText = "확인")
+                        CustomBottomSheet(viewModel = sharedViewModel,  title = "나의 반려동물을 선택하여 주세요.", btnText = "확인", onDismiss = {newValue -> onDissMiss(newValue)})
                         Spacer(modifier = Modifier
                             .height(navigationBarHeight)
                             .fillMaxWidth()
@@ -297,6 +300,7 @@ fun ProfileContent(
     val wtCont3 = "구의동"
     val dustIcon= R.drawable.dust_good
 
+    val scope = rememberCoroutineScope()
     val petInfo by viewModel.petInfo.collectAsState()
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
 
@@ -370,7 +374,8 @@ fun ProfileContent(
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
                 HorizontalPager(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize(),
                     state = pagerState,
                     beyondBoundsPageCount = 1,
                     flingBehavior = PagerDefaults.flingBehavior(
@@ -392,10 +397,11 @@ fun ProfileContent(
                             scaleX = 1 - pageOffset.absoluteValue / 4
                             scaleY = 1 - pageOffset.absoluteValue / 4
                         }
-                        .fillMaxSize()
-                        , contentAlignment = Alignment.Center) {
+                        .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
 
-                        CircleImage(size = 180, imageUri = currentPetInfo[page].petRprsImgAddr)
+                        CircleImageHome(size = 180, imageUri = currentPetInfo[page].petRprsImgAddr, page, pagerState)
                     }
                 }
 
@@ -1194,8 +1200,9 @@ fun BottomInfo(){
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CircleImage(size: Int, imageUri:String?){
+fun CircleImage(size: Int, imageUri: String?){
 
     Box(
         modifier = Modifier
@@ -1227,6 +1234,50 @@ fun CircleImage(size: Int, imageUri:String?){
     }
 }
 
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun CircleImageHome(size: Int, imageUri: String?, page: Int, pagerState: PagerState){
+
+    val scope = rememberCoroutineScope()
+
+    Box(
+        modifier = Modifier
+            .size(size.dp)
+            .border(shape = CircleShape, border = BorderStroke(5.dp, color = design_white))
+            //.shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
+            .shadow(
+                color = design_shadow,
+                offsetY = 10.dp,
+                offsetX = 10.dp,
+                spread = 4.dp,
+                blurRadius = 3.dp,
+                borderRadius = 90.dp
+            )
+            .clip(CircleShape)
+            .clickable {
+                scope.launch {
+                    pagerState.animateScrollToPage(
+                        page = page,
+                        animationSpec = tween(durationMillis = 600)
+                    )
+                }
+            }
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUri)
+                .crossfade(true)
+                .build(),
+            contentDescription = "",
+            placeholder = painterResource(id = R.drawable.profile_default),
+            error= painterResource(id = R.drawable.profile_default),
+            modifier= Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+    }
+}
 @Composable
 fun CircleImageOffset(imageUri: String?, index: Int){
 

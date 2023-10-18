@@ -112,6 +112,7 @@ import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CustomTextField
+import kr.carepet.app.navi.component.LoadingDialog
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_camera_bg
@@ -124,6 +125,7 @@ import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.LoginViewModel
+import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
 import kr.carepet.data.SCD
 import kr.carepet.data.SggList
@@ -137,7 +139,8 @@ fun PetCreateScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: UserCreateViewModel,
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
+    sharedViewModel: SharedViewModel
 ){
 
     val scdList by remember { mutableStateOf(viewModel.scdList) }
@@ -186,6 +189,7 @@ fun PetCreateScreen(
     val userId by viewModel.userID.collectAsState()
     val userPw by viewModel.userPW.collectAsState()
     val snsLogin by viewModel.snsLogin.collectAsState()
+    var isLoading by remember{ mutableStateOf(false) }
 
     Log.d("LOG","petCreate composing")
 
@@ -200,6 +204,11 @@ fun PetCreateScreen(
             .padding(paddingValues)
             .verticalScroll(rememberScrollState())
         ){
+            LoadingDialog(
+                loadingText = "펫 등록중...",
+                loadingState = isLoading
+            )
+
             Row (horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()){
                 Text(text = "건너뛰기",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -207,30 +216,37 @@ fun PetCreateScreen(
                     modifier= Modifier
                         .padding(end = 20.dp)
                         .clickable {
-                            if (MySharedPreference.getIsLogin()) {
-                                navController.navigate(Screen.MainScreen.route) {
-                                    popUpTo(0)
-                                }
-                            } else {
-                                scope.launch {
-                                    val userCreateSuccess = viewModel.sendUserToServer()
-                                    if (userCreateSuccess) {
-                                        val loginSuccess =
-                                            loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)
-                                        if (loginSuccess) {
-                                            navController.navigate(Screen.MainScreen.route) {
-                                                popUpTo(0)
-                                            }
+                            //if (MySharedPreference.getIsLogin()) {
+                            //    navController.navigate(Screen.MainScreen.route) {
+                            //        popUpTo(0)
+                            //    }
+                            //} else {
+                            //
+                            //}
+
+                            scope.launch {
+                                val userCreateSuccess = viewModel.sendUserToServer()
+                                if (userCreateSuccess) {
+                                    val loginSuccess =
+                                        loginViewModel.onLoginButtonClick(
+                                            userId,
+                                            userPw,
+                                            snsLogin
+                                        )
+                                    if (loginSuccess) {
+                                        sharedViewModel.updateInit(true)
+                                        navController.navigate(Screen.MainScreen.route) {
+                                            popUpTo(0)
                                         }
-                                    } else {
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                viewModel.userResponse.value.detailMessage,
-                                                Toast.LENGTH_SHORT
-                                            )
-                                            .show()
                                     }
+                                } else {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            viewModel.userResponse.value.detailMessage,
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                 }
                             }
                         },
@@ -820,35 +836,33 @@ fun PetCreateScreen(
                 onClick = {
                     scope.launch {
 
+                        isLoading = true
+
                         if (IntegrityCheck(viewModel, context)){
-                            // 로그인 된 상태면 펫 생성만
-                            if (MySharedPreference.getIsLogin()){
-                                val petCreateSuccess = viewModel.createPet()
-                                if(petCreateSuccess){
-                                    navController.navigate(Screen.MainScreen.route){
-                                        popUpTo(0)
-                                    }
-                                }else{
-                                    Toast.makeText(context, viewModel.myPetResModel.value?.detailMessage ?: "", Toast.LENGTH_SHORT).show()
-                                }
-                            }else{ // 회원가입시에 하는거면 가입, 로그인, 펫 생성까지
-                                val userCreateSuccess = viewModel.sendUserToServer()
-                                if (userCreateSuccess){
-                                    val loginSuccess = loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)
-                                    if (loginSuccess){
-                                        val petCreateSuccess = viewModel.createPet()
-                                        if(petCreateSuccess){
-                                            navController.navigate(Screen.MainScreen.route){
-                                                popUpTo(0)
-                                            }
-                                        }else{
-                                            Toast.makeText(context, viewModel.myPetResModel.value?.detailMessage ?: "", Toast.LENGTH_SHORT).show()
+                            val userCreateSuccess = viewModel.sendUserToServer()
+                            if (userCreateSuccess){
+                                val loginSuccess = loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)
+                                if (loginSuccess){
+                                    val petCreateSuccess = viewModel.createPet()
+                                    if(petCreateSuccess){
+                                        isLoading = false
+                                        sharedViewModel.updateInit(true)
+                                        navController.navigate(Screen.MainScreen.route){
+                                            popUpTo(0)
                                         }
+                                    }else{
+                                        isLoading = false
+                                        Toast.makeText(context, viewModel.myPetResModel.value?.detailMessage ?: "", Toast.LENGTH_SHORT).show()
                                     }
                                 }else{
-                                    Toast.makeText(context, viewModel.userResponse.value.detailMessage, Toast.LENGTH_SHORT).show()
+                                    isLoading = false
                                 }
+                            }else{
+                                isLoading = false
+                                Toast.makeText(context, viewModel.userResponse.value.detailMessage, Toast.LENGTH_SHORT).show()
                             }
+
+                            isLoading = false
                         }
                     }
                 },

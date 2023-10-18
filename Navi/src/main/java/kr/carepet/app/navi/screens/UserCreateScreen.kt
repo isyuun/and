@@ -273,20 +273,20 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                                     val result = viewModel.nickNameCheck()
                                     if (result){
                                         focusManager.clearFocus()
+                                        viewModel.updateUserNickNamePass(nickName)
                                         snackbarHostState.showSnackbar(
                                             message = "사용하실 수 있는 닉네임입니다",
                                             actionLabel = "확인",
                                             duration = SnackbarDuration.Short,
-                                            withDismissAction = true
+                                            withDismissAction = false
                                         )
-                                        viewModel.updateUserNickNamePass(nickName)
                                     }else{
                                         focusManager.clearFocus()
                                         snackbarHostState.showSnackbar(
                                             message = "이미 사용중인 닉네임입니다",
                                             actionLabel = "확인",
                                             duration = SnackbarDuration.Short,
-                                            withDismissAction = true
+                                            withDismissAction = false
                                         )
                                     }
                                 }

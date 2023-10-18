@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.screens.mainscreen.shadow
 import kr.carepet.app.navi.ui.theme.design_button_bg
@@ -58,7 +59,7 @@ import kr.carepet.data.pet.PetDetailData
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel){
+fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel, onDismiss: (Boolean) -> Unit){
 
     val petList by viewModel.petInfo.collectAsState()
 
@@ -83,15 +84,25 @@ fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel){
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            contentPadding = PaddingValues(horizontal = 20.dp)
-        ){
-            items(petList){ petList ->
-                Box (modifier = Modifier.padding(horizontal = 4.dp)){
-                    BottomSheetItem(viewModel = viewModel, petList = petList)
+        if (petList[0].ownrPetUnqNo == ""){
+            Text(
+                text = "등록된 펫이 없어요",
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                color = design_login_text,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }else{
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                contentPadding = PaddingValues(horizontal = 20.dp)
+            ){
+                items(petList){ petList ->
+                    Box (modifier = Modifier.padding(horizontal = 4.dp)){
+                        BottomSheetItem(viewModel = viewModel, petList = petList)
+                    }
                 }
             }
         }
@@ -99,7 +110,11 @@ fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel){
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
         Button(
-            onClick = { },
+            onClick = {
+                scope.launch {
+                    onDismiss(false)
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
