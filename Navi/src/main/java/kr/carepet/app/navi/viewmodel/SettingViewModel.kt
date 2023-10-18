@@ -60,37 +60,13 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
         return true // 값을 업데이트하는 데 성공했음을 나타내는 불리언 값을 반환합니다.
     }
 
+    private val _otpValue = MutableStateFlow("") // Data 저장
+    val otpValue: StateFlow<String> = _otpValue.asStateFlow() // state 노출
+    fun updateOtpValue(newValue: String) { _otpValue.value = newValue }
+
     private val _inviteCode = MutableStateFlow("") // Data 저장
     val inviteCode: StateFlow<String> = _inviteCode.asStateFlow() // state 노출
     fun updateInviteCode(newValue: String) { _inviteCode.value = newValue }
-
-    private val _setInviteCode = MutableStateFlow("") // Data 저장
-    val setInviteCode: StateFlow<String> = _setInviteCode.asStateFlow() // state 노출
-    fun updateSetInviteCode(newValue: String) { _setInviteCode.value = newValue }
-
-    private val _setInviteCode1 = MutableStateFlow("") // Data 저장
-    val setInviteCode1: StateFlow<String> = _setInviteCode1.asStateFlow() // state 노출
-    fun updateSetInviteCode1(newValue: String) { _setInviteCode1.value = newValue }
-
-    private val _setInviteCode2 = MutableStateFlow("") // Data 저장
-    val setInviteCode2: StateFlow<String> = _setInviteCode2.asStateFlow() // state 노출
-    fun updateSetInviteCode2(newValue: String) { _setInviteCode2.value = newValue }
-
-    private val _setInviteCode3 = MutableStateFlow("") // Data 저장
-    val setInviteCode3: StateFlow<String> = _setInviteCode3.asStateFlow() // state 노출
-    fun updateSetInviteCode3(newValue: String) { _setInviteCode3.value = newValue }
-
-    private val _setInviteCode4 = MutableStateFlow("") // Data 저장
-    val setInviteCode4: StateFlow<String> = _setInviteCode4.asStateFlow() // state 노출
-    fun updateSetInviteCode4(newValue: String) { _setInviteCode4.value = newValue }
-
-    private val _setInviteCode5 = MutableStateFlow("") // Data 저장
-    val setInviteCode5: StateFlow<String> = _setInviteCode5.asStateFlow() // state 노출
-    fun updateSetInviteCode5(newValue: String) { _setInviteCode5.value = newValue }
-
-    private val _setInviteCode6 = MutableStateFlow("") // Data 저장
-    val setInviteCode6: StateFlow<String> = _setInviteCode6.asStateFlow() // state 노출
-    fun updateSetInviteCode6(newValue: String) { _setInviteCode6.value = newValue }
 
     private val _selectedDate = MutableStateFlow("") // Data 저장
     val selectedDate: StateFlow<String> = _selectedDate.asStateFlow() // state 노출
@@ -142,6 +118,9 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     private val _isCheck = MutableStateFlow(false) // Data 저장
     val isCheck: StateFlow<Boolean> = _isCheck.asStateFlow() // state 노출
     fun updateIsCheck(newValue: Boolean) { _isCheck.value = newValue }
+
+    private val _detailMessage = MutableStateFlow("") // Data 저장
+    val detailMessage: StateFlow<String> = _detailMessage.asStateFlow() // state 노출
 
     var state by mutableStateOf(MyScreenState())
         private set
@@ -309,16 +288,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     suspend fun setInviteCode():Boolean{
         val apiService = RetrofitClientServer.instance
 
-        _setInviteCode.value = buildString {
-            append(_setInviteCode1.value)
-            append(_setInviteCode2.value)
-            append(_setInviteCode3.value)
-            append(_setInviteCode4.value)
-            append(_setInviteCode5.value)
-            append(_setInviteCode6.value)
-        }
-
-        val call = apiService.setInviteCode(_setInviteCode.value)
+        val call = apiService.setInviteCode(_otpValue.value.uppercase())
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<SetInviteCodeRes>{
                 override fun onResponse(
@@ -330,8 +300,12 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                         if (body?.statusCode == 200){
                             continuation.resume(true)
                         }else{
+                            _detailMessage.value = body?.detailMessage.toString()
                             continuation.resume(false)
                         }
+                    }else{
+                        _detailMessage.value = response.body()?.detailMessage.toString()
+                        continuation.resume(false)
                     }
                 }
 

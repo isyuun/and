@@ -115,7 +115,7 @@ fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
         }
         composable("petCreateScreen"){
 
-            PetCreateScreen(navController = navController, viewModel = userCreateViewModel, loginViewModel = viewModel)
+            PetCreateScreen(navController = navController, viewModel = userCreateViewModel, loginViewModel = viewModel, sharedViewModel = sharedViewModel)
         }
         composable("petKindContent"){
 

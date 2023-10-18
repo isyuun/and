@@ -1,8 +1,16 @@
 package kr.carepet.app.navi.screens.myscreen
 
+import android.content.ClipboardManager
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,9 +22,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -24,19 +34,32 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,10 +76,13 @@ import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewModel){
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val dm by settingViewModel.detailMessage.collectAsState()
 
     Scaffold (
         topBar = { BackTopBar(title = "초대코드 등록하기", navController = navController) }
@@ -106,7 +132,7 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
 
                 Spacer(modifier = Modifier.padding(top = 20.dp))
 
-                SetKey(settingViewModel = settingViewModel)
+                SetKeyTemp(settingViewModel = settingViewModel)
 
                 Spacer(modifier = Modifier.padding(top = 40.dp))
 
@@ -119,7 +145,9 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
                                 settingViewModel.updatePetInfo()
                                 navController.popBackStack()
                             }else{
-                                Log.d("LOG","등록실패")
+                                scope.launch {
+                                    Toast.makeText(context, dm , Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
 
@@ -148,179 +176,98 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
 @Composable
-fun SetKey(settingViewModel: SettingViewModel){
+fun SetKeyTemp(settingViewModel: SettingViewModel){
 
-    val text1 by settingViewModel.setInviteCode1.collectAsState()
-    val text2 by settingViewModel.setInviteCode2.collectAsState()
-    val text3 by settingViewModel.setInviteCode3.collectAsState()
-    val text4 by settingViewModel.setInviteCode4.collectAsState()
-    val text5 by settingViewModel.setInviteCode5.collectAsState()
-    val text6 by settingViewModel.setInviteCode6.collectAsState()
+    val context = LocalContext.current
+    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
-    val focusManager = LocalFocusManager.current
+    val otpValue by settingViewModel.otpValue.collectAsState()
+    val focusRequester by remember { mutableStateOf(FocusRequester()) }
+    val inputService = LocalTextInputService.current
 
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .fillMaxWidth()
-            .height(60.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 3.dp)
-                .fillMaxHeight()
-                .weight(1f)
-                .background(color = design_white, shape = RoundedCornerShape(12.dp))
-                .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, design_textFieldOutLine, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
-        ){
-            BasicTextField(
-                value = text1,
-                onValueChange = {
-                    //if (it.length <= 1){
-                    //    settingViewModel.updateSetInviteCode1(it)
-                    //    focusManager.moveFocus(FocusDirection.Next)
-                    //}
-                    if (it.length <= 1){
-                        settingViewModel.updateSetInviteCode1(it)
-                        focusManager.moveFocus(FocusDirection.Next)
-                    }
-                },
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-                    .plus(TextStyle(color = design_login_text, fontSize = 24.sp, lineHeight = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)))),
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 3.dp)
-                .fillMaxHeight()
-                .weight(1f)
-                .background(color = design_white, shape = RoundedCornerShape(12.dp))
-                .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, design_textFieldOutLine, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
-        ){
-            BasicTextField(
-                value = text2,
-                onValueChange = {
-                    if (it.length <= 1){
-                        settingViewModel.updateSetInviteCode2(it)
-                        focusManager.moveFocus(FocusDirection.Next)
-                    }
-                },
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-                    .plus(TextStyle(color = design_login_text, fontSize = 24.sp, lineHeight = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold))))
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 3.dp)
-                .fillMaxHeight()
-                .weight(1f)
-                .background(color = design_white, shape = RoundedCornerShape(12.dp))
-                .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, design_textFieldOutLine, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
-        ){
-            BasicTextField(
-                value = text3,
-                onValueChange = {
-                    if (it.length <= 1){
-                        settingViewModel.updateSetInviteCode3(it)
-                        focusManager.moveFocus(FocusDirection.Next)
-                    }
-                },
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-                    .plus(TextStyle(color = design_login_text, fontSize = 24.sp, lineHeight = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold))))
-            )
-        }
-
-        Spacer(modifier = Modifier
-            .padding(horizontal = 2.dp)
-            .size(10.dp, 2.dp)
-            .background(design_login_text))
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 3.dp)
-                .fillMaxHeight()
-                .weight(1f)
-                .background(color = design_white, shape = RoundedCornerShape(12.dp))
-                .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, design_textFieldOutLine, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
-        ){
-            BasicTextField(
-                value = text4,
-                onValueChange = {
-                    if (it.length <= 1){
-                        settingViewModel.updateSetInviteCode4(it)
-                        focusManager.moveFocus(FocusDirection.Next)
-                    }
-                },
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-                    .plus(TextStyle(color = design_login_text, fontSize = 24.sp, lineHeight = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold))))
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 3.dp)
-                .fillMaxHeight()
-                .weight(1f)
-                .background(color = design_white, shape = RoundedCornerShape(12.dp))
-                .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, design_textFieldOutLine, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
-        ){
-            BasicTextField(
-                value = text5,
-                onValueChange = {
-                    if (it.length <= 1){
-                        settingViewModel.updateSetInviteCode5(it)
-                        focusManager.moveFocus(FocusDirection.Next)
-                    }
-                },
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-                    .plus(TextStyle(color = design_login_text, fontSize = 24.sp, lineHeight = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold))))
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 3.dp)
-                .fillMaxHeight()
-                .weight(1f)
-                .background(color = design_white, shape = RoundedCornerShape(12.dp))
-                .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, design_textFieldOutLine, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
-        ){
-            BasicTextField(
-                value = text6,
-                onValueChange = {
-                    if (it.length <= 1){
-                        settingViewModel.updateSetInviteCode6(it)
-                    }
-                },
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-                    .plus(TextStyle(color = design_login_text, fontSize = 24.sp, lineHeight = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)))),
-            )
-        }
-
-
+    LaunchedEffect(Unit){
+        focusRequester.requestFocus()
+        settingViewModel.updateOtpValue("")
     }
+
+    BasicTextField(
+        value = otpValue,
+        onValueChange = {
+            if (it.length <= 6) {
+                settingViewModel.updateOtpValue(it)
+            }
+        },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text
+        ),
+        decorationBox = {
+            Row (
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                repeat(6){ index ->
+                    val char = when {
+                        index >= otpValue.length -> ""
+                        else -> otpValue[index].toString()
+                    }
+                    var isFocused = otpValue.length == index
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp)
+                            .border(
+                                if (isFocused) 2.dp else 1.dp,
+                                if (isFocused) design_login_text else design_textFieldOutLine,
+                                RoundedCornerShape(8.dp)
+                            )
+                            .background(color = design_white, shape = RoundedCornerShape(8.dp))
+                            .combinedClickable(
+                                onClick = {
+                                    focusRequester.requestFocus()
+                                    inputService?.startInput()
+                                },
+                                onLongClick = {
+                                    val clipData = clipboardManager.primaryClip
+
+                                    if (clipData != null && clipData.itemCount > 0) {
+                                        val clipboardText = clipData.getItemAt(0).text.toString()
+
+                                        if (clipboardText.length == 6) {
+                                            settingViewModel.updateOtpValue(clipboardText)
+                                        } else {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "복사된 초대코드가 없습니다",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        }
+                                    }
+                                },
+                                onLongClickLabel = ""
+                            ),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = char.uppercase(),
+                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            fontSize = 24.sp, color = design_login_text,
+                            lineHeight = 24.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+                }
+            }
+        },
+        modifier = Modifier
+            .padding(start = 40.dp, end = 40.dp)
+            .focusRequester(focusRequester)
+    )
+
 }
