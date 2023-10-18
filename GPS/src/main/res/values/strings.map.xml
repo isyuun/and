@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">케어펫</string>
+    <string name="app_name">펫팁</string>
 
+    <string name="open">열기</string>
     <string name="start">시작</string>
     <string name="stop">중지</string>
     <string name="pause">정지</string>
@@ -29,4 +30,9 @@
     <string name="walk_button_finish">네,종료할게요.</string>
     <string name="walk_button_resume">조금 더 할게요.</string>
     <string name="walk_title_marking">%s을 남길 아이</string>
+    <string name="walk_title_walking">행복한 산책중</string>
+    <string name="walk_title_tip">소소한 산책 TIP</string>
+    <string name="walk_title_tips">슬개골 건강에는 비탈길, 계단보다 평지가 좋아요~</string>
+    <string name="walk_text_no_location">위치정보 확인중입니다. GPS수신위치로 이동해주세요.</string>
+    <string name="walk_text_in_tracking">위치정보 확인중입니다.</string>
 </resources>

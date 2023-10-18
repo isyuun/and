@@ -34,6 +34,17 @@ package kr.carepet.app.navi
  * @author      : isyuun@care-pet.kr
  * @description :
  */
+import android.content.ComponentName
+import android.os.IBinder
 import kr.carepet.map.app.MapApplication
+import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
 
-open class Application : MapApplication()
+open class Application : MapApplication() {
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+        super.onServiceConnected(name, service)
+        if (!start) start()    //test
+    }
+}

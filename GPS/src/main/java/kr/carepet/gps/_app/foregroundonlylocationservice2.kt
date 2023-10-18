@@ -176,6 +176,38 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         this.write()
     }
 
+    val _duration: String
+        get() {
+            if (tracks?.isEmpty() == true) {
+                return "00:00:00"
+            }
+            val startTime = tracks?.first()?.time ?: System.currentTimeMillis()
+            //val endTime = tracks?.last().time
+            val endTime = System.currentTimeMillis()
+            val durationInMillis = endTime - startTime
+            val seconds = durationInMillis / 1000
+            val minutes = seconds / 60
+            val hours = minutes / 60
+            return String.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60)
+        }
+
+    val _distance: String
+        get() {
+            if (tracks?.isEmpty() == true) {
+                return "0.00 km"
+            }
+            var totalDistance = 0.0
+            tracks?.let {
+                for (i in 1 until it.size) {
+                    val prevLocation = it[i - 1]
+                    val currentLocation = it[i]
+                    val distance = prevLocation.location.distanceTo(currentLocation.location)
+                    totalDistance += distance
+                }
+            }
+            return String.format("%.2f km", totalDistance / 1000)
+        }
+
     val duration
         get() = _GPXWriter.calculateDuration(_tracks)
 

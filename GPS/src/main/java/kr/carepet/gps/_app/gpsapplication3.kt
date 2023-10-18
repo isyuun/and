@@ -29,8 +29,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import kr.carepet.data.pet.CurrentPetData
-import kr.carepet.gpx.TRACK_ZERO_NO
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -43,11 +41,6 @@ import kr.carepet.util.getMethodName
  */
 open class gpsapplication3 : gpsapplication2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    override fun onCreate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}[$no]")
-        super.onCreate()
-    }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
@@ -67,94 +60,5 @@ open class gpsapplication3 : gpsapplication2() {
         //post { pee("") }    //test
         //post { poo("") }    //test
         //post { mark("") }    //test
-    }
-
-    override fun start() {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
-        super.start()
-        tracks?.clear()
-        images?.clear()
-    }
-
-    override fun stop() {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
-        super.stop()
-    }
-
-    fun end() {
-    }
-
-    val path
-        get() = this.service?.path
-
-    val file
-        get() = this.service?.file
-
-    val images
-        get() = this.service?.imgs
-
-    val tracks
-        get() = this.service?.tracks
-
-    val pets = ArrayList<CurrentPetData>()
-
-    fun add(pet: CurrentPetData) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.pets.contains(pet)}][$no]$pet$pets")
-        if (!this.pets.contains(pet)) this.pets.add(pet)
-        select()
-    }
-
-    fun add(pets: List<CurrentPetData>) {
-        Log.i(__CLASSNAME__, "${getMethodName()}$pets")
-        this.pets.clear(); this.pets.addAll(pets)
-        select()
-    }
-
-    fun remove(pet: CurrentPetData) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.pets.contains(pet)}][$no]$pet$pets")
-        if (this.pets.contains(pet)) this.pets.remove(pet)
-        select()
-    }
-
-    fun remove() {
-        Log.i(__CLASSNAME__, "${getMethodName()}$pets")
-        this.pets.clear()
-        select()
-    }
-
-    private fun select() {
-        if (!this.pets.isEmpty()) select(this.pets.last()) else no = TRACK_ZERO_NO
-    }
-
-    private fun select(pet: CurrentPetData) {
-        if (this.pets.contains(pet)) no = pet.ownrPetUnqNo
-    }
-
-    fun contains(pet: CurrentPetData): Boolean {
-        return this.pets.contains(pet)
-    }
-
-    private var no: String
-        get() = this.service?.no ?: TRACK_ZERO_NO
-        set(no) {
-            this.service?.no = no
-        }
-
-    fun pee(pet: CurrentPetData) {
-        select(pet)
-        Log.d(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
-        this.service?.pee()
-    }
-
-    fun poo(pet: CurrentPetData) {
-        select(pet)
-        Log.d(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
-        this.service?.poo()
-    }
-
-    fun mrk(pet: CurrentPetData) {
-        select(pet)
-        Log.d(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
-        this.service?.mrk()
     }
 }

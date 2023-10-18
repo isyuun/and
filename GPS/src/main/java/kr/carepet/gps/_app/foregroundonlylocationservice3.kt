@@ -44,7 +44,6 @@ import kr.carepet.util.getMethodName
 import java.io.File
 import java.util.Collections
 
-
 /**
  * @Project     : carepet-android
  * @FileName    : foregroundonlylocationservice3.kt
@@ -61,12 +60,6 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
 
     override fun onServiceDisconnected(name: ComponentName) {
         Log.i(__CLASSNAME__, "${getMethodName()}...")
-    }
-
-    override fun generateNotification(location: android.location.Location?): Notification? {
-        val ret = super.generateNotification(location)
-        Log.i(__CLASSNAME__, "${getMethodName()}${location.toText()}, $ret")
-        return ret
     }
 
     private lateinit var cameraContentObserver: CameraContentObserver

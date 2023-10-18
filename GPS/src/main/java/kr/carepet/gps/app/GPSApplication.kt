@@ -29,7 +29,7 @@ import android.Manifest
 import android.content.ComponentName
 import android.os.Build
 import android.os.IBinder
-import kr.carepet.gps._app.gpsapplication3
+import kr.carepet.gps._app.gpsapplication4
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -40,7 +40,7 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class GPSApplication : gpsapplication3() {
+open class GPSApplication : gpsapplication4() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     companion object {
@@ -83,6 +83,6 @@ open class GPSApplication : gpsapplication3() {
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
-        //start()    //test
+        //if (!start) start()    //test
     }
 }

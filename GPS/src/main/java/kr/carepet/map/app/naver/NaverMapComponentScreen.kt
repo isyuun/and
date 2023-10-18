@@ -34,7 +34,6 @@ import android.os.Build
 import android.provider.MediaStore
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -77,6 +76,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -101,6 +101,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -122,6 +123,7 @@ import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.widget.LocationButtonView
 import com.naver.maps.map.widget.ZoomControlView
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.R
@@ -384,7 +386,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         }
     }
 
-    var position = remember { LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO) }
+    var position by remember { mutableStateOf(LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
     source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }
     source.isCompassEnabled = true
 
@@ -482,8 +484,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         )
     }
 
+    /** top */
     Box {
-        WalkInfoNavi(pet = pets[0], start = start)
+        WalkInfoNavi(application.start)
     }
 
     /** bottom/right/left/walk */
@@ -1017,8 +1020,9 @@ fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boole
 @Composable
 fun WalkInfoSheet() {
     val application = GPSApplication.getInstance()
-    val duration = remember { application.service?.duration }
-    val distance = remember { application.service?.distance }
+    val duration = remember { application._duration }
+    val distance = remember { application._distance }
+    Log.d(__CLASSNAME__, "${getMethodName()}[${System.currentTimeMillis()}][$duration][$distance]")
     Row(
         modifier = Modifier
             .padding(top = 16.dp, bottom = 16.dp)
@@ -1067,20 +1071,42 @@ fun WalkInfoSheet() {
 }
 
 @Composable
-fun WalkInfoNavi(pet: CurrentPetData, start: Boolean) {
+fun WalkInfoNavi(start: Boolean) {
+    Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
+    val application = GPSApplication.getInstance()
+    var pet by remember { mutableStateOf(CurrentPetData("", "", "", "", "", "", 0.0f)) }
+    if (application.pets.isNotEmpty()) pet = application.pets[0]
+    var count by remember { mutableIntStateOf(0) }
+    var duration by remember { mutableStateOf("00:00:00") }
+    var distance by remember { mutableStateOf("0.00 km") }
+    if (start) {
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(1000) // 1초마다 업데이트
+                if (start) count++ else count = 0
+                duration = application._duration.toString()
+                distance = application._distance.toString()
+            }
+        }
+    }
     Column(modifier = Modifier.fillMaxWidth()) {
+        R.string.walk_title_tip
         AnimatedVisibility(
             visible = !start,
             enter = expandVertically(),
-            exit = shrinkVertically()
+            exit = shrinkVertically(),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
                     .background(
                         color = MaterialTheme.colorScheme.background,
-                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                    )
+                    .border(
+                        width = 0.1.dp,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
                     )
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
@@ -1092,7 +1118,7 @@ fun WalkInfoNavi(pet: CurrentPetData, start: Boolean) {
                 ) {
                     Icon(painter = painterResource(id = R.drawable.icon_bulb), contentDescription = "", tint = Color.Unspecified)
                     Text(
-                        text = "소소한 산책 TIP",
+                        text = stringResource(id = R.string.walk_title_tip),
                         fontSize = 12.sp,
                         letterSpacing = (-0.6).sp,
                         modifier = Modifier.padding(start = 4.dp)
@@ -1100,7 +1126,7 @@ fun WalkInfoNavi(pet: CurrentPetData, start: Boolean) {
                 }
                 Spacer(modifier = Modifier.padding(top = 4.dp))
                 Text(
-                    text = "슬개골 건강에는 비탈길, 계단보다 평지가 좋아요~",
+                    text = stringResource(id = R.string.walk_title_tips),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
                     modifier = Modifier.padding(start = 20.dp)
@@ -1108,25 +1134,26 @@ fun WalkInfoNavi(pet: CurrentPetData, start: Boolean) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
             }
         }
+        R.string.walk_title_walking
         AnimatedVisibility(
             visible = start,
             enter = expandVertically(),
-            //enter = expandVertically(
-            //    animationSpec = tween(delayMillis = 500)
-            //),
-            exit = shrinkVertically()
+            exit = shrinkVertically(),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
                     .background(
                         color = MaterialTheme.colorScheme.background,
-                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                    )
+                    .border(
+                        width = 0.1.dp,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
                     )
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
-
                 Row(
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
@@ -1138,24 +1165,45 @@ fun WalkInfoNavi(pet: CurrentPetData, start: Boolean) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         CircleImageTopBar(size = 40, imageUri = pet.petRprsImgAddr)
-
                         Column(
                             modifier = Modifier
                                 .padding(start = 12.dp)
                         ) {
                             Text(
-                                text = "행복한 산책중",
+                                text = stringResource(id = R.string.walk_title_walking),
                                 fontSize = 12.sp,
                                 letterSpacing = (-0.6).sp,
                                 fontWeight = FontWeight.Normal
                             )
-
-                            Text(
-                                text = "01:20:54",
-                                fontSize = 22.sp,
-                                letterSpacing = (-0.0).sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Row {
+                                Text(
+                                    modifier = Modifier
+                                        .weight(1.0f)
+                                        .fillMaxWidth(),
+                                    text = duration,
+                                    fontSize = 22.sp,
+                                    letterSpacing = (-0.0).sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Start,
+                                    //style = TextStyle(background = Color.Yellow),
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .weight(1.0f)
+                                        .fillMaxWidth(),
+                                    text = distance,
+                                    fontSize = 22.sp,
+                                    letterSpacing = (-0.0).sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.End,
+                                    //style = TextStyle(background = Color.Yellow),
+                                )
+                                Spacer(
+                                    modifier = Modifier
+                                        .weight(1.0f)
+                                        .fillMaxWidth(),
+                                )
+                            }
                         }
                     }
                     //Text(
@@ -1179,7 +1227,6 @@ fun WalkInfoNavi(pet: CurrentPetData, start: Boolean) {
 
 @Composable
 fun CircleImageTopBar(size: Int, imageUri: String?) {
-
     Box(
         modifier = Modifier
             .size(size.dp)
@@ -1198,6 +1245,5 @@ fun CircleImageTopBar(size: Int, imageUri: String?) {
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
     }
 }
