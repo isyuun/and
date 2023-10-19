@@ -108,6 +108,7 @@ fun PostScreen(viewModel:WalkViewModel, navController: NavHostController){
     val tracks = application.tracks
     val file = application.file
     val images = application.images
+    val pets = application.pets
 
     val walkMemo by viewModel.walkMemo.collectAsState()
     val postStory by viewModel.postStory.collectAsState()
