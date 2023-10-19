@@ -636,6 +636,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             }
                         }
                     } else {
+                        source.lastLocation?.let { tracks?.add(Track(it)) }
                         Text(
                             text = stringResource(id = R.string.walk_title_end),
                             fontSize = 20.sp,
