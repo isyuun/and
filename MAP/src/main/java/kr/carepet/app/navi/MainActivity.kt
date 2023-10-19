@@ -45,7 +45,7 @@ open class MainActivity : kr.carepet.map.app.MapActivity() {
         Log.v(__CLASSNAME__, "${getMethodName()}")
         //super.setContent()
         setContent {
-            AppTheme {
+            AppTheme(dynamicColor = true) {
                 MapApp()
             }
         }
