@@ -39,7 +39,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -1059,6 +1061,7 @@ fun WalkInfoSheet() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WalkInfoNavi(start: Boolean) {
     Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
@@ -1110,7 +1113,11 @@ fun WalkInfoNavi(start: Boolean) {
                         text = stringResource(id = R.string.walk_title_tip),
                         fontSize = 12.sp,
                         letterSpacing = (-0.6).sp,
-                        modifier = Modifier.padding(start = 4.dp)
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .basicMarquee(),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 1,
                     )
                 }
                 Spacer(modifier = Modifier.padding(top = 4.dp))
@@ -1118,7 +1125,11 @@ fun WalkInfoNavi(start: Boolean) {
                     text = stringResource(id = R.string.walk_title_tips),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    modifier = Modifier.padding(start = 20.dp)
+                    modifier = Modifier
+                        .padding(start = 48.dp)
+                        .basicMarquee(),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
                 )
                 Spacer(modifier = Modifier.padding(top = 16.dp))
             }
@@ -1162,8 +1173,10 @@ fun WalkInfoNavi(start: Boolean) {
                                 text = stringResource(id = R.string.walk_title_walking),
                                 fontSize = 12.sp,
                                 letterSpacing = (-0.6).sp,
-                                fontWeight = FontWeight.Normal
-                            )
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.onBackground,
+
+                                )
                             Row {
                                 Text(
                                     modifier = Modifier
@@ -1175,6 +1188,7 @@ fun WalkInfoNavi(start: Boolean) {
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Start,
                                     //style = TextStyle(background = Color.Yellow),
+                                    color = MaterialTheme.colorScheme.onBackground,
                                 )
                                 Text(
                                     modifier = Modifier
@@ -1186,6 +1200,7 @@ fun WalkInfoNavi(start: Boolean) {
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.End,
                                     //style = TextStyle(background = Color.Yellow),
+                                    color = MaterialTheme.colorScheme.onBackground,
                                 )
                                 Spacer(
                                     modifier = Modifier
