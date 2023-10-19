@@ -103,7 +103,7 @@ import kr.carepet.singleton.G
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(viewModel:WalkViewModel, navController: NavHostController){
-    val application = GPSApplication.getInstance()
+    val application = GPSApplication.instance
 
     val tracks = application.tracks
     val file = application.file
