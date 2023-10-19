@@ -26,8 +26,8 @@
 package kr.carepet.app.navi
 
 /**import kr.carepet.util.__CLASSNAME__*/
-import android.os.Bundle
-import kr.carepet.map.app.MapActivity
+import androidx.activity.compose.setContent
+import kr.carepet.app.navi.ui.theme.AppTheme
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -38,11 +38,16 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class MainActivity : MapActivity() {
+open class MainActivity : kr.carepet.map.app.MapActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(__CLASSNAME__, "${getMethodName()}savedInstanceState:$savedInstanceState")
-        super.onCreate(savedInstanceState)
+    override fun setContent() {
+        Log.v(__CLASSNAME__, "${getMethodName()}")
+        //super.setContent()
+        setContent {
+            AppTheme {
+                MapApp()
+            }
+        }
     }
 }
