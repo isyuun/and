@@ -33,7 +33,6 @@ import kr.carepet.gpx.GPXWriter2
 import kr.carepet.gpx.GPX_INTERVAL_UPDATE_METERS
 import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
 import kr.carepet.gpx.Track
-import kr.carepet.gpx._GPXWriter
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.io.File
@@ -176,13 +175,40 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         this.write()
     }
 
-    val _duration: String
+    val _duration: Long
+        get() {
+            if (tracks?.isEmpty() == true) {
+                return 0L
+            }
+            val startTime = tracks?.first()?.time ?: System.currentTimeMillis()
+            val endTime = tracks?.last()?.time ?: System.currentTimeMillis()
+            return endTime - startTime
+        }
+
+    val _distance: Float
+        get() {
+            if (tracks?.isEmpty() == true) {
+                return 0.0f
+            }
+            var totalDistance = 0.0f
+            tracks?.let {
+                for (i in 1 until it.size) {
+                    val prevLocation = it[i - 1]
+                    val currentLocation = it[i]
+                    val distance = prevLocation.location.distanceTo(currentLocation.location)
+                    totalDistance += distance
+                }
+            }
+            return totalDistance
+        }
+
+    val duration: String
+        //get() = _GPXWriter.calculateDuration(_tracks)
         get() {
             if (tracks?.isEmpty() == true) {
                 return "00:00:00"
             }
             val startTime = tracks?.first()?.time ?: System.currentTimeMillis()
-            //val endTime = tracks?.last().time
             val endTime = System.currentTimeMillis()
             val durationInMillis = endTime - startTime
             val seconds = durationInMillis / 1000
@@ -191,7 +217,8 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
             return String.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60)
         }
 
-    val _distance: String
+    val distance: String
+        //get() = _GPXWriter.calculateTotalDistance(_tracks)
         get() {
             if (tracks?.isEmpty() == true) {
                 return "0.00 km"
@@ -207,10 +234,4 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
             }
             return String.format("%.2f km", totalDistance / 1000)
         }
-
-    val duration
-        get() = _GPXWriter.calculateDuration(_tracks)
-
-    val distance
-        get() = _GPXWriter.calculateTotalDistance(_tracks)
 }

@@ -1011,8 +1011,8 @@ fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boole
 @Composable
 fun WalkInfoSheet() {
     val application = GPSApplication.instance
-    val duration = remember { application._duration }
-    val distance = remember { application._distance }
+    val duration = remember { application.duration }
+    val distance = remember { application.distance }
     Log.d(__CLASSNAME__, "${getMethodName()}[${System.currentTimeMillis()}][$duration][$distance]")
     Row(
         modifier = Modifier
@@ -1076,8 +1076,8 @@ fun WalkInfoNavi(start: Boolean) {
             while (true) {
                 delay(1000) // 1초마다 업데이트
                 if (start) count++ else count = 0
-                duration = application._duration.toString()
-                distance = application._distance.toString()
+                duration = application.duration.toString()
+                distance = application.distance.toString()
             }
         }
     }

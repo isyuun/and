@@ -48,7 +48,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3() {
 
     override fun generateNotification(location: android.location.Location?): Notification {
         //var ret = super.generateNotification(location)
-        val title = "${getString(R.string.walk_title_walking)} - ${_duration}"
+        val title = "${getString(R.string.walk_title_walking)} - ${duration}"
         val text = "${getString(R.string.app_name)}이 ${getString(R.string.walk_text_in_tracking)}"
         val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent(), PendingIntent.FLAG_MUTABLE)
         val ret = notificationCompatBuilder
@@ -83,7 +83,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3() {
         timer = Timer()
         timer.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                val title = "${getString(R.string.walk_title_walking)} - ${_duration}"
+                val title = "${getString(R.string.walk_title_walking)} - ${duration}"
                 Log.wtf(__CLASSNAME__, "${getMethodName()} $title")
                 notification = notificationCompatBuilder.setContentTitle(title).build()
                 notificationManager.notify(NOTIFICATION_ID, notification)

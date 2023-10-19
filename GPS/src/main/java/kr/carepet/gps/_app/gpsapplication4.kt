@@ -77,7 +77,7 @@ open class gpsapplication4 : gpsapplication3() {
     val duration
         get() = this.service?.duration
 
-    val distance: String?
+    val distance
         get() = this.service?.distance
 
     val pets = ArrayList<CurrentPetData>()
