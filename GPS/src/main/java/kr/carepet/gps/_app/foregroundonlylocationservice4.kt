@@ -93,6 +93,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3() {
 
     private var notification: Notification? = null
     override fun onUnbind(intent: Intent): Boolean {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$intent")
         if (!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this)) {
             if (notification == null) notification = generateNotification(currentLocation)
             startForeground(NOTIFICATION_ID, notification)
@@ -104,13 +105,10 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3() {
     }
 
     override fun onRebind(intent: Intent) {
-        try {
-            timer.cancel()
-            timer.purge()
-            timer == null
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$intent")
+        timer.cancel()
+        timer.purge()
+        timer == null
         super.onRebind(intent)
     }
 
