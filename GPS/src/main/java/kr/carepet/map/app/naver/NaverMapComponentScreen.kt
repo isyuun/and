@@ -51,7 +51,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -131,6 +130,7 @@ import kr.carepet.gps.app.GPSApplication
 import kr.carepet.gpx.GPX_CAMERA_ZOOM_ZERO
 import kr.carepet.gpx.GPX_LATITUDE_ZERO
 import kr.carepet.gpx.GPX_LONGITUDE_ZERO
+import kr.carepet.gpx.TRACK_ZERO_NUM
 import kr.carepet.gpx.Track
 import kr.carepet.map._app.getRounded
 import kr.carepet.map._app.toPx
@@ -177,31 +177,33 @@ fun marker(context: Context, position: LatLng?, id: Int, back: Color = Color.Whi
     return marker
 }
 
-@Composable
-fun pee(position: LatLng): Marker {
-    val context = LocalContext.current
-    val marker = marker(context, position, R.drawable.marker_pee, Color(0xFFEEBF00))
-    return marker
+fun marker(position: LatLng, event: Track.EVENT): Marker? {
+    val context = GPSApplication.instance.applicationContext
+    val id = when (event) {
+        Track.EVENT.nnn -> -1
+        Track.EVENT.img -> -1
+        Track.EVENT.pee -> R.drawable.marker_pee
+        Track.EVENT.poo -> R.drawable.marker_poop
+        Track.EVENT.mrk -> R.drawable.marker_marking
+    }
+    val back = when (event) {
+        Track.EVENT.nnn -> Color.White
+        Track.EVENT.img -> Color.White
+        Track.EVENT.pee -> Color(0xFFEEBF00)
+        Track.EVENT.poo -> Color(0xFF956A5C)
+        Track.EVENT.mrk -> Color(0xFF4AB0F5)
+    }
+    return if (id > -1) marker(context, position, id, back) else null
 }
 
-@Composable
-fun poo(position: LatLng): Marker {
-    val context = LocalContext.current
-    val marker = marker(context, position, R.drawable.marker_poop, Color(0xFF956A5C))
-    return marker
-}
-
-@Composable
-fun mrk(position: LatLng): Marker {
-    val context = LocalContext.current
-    val marker = marker(context, position, R.drawable.marker_marking, Color(0xFF4AB0F5))
-    return marker
-}
-
-@Composable
-fun img(position: LatLng): Marker {
-    val context = LocalContext.current
-    val marker = marker(context, position, R.drawable.marker_poop, Color(0xFF956A5C))
+fun mark(pet: CurrentPetData, event: Track.EVENT, position: LatLng, mapView: MapView): Marker? {
+    GPSApplication.instance.mark(pet, event)
+    var marker = marker(position, event)
+    marker?.let {
+        mapView.getMapAsync { naverMap ->
+            it.map = naverMap
+        }
+    }
     return marker
 }
 
@@ -359,12 +361,20 @@ fun ImageButton(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NaverMapApp(source: FusedLocationSource) {
-    val application = GPSApplication.getInstance()
+    Log.v(__CLASSNAME__, "${getMethodName()}[ST]")
+    val application = GPSApplication.instance
+    if (G.mapPetInfo.isEmpty()) {   //test
+        val pet = CurrentPetData("", TRACK_ZERO_NUM, "읎따", "", "", "", 0.0f)
+        application.add(pet)
+        application.add(pet)
+        G.mapPetInfo = application.pets
+    }
     val pets = G.mapPetInfo
+    if (pets.size == 1) application.add(pets[0])
     val context = LocalContext.current
     val tracks = application.tracks
     val start = application.start
-    Log.i(__CLASSNAME__, "${getMethodName()}[${start}][${tracks?.size}][${source.lastLocation}][$pets]")
+    Log.i(__CLASSNAME__, "${getMethodName()}[${start}][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
 
     val markers = remember { mutableListOf<Marker>() }
     val coords = remember { mutableListOf<LatLng>() }
@@ -375,13 +385,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             val lat = track.latitude
             val lon = track.longitude
             val pos = LatLng(lat, lon)
-            when (track.event) {
-                Track.EVENT.nnn -> "TODO()"
-                Track.EVENT.img -> "TODO()"
-                Track.EVENT.pee -> markers.add(pee(pos))
-                Track.EVENT.poo -> markers.add(poo(pos))
-                Track.EVENT.mrk -> markers.add(mrk(pos))
-            }
+            val mrk = marker(pos, track.event)
+            mrk?.let { markers.add(it) }
             coords.add(pos)
         }
     }
@@ -440,9 +445,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
         }
     }
-    val pee = pee(position)
-    val poo = poo(position)
-    val mrk = mrk(position)
 
     val activity = LocalContext.current as Activity
 
@@ -490,7 +492,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
 
     /** bottom/right/left/walk */
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 20.dp)
+    ) {
         Log.i(__CLASSNAME__, "::NaverMapApp@Box${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
         /** bottom */
         if (showBottomSheet) {
@@ -705,8 +711,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 }
             }
         }
-        Log.w(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
         /** right */
+        Log.w(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
         AnimatedVisibility(
             visible = !showPetsSheet,
             modifier = Modifier.align(Alignment.BottomEnd),
@@ -726,7 +732,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                         if (!start) return@IconButton     //test
                         event = Track.EVENT.pee
-                        showPetsSheet = true
+                        if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
+                        else showPetsSheet = true
                     },
                     drawable = ImageVector.vectorResource(id = R.drawable.icon_pee),
                     description = stringResource(R.string.pee),
@@ -740,7 +747,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                         if (!start) return@IconButton     //test
                         event = Track.EVENT.poo
-                        showPetsSheet = true
+                        if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
+                        else showPetsSheet = true
                     },
                     drawable = ImageVector.vectorResource(id = R.drawable.icon_poop),
                     description = stringResource(R.string.poop),
@@ -754,7 +762,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                         if (!start) return@IconButton     //test
                         event = Track.EVENT.mrk
-                        showPetsSheet = true
+                        if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
+                        else showPetsSheet = true
                     },
                     drawable = ImageVector.vectorResource(id = R.drawable.icon_marking),
                     description = stringResource(R.string.mark),
@@ -769,7 +778,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             modifier = Modifier
                 .padding(
                     horizontal = 24.dp,
-                    vertical = 100.dp
+                    vertical = 150.dp
                 )
                 .align(Alignment.BottomStart),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -807,18 +816,21 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 description = stringResource(R.string.photo),
                 size = 40.dp
             )
-            Spacer(modifier = Modifier.height(29.dp)) // 아래 마진 추가
             val locationButton = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
             locationButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 leftMargin = 16.5.dp.toPx(context).toInt()
-                bottomMargin = 42.dp.toPx(context).toInt()
+                bottomMargin = 68.dp.toPx(context).toInt()
             }
         }
         /** walk */
         Button(
             onClick = {
                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                showBottomSheet = !showBottomSheet
+                if (pets.size == 1 && !start) {
+                    application.start()
+                } else {
+                    showBottomSheet = !showBottomSheet
+                }
             },
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
@@ -908,31 +920,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                                 if (!start) return@ImageButton    //test
                                 showPetsSheet = false
-                                var mark: Marker? = null
-                                when (event) {
-                                    Track.EVENT.nnn -> {}
-                                    Track.EVENT.img -> {}
-                                    Track.EVENT.pee -> {
-                                        mark = pee
-                                        application.pee(pet)
-                                    }
-
-                                    Track.EVENT.poo -> {
-                                        mark = poo
-                                        application.poo(pet)
-                                    }
-
-                                    Track.EVENT.mrk -> {
-                                        mark = mrk
-                                        application.mrk(pet)
-                                    }
-                                }
-                                mark?.let {
-                                    markers.add(it)
-                                    mapView.getMapAsync { naverMap ->
-                                        it.map = naverMap
-                                    }
-                                }
+                                mark(pet, event, position, mapView)?.let { markers.add(it) }
                             },
                             drawable = ImageVector.vectorResource(id = R.drawable.walk_active),
                             description = stringResource(R.string.mark),
@@ -944,6 +932,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
         }
     }
+    Log.v(__CLASSNAME__, "${getMethodName()}[ED]")
 }
 
 @Composable
@@ -1019,7 +1008,7 @@ fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boole
 
 @Composable
 fun WalkInfoSheet() {
-    val application = GPSApplication.getInstance()
+    val application = GPSApplication.instance
     val duration = remember { application._duration }
     val distance = remember { application._distance }
     Log.d(__CLASSNAME__, "${getMethodName()}[${System.currentTimeMillis()}][$duration][$distance]")
@@ -1073,7 +1062,7 @@ fun WalkInfoSheet() {
 @Composable
 fun WalkInfoNavi(start: Boolean) {
     Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
-    val application = GPSApplication.getInstance()
+    val application = GPSApplication.instance
     var pet by remember { mutableStateOf(CurrentPetData("", "", "", "", "", "", 0.0f)) }
     if (application.pets.isNotEmpty()) pet = application.pets[0]
     var count by remember { mutableIntStateOf(0) }

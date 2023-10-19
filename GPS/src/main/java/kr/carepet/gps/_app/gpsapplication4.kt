@@ -27,6 +27,7 @@ package kr.carepet.gps._app
 
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gpx.TRACK_ZERO_NO
+import kr.carepet.gpx.Track
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -123,21 +124,31 @@ open class gpsapplication4 : gpsapplication3() {
             this.service?.no = no
         }
 
-    fun pee(pet: CurrentPetData) {
+    private fun pee(pet: CurrentPetData) {
         select(pet)
         Log.d(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
         this.service?.pee()
     }
 
-    fun poo(pet: CurrentPetData) {
+    private fun poo(pet: CurrentPetData) {
         select(pet)
         Log.d(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
         this.service?.poo()
     }
 
-    fun mrk(pet: CurrentPetData) {
+    private fun mrk(pet: CurrentPetData) {
         select(pet)
         Log.d(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no]")
         this.service?.mrk()
+    }
+
+    fun mark(pet: CurrentPetData, event: Track.EVENT) {
+        when (event) {
+            Track.EVENT.nnn -> {}
+            Track.EVENT.img -> {}
+            Track.EVENT.pee -> pee(pet)
+            Track.EVENT.poo -> poo(pet)
+            Track.EVENT.mrk -> mrk(pet)
+        }
     }
 }

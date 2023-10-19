@@ -48,7 +48,7 @@ import kr.carepet.util.getMethodName
 open class gpsappcompatactivity : AppCompatActivity(), IForegroundOnlyBroadcastReceiver {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private val application: GPSApplication = GPSApplication.getInstance()
+    private val application: GPSApplication = GPSApplication.instance
     private lateinit var receiver: ForegroundOnlyBroadcastReceiver2
 
     internal fun location4Intent(intent: Intent): Location? {

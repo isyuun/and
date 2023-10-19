@@ -36,6 +36,7 @@ import android.net.Uri
  * @description :
  */
 const val TRACK_ZERO_NO = "Pnnnnnnnnnnnnnn"
+const val TRACK_ZERO_NUM = "P00000000000000"
 const val TRACK_ZERO_IMG = 0
 const val TRACK_ZERO_PEE = 0
 const val TRACK_ZERO_POO = 0

@@ -61,13 +61,13 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
 
     @Composable
     fun MapApp() {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$fusedLocationSource][${fusedLocationSource.lastLocation}]")
+        //Log.d(__CLASSNAME__, "${getMethodName()}[$fusedLocationSource][${fusedLocationSource.lastLocation}]")
         NaverMapApp()
     }
 
     @Composable
     private fun NaverMapApp() {
-        Log.d(__CLASSNAME__, "${getMethodName()}[$fusedLocationSource][${fusedLocationSource.lastLocation}]")
+        //Log.d(__CLASSNAME__, "${getMethodName()}[$fusedLocationSource][${fusedLocationSource.lastLocation}]")
         NaverMapApp(fusedLocationSource)
     }
 

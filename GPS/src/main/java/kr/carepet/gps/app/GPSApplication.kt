@@ -46,8 +46,10 @@ open class GPSApplication : gpsapplication4() {
     companion object {
         private var singleton: GPSApplication? = null
 
+        val instance
+            get() = isntance()
         @JvmStatic
-        fun getInstance(): GPSApplication {
+        private fun isntance(): GPSApplication {
             return singleton ?: synchronized(this) {
                 singleton ?: GPSApplication().also {
                     singleton = it
@@ -55,7 +57,7 @@ open class GPSApplication : gpsapplication4() {
             }
         }
 
-        val permissions: Array<String> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        internal val permissions: Array<String> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arrayOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION,
