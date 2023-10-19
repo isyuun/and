@@ -50,12 +50,9 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3() {
         //var ret = super.generateNotification(location)
         val title = "${getString(R.string.walk_title_walking)} - ${_duration}"
         val text = "${getString(R.string.app_name)}이 ${getString(R.string.walk_text_in_tracking)}"
-        //val style = NotificationCompat.BigTextStyle()
-        //    .setBigContentTitle(title)
-        //    .bigText(text)
         val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent(), PendingIntent.FLAG_MUTABLE)
         val ret = notificationCompatBuilder
-            //.setStyle(style)
+            //.setStyle(style)      //ㅆㅂ
             .setContentTitle(title)
             .setContentText(text)
             .setSmallIcon(R.mipmap.ic_launcher)

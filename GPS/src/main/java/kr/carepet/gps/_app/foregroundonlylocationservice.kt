@@ -356,7 +356,7 @@ open class foregroundonlylocationservice() : _foregroundonlylocationservice() {
         // Notification Channel Id is ignored for Android pre O (26).
         val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent(), PendingIntent.FLAG_MUTABLE)
         val ret = notificationCompatBuilder
-            //.setStyle(style)
+            .setStyle(style)
             .setContentTitle(title)
             .setContentText(text)
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -368,11 +368,11 @@ open class foregroundonlylocationservice() : _foregroundonlylocationservice() {
                 getString(R.string.open),
                 activityPendingIntent
             )
-            //.addAction(
-            //    R.drawable.ic_cancel,
-            //    getString(R.string.stop),
-            //    servicePendingIntent
-            //)
+            .addAction(
+                R.drawable.ic_cancel,
+                getString(R.string.stop),
+                servicePendingIntent
+            )
             .setContentIntent(activityPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setOnlyAlertOnce(true)
