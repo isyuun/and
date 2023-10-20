@@ -28,11 +28,14 @@ package kr.carepet.gps._app
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
+import android.location.Location
 import androidx.core.app.NotificationCompat
+import com.google.android.gms.location.LocationResult
 import kr.carepet.gps.R
-import kr.carepet.gps.app.GPSApplication
+import kr.carepet.gpx.Track
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
+import java.util.Collections
 import java.util.Timer
 import java.util.TimerTask
 
@@ -45,8 +48,7 @@ import java.util.TimerTask
  */
 open class foregroundonlylocationservice4 : foregroundonlylocationservice3() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    override fun generateNotification(location: android.location.Location?): Notification {
+    override fun generateNotification(location: Location?): Notification {
         //var ret = super.generateNotification(location)
         val title = "${getString(R.string.walk_title_walking)} - ${duration}"
         val text = "${getString(R.string.app_name)}이 ${getString(R.string.walk_text_in_tracking)}"
@@ -84,7 +86,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3() {
         timer.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 val title = "${getString(R.string.walk_title_walking)} - ${duration}"
-                Log.wtf(__CLASSNAME__, "${getMethodName()} $title")
+                //Log.wtf(__CLASSNAME__, "${getMethodName()} $title")
                 notification = notificationCompatBuilder.setContentTitle(title).build()
                 notificationManager.notify(NOTIFICATION_ID, notification)
             }
@@ -95,7 +97,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3() {
     override fun onUnbind(intent: Intent): Boolean {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$intent")
         if (!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this)) {
-            if (notification == null) notification = generateNotification(currentLocation)
+            if (notification == null) notification = generateNotification(location)
             startForeground(NOTIFICATION_ID, notification)
             serviceRunningInForeground = true
             notificationManager.notify(NOTIFICATION_ID, notification)
@@ -110,6 +112,61 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3() {
         timer.purge()
         timer == null
         super.onRebind(intent)
+    }
+
+    override fun onLocationResult(locationResult: LocationResult) {
+        Log.w(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
+        if (start && pause) {
+            val exit = exit(locationResult)
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit]$location$locationResult")
+            location = locationResult.lastLocation
+            if (exit) return
+            location?.let { _pauses.add(Track(it)) }
+            Log.i(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
+        } else {
+            super.onLocationResult(locationResult)
+        }
+    }
+
+    private var pause = false
+    private var _pause: Track? = null
+    private val _pauses = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
+
+    fun pause() {
+        //val loc = location    //ㅆㅂ
+        val loc = location?.let { Location(it) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::write[${(start && pause)}][start:$start][pause:$pause][${location == loc}][${tracks.size}]")
+        if (!start or pause) return else pause = true
+        loc?.let {
+            it.time = System.currentTimeMillis()
+            _pause = Track(it)
+            if (!_tracks.contains(_pause)) _tracks.add(_pause)
+        }
+        write()
+        _pauses.clear()
+    }
+
+    fun resume() {
+        //val loc = location    //ㅆㅂ
+        val loc = location?.let { Location(it) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::write[${(start && pause)}][start:$start][pause:$pause][${location == loc}][${tracks.size}]")
+        if (!start or !pause) return else pause = false
+        if (_tracks.contains(_pause)) _tracks.remove(_pause)
+        if (_pauses.isNotEmpty()) _tracks.addAll(_pauses)
+        write()
+        _pauses.clear()
+    }
+
+    override fun start() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][$start][$pause][$location]")
+        super.start()
+        pause = false
+    }
+
+    override fun stop() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][$start][$pause][$location]")
+        super.stop()
+        pause = false
     }
 
 }

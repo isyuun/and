@@ -49,13 +49,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -281,7 +279,10 @@ fun IconButton(
     size: Dp = 0.dp
 ) {
     val modifier = if (size > 0.dp) Modifier.size(size) else Modifier.fillMaxHeight()
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(
             text = text,
             fontWeight = FontWeight.Bold,
@@ -289,7 +290,6 @@ fun IconButton(
             modifier = Modifier
                 .background(Color.Transparent),
         )
-        Spacer(modifier = Modifier.padding(start = 8.dp))
         IconButton(
             onClick = onClick,
             modifier = modifier
@@ -327,7 +327,10 @@ fun ImageButton(
     size: Dp = 0.dp
 ) {
     val modifier = if (size > 0.dp) Modifier.size(size) else Modifier.fillMaxHeight()
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(
             text = text,
             fontWeight = FontWeight.Bold,
@@ -335,7 +338,6 @@ fun ImageButton(
             modifier = Modifier
                 .background(Color.Transparent),
         )
-        Spacer(modifier = Modifier.padding(start = 8.dp))
         IconButton(
             onClick = onClick,
             modifier = modifier
@@ -396,6 +398,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var position by remember { mutableStateOf(LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
     source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }
     source.isCompassEnabled = true
+    var pasition by remember { mutableStateOf(LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
 
     Log.w(__CLASSNAME__, "${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
 
@@ -458,7 +461,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var event by remember { mutableStateOf(Track.EVENT.nnn) }
     var showPetsSheet by remember { mutableStateOf(false) }
 
-    /** NaverMap */
+    /** map */
     Box {
         AndroidView(
             factory = { context ->
@@ -489,9 +492,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
 
     /** top */
-    Box {
-        WalkInfoNavi(application.start)
-    }
+    WalkInfoNavi(application.start)
 
     /** bottom/right/left/walk */
     Box(
@@ -504,7 +505,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
+                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                     showBottomSheet = false
+                    application.resume()
                 },
                 sheetState = sheetState,
                 dragHandle = {},
@@ -529,7 +532,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                         )
-                        Spacer(modifier = Modifier.padding(top = 10.dp))
                         R.string.walk_check_select_all
                         Row(
                             modifier = Modifier
@@ -557,7 +559,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         LazyRow(modifier = Modifier.fillMaxWidth()) {
                             items(pets) { pet ->
                                 Log.i(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[${application.contains(pet)}][${pet}]")
-                                Box() {
+                                Box {
                                     WalkPetButton(
                                         pet = pet,
                                         checked = application.contains(pet),
@@ -570,7 +572,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 }
                             }
                         }
-                        Spacer(modifier = Modifier.padding(top = 4.dp))
                         R.string.walk_check_select
                         Row(
                             modifier = Modifier
@@ -589,54 +590,43 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 letterSpacing = (-0.7).sp
                             )
                         }
-                        Spacer(modifier = Modifier.padding(top = 10.dp))
                         /** walk */
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                        ) {
-                            Button(
-                                enabled = application.pets.isNotEmpty(),
-                                onClick = {
-                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                        if (!sheetState.isVisible) {
-                                            showBottomSheet = false
-                                        }
-                                    }
-                                    if (!start) {
-                                        application.start()
-                                    } else {
-                                        application.stop()
-                                    }
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                contentPadding = PaddingValues(14.dp),
-                            ) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Row {
-                                        Icon(
-                                            imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
-                                            contentDescription = stringResource(id = R.string.track),
-                                            tint = Color.White,
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = stringResource(id = R.string.walk_button_start),
-                                        )
+                        Button(
+                            enabled = application.pets.isNotEmpty(),
+                            onClick = {
+                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
                                     }
                                 }
+                                if (!start) {
+                                    application.start()
+                                } else {
+                                    application.stop()
+                                }
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            contentPadding = PaddingValues(14.dp),
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
+                                    contentDescription = stringResource(id = R.string.track),
+                                    tint = Color.White,
+                                )
+                                Text(
+                                    text = stringResource(id = R.string.walk_button_start),
+                                )
                             }
                         }
                     } else {
-                        source.lastLocation?.let { tracks?.add(Track(it)) }
+                        application.pause()
                         Text(
                             text = stringResource(id = R.string.walk_title_end),
                             fontSize = 20.sp,
@@ -646,12 +636,13 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
                         ) {
+                            R.string.walk_button_finish
                             Button(
                                 onClick = {
-                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                                         if (!sheetState.isVisible) {
                                             showBottomSheet = false
@@ -676,19 +667,12 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 contentPadding = PaddingValues(14.dp),
                                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
                             ) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Text(
-                                        text = stringResource(id = R.string.walk_button_finish),
-                                    )
-                                }
+                                Text(text = stringResource(id = R.string.walk_button_finish))
                             }
-                            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                            R.string.walk_button_resume
                             Button(
                                 onClick = {
-                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                                         if (!sheetState.isVisible) {
                                             showBottomSheet = false
@@ -700,14 +684,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 contentPadding = PaddingValues(14.dp),
                                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                             ) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Text(
-                                        text = stringResource(id = R.string.walk_button_resume),
-                                    )
-                                }
+                                Text(text = stringResource(id = R.string.walk_button_resume))
                             }
                         }
                     }
@@ -717,7 +694,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         /** right */
         Log.w(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
         AnimatedVisibility(
-            visible = !showPetsSheet,
+            visible = true,
             modifier = Modifier.align(Alignment.BottomEnd),
         ) {
             Column(
@@ -837,30 +814,27 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             },
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(
-                    horizontal = 32.dp,
+                    horizontal = 28.dp,
                     vertical = 24.dp,
                 )
-                .align(Alignment.BottomCenter),
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(),
             contentPadding = PaddingValues(14.dp),
             colors = buttonColors
         ) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center,
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
-                        contentDescription = stringResource(id = R.string.walk_button_start),
-                        tint = Color.White,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = buttonText,
-                    )
-                }
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
+                    contentDescription = stringResource(id = R.string.walk_button_start),
+                    tint = Color.White,
+                )
+                Text(
+                    text = buttonText,
+                )
             }
         }
         val zoomControlButton = mapView.findViewById<ZoomControlView>(com.naver.maps.map.R.id.navermap_zoom_control)
@@ -899,14 +873,13 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.End
             ) {
-                val item =
-                    when (event) {
-                        Track.EVENT.nnn -> stringResource(id = R.string.nnn)
-                        Track.EVENT.img -> stringResource(id = R.string.nnn)
-                        Track.EVENT.pee -> stringResource(id = R.string.pee)
-                        Track.EVENT.poo -> stringResource(id = R.string.poop)
-                        Track.EVENT.mrk -> stringResource(id = R.string.mark)
-                    }
+                val item = when (event) {
+                    Track.EVENT.nnn -> stringResource(id = R.string.nnn)
+                    Track.EVENT.img -> stringResource(id = R.string.nnn)
+                    Track.EVENT.pee -> stringResource(id = R.string.pee)
+                    Track.EVENT.poo -> stringResource(id = R.string.poop)
+                    Track.EVENT.mrk -> stringResource(id = R.string.mark)
+                }
                 val text = String.format(stringResource(id = R.string.walk_title_marking), item)
                 Text(
                     text = text,
@@ -983,13 +956,12 @@ fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boole
                     contentDescription = "",
                     placeholder = painterResource(id = R.drawable.profile_default),
                     error = painterResource(id = R.drawable.profile_default),
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
                 )
             }
             Row(
-                //modifier = Modifier
-                //    .clickable { check = !check },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -1027,6 +999,7 @@ fun WalkInfoSheet() {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        R.string.walk_title_duration
         Column(
             modifier = Modifier
                 .padding(start = 24.dp, top = 16.dp, bottom = 16.dp)
@@ -1043,6 +1016,7 @@ fun WalkInfoSheet() {
                 fontWeight = FontWeight.Bold,
             )
         }
+        R.string.walk_title_distance
         Column(
             modifier = Modifier
                 .padding(start = 24.dp, top = 16.dp, bottom = 16.dp)
@@ -1082,150 +1056,139 @@ fun WalkInfoNavi(start: Boolean) {
             }
         }
     }
-    Column(modifier = Modifier.fillMaxWidth()) {
-        R.string.walk_title_tip
-        AnimatedVisibility(
-            visible = !start,
-            enter = expandVertically(),
-            exit = shrinkVertically(),
+    R.string.walk_title_tip
+    AnimatedVisibility(
+        visible = !start,
+        enter = expandVertically(),
+        exit = shrinkVertically(),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                )
+                .border(
+                    width = 0.1.dp,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                )
+                .padding(bottom = 8.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.Start,
         ) {
-            Column(
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.background,
-                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                    )
-                    .border(
-                        width = 0.1.dp,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                    )
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Spacer(modifier = Modifier.padding(top = 16.dp))
-                Row(
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(painter = painterResource(id = R.drawable.icon_bulb), contentDescription = "", tint = Color.Unspecified)
-                    Text(
-                        text = stringResource(id = R.string.walk_title_tip),
-                        fontSize = 12.sp,
-                        letterSpacing = (-0.6).sp,
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .basicMarquee(),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        maxLines = 1,
-                    )
-                }
-                Spacer(modifier = Modifier.padding(top = 4.dp))
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_bulb),
+                    contentDescription = "",
+                    tint = Color.Unspecified,
+                )
                 Text(
-                    text = stringResource(id = R.string.walk_title_tips),
-                    fontSize = 14.sp,
-                    letterSpacing = (-0.7).sp,
+                    text = stringResource(id = R.string.walk_title_tip),
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.6).sp,
                     modifier = Modifier
-                        .padding(start = 48.dp)
+                        .padding(start = 4.dp)
                         .basicMarquee(),
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                 )
-                Spacer(modifier = Modifier.padding(top = 16.dp))
             }
+            Text(
+                modifier = Modifier
+                    .padding(start = 24.dp)
+                    .basicMarquee(),
+                text = stringResource(id = R.string.walk_title_tips),
+                fontSize = 14.sp,
+                letterSpacing = (-0.7).sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 1,
+            )
         }
-        R.string.walk_title_walking
-        AnimatedVisibility(
-            visible = start,
-            enter = expandVertically(),
-            exit = shrinkVertically(),
+    }
+    R.string.walk_title_walking
+    AnimatedVisibility(
+        visible = start,
+        enter = expandVertically(),
+        exit = shrinkVertically(),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                )
+                .border(
+                    width = 0.1.dp,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                )
+                .padding(bottom = 0.dp)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(0.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
+            CircleImageTopBar(size = 40, imageUri = pet.petRprsImgAddr)
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.background,
-                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                    )
-                    .border(
-                        width = 0.1.dp,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                    )
+                    .padding(start = 12.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start,
             ) {
-                Spacer(modifier = Modifier.padding(top = 16.dp))
+                Text(
+                    text = stringResource(id = R.string.walk_title_walking),
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.6).sp,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
                 Row(
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        CircleImageTopBar(size = 40, imageUri = pet.petRprsImgAddr)
-                        Column(
-                            modifier = Modifier
-                                .padding(start = 12.dp)
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.walk_title_walking),
-                                fontSize = 12.sp,
-                                letterSpacing = (-0.6).sp,
-                                fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.onBackground,
-
-                                )
-                            Row {
-                                Text(
-                                    modifier = Modifier
-                                        .weight(1.0f)
-                                        .fillMaxWidth(),
-                                    text = duration,
-                                    fontSize = 22.sp,
-                                    letterSpacing = (-0.0).sp,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Start,
-                                    //style = TextStyle(background = Color.Yellow),
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                )
-                                Text(
-                                    modifier = Modifier
-                                        .weight(1.0f)
-                                        .fillMaxWidth(),
-                                    text = distance,
-                                    fontSize = 22.sp,
-                                    letterSpacing = (-0.0).sp,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.End,
-                                    //style = TextStyle(background = Color.Yellow),
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                )
-                                Spacer(
-                                    modifier = Modifier
-                                        .weight(1.0f)
-                                        .fillMaxWidth(),
-                                )
-                            }
-                        }
-                    }
-                    //Text(
-                    //    text = "반려동물 변경",
-                    //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    //    fontSize = 14.sp,
-                    //    letterSpacing = (-0.6).sp,
-                    //    textDecoration = TextDecoration.Underline,
-                    //    color = design_skip,
-                    //    modifier = Modifier.clickable {
-                    //        viewModel.updateSheetChange("change")
-                    //        scope.launch { bottomSheetState.show() }
-                    //    }
-                    //)
+                    Text(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        text = duration,
+                        fontSize = 22.sp,
+                        letterSpacing = (-0.0).sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Start,
+                        //style = TextStyle(background = Color.Yellow),
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                    Text(
+                        modifier = Modifier
+                            .weight(2.0f),
+                        text = distance,
+                        fontSize = 22.sp,
+                        letterSpacing = (-0.0).sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Start,
+                        //style = TextStyle(background = Color.Yellow),
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
                 }
-                Spacer(modifier = Modifier.padding(top = 16.dp))
             }
+            //Text(
+            //    text = "반려동물 변경",
+            //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //    fontSize = 14.sp,
+            //    letterSpacing = (-0.6).sp,
+            //    textDecoration = TextDecoration.Underline,
+            //    color = design_skip,
+            //    modifier = Modifier.clickable {
+            //        viewModel.updateSheetChange("change")
+            //        scope.launch { bottomSheetState.show() }
+            //    }
+            //)
         }
     }
 }

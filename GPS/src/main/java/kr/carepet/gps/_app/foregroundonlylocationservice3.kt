@@ -26,7 +26,6 @@
 package kr.carepet.gps._app
 
 import android.Manifest
-import android.app.Notification
 import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.ServiceConnection
@@ -149,11 +148,11 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
     private fun img(path: String) {
         if (_imgs.size > 0 && _imgs.contains(path)) return
         _imgs.add(path)
-        val loc = currentLocation
+        val loc = location
         val img = _imgs.size
         val trk = loc?.let { Track(it/*, no = this.no*/, img = img, uri = Uri.parse(path)) }
-        Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${_imgs.size}], ${_imgs[img-1]}, $trk")
-        trk?.let { add(it) }
+        Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${_imgs.size}], ${_imgs[img - 1]}, $trk")
+        trk?.let { _tracks.add(it) }
         write()
     }
 
@@ -175,6 +174,6 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2(), Se
     }
 
     private val _imgs = Collections.synchronizedList(ArrayList<String>()) // The list of Tracks
-    internal val imgs
+    internal val images
         get() = _imgs
 }
