@@ -73,7 +73,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         val size = _tracks.size
         val max = GPX_INTERVAL_UPDATE_METERS
         val exit = (size > 0 && dist < max)
-        Log.v(__CLASSNAME__, "${getMethodName()}[exit:$exit][$size][${max}m][${dist}m][${trk1?.toText()}, ${trk2?.toText()}], $trk1, $trk2")
+        Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[exit:$exit][$size][${max}m][${dist}m][${trk1?.toText()}, ${trk2?.toText()}], $trk1, $trk2")
         return exit
     }
 
