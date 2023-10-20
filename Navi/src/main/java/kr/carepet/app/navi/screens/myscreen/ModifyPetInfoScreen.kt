@@ -2,10 +2,13 @@ package kr.carepet.app.navi.screens.myscreen
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -44,6 +47,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -52,10 +56,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -94,18 +101,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
+import kr.carepet.app.navi.component.CustomDialog
 import kr.carepet.app.navi.component.CustomTextField
 import kr.carepet.app.navi.screens.PetCreateScreen
+import kr.carepet.app.navi.screens.mainscreen.BackOnPressed
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_camera_bg
@@ -118,13 +129,17 @@ import kr.carepet.app.navi.ui.theme.design_sharp
 import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
+import kr.carepet.app.navi.viewmodel.PickerState
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
 import kr.carepet.data.SCD
 import kr.carepet.data.SggList
 import kr.carepet.data.UmdList
 import kr.carepet.data.pet.PetListData
+import kr.carepet.util.Log
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -132,10 +147,11 @@ fun ModifyPetInfoScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: UserCreateViewModel,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
+    index: String? = null
 ){
-
-    val scdList by remember { mutableStateOf(viewModel.scdList) }
+    val petInfo by sharedViewModel.petInfo.collectAsState()
+    val selectPet = petInfo[index?.toInt() ?: 0]
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -161,23 +177,148 @@ fun ModifyPetInfoScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    val petName by viewModel.petName.collectAsState()
     val petDorC by viewModel.petDorC.collectAsState()
     val petKind by viewModel.petKind.collectAsState()
-    val petName by viewModel.petName.collectAsState()
     val petBirth by viewModel.petBirth.collectAsState()
     val petBirthUK by viewModel.petBirthUnknown.collectAsState()
     val petWght by viewModel.petWght.collectAsState()
     val petGender by viewModel.petGender.collectAsState()
     val petNtr by viewModel.petNtr.collectAsState()
 
-    val address by viewModel.address.collectAsState()
+    var showDialog by remember{ mutableStateOf(false) }
+    var init by rememberSaveable { mutableStateOf(true) }
+    var delete by remember{ mutableStateOf(false) }
+
+    LaunchedEffect(Unit){
+        if (init){
+            viewModel.updatePetName(selectPet.petNm)
+            viewModel.updatePetDorC("강아지")
+            viewModel.updatePetKind(
+                PetListData(
+                    petDogSzCd = "",
+                    petNm = selectPet.petKindNm,
+                    petEnNm = "",
+                    petInfoUnqNo = selectPet.petInfoUnqNo,
+                    petTypCd = ""
+                )
+            )
+            viewModel.updatePetWght(selectPet.wghtVl.toString())
+            viewModel.updatePetGender(selectPet.sexTypNm?:"남아")
+            viewModel.updatePetNtr(selectPet.ntrTypNm?:"했어요")
+            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = selectPet.stdgCtpvCd, upCdId = ""))
+            viewModel.updateSelectedItem2(SggList(sggCd = selectPet.stdgSggCd, sggNm = ""))
+            viewModel.updateSelectedItem3(UmdList(umdCd = selectPet.stdgUmdCd, umdNm = ""))
+            viewModel.updateAddress(
+                "${selectPet.stdgCtpvNm} " +
+                        "${selectPet.stdgSggNm} " +
+                        "${selectPet.stdgUmdNm}"
+            )
+            viewModel.updatePetBirth(selectPet.petBrthYmd)
+            viewModel.setImageUri(selectPet.petRprsImgAddr?.toUri(),context)
+
+            init = false
+        }
+    }
+
+    LaunchedEffect(key1 = delete){
+        if (delete){
+            scope.launch {
+                val result = viewModel.deletePet(selectPet.ownrPetUnqNo)
+                if (result) {
+                    sharedViewModel.updateInit(true)
+                    sharedViewModel.loadPetInfo()
+                    sharedViewModel.loadCurrentPetInfo()
+                    navController.popBackStack()
+                    navController.popBackStack()
+
+                    viewModel.updatePetName("")
+                    viewModel.updatePetKind(
+                        PetListData(
+                            petDogSzCd = "",
+                            petNm = "사이즈/품종 선택",
+                            petEnNm = "",
+                            petInfoUnqNo = 0,
+                            petTypCd = ""
+                        )
+                    )
+                    viewModel.updatePetWght("")
+                    viewModel.updatePetGender("남아")
+                    viewModel.updatePetNtr("했어요")
+                    viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+                    viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
+                    viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
+                    viewModel.updatePetBirth("")
+                    viewModel.updateYear(PickerState())
+                    viewModel.setImageUri(null,context)
+                    viewModel.updateAddress("주소 선택")
+
+                    init = true
+
+                } else {
+                    Toast
+                        .makeText(context, "삭제 실패", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    }
+
+    BackHandler {
+        navController.popBackStack()
+
+        scope.launch {
+            delay(700)
+
+
+            viewModel.updatePetName("")
+            viewModel.updatePetKind(
+                PetListData(
+                    petDogSzCd = "",
+                    petNm = "사이즈/품종 선택",
+                    petEnNm = "",
+                    petInfoUnqNo = 0,
+                    petTypCd = ""
+                )
+            )
+            viewModel.updatePetWght("")
+            viewModel.updatePetGender("남아")
+            viewModel.updatePetNtr("했어요")
+            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+            viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
+            viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
+            viewModel.updatePetBirth("")
+            viewModel.updateYear(PickerState())
+            viewModel.setImageUri(null,context)
+            viewModel.updateAddress("주소 선택")
+
+            init = true
+        }
+
+    }
 
     Scaffold (
         modifier = modifier.fillMaxSize(),
         topBar = {
-            BackTopBar(title = "반려동물 정보 수정", navController = navController)
+            BackTopBarInModify(title = "반려동물 정보 수정", navController = navController, viewModel = viewModel, initChange = {newValue -> init = newValue})
         }
     ){ paddingValues ->
+        AnimatedVisibility(
+            visible = showDialog,
+            enter = scaleIn(),
+            exit = scaleOut()
+        ) {
+            CustomDialogDelete(
+                onDismiss = { newValue -> showDialog = newValue },
+                navController = navController,
+                confirm = "삭제하기",
+                dismiss = "취소",
+                title = "반려동물 정보 삭제하기",
+                text = "정말 삭제하시겠어요?",
+                valueChange = { newValue -> delete = newValue}
+            )
+        }
+
         Column (modifier= Modifier
             .fillMaxSize()
             .padding(paddingValues)
@@ -337,7 +478,7 @@ fun ModifyPetInfoScreen(
 
             CustomTextField(
                 value = petName,
-                onValueChange = {viewModel.updatePetName(it)},
+                onValueChange = { viewModel.updatePetName(it) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -371,10 +512,11 @@ fun ModifyPetInfoScreen(
                 CustomTextField(
                     enabled = !petBirthUK,
                     readOnly = true,
-                    value = if(!yearPickerState.selectedItem.equals("")){
+                    value =
+                    if(!yearPickerState.selectedItem.equals("")){
                         "${yearPickerState.selectedItem}-${monthPickerState.selectedItem}-${dayPickerState.selectedItem}"
                     }else{
-                        petBirth
+                        formatDate(petBirth)
                     },
                     onValueChange = {},
                     singleLine = true,
@@ -513,7 +655,7 @@ fun ModifyPetInfoScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically){
                 CustomTextField(
                     value = petWght,
-                    onValueChange = {viewModel.updatePetWght(it)},
+                    onValueChange = { viewModel.updatePetWght(it) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,
@@ -778,15 +920,15 @@ fun ModifyPetInfoScreen(
                 onClick = {
                     scope.launch {
                         if (IntegrityCheck(viewModel, context)){
-                            val result = viewModel.createPet()
+                            val result = viewModel.modifyPet(selectPet.ownrPetUnqNo)
 
                             if(result){
-                                Toast.makeText(context, "등록성공", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "수정 성공", Toast.LENGTH_SHORT).show()
                                 sharedViewModel.loadCurrentPetInfo()
                                 sharedViewModel.loadPetInfo()
                                 navController.popBackStack()
                             }else{
-                                Toast.makeText(context, "등록실패", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "수정 실패", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -812,7 +954,12 @@ fun ModifyPetInfoScreen(
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                 textDecoration = TextDecoration.Underline,
                 color = design_sharp,
-                modifier = Modifier.padding(end = 20.dp, bottom = 20.dp).align(Alignment.End)
+                modifier = Modifier
+                    .padding(end = 20.dp, bottom = 20.dp)
+                    .align(Alignment.End)
+                    .clickable {
+                        showDialog = true
+                    }
             )
         }// Column
     }
@@ -829,3 +976,127 @@ private fun Modifier.fadingEdge(brush: Brush) = this
 private fun pixelsToDp(pixels: Int) = with(LocalDensity.current) { pixels.toDp() }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BackTopBarInModify(title: String, navController: NavHostController, backVisible:Boolean=true,viewModel: UserCreateViewModel,initChange:(Boolean)->Unit){
+
+    TopAppBar(
+        colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
+        modifier = Modifier.height(60.dp),
+        title = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                AnimatedVisibility(
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    visible = backVisible,
+                    enter = scaleIn(),
+                    exit = scaleOut()
+                ) {
+                    Icon(painter = painterResource(id = R.drawable.arrow_back),
+                        contentDescription = "",
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .clickable {
+                                navController.popBackStack()
+
+                                viewModel.updatePetName("")
+                                viewModel.updatePetKind(
+                                    PetListData(
+                                        petDogSzCd = "",
+                                        petNm = "사이즈/품종 선택",
+                                        petEnNm = "",
+                                        petInfoUnqNo = 0,
+                                        petTypCd = ""
+                                    )
+                                )
+                                viewModel.updatePetWght("")
+                                viewModel.updatePetGender("남아")
+                                viewModel.updatePetNtr("했어요")
+
+                                initChange(true)
+                            }
+                    )
+                }
+
+
+                Text(
+                    text = title,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    letterSpacing = (-1.0).sp,
+                    color = design_login_text,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
+    )
+}
+
+@Composable
+fun CustomDialogDelete(
+    onDismiss:(Boolean) -> Unit,
+    navController: NavHostController,
+    confirm: String,
+    dismiss : String,
+    title : String,
+    text : String,
+    valueChange : (Boolean) -> Unit
+){
+    AlertDialog(
+        onDismissRequest = { onDismiss(false) },
+        confirmButton = {
+            Button(
+                onClick = {
+                    valueChange(true)
+                    onDismiss(false)
+                },
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = design_button_bg
+                )
+            ) {
+                Text(
+                    text = confirm,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    color = design_white
+                )
+            } },
+        title = { Text(text = title) },
+        text = { Text(text = text, color = design_skip) },
+        dismissButton = {
+            Button(
+                onClick = {
+                    onDismiss(false)
+                },
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = design_white
+                ),
+                border = BorderStroke(1.dp, color = design_login_text)
+            ) {
+                Text(
+                    text = dismiss,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    color = design_login_text
+                )
+            }
+        },
+        containerColor = design_white
+    )
+}
+
+fun formatDate(inputDate: String): String {
+    val inputFormat = SimpleDateFormat("yyyyMMdd")
+    val outputFormat = SimpleDateFormat("yyyy-MM-dd")
+
+    try {
+        val date = inputFormat.parse(inputDate)
+        return outputFormat.format(date)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return inputDate
+    }
+}

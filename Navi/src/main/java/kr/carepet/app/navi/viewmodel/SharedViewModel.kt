@@ -64,8 +64,11 @@ class SharedViewModel:ViewModel(){
 
     private val _selectPet = MutableStateFlow<CurrentPetData?>(null)
     val selectPet: StateFlow<CurrentPetData?> = _selectPet.asStateFlow()
-    fun updateSelectPet(newValue: CurrentPetData) { _selectPet.value = newValue }
+    fun updateSelectPet(newValue: CurrentPetData?) { _selectPet.value = newValue }
 
+    private val _selectPetTemp = MutableStateFlow<CurrentPetData?>(null)
+    val selectPetTemp: StateFlow<CurrentPetData?> = _selectPetTemp.asStateFlow()
+    fun updateSelectPetTemp(newValue: CurrentPetData) { _selectPetTemp.value = newValue }
 
     fun parseBirthday(birthdayString: String): LocalDate? {
         val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")

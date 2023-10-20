@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.wear.compose.material.contentColorFor
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.cmm.commonRes
 import kr.carepet.data.pet.CurrentPetData
+import kr.carepet.data.pet.DeletePetReq
 import kr.carepet.data.pet.InviteCodeReq
 import kr.carepet.data.pet.InviteCodeRes
 import kr.carepet.data.pet.Member
@@ -43,6 +45,10 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
 
     fun updatePetInfo(){
         sharedViewModel.viewModelScope.launch { sharedViewModel.loadPetInfo() }
+    }
+
+    fun updateCurrentPetInfo(){
+        sharedViewModel.viewModelScope.launch { sharedViewModel.loadCurrentPetInfo() }
     }
 
     // -------------------My Screen--------------------------
@@ -79,8 +85,8 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
 
     // -------------------PetInfo Screen---------------------
 
-    private val _memberList = MutableStateFlow<List<Member>>(emptyList()) // Data 저장
-    val memberList: StateFlow<List<Member>> = _memberList.asStateFlow() // state 노출
+    private val _memberList = MutableStateFlow<List<Member>?>(null) // Data 저장
+    val memberList: StateFlow<List<Member>?> = _memberList.asStateFlow() // state 노출
 
     // -------------------PetInfo Screen---------------------
 
@@ -431,8 +437,8 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                         val body = response.body()
                         body?.let {
                             _memberList.value = body.petDetailData.memberList
+                            continuation.resume(true)
                         }
-
                     }else{
                         _memberList.value = emptyList()
                         continuation.resume(false)
@@ -448,7 +454,6 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
 
         }
     }
-
 }
 
 fun getDateTime(date: Date): String {

@@ -21,6 +21,7 @@ import kr.carepet.data.daily.WalkListRes
 import kr.carepet.data.daily.WeekRecordReq
 import kr.carepet.data.daily.WeekRecordRes
 import kr.carepet.data.pet.CurrentPetRes
+import kr.carepet.data.pet.DeletePetReq
 import kr.carepet.data.pet.InviteCodeReq
 import kr.carepet.data.pet.InviteCodeRes
 import kr.carepet.data.pet.MyPetListReq
@@ -49,6 +50,7 @@ import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -96,6 +98,26 @@ interface ApiService {
         @Part("wghtVl") wghtVl: Float,
     ):Call<MyPetResModel>
 
+    @Multipart
+    @POST("api/v1/mypet/update")
+    fun modifyPet(
+        @Part("ownrPetUnqNo") ownrPetUnqNo: RequestBody,
+        @Part("petRelCd") petRelCd: RequestBody,
+        @Part("petNm") petNm: RequestBody,
+        @Part("petRegNo") petRegNo: RequestBody,
+        @Part("stdgSggCd") stdgSggCd: RequestBody,
+        @Part("petInfoUnqNo") petInfoUnqNo: RequestBody,
+        @Part("petBrthYmd") petBrthYmd: RequestBody,
+        @Part("delYn") delYn: RequestBody,
+        @Part("stdgUmdCd") stdgUmdCd: RequestBody,
+        @Part file: MultipartBody.Part,
+        @Part("petRprsYn") petRprsYn: RequestBody,
+        @Part("ntrTypCd") ntrTypCd: RequestBody,
+        @Part("sexTypCd") sexTypCd: RequestBody,
+        @Part("petMngrYn") petMngrYn: RequestBody,
+        @Part("stdgCtpvCd") stdgCtpvCd: RequestBody,
+    ):Call<MyPetResModel>
+
     @POST("api/v1/mypet/list")
     fun myPetList(@Body data: MyPetListReq) : Call<MyPetListRes>
 
@@ -107,7 +129,7 @@ interface ApiService {
 
     @Multipart
     @POST("api/v1/daily-life/upload")
-    fun uploadPhoto(@Part photos: List<MultipartBody.Part>): Call<PhotoRes>
+    fun uploadPhoto(@Part photos: ArrayList<MultipartBody.Part>): Call<PhotoRes>
 
     @POST("api/v1/daily-life/create")
     fun uploadDaily(@Body data: DailyCreateReq): Call<DailyCreateRes>
@@ -144,4 +166,7 @@ interface ApiService {
 
     @POST("api/v1/member/reset-password")
     fun resetPw(@Body data : ResetPwReq) : Call<commonRes>
+
+    @POST("api/v1/mypet/delete")
+    fun deletePet(@Body data : DeletePetReq) : Call<commonRes>
 }

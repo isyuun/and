@@ -6,6 +6,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -42,6 +49,7 @@ import kr.carepet.app.navi.screens.myscreen.PetProfileScreen
 import kr.carepet.app.navi.screens.myscreen.SetKeyScreen
 import kr.carepet.app.navi.screens.myscreen.UserInfoScreen
 import kr.carepet.app.navi.screens.walkscreen.PostScreen
+import kr.carepet.app.navi.screens.walkscreen.WalkDetailContent
 import kr.carepet.app.navi.ui.theme.AppTheme
 import kr.carepet.app.navi.viewmodel.CommunityViewModel
 import kr.carepet.app.navi.viewmodel.HomeViewModel
@@ -186,8 +194,35 @@ fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
         composable("addPetScreen"){
             AddPetScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)
         }
-        composable("modifyPetInfoScreen"){
-            ModifyPetInfoScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)
+        composable("modifyPetInfoScreen/{index}"){ backStackEntry ->
+            ModifyPetInfoScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel,
+                index = backStackEntry.arguments?.getString("index")
+            )
+        }
+        composable(
+            "walkDetailContent",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
+                    )
+                ) + slideIntoContainer(
+                    animationSpec = tween(300, easing = EaseIn),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
+                    )
+                ) + slideOutOfContainer(
+                    animationSpec = tween(300, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.End
+                )
+            }
+        ){
+            WalkDetailContent(walkViewModel = walkViewModel, navController)
         }
     }
 }
@@ -217,7 +252,8 @@ sealed class Screen(val route: String) {
     object InviteScreen : Screen("inviteScreen")
     object SetKeyScreen : Screen("setKeyScreen")
     object AddPetScreen : Screen("addPetScreen")
-    object ModifyPetInfoScreen : Screen("modifyPetInfoScreen")
+    object WalkDetailContent : Screen("walkDetailContent")
+    object ModifyPetInfoScreen : Screen("modifyPetInfoScreen/{index}")
     object PetProfileScreen : Screen("petProfileScreen/{index}")
 }
 

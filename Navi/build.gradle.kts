@@ -61,6 +61,7 @@ dependencies {
     implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":GPS")))
     implementation(project(mapOf("path" to ":NAV")))
+    implementation(project(mapOf("path" to ":GPX")))
 
     //기존 implementation
     implementation("androidx.core:core-ktx:1.9.0")

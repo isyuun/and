@@ -927,7 +927,6 @@ fun PetKindContent(
         viewModel.onKindClick()
     }
 
-    val sDog by viewModel.sDog.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
     val pets by viewModel.pets.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()

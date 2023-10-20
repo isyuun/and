@@ -54,6 +54,7 @@ import kr.carepet.app.navi.ui.theme.design_shadow
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SharedViewModel
+import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.pet.PetDetailData
 
 
@@ -61,7 +62,8 @@ import kr.carepet.data.pet.PetDetailData
 @Composable
 fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel, onDismiss: (Boolean) -> Unit){
 
-    val petList by viewModel.petInfo.collectAsState()
+    val petList by viewModel.currentPetInfo.collectAsState()
+    val selectedPetTemp by viewModel.selectPetTemp.collectAsState()
 
     val scope = rememberCoroutineScope()
 
@@ -112,6 +114,7 @@ fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel, 
         Button(
             onClick = {
                 scope.launch {
+                    viewModel.updateSelectPet(selectedPetTemp)
                     onDismiss(false)
                 }
             },
@@ -130,37 +133,36 @@ fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel, 
 }
 
 @Composable
-fun BottomSheetItem(viewModel: SharedViewModel, petList : PetDetailData){
+fun BottomSheetItem(viewModel: SharedViewModel, petList : CurrentPetData){
 
     val configuration = LocalConfiguration.current
 
     val screenWidth = configuration.screenWidthDp.dp -60.dp
 
     val petName:String = petList.petNm
-    val imageUri:String = petList.petRprsImgAddr
+    val imageUri:String? = petList.petRprsImgAddr
 
-    val selectedPet by viewModel.selectPet.collectAsState()
-    var isSeleted by rememberSaveable { mutableStateOf(false) }
+    val selectedPetTemp by viewModel.selectPetTemp.collectAsState()
 
     Button(
-        onClick = { isSeleted= !isSeleted },
+        onClick = { viewModel.updateSelectPetTemp(petList) },
         modifier = Modifier
             .size(width = screenWidth / 3, height = screenWidth / 3 - 9.dp)
             .shadow(ambientColor = design_shadow, elevation = 0.dp)
         ,
         shape = RoundedCornerShape(12.dp),
-        colors = if(isSeleted) {
+        colors = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) {
             ButtonDefaults.buttonColors(design_select_btn_bg)
         } else {
             ButtonDefaults.buttonColors(design_white)
         },
-        border = if(isSeleted) {
+        border = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) {
             BorderStroke(1.dp, color = design_select_btn_text)
         } else {
             BorderStroke(1.dp, color = design_textFieldOutLine)
         },
         contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-        elevation = if(isSeleted){
+        elevation = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo){
             ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
         } else {
             ButtonDefaults.buttonElevation(defaultElevation = 0.dp)

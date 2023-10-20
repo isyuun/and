@@ -104,6 +104,7 @@ import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CustomTextField
+import kr.carepet.app.navi.component.LoadingDialog
 import kr.carepet.app.navi.screens.PetCreateScreen
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
@@ -154,6 +155,7 @@ fun AddPetScreen(
     var monthIndex by rememberSaveable { mutableIntStateOf(month.indexOf(currentMonth.toString())) }
     var dayIndex by rememberSaveable { mutableIntStateOf(day.indexOf(currentDay.toString())) }
 
+    var isLoading by remember{ mutableStateOf(false) }
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
     var expanded by remember { mutableStateOf (false) }
     val focusManager = LocalFocusManager.current
@@ -176,6 +178,12 @@ fun AddPetScreen(
             BackTopBar(title = "반려동물 등록", navController = navController)
         }
     ){ paddingValues ->
+
+        LoadingDialog(
+            loadingText = "펫 등록중...",
+            loadingState = isLoading
+        )
+
         Column (modifier= Modifier
             .fillMaxSize()
             .padding(paddingValues)
@@ -776,14 +784,16 @@ fun AddPetScreen(
                 onClick = {
                     scope.launch {
                         if (IntegrityCheck(viewModel, context)){
+                            isLoading = true
                             val result = viewModel.createPet()
 
                             if(result){
-                                Toast.makeText(context, "등록성공", Toast.LENGTH_SHORT).show()
+                                isLoading = false
                                 sharedViewModel.loadCurrentPetInfo()
                                 sharedViewModel.loadPetInfo()
                                 navController.popBackStack()
                             }else{
+                                isLoading = false
                                 Toast.makeText(context, "등록실패", Toast.LENGTH_SHORT).show()
                             }
                         }
@@ -815,7 +825,9 @@ fun CircleImageCreate(viewModel: UserCreateViewModel){
     val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){ uri ->
-        viewModel.setImageUri(uri,context)
+        if (uri != null){
+            viewModel.setImageUri(uri,context)
+        }
     }
 
 

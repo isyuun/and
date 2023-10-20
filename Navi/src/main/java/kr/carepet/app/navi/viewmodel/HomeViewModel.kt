@@ -1,6 +1,5 @@
 package kr.carepet.app.navi.viewmodel
 
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +23,7 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
         sharedViewModel.updateSelectPet(newData)
     }
 
-    suspend fun callGetWeekRecord(ownrPetUnqNo: String, searchDay: String){
+    suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String){
         sharedViewModel.getWeekRecord(ownrPetUnqNo, searchDay)
     }
 

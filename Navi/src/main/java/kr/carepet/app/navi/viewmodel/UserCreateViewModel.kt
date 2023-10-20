@@ -28,6 +28,8 @@ import kr.carepet.data.SggList
 import kr.carepet.data.SggListRes
 import kr.carepet.data.UmdList
 import kr.carepet.data.UmdListRes
+import kr.carepet.data.cmm.commonRes
+import kr.carepet.data.pet.DeletePetReq
 import kr.carepet.data.pet.MyPetResModel
 import kr.carepet.data.pet.PetListData
 import kr.carepet.data.pet.PetListResModel
@@ -318,7 +320,6 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                 inputStream?.close()
 
                 _imageFile.emit(file) // 변환된 File 객체를 StateFlow에 업데이트
-                Log.d("LOG",_imageFile.value.toString())
             } catch (e: IOException) {
                 e.printStackTrace()
                 _imageFile.emit(null) // 변환 실패 시 null로 업데이트
@@ -471,7 +472,6 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
             val fileRequestBody = _imageFile.value?.asRequestBody("image/*".toMediaType()) ?: RequestBody.create("image/*".toMediaType(), ByteArray(0))
             val filePart = MultipartBody.Part.createFormData("file", _imageFile.value?.name, fileRequestBody)
 
-            Log.d("LOG",_imageUri.value?.path.toString()+ kr.carepet.singleton.G.accessToken)
             // 일단 받아올수있는 데이터, 이름,생일,종,성별,중성화,몸무게 정도 받아오기
             val petRelCd = "001".toRequestBody("text/plain".toMediaType()) // 펫 관계코드
             val petNm = petName.value.toRequestBody("text/plain".toMediaType()) //펫 이름
@@ -504,7 +504,6 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
             val stdgCtpvCd = selectedItem1.value.cdld.toRequestBody("text/plain".toMediaType()) //시도 코드
 
             val response = apiService.createPet(petRelCd, petNm, petRegNo, stdgSggCd, petInfoUnqNo,petBrthYmd, delYn, stdgUmdCd, filePart, petRprsYn, ntrTypCd, sexTypCd, petMngrYn, stdgCtpvCd, wghtVl)
-
             response.enqueue(object : Callback<MyPetResModel>{
                 override fun onResponse(call: Call<MyPetResModel>, response: Response<MyPetResModel>) {
                     if(response.isSuccessful){
@@ -547,6 +546,126 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                 }
             })
         }
+
+    suspend fun modifyPet(ownrPetUnqNo:String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val fileRequestBody = _imageFile.value?.asRequestBody("image/*".toMediaType()) ?: RequestBody.create("image/*".toMediaType(), ByteArray(0))
+        val filePart = MultipartBody.Part.createFormData("file", _imageFile.value?.name, fileRequestBody)
+
+        // 일단 받아올수있는 데이터, 이름,생일,종,성별,중성화,몸무게 정도 받아오기
+        val ownrPetUnqNo = ownrPetUnqNo.toRequestBody("text/plain".toMediaType())
+        val petRelCd = "001".toRequestBody("text/plain".toMediaType()) // 펫 관계코드
+        val petNm = petName.value.toRequestBody("text/plain".toMediaType()) //펫 이름
+        val petRegNo = "Y".toRequestBody("text/plain".toMediaType()) //펫 등록번호
+        val petInfoUnqNo = petKind.value.petInfoUnqNo.toString().toRequestBody("text/plain".toMediaType()) //펫 종 고유번호
+        val stdgSggCd = selectedItem2.value.sggCd.toRequestBody("text/plain".toMediaType()) //시군구 코드
+        val petBrthYmd = petBirth.value.toRequestBody("text/plain".toMediaType()) // 생일
+        val stdgUmdCd =
+            if(selectedItem3.value.umdCd!=""){
+                selectedItem3.value.umdCd.toRequestBody("text/plain".toMediaType())
+            }else{
+                "1".toRequestBody("text/plain".toMediaType())
+            } // 읍면동 코드
+        val delYn = "N".toRequestBody("text/plain".toMediaType()) // 삭제 여부
+        val petRprsYn = petRprsYn.value.toRequestBody("text/plain".toMediaType()) // 펫 대표여부
+        val ntrTypCd = when(petNtr.value){
+            "했어요" -> "001".toRequestBody("text/plain".toMediaType()) //중성화 코드
+            "안했어요" -> "002".toRequestBody("text/plain".toMediaType()) //중성화 코드
+            "모름" -> "003".toRequestBody("text/plain".toMediaType()) //중성화 코드
+            else -> "003".toRequestBody("text/plain".toMediaType()) //중성화 코드
+        }
+        val sexTypCd = when(petGender.value){
+            "남아" -> "002".toRequestBody("text/plain".toMediaType()) //중성화 코드
+            "여아" -> "001".toRequestBody("text/plain".toMediaType()) //중성화 코드
+            "모름" -> "003".toRequestBody("text/plain".toMediaType()) //중성화 코드
+            else -> "003".toRequestBody("text/plain".toMediaType()) //중성화 코드
+        }
+        val petMngrYn = "Y".toRequestBody("text/plain".toMediaType()) // 펫 관리자여부
+        //val wghtVl = petWght.value.toFloat() // 몸무게
+        val stdgCtpvCd = selectedItem1.value.cdld.toRequestBody("text/plain".toMediaType()) //시도 코드
+
+        Log.d("IMAGE",filePart.toString())
+        val call = apiService.modifyPet(ownrPetUnqNo, petRelCd, petNm, petRegNo, stdgSggCd, petInfoUnqNo,petBrthYmd, delYn, stdgUmdCd, filePart, petRprsYn, ntrTypCd, sexTypCd, petMngrYn, stdgCtpvCd)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object :Callback<MyPetResModel>{
+                override fun onResponse(
+                    call: Call<MyPetResModel>,
+                    response: Response<MyPetResModel>
+                ) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (body.statusCode==200){
+                                _myPetResModel.value = it
+
+                                //---- 초기화 ----
+                                _petKind.value = PetListData("", "", 0, "사이즈/품종 선택", "")
+                                _selectedItem1.value = SCD("", "", "")
+                                _selectedItem2.value = SggList("", "") // 시군구
+                                _selectedItem3.value = UmdList("", "") // 읍면동
+                                _sggList.value = emptyList()
+                                _umdList.value = emptyList()
+                                _address.value = "주소 선택"
+                                _petName.value = ""
+                                _year.value =PickerState()
+                                _petBirth.value = ""
+                                _petBirthUnknown.value = false
+                                _petWght.value = ""
+                                _petGender.value = "남아"
+                                _petNtr.value = "했어요"
+                                _imageUri.value = null
+                                //---- 초기화 ----
+
+                                continuation.resume(true)
+                            }else{
+                                _myPetResModel.value = it
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<MyPetResModel>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun deletePet(ownrPetUnqNo:String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = DeletePetReq("Y",ownrPetUnqNo)
+
+        val call = apiService.deletePet(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object :Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (body.statusCode == 200){
+                                continuation.resume(true)
+                            }else{
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
 
     suspend fun login(): Boolean {
         val apiService = RetrofitClientServer.instance

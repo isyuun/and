@@ -142,7 +142,6 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
     val timePickerState = rememberTimePickerState()
     val datePickerState = rememberDatePickerState()
     val snackState = remember { SnackbarHostState() }
-    SnackbarHost(hostState = snackState, Modifier)
     var openDialog by remember { mutableStateOf(false) }
     var openTimePicker by remember { mutableStateOf(false) }
 
@@ -233,7 +232,10 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
 
                 Row {
                     Button(
-                        onClick = { openBottomSheet = true },
+                        onClick = {
+                            if (petInfo[0].ownrPetUnqNo!=""){
+                                openBottomSheet = true
+                            } },
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = design_btn_border
@@ -276,13 +278,33 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            LazyColumn(
-                state = rememberLazyListState(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.heightIn(max = 400.dp)
-            ){
-                itemsIndexed(petInfo){ index, item ->
-                    MyPagePetItem(petDetailData = item,sharedViewModel, navController, index)
+            if (petInfo[0].ownrPetUnqNo==""){
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .border(
+                            1.dp,
+                            color = design_textFieldOutLine,
+                            shape = RoundedCornerShape(12.dp)
+                        ), contentAlignment = Alignment.Center
+                ){
+                    Text(
+                        text = "관리중인 펫이 없어요",
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 14.sp, color = design_login_text
+                    )
+                }
+            }else{
+                LazyColumn(
+                    state = rememberLazyListState(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.heightIn(max = 400.dp)
+                ){
+                    itemsIndexed(petInfo){ index, item ->
+                        MyPagePetItem(petDetailData = item,sharedViewModel, navController, index)
+                    }
                 }
             }
 

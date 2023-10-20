@@ -65,9 +65,7 @@ fun LogoTopBar(
     walkViewModel: WalkViewModel
 ) {
 
-    val scope = rememberCoroutineScope()
     val toMonthCalendar by walkViewModel.toMonthCalendar.collectAsState()
-    val toDetail by walkViewModel.toDetail.collectAsState()
 
     TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
@@ -103,14 +101,7 @@ fun LogoTopBar(
                             .clickable {
                                 if (toMonthCalendar){
                                     walkViewModel.updateToMonthCalendar(false)
-                                }else if (toDetail){
-                                    walkViewModel.updateToDetail(false)
-                                }
-
-                                if (!(toMonthCalendar&&toDetail)){
-                                    backBtnOnChange(false)
-                                }
-                                       },
+                                } },
                         tint = Color.Unspecified)
                 }
 
@@ -123,6 +114,7 @@ fun LogoTopBar(
                         .clickable { openBottomSheet(true) },
                     verticalAlignment = Alignment.CenterVertically
                 ){
+                    Spacer(modifier = Modifier.padding(start = 16.dp))
                     CircleImageTopBar(size = 35, imageUri = petDetailData.petRprsImgAddr)
                     Spacer(modifier = Modifier.padding(end=4.dp))
                     Row (
@@ -149,18 +141,6 @@ fun LogoTopBar(
                 }
             }
         })
-}
-
-
-@Composable
-fun TopbarPetData(
-    petDetailData: PetDetailData,
-    modifier: Modifier,
-    bottomSheetState: Unit
-){
-
-
-
 }
 
 @Composable

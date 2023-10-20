@@ -56,7 +56,6 @@ class TokenInterceptor() : Interceptor {
             }
         }
 
-
         return response
     }
 

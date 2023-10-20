@@ -182,7 +182,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Button(
-                onClick = { navController.navigate("modifyPetInfoScreen/${index}") },
+                onClick = { navController.navigate(Screen.ModifyPetInfoScreen.route) },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = design_white
@@ -220,13 +220,13 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
                 Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
-                if (memberList?.isNotEmpty()==true){
+                if (memberList.isNotEmpty()){
                     LazyColumn(
                         state = rememberLazyListState(),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.heightIn(max = 300.dp)
                     ){
-                        items(memberList!!){ item ->
+                        items(memberList){ item ->
                             GroupItem(item = item)
                         }
                     }

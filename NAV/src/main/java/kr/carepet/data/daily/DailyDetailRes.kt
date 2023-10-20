@@ -17,8 +17,6 @@ data class DailyDetailRes(
 data class DailyDetailData(
     @SerializedName("atchPath")
     var atchPath: String, // http://carepet.hopto.org/img
-    @SerializedName("bwlMvmNmtm")
-    var bwlMvmNmtm: Int, // 0
     @SerializedName("cmntCnt")
     var cmntCnt: Int, // 0
     @SerializedName("cmntList")
@@ -44,87 +42,95 @@ data class DailyDetailData(
     @SerializedName("rgtrIpAddr")
     var rgtrIpAddr: Any?, // null
     @SerializedName("rlsDt")
-    var rlsDt: String, // 2023.09.08 01:09
+    var rlsDt: String, // 2023.10.20 01:10
     @SerializedName("rlsYn")
     var rlsYn: String, // Y
     @SerializedName("schCn")
-    var schCn: String,
+    var schCn: String, // 001 추가
     @SerializedName("schTtl")
-    var schTtl: String, // 이슬 산책
+    var schTtl: String, // 코드리스트 추가
     @SerializedName("schUnqNo")
-    var schUnqNo: Int, // 3
+    var schUnqNo: Int, // 53
     @SerializedName("totClr")
-    var totClr: Int, // 340
+    var totClr: Int, // 300
     @SerializedName("totDstnc")
-    var totDstnc: Int, // 1500
+    var totDstnc: Int, // 0
     @SerializedName("totMvmnPathFile")
     var totMvmnPathFile: Any?, // null
     @SerializedName("userId")
-    var userId: String, // e94da19e-cc79-4153-8f07-5ec943a39d6f
+    var userId: String, // 9d93728e-c71e-41ee-ad8d-6ee741201921
     @SerializedName("walkDptreDt")
-    var walkDptreDt: String, // 2023-09-08 10:27:21
+    var walkDptreDt: String, // 2023-10-20 13:35:46
     @SerializedName("walkEndDt")
-    var walkEndDt: String // 2023-09-08 13:27:11
+    var walkEndDt: String // 2023-10-20 13:35:46
 )
 
 data class DailyLifeFile(
     @SerializedName("atchFileNm")
-    var atchFileNm: String, // f98642708ab44adebc49800192773cbf.JPEG
+    var atchFileNm: String, // 958984f26b154024a9f2bbf78be1235d.JPG
     @SerializedName("atchFileSn")
-    var atchFileSn: String, // 3
+    var atchFileSn: String, // 44
     @SerializedName("atchFileSz")
-    var atchFileSz: Int, // 85917
+    var atchFileSz: Int, // 2859770
     @SerializedName("fileExtnNm")
-    var fileExtnNm: String, // JPEG
+    var fileExtnNm: String, // JPG
     @SerializedName("filePathNm")
-    var filePathNm: String, // /dailyLife/20230908/
+    var filePathNm: String, // /dailyLife/20231020/
     @SerializedName("flmPstnLat")
     var flmPstnLat: Any?, // null
     @SerializedName("flmPstnLot")
     var flmPstnLot: Any?, // null
     @SerializedName("orgnlAtchFileNm")
-    var orgnlAtchFileNm: String, // KakaoTalk_Photo_2023-08-08-15-11-27.jpeg
+    var orgnlAtchFileNm: String, // image_file_name.jpg
     @SerializedName("rowState")
     var rowState: Any?, // null
     @SerializedName("schUnqNo")
-    var schUnqNo: Int // 3
+    var schUnqNo: Int // 53
 )
 
 data class DailyLifePet(
     @SerializedName("age")
-    var age: String, // 6년9개월12일
+    var age: String, // 15년2일
+    @SerializedName("bwlMvmNmtm")
+    var bwlMvmNmtm: Int, // 1
     @SerializedName("ownrPetUnqNo")
-    var ownrPetUnqNo: String, // P20230908000005
+    var ownrPetUnqNo: String, // P20231018000071
     @SerializedName("petNm")
-    var petNm: String, // 이슬
+    var petNm: String, // 첫째
+    @SerializedName("petImg")
+    var petImg: String,
+    @SerializedName("relmIndctNmtm")
+    var relmIndctNmtm: Int, // 0
     @SerializedName("rowState")
     var rowState: Any?, // null
     @SerializedName("schUnqNo")
-    var schUnqNo: Int, // 3
+    var schUnqNo: Int, // 53
     @SerializedName("stdgUmdNm")
-    var stdgUmdNm: String // 공릉동
+    var stdgUmdNm: Any?, // null
+    @SerializedName("urineNmtm")
+    var urineNmtm: Int // 1
 )
 
 data class DailyLifeSchHashTag(
     @SerializedName("hashTagNm")
-    var hashTagNm: String, // 댕댕이
+    var hashTagNm: String, // 해시
     @SerializedName("hashTagNo")
-    var hashTagNo: String, // 3
+    var hashTagNo: String, // 21
     @SerializedName("rowState")
     var rowState: Any?, // null
     @SerializedName("schUnqNo")
-    var schUnqNo: Int // 3
+    var schUnqNo: Int // 53
 )
 
 data class DailyLifeSchSe(
     @SerializedName("cdId")
-    var cdId: String, // 002
+    var cdId: String, // 001
     @SerializedName("cdNm")
-    var cdNm: String, // 일상
+    var cdNm: String, // 산책
     @SerializedName("rowState")
     var rowState: Any?, // null
     @SerializedName("schUnqNo")
-    var schUnqNo: Int // 3
+    var schUnqNo: Int // 53
 )
 
 data class DailyDetailReq(

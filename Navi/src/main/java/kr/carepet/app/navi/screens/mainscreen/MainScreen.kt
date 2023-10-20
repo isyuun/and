@@ -234,6 +234,7 @@ fun MainScreen(
                         navController = navController,
                         walkViewModel = walkViewModel,
                         sharedViewModel = sharedViewModel,
+                        homeViewModel = homeViewModel,
                         backBtnOn = {newValue -> backBtnOnLT = newValue},
                         openBottomSheet = openBottomSheet,
                         onDissMiss = {newValue -> openBottomSheet = newValue}

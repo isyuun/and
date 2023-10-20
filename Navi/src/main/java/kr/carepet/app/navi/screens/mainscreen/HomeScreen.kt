@@ -7,7 +7,6 @@ package kr.carepet.app.navi.screens.mainscreen
 import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -125,9 +124,11 @@ import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
+import java.util.Date
 import java.util.Locale
 import kotlin.math.absoluteValue
 
@@ -152,7 +153,7 @@ fun HomeScreen(
     //petInfo.size가 갱신되기 전에, 뷰가 만들어지면서 에러발생
     var pagerState = rememberPagerState(pageCount = { currentPetInfo.size })
 
-    var refresh by rememberSaveable { mutableStateOf(true) }
+    val selectedPet by sharedViewModel.selectPet.collectAsState()
 
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -168,9 +169,17 @@ fun HomeScreen(
 
     LaunchedEffect(key1 = pagerState.currentPage, key2 = currentPetInfo){
         if (currentPetInfo.isNotEmpty()){
-            viewModel.callGetWeekRecord(currentPetInfo[pagerState.currentPage].ownrPetUnqNo, getFormattedTodayDate())
+            viewModel.getWeekRecord(currentPetInfo[pagerState.currentPage].ownrPetUnqNo, getFormattedTodayDate())
             viewModel.updateSeletedPet(currentPetInfo[pagerState.currentPage])
+
+            sharedViewModel.updateSelectPetTemp(currentPetInfo[pagerState.currentPage])
         }
+    }
+
+    LaunchedEffect(key1 = selectedPet){
+        val index = currentPetInfo.indexOf(selectedPet)
+
+        pagerState.animateScrollToPage(index)
     }
 
     LaunchedEffect(key1 = G.toPost){
@@ -192,7 +201,11 @@ fun HomeScreen(
         ) {
             CustomDialog(
                 onDismiss = { newValue -> showDialogChange(newValue) },
-                navController = navController
+                navController = navController,
+                confirm = "등록하기",
+                dismiss = "나중에",
+                title = "같이 산책할 펫이 없어요",
+                text = "펫을 등록하시겠어요?"
             )
         }
 
@@ -300,8 +313,6 @@ fun ProfileContent(
     val wtCont3 = "구의동"
     val dustIcon= R.drawable.dust_good
 
-    val scope = rememberCoroutineScope()
-    val petInfo by viewModel.petInfo.collectAsState()
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
 
     Log.d("LOG",currentPetInfo.isEmpty().toString())
@@ -995,7 +1006,7 @@ fun BottomSheetContent(
 fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData, index: Int){
 
     val petName:String = petList.petNm
-    val imageUri:String = petList.petRprsImgAddr
+    val imageUri:String? = petList.petRprsImgAddr
     val petKind:String = petList.petKindNm
     val petAge:String = if(petList.petBrthYmd == ""){
         "미상"
@@ -1382,6 +1393,14 @@ fun getTodayDayOfWeek(): String {
     val dayOfWeek = today.dayOfWeek
     val dayOfWeekText = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
     return dayOfWeekText
+}
+
+fun getFormattedDate(): String {
+    val pattern = "yyyy.MM.dd" // 원하는 날짜 포맷 지정
+    val simpleDateFormat = SimpleDateFormat(pattern)
+    val currentDate = Date()
+
+    return simpleDateFormat.format(currentDate)
 }
 
 data class StoryList(val imageUri: Any?,val title: String, val petName: String, val likeCount: String, val commentCount: String)

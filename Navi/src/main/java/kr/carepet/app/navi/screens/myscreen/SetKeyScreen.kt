@@ -142,6 +142,7 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
                             val result = settingViewModel.setInviteCode()
 
                             if (result){
+                                settingViewModel.updateCurrentPetInfo()
                                 settingViewModel.updatePetInfo()
                                 navController.popBackStack()
                             }else{

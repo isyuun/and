@@ -19,7 +19,14 @@ import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_white
 
 @Composable
-fun CustomDialog(onDismiss:(Boolean) -> Unit, navController: NavHostController){
+fun CustomDialog(
+    onDismiss:(Boolean) -> Unit,
+    navController: NavHostController,
+    confirm: String,
+    dismiss : String,
+    title : String,
+    text : String
+){
     AlertDialog(
         onDismissRequest = { onDismiss(false) },
         confirmButton = {
@@ -34,13 +41,13 @@ fun CustomDialog(onDismiss:(Boolean) -> Unit, navController: NavHostController){
                 )
             ) {
                 Text(
-                    text = "등록하기",
+                    text = confirm,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     color = design_white
                 )
             } },
-        title = { Text(text = "같이 산책할 펫이 없어요") },
-        text = { Text(text = "펫을 등록하시겠어요?", color = design_skip) },
+        title = { Text(text = title) },
+        text = { Text(text = text, color = design_skip) },
         dismissButton = {
             Button(
                 onClick = {
@@ -53,7 +60,7 @@ fun CustomDialog(onDismiss:(Boolean) -> Unit, navController: NavHostController){
                 border = BorderStroke(1.dp, color = design_login_text)
             ) {
                 Text(
-                    text = "나중에",
+                    text = dismiss,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     color = design_login_text
                 )

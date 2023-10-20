@@ -46,7 +46,7 @@ data class PetDetailData(
     @SerializedName("petRelUnqNo")
     var petRelUnqNo: Int, // 30
     @SerializedName("petRprsImgAddr")
-    var petRprsImgAddr: String, // http://carepet.hopto.org/img/mypet/20230920/46bb3b500643478e8c5a5b14975fe983.JPG
+    var petRprsImgAddr: String?, // http://carepet.hopto.org/img/mypet/20230920/46bb3b500643478e8c5a5b14975fe983.JPG
     @SerializedName("petRprsYn")
     var petRprsYn: String, // Y
     @SerializedName("sexTypCd")
