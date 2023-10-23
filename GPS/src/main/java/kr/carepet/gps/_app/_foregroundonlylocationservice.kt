@@ -42,6 +42,7 @@ internal const val NOTIFICATION_ID = 12345678
 internal const val NOTIFICATION_CHANNEL_ID = "kr.carepet.app.navi.channel.01"
 
 internal const val SHARED_PREFERENCE_FILE_KEY = "$PACKAGE_NAME.PREFERENCE_FILE_KEY"
+
 /**
  * @Project     : carepet-android
  * @FileName    : _foregroundonlylocationservice.kt

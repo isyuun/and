@@ -58,7 +58,7 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class foregroundonlylocationservice() : _foregroundonlylocationservice() {
+open class foregroundonlylocationservice : _foregroundonlylocationservice() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     /*
@@ -87,7 +87,7 @@ open class foregroundonlylocationservice() : _foregroundonlylocationservice() {
     // Used only for local storage of the last known location. Usually, this would be saved to your
     // database, but because this is a simplified sample without a full database, we only need the
     // last location to create a Notification if the user navigates away from the app.
-    protected var currentLocation: Location? = null
+    protected var location: Location? = null
 
     //https://stackoverflow.com/questions/74264850/localbroadcastmanager-is-now-deprecated-how-to-send-data-from-service-to-activi
     //Define a LiveData to observe in activity
@@ -146,7 +146,7 @@ open class foregroundonlylocationservice() : _foregroundonlylocationservice() {
 
     private fun actionForegroundIntent(): Intent {
         val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
-        intent.putExtra(EXTRA_LOCATION, currentLocation)
+        intent.putExtra(EXTRA_LOCATION, location)
         return intent
     }
 
@@ -155,7 +155,7 @@ open class foregroundonlylocationservice() : _foregroundonlylocationservice() {
         // Normally, you want to save a new location to a database. We are simplifying
         // things a bit and just saving it as a local variable, as we only need it again
         // if a Notification is created (when the user navigates away from app).
-        currentLocation = locationResult.lastLocation
+        location = locationResult.lastLocation
 
         // Notify our Activity that a new location was added. Again, if this was a
         // production app, the Activity would be listening for changes to a database

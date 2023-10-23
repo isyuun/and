@@ -53,7 +53,14 @@ open class gpsapplication4 : gpsapplication3() {
         super.stop()
     }
 
-    fun end() {
+    fun pause() {
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
+        this.service?.pause()
+    }
+
+    fun resume() {
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
+        this.service?.resume()
     }
 
     val path
@@ -63,7 +70,7 @@ open class gpsapplication4 : gpsapplication3() {
         get() = this.service?.file
 
     val images
-        get() = this.service?.imgs
+        get() = this.service?.images
 
     val tracks
         get() = this.service?.tracks

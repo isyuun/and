@@ -48,6 +48,7 @@ open class GPSApplication : gpsapplication4() {
 
         val instance
             get() = isntance()
+
         @JvmStatic
         private fun isntance(): GPSApplication {
             return singleton ?: synchronized(this) {

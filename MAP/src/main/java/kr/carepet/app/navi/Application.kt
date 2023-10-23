@@ -45,6 +45,6 @@ open class Application : MapApplication() {
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
-        if (!start) start()    //test
+        //if (!start) start()   //test
     }
 }
