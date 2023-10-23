@@ -181,6 +181,7 @@ fun ModifyPetInfoScreen(
                         "${selectPet.stdgUmdNm}"
             )
             viewModel.updatePetBirth(selectPet.petBrthYmd)
+            viewModel.updatePetBirthUnknown(selectPet.petBrthYmd=="미상")
             viewModel.setImageUri(selectPet.petRprsImgAddr?.toUri(),context)
 
             init = false

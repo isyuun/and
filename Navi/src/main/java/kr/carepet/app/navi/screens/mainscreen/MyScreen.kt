@@ -574,7 +574,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(
-                text = if (petDetailData.petBrthYmd==""){
+                text = if (petDetailData.petBrthYmd=="미상"){
                     "미상"
                 }else{
                     sharedViewModel.changeBirth(petDetailData.petBrthYmd)

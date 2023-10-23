@@ -1008,7 +1008,7 @@ fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData, index: Int
     val petName:String = petList.petNm
     val imageUri:String? = petList.petRprsImgAddr
     val petKind:String = petList.petKindNm
-    val petAge:String = if(petList.petBrthYmd == ""){
+    val petAge:String = if(petList.petBrthYmd == "미상"){
         "미상"
     }else{
         viewModel.changeBirth(petList.petBrthYmd)

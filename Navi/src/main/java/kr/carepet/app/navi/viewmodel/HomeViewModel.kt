@@ -33,7 +33,7 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
 
     val emptyPet = PetDetailData(
         ownrPetUnqNo = "",
-        petBrthYmd = "",
+        petBrthYmd = "미상",
         petInfoUnqNo = 0,
         petKindNm = "웨스트 하이랜드 화이트 테리어",
         petMngrYn = "",

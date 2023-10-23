@@ -123,7 +123,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 }
 
                 Text(
-                    text = if (petInfo[index].petBrthYmd==""){
+                    text = if (petInfo[index].petBrthYmd=="미상"){
                         "미상"
                     }else{
                         sharedViewModel.changeBirth(petInfo[index].petBrthYmd)

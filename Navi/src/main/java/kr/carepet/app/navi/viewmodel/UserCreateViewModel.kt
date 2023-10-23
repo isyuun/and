@@ -480,7 +480,11 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
             val petRegNo = "Y".toRequestBody("text/plain".toMediaType()) //펫 등록번호
             val petInfoUnqNo = petKind.value.petInfoUnqNo.toString().toRequestBody("text/plain".toMediaType()) //펫 종 고유번호
             val stdgSggCd = selectedItem2.value.sggCd.toRequestBody("text/plain".toMediaType()) //시군구 코드
-            val petBrthYmd = petBirth.value.toRequestBody("text/plain".toMediaType()) // 생일
+            val petBrthYmd = if (_petBirthUnknown.value){
+                "미상".toRequestBody("text/plain".toMediaType()) // 생일
+            }else{
+                petBirth.value.toRequestBody("text/plain".toMediaType()) // 생일
+            }
             val stdgUmdCd =
                 if(selectedItem3.value.umdCd!=""){
                     selectedItem3.value.umdCd.toRequestBody("text/plain".toMediaType())
@@ -562,7 +566,11 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
         val petRegNo = "Y".toRequestBody("text/plain".toMediaType()) //펫 등록번호
         val petInfoUnqNo = petKind.value.petInfoUnqNo.toString().toRequestBody("text/plain".toMediaType()) //펫 종 고유번호
         val stdgSggCd = selectedItem2.value.sggCd.toRequestBody("text/plain".toMediaType()) //시군구 코드
-        val petBrthYmd = petBirth.value.toRequestBody("text/plain".toMediaType()) // 생일
+        val petBrthYmd = if (_petBirthUnknown.value){
+            "미상".toRequestBody("text/plain".toMediaType()) // 생일
+        }else{
+            petBirth.value.toRequestBody("text/plain".toMediaType()) // 생일
+        }
         val stdgUmdCd =
             if(selectedItem3.value.umdCd!=""){
                 selectedItem3.value.umdCd.toRequestBody("text/plain".toMediaType())

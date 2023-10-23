@@ -24,11 +24,11 @@ android {
     }
     buildTypes {
         getByName("debug") {
-            isMinifyEnabled = false
-            isDebuggable = true
-            signingConfig = signingConfigs.getByName("debug")
-            manifestPlaceholders["enableCrashlytics"] = "false"
-            extra.set("alwaysUpdateBuildId", false)
+            //isMinifyEnabled = false
+            //isDebuggable = true
+            //signingConfig = signingConfigs.getByName("debug")
+            //manifestPlaceholders["enableCrashlytics"] = "false"
+            //extra.set("alwaysUpdateBuildId", false)
         }
         getByName("release") {
             //shrinkResources = true
