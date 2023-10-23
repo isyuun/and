@@ -120,16 +120,16 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                 .background(color = design_white)
                 .verticalScroll(rememberScrollState())
         ) {
-            Text(text = "이름", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
-            )
-
-            CustomTFInInquiry(
-                value = name,
-                onValueChange = {newValue -> settingViewModel.updateName(newValue)},
-                placeholder = "이름을 입력해주세요",
-                keyboardType = KeyboardType.Text
-            )
+            //Text(text = "이름", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //    modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+            //)
+            //
+            //CustomTFInInquiry(
+            //    value = name,
+            //    onValueChange = {newValue -> settingViewModel.updateName(newValue)},
+            //    placeholder = "이름을 입력해주세요",
+            //    keyboardType = KeyboardType.Text
+            //)
 
             Text(text = "문의유형", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
@@ -183,27 +183,27 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                 }
             }
 
-            Text(text = "휴대폰 번호", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
-            )
-
-            CustomTFInInquiry(
-                value = phoneNum,
-                onValueChange = {newValue -> settingViewModel.updatePhoneNum(newValue)},
-                placeholder = "'_'없이 숫자만",
-                keyboardType = KeyboardType.Number
-            )
-
-            Text(text = "이메일", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
-            )
-
-            CustomTFInInquiry(
-                value = email,
-                onValueChange = {newValue -> settingViewModel.updateEmail(newValue)},
-                placeholder = "이메일을 입력해주세요",
-                keyboardType = KeyboardType.Email
-            )
+            //Text(text = "휴대폰 번호", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //    modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+            //)
+            //
+            //CustomTFInInquiry(
+            //    value = phoneNum,
+            //    onValueChange = {newValue -> settingViewModel.updatePhoneNum(newValue)},
+            //    placeholder = "'_'없이 숫자만",
+            //    keyboardType = KeyboardType.Number
+            //)
+            //
+            //Text(text = "이메일", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //    modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+            //)
+            //
+            //CustomTFInInquiry(
+            //    value = email,
+            //    onValueChange = {newValue -> settingViewModel.updateEmail(newValue)},
+            //    placeholder = "이메일을 입력해주세요",
+            //    keyboardType = KeyboardType.Email
+            //)
 
             Text(text = "제목", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text

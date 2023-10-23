@@ -36,6 +36,8 @@ import kr.carepet.data.pet.PetListResModel
 import kr.carepet.data.user.LoginResModel
 import kr.carepet.data.user.NickNameCheckRes
 import kr.carepet.data.user.UserDataResponse
+import kr.carepet.singleton.G
+import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -686,15 +688,15 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                             if (it.statusCode == 200) { // status code 200 검증
                                 // 200이면 login 처리, access/refresh token G 및 shared 에 저장
 
-                                kr.carepet.singleton.G.accessToken = it.data.accessToken
-                                kr.carepet.singleton.G.refreshToken = it.data.refreshToken
-                                kr.carepet.singleton.G.userId = it.data.userId
+                                G.accessToken = it.data.accessToken
+                                G.refreshToken = it.data.refreshToken
+                                G.userId = it.data.userId
                                 // shared에 저장
-                                kr.carepet.singleton.MySharedPreference.setAccessToken(it.data.accessToken)
-                                kr.carepet.singleton.MySharedPreference.setRefreshToken(it.data.refreshToken)
-                                kr.carepet.singleton.MySharedPreference.setUserId(it.data.userId)
-                                kr.carepet.singleton.MySharedPreference.setLastLoginMethod(_snsLogin.value)
-                                kr.carepet.singleton.MySharedPreference.setIsLogin(true)
+                                MySharedPreference.setAccessToken(it.data.accessToken)
+                                MySharedPreference.setRefreshToken(it.data.refreshToken)
+                                MySharedPreference.setUserId(it.data.userId)
+                                MySharedPreference.setLastLoginMethod(_snsLogin.value)
+                                MySharedPreference.setIsLogin(true)
 
                                 Log.d(
                                     "Token",

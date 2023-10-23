@@ -31,6 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import java.time.Duration
 import java.util.Date
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 
 
@@ -57,6 +58,7 @@ object RetrofitClientServer {
         OkHttpClient.Builder()
             .addInterceptor(tokenInterceptor)
             .addInterceptor(loggingInterceptor)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }
 

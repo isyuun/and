@@ -88,7 +88,7 @@ fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel, 
 
         if (petList[0].ownrPetUnqNo == ""){
             Text(
-                text = "등록된 펫이 없어요",
+                text = "등록된 반려동물이 없어요",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 16.sp, letterSpacing = (-0.8).sp,
                 color = design_login_text,

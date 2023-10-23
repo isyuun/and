@@ -110,7 +110,6 @@ import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
-import kr.carepet.util.Log
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -291,7 +290,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         ), contentAlignment = Alignment.Center
                 ){
                     Text(
-                        text = "관리중인 펫이 없어요",
+                        text = "관리중인 반려동물이 없어요",
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, color = design_login_text
                     )
@@ -634,9 +633,11 @@ fun MyBottomSheet(
     timeState: TimePickerState
 ){
 
-    val currentPetList by sharedViewModel.currentPetInfo.collectAsState()
+    val petList by sharedViewModel.petInfo.collectAsState()
     val endCheck by settingViewModel.endCheck.collectAsState()
     val selectedPet = settingViewModel.selectedPet
+
+    val managedPet:List<PetDetailData> = petList.filter { it.mngrType == "M" }
 
     val context = LocalContext.current
 
@@ -670,16 +671,21 @@ fun MyBottomSheet(
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            contentPadding = PaddingValues(horizontal = 20.dp)
-        ){
-            items(currentPetList){ petList ->
-                MyBottomSheetItem(viewModel = sharedViewModel, settingViewModel= settingViewModel, petList = petList)
+        if (managedPet.isNotEmpty()){
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                contentPadding = PaddingValues(horizontal = 20.dp)
+            ){
+                items(managedPet){ petList ->
+                    MyBottomSheetItem(viewModel = sharedViewModel, settingViewModel= settingViewModel, petList = petList)
+                }
             }
+        }else{
+
         }
+
 
         Row (modifier = Modifier
             .padding(end = 20.dp)
@@ -799,16 +805,14 @@ fun MyBottomSheet(
 }
 
 @Composable
-fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewModel, petList : CurrentPetData){
+fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewModel, petList : PetDetailData){
 
     val configuration = LocalConfiguration.current
 
     val screenWidth = configuration.screenWidthDp.dp -60.dp
 
     val petName:String = petList.petNm
-    val imageUri:String = petList.petRprsImgAddr
-
-    val selectedPet = settingViewModel.selectedPet
+    val imageUri:String = petList.petRprsImgAddr?: ""
 
     var isSeleted by rememberSaveable { mutableStateOf(false) }
 

@@ -97,7 +97,12 @@ fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
     val communityViewModel = remember{CommunityViewModel(sharedViewModel)}
     val settingViewModel = remember{SettingViewModel(sharedViewModel)}
 
-    NavHost(navController = navController, startDestination = "intro"){
+    NavHost(
+        navController = navController,
+        startDestination = "intro",
+        enterTransition = { fadeIn(tween(700)) },
+        exitTransition = { fadeOut(tween(700)) }
+    ){
         composable("intro"){
 
             IntroScreen(navController = navController, viewModel = sharedViewModel, loginViewModel = viewModel)

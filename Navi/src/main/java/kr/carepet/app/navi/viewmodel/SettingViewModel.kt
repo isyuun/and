@@ -56,12 +56,11 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     val endCheck: StateFlow<Boolean> = _endCheck.asStateFlow() // state 노출
     fun updateEndCheck(newValue: Boolean) { _endCheck.value = newValue }
 
-    val selectedPet = mutableListOf<CurrentPetData>()
+    val selectedPet = mutableListOf<PetDetailData>()
 
-    private val _selectedPetSave = MutableStateFlow<List<CurrentPetData>>(emptyList())
-    val selectedPetSave: StateFlow<List<CurrentPetData>> = _selectedPetSave.asStateFlow()
-
-    fun updateSelectedPetSave(newValue: List<CurrentPetData>): Boolean {
+    private val _selectedPetSave = MutableStateFlow<List<PetDetailData>>(emptyList())
+    val selectedPetSave: StateFlow<List<PetDetailData>> = _selectedPetSave.asStateFlow()
+    fun updateSelectedPetSave(newValue: List<PetDetailData>): Boolean {
         _selectedPetSave.value = newValue
         return true // 값을 업데이트하는 데 성공했음을 나타내는 불리언 값을 반환합니다.
     }
@@ -436,8 +435,13 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                     if(response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _memberList.value = body.petDetailData.memberList
-                            continuation.resume(true)
+                            if (body.petDetailData != null){
+                                _memberList.value = body.petDetailData.memberList
+                                continuation.resume(true)
+                            }else{
+                                _memberList.value = emptyList()
+                                continuation.resume(true)
+                            }
                         }
                     }else{
                         _memberList.value = emptyList()

@@ -1,6 +1,5 @@
 package kr.carepet.app.navi.component
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,33 +53,30 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.MonthDay
+import kr.carepet.util.Log
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel) {
 
     val selectPet by sharedViewModel.selectPet.collectAsState()
-
-    var ownrPetUnqNo by remember { mutableStateOf(selectPet?.ownrPetUnqNo?:"") }
 
     var currentMonth by remember { mutableStateOf(getCurrentYearMonthKr()) }
 
     // 애니메이션 기다리기 위한 작업
     var firstLoad by remember { mutableStateOf(true) }
 
-    LaunchedEffect(key1 = ownrPetUnqNo, key2 = currentMonth){
+    LaunchedEffect(key1 = selectPet, key2 = currentMonth){
         if (firstLoad){
             delay(160)
             firstLoad = false
-            Log.d("LOG","딜레이 진입")
         }
         walkViewModel.viewModelScope.launch {
             val date =formatKoreanDateToYearMonth(currentMonth)
-            walkViewModel.getMonthData(ownrPetUnqNo, date)
+            walkViewModel.getMonthData(selectPet?.ownrPetUnqNo ?: "", date)
         }
     }
 

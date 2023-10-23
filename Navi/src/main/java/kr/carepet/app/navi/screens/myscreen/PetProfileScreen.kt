@@ -1,5 +1,6 @@
 package kr.carepet.app.navi.screens.myscreen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -181,10 +182,12 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Button(
+                enabled = petInfo[index].mngrType == "M",
                 onClick = { navController.navigate("modifyPetInfoScreen/${index}") },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = design_white
+                    containerColor = design_white,
+                    disabledContainerColor = design_white
                 ),
                 border = BorderStroke(width = 1.dp, color = design_btn_border),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp, pressedElevation = 0.dp),
@@ -195,7 +198,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                     .height(48.dp)
             ) {
                 Text(
-                    text = "정부 수정하기",
+                    text = if(petInfo[index].mngrType == "M"){"정보 수정하기"}else{"관리중인 반려동물만 수정 가능합니다"},
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
                     color = design_login_text

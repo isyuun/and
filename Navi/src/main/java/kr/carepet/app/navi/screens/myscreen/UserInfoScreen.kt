@@ -29,6 +29,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,13 +76,67 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
+    var showDialog by remember{ mutableStateOf(false) }
+    var withDraw by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = withDraw){
+        if (withDraw){
+            scope.launch {
+                val result = settingViewModel.withdraw()
+                if (result){
+
+                    G.userEmail = ""
+                    G.userId = ""
+                    G.refreshToken = ""
+                    G.accessToken = ""
+
+                    MySharedPreference.setUserId("")
+                    MySharedPreference.setRefreshToken("")
+                    MySharedPreference.setAccessToken("")
+                    MySharedPreference.setLastLoginMethod("")
+                    MySharedPreference.setIsLogin(false)
+
+                    snackbarHostState.showSnackbar(
+                        message = "회원탈퇴를 완료했습니다",
+                        actionLabel = "확인",
+                        duration = SnackbarDuration.Short,
+                        withDismissAction = true
+                    )
+
+                    navController.navigate(Screen.Login.route){
+                        popUpTo(0)
+                    }
 
 
+                }else{
+                    snackbarHostState.showSnackbar(
+                        message = "회원탈퇴를 실패해습니다",
+                        actionLabel = "확인",
+                        duration = SnackbarDuration.Short,
+                        withDismissAction = true
+                    )
+                }
+                withDraw = false
+            }
+        }
+    }
 
     Scaffold (
         topBar = { BackTopBar(title = "개인 정보 수정", navController = navController) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
+
+        if (showDialog){
+            CustomDialogDelete(
+                onDismiss = { newValue -> showDialog = newValue },
+                confirm = "탈퇴하기",
+                dismiss = "취소",
+                title = "회원 탈퇴하기",
+                text = "정말 탈퇴하시겠어요?",
+                valueChange = { newValue -> withDraw = newValue}
+            )
+        }
+
         Column (
             modifier = Modifier
                 .padding(paddingValues)
@@ -341,42 +396,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
             ){
                 Button(
                     onClick = {
-                              scope.launch {
-                                  val result = settingViewModel.withdraw()
-                                  if (result){
-
-                                      G.userEmail = ""
-                                      G.userId = ""
-                                      G.refreshToken = ""
-                                      G.accessToken = ""
-
-                                      MySharedPreference.setUserId("")
-                                      MySharedPreference.setRefreshToken("")
-                                      MySharedPreference.setAccessToken("")
-                                      MySharedPreference.setLastLoginMethod("")
-                                      MySharedPreference.setIsLogin(false)
-
-                                      snackbarHostState.showSnackbar(
-                                          message = "회원탈퇴를 완료했습니다",
-                                          actionLabel = "확인",
-                                          duration = SnackbarDuration.Short,
-                                          withDismissAction = true
-                                      )
-
-                                      navController.navigate(Screen.Login.route){
-                                          popUpTo(0)
-                                      }
-
-
-                                  }else{
-                                      snackbarHostState.showSnackbar(
-                                          message = "회원탈퇴를 실패해습니다",
-                                          actionLabel = "확인",
-                                          duration = SnackbarDuration.Short,
-                                          withDismissAction = true
-                                      )
-                                  }
-                              }
+                              showDialog =true
                     },
                     modifier = Modifier
                         .padding(end = 20.dp)

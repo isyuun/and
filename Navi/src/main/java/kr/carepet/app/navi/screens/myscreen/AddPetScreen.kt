@@ -90,11 +90,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -105,7 +103,6 @@ import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CustomTextField
 import kr.carepet.app.navi.component.LoadingDialog
-import kr.carepet.app.navi.screens.PetCreateScreen
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_camera_bg
@@ -783,7 +780,7 @@ fun AddPetScreen(
             Button(
                 onClick = {
                     scope.launch {
-                        if (IntegrityCheck(viewModel, context)){
+                        if (integrityCheck(viewModel, context)){
                             isLoading = true
                             val result = viewModel.createPet()
 
@@ -1463,7 +1460,7 @@ class PickerState {
     var selectedItem by mutableStateOf("")
 }
 
-fun IntegrityCheck(viewModel: UserCreateViewModel, context: Context):Boolean{
+fun integrityCheck(viewModel: UserCreateViewModel, context: Context):Boolean{
     if (viewModel.petKind.value.petNm=="사이즈/품종 선택"){
         Toast.makeText(context, "펫 종류를 선택해주세요", Toast.LENGTH_SHORT).show()
         return false

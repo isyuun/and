@@ -942,7 +942,7 @@ fun BottomSheetContent(
                 onClick = { },
                 border = BorderStroke(1.dp, design_textFieldOutLine)
             ) {
-                Text(text = "새로운 펫 추가", color = Color.Black)
+                Text(text = "새로운 반려동물 추가", color = Color.Black)
             }
         }
 

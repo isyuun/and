@@ -295,10 +295,10 @@ class SharedViewModel:ViewModel(){
     fun clear(){
         _moreStoryClick.value =false
         _weekRecord.value = null
-        _petInfo.value = emptyList()
-        _currentPetInfo.value = emptyList()
+        _init.value = true
+        //_petInfo.value = emptyList()
+       // _currentPetInfo.value = emptyList()
         _selectPet.value = null
-        Log.d("CLEAR","shared init")
     }
 }
 

@@ -1,22 +1,14 @@
 package kr.carepet.app.navi.screens.myscreen
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,27 +17,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -62,14 +45,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,8 +65,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -97,26 +76,15 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
-import kr.carepet.app.navi.component.BackTopBar
-import kr.carepet.app.navi.component.CustomDialog
 import kr.carepet.app.navi.component.CustomTextField
-import kr.carepet.app.navi.screens.PetCreateScreen
-import kr.carepet.app.navi.screens.mainscreen.BackOnPressed
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_camera_bg
@@ -136,10 +104,8 @@ import kr.carepet.data.SCD
 import kr.carepet.data.SggList
 import kr.carepet.data.UmdList
 import kr.carepet.data.pet.PetListData
-import kr.carepet.util.Log
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -260,6 +226,8 @@ fun ModifyPetInfoScreen(
                         .makeText(context, "삭제 실패", Toast.LENGTH_SHORT)
                         .show()
                 }
+
+                delete = false
             }
         }
     }
@@ -303,14 +271,10 @@ fun ModifyPetInfoScreen(
             BackTopBarInModify(title = "반려동물 정보 수정", navController = navController, viewModel = viewModel, initChange = {newValue -> init = newValue})
         }
     ){ paddingValues ->
-        AnimatedVisibility(
-            visible = showDialog,
-            enter = scaleIn(),
-            exit = scaleOut()
-        ) {
+
+        if (showDialog){
             CustomDialogDelete(
                 onDismiss = { newValue -> showDialog = newValue },
-                navController = navController,
                 confirm = "삭제하기",
                 dismiss = "취소",
                 title = "반려동물 정보 삭제하기",
@@ -919,7 +883,7 @@ fun ModifyPetInfoScreen(
             Button(
                 onClick = {
                     scope.launch {
-                        if (IntegrityCheck(viewModel, context)){
+                        if (integrityCheck(viewModel, context)){
                             val result = viewModel.modifyPet(selectPet.ownrPetUnqNo)
 
                             if(result){
@@ -1038,7 +1002,6 @@ fun BackTopBarInModify(title: String, navController: NavHostController, backVisi
 @Composable
 fun CustomDialogDelete(
     onDismiss:(Boolean) -> Unit,
-    navController: NavHostController,
     confirm: String,
     dismiss : String,
     title : String,
@@ -1088,6 +1051,7 @@ fun CustomDialogDelete(
     )
 }
 
+@SuppressLint("SimpleDateFormat")
 fun formatDate(inputDate: String): String {
     val inputFormat = SimpleDateFormat("yyyyMMdd")
     val outputFormat = SimpleDateFormat("yyyy-MM-dd")
