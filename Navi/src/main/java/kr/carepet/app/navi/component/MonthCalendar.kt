@@ -52,6 +52,7 @@ import kr.carepet.app.navi.ui.theme.design_deep_blue
 import kr.carepet.app.navi.ui.theme.design_intro_bg
 import kr.carepet.app.navi.ui.theme.design_sharp
 import kr.carepet.app.navi.ui.theme.design_white
+import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.MonthDay
 import java.time.LocalDate
@@ -61,17 +62,13 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MonthCalendar(walkViewModel: WalkViewModel, backBtnOn: (Boolean) -> Unit) {
+fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel) {
 
-    val petInfo by walkViewModel.petInfo.collectAsState()
+    val selectPet by sharedViewModel.selectPet.collectAsState()
 
-    var ownrPetUnqNo by remember { mutableStateOf(
-        petInfo.filter { it.petRprsYn=="Y"}[0].ownrPetUnqNo
-    ) }
+    var ownrPetUnqNo by remember { mutableStateOf(selectPet?.ownrPetUnqNo?:"") }
 
-    var currentMonth by remember { mutableStateOf(
-        getCurrentYearMonthKr()
-    ) }
+    var currentMonth by remember { mutableStateOf(getCurrentYearMonthKr()) }
 
     // 애니메이션 기다리기 위한 작업
     var firstLoad by remember { mutableStateOf(true) }

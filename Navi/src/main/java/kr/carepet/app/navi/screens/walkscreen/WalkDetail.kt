@@ -143,7 +143,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
 
                         HorizontalPager(
                             modifier = Modifier
-                                .padding(horizontal = 40.dp)
+                                .padding(horizontal = 10.dp)
                                 .fillMaxWidth()
                                 .heightIn(max = 240.dp),
                             state = pagerState,

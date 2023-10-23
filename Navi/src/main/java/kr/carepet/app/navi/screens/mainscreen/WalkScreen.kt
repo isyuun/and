@@ -188,7 +188,7 @@ fun WalkScreen(
                 targetOffsetY = {-it}
             )
         ) {
-            MonthCalendar(walkViewModel = walkViewModel, backBtnOn = backBtnOn)
+            MonthCalendar(walkViewModel = walkViewModel, sharedViewModel = sharedViewModel)
         }
 
         if (openBottomSheet){
