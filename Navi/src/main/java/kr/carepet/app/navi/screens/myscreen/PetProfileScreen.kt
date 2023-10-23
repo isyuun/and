@@ -44,7 +44,6 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kr.carepet.app.navi.R
-import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.screens.mainscreen.CircleImage
 import kr.carepet.app.navi.ui.theme.design_999999
@@ -182,7 +181,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Button(
-                onClick = { navController.navigate(Screen.ModifyPetInfoScreen.route) },
+                onClick = { navController.navigate("modifyPetInfoScreen/${index}") },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = design_white
@@ -220,13 +219,13 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
                 Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
-                if (memberList.isNotEmpty()){
+                if (memberList?.isNotEmpty()==true){
                     LazyColumn(
                         state = rememberLazyListState(),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.heightIn(max = 300.dp)
                     ){
-                        items(memberList){ item ->
+                        items(memberList!!){ item ->
                             GroupItem(item = item)
                         }
                     }
