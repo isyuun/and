@@ -506,15 +506,14 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                                 navController.popBackStack()
                                 isLoading = false
                             }else{
+                                isLoading = false
                                 snackState.showSnackbar(
                                     message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
                                     actionLabel = "확인",
                                     duration = SnackbarDuration.Short,
                                     withDismissAction = false
                                 )
-                                isLoading = false
                             }
-                            isLoading = false
                         }else{
                             val photoUpload = viewModel.photoUpload(context = context)
                             if (photoUpload) {
@@ -523,15 +522,16 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                                     navController.popBackStack()
                                     isLoading = false
                                 }else{
+                                    isLoading = false
                                     snackState.showSnackbar(
                                         message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
                                         actionLabel = "확인",
                                         duration = SnackbarDuration.Short,
                                         withDismissAction = false
                                     )
-                                    isLoading = false
                                 }
                             } else {
+                                isLoading = false
                                 snackState.showSnackbar(
                                     message = "사진전송에 실패했습니다. 다시 시도해주세요",
                                     actionLabel = "확인",
