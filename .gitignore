@@ -1,3 +1,6 @@
+# .APK
+!.APK/
+
 # Gradle files
 .gradle/
 build/

@@ -5,6 +5,35 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("../.APK/kr.carepet.debug.jks")
+        }
+        create("release") {
+            storeFile = file("../.APK/kr.carepet.release.jks")
+            storePassword = "is230710!!"
+            keyAlias = "carepet"
+            keyPassword = "is230710!!"
+        }
+    }
+    buildTypes {
+        getByName("debug") {
+            isMinifyEnabled = false
+            isDebuggable = true
+            signingConfig = signingConfigs.getByName("debug")
+            manifestPlaceholders["enableCrashlytics"] = "false"
+            extra.set("alwaysUpdateBuildId", false)
+        }
+        getByName("release") {
+            //shrinkResources = true
+            isMinifyEnabled = true
+            isDebuggable = false
+            signingConfig = signingConfigs.getByName("release")
+            manifestPlaceholders["enableCrashlytics"] = "true"
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+
     namespace = "kr.carepet.app.navi"
     compileSdk = 34
 
@@ -21,15 +50,15 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
+    //buildTypes {
+    //    release {
+    //        isMinifyEnabled = false
+    //        proguardFiles(
+    //            getDefaultProguardFile("proguard-android-optimize.txt"),
+    //            "proguard-rules.pro"
+    //        )
+    //    }
+    //}
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
