@@ -70,14 +70,18 @@ data class PetDetailData(
 )
 
 data class Member(
+    @SerializedName("userId")
+    var userId: String,
     @SerializedName("endDt")
     var endDt: String,
     @SerializedName("mngrType")
     var mngrType: String, // M
     @SerializedName("nckNm")
     var nckNm: String, // dal
-    @SerializedName("userId")
-    var userId: String // 9d70ff46-c9e6-4b29-b69a-f9f3829c7eb0
+    @SerializedName("ownrPetUnqNo")
+    var ownrPetUnqNo: String,
+    @SerializedName("petRelUnqNo")
+    var petRelUnqNo: Int
 )
 
 data class PetDetailReq(

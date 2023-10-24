@@ -65,8 +65,6 @@ fun LogoTopBar(
     walkViewModel: WalkViewModel
 ) {
 
-    val toMonthCalendar by walkViewModel.toMonthCalendar.collectAsState()
-
     TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
         modifier = Modifier.height(60.dp),
@@ -95,14 +93,21 @@ fun LogoTopBar(
                     enter = scaleIn(),
                     exit = scaleOut()
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.arrow_back),
-                        contentDescription = "",
-                        modifier= modifier
+
+                    Box(
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(shape = CircleShape)
                             .clickable {
-                                if (toMonthCalendar){
-                                    walkViewModel.updateToMonthCalendar(false)
-                                } },
-                        tint = Color.Unspecified)
+                                walkViewModel.updateToMonthCalendar(false)
+                                 }
+                            .align(Alignment.CenterStart),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Icon(painter = painterResource(id = R.drawable.arrow_back),
+                            contentDescription = "",
+                            tint = Color.Unspecified)
+                    }
                 }
 
 

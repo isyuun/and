@@ -1,6 +1,10 @@
 package kr.carepet.app.navi.viewmodel
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -8,13 +12,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil.Coil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kr.carepet._app.application
-import kr.carepet.app.Application
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
 import kr.carepet.data.daily.DailyDetailData
@@ -45,6 +48,9 @@ import java.lang.Integer.min
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.coroutines.resume
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
+
 
 class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() {
 
@@ -290,36 +296,19 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         val apiService = RetrofitClientServer.instance
 
         val parts = ArrayList<MultipartBody.Part>()
-        var files: File?
+        //var files: File?
 
         val maxImages = 5
 
         for (i in 0 until min(maxImages, state.listOfSelectedImages.size - 1)) {
             val fileUri = state.listOfSelectedImages[i]
+            val resizedFile = resizeImage(context, fileUri, i)
 
-            val contentResolver = context.contentResolver
-            val fileName = "image${i}.jpg"
-            val file = File(context.filesDir, fileName)
-
-            files = try {
-                val inputStream = fileUri?.let { contentResolver.openInputStream(it) }
-                val outputStream = FileOutputStream(file)
-                inputStream?.copyTo(outputStream)
-
-                outputStream.close()
-                inputStream?.close()
-
-                file // 변환된 File 객체를 StateFlow에 업데이트
-            } catch (e: IOException) {
-                e.printStackTrace()
-                null// 변환 실패 시 null로 업데이트
+            resizedFile?.let {
+                val requestBody = it.asRequestBody("image/*".toMediaType())
+                val part = MultipartBody.Part.createFormData("files", "image$i.jpg", requestBody)
+                parts.add(part)
             }
-
-            val requestBody = files?.asRequestBody("image/*".toMediaType())
-                ?: RequestBody.create("image/*".toMediaType(), ByteArray(0))
-            val part = MultipartBody.Part.createFormData("files", fileName, requestBody)
-
-            parts.add(part)
         }
 
         val call = apiService.uploadPhoto(parts)
@@ -416,4 +405,74 @@ fun formatTimestampToCustomString(timestamp: Long): String {
     val date = Date(timestamp)
     val sdf = SimpleDateFormat("yyyyMMddHHmmss")
     return sdf.format(date)
+}
+
+suspend fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
+    try {
+        val contentResolver = context.contentResolver
+        val inputStream = contentResolver.openInputStream(fileUri)
+        if (inputStream != null) {
+            // 원본 이미지를 Bitmap으로 디코딩
+            val originalBitmap = BitmapFactory.decodeStream(inputStream)
+
+            // 원본 이미지 파일 크기가 2MB 이하면 원본 이미지 반환
+            if (originalBitmap.byteCount <= 2 * 1024 * 1024) {
+
+                Log.d("RESIZE","ORIGIN")
+
+                val fileName = "image${index}.jpg"
+                val file = File(context.filesDir, fileName)
+                val files = try {
+                    val outputStream = FileOutputStream(file)
+                    inputStream?.copyTo(outputStream)
+
+                    outputStream.close()
+                    inputStream?.close()
+
+                    file // 변환된 File 객체를 StateFlow에 업데이트
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    null// 변환 실패 시 null로 업데이트
+                }
+                return files
+
+            }else{
+
+                Log.d("RESIZE","RESIZE")
+                val quality = 100 // 원하는 품질로 조절
+
+                // 이미지의 종횡비 비율 유지하며 크기 조절
+                val maxWidth = 1920 // 최대 가로 크기 (원하는 크기로 조절)
+                val maxHeight = 1080 // 최대 세로 크기 (원하는 크기로 조절)
+                val newWidth: Int
+                val newHeight: Int
+                if (originalBitmap.width > originalBitmap.height) {
+                    newWidth = min(originalBitmap.width, maxWidth)
+                    newHeight = (newWidth.toFloat() / originalBitmap.width * originalBitmap.height).toInt()
+                } else {
+                    newHeight = min(originalBitmap.height, maxHeight)
+                    newWidth = (newHeight.toFloat() / originalBitmap.height * originalBitmap.width).toInt()
+                }
+
+                // 크기 조절된 이미지를 생성
+                val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
+
+                // 이미지 파일 저장
+                val cacheDir = context.cacheDir
+                val fileName = "image${index}"
+                val resizedFile = File(cacheDir, fileName)
+                val outputStream = FileOutputStream(resizedFile)
+
+                // 이미지를 JPEG 형식으로 저장 (품질 설정 적용)
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+                outputStream.close()
+
+                inputStream.run { close() }
+                return resizedFile
+            }
+        }
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+    return null
 }

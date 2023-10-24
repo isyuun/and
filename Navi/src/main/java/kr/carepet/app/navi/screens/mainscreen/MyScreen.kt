@@ -544,7 +544,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                     when(petDetailData.mngrType){
                         "M" -> "관리중"
                         "I" -> "참여중"
-                        "G" -> "동참중단"
+                        "C" -> "동참중단"
                         else -> "에러"
                     },
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -554,7 +554,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                     when(petDetailData.mngrType){
                         "M" -> design_white
                         "I" -> design_btn_border
-                        "G" -> design_999999
+                        "C" -> design_999999
                         else -> design_DDDDDD
                     },
                     modifier = Modifier.padding(horizontal = 9.dp, vertical = 2.dp)

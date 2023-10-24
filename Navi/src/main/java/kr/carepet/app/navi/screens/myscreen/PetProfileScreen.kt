@@ -1,9 +1,15 @@
 package kr.carepet.app.navi.screens.myscreen
 
-import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +36,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +54,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.screens.mainscreen.CircleImage
@@ -60,6 +72,8 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.pet.Member
+import kr.carepet.data.pet.PetDetailData
+import kr.carepet.util.Log
 
 @Composable
 fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedViewModel, settingViewModel: SettingViewModel,index: String?){
@@ -222,14 +236,18 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
                 Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
-                if (memberList?.isNotEmpty()==true){
+                AnimatedVisibility(
+                    visible = memberList?.isNotEmpty()==true,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
                     LazyColumn(
                         state = rememberLazyListState(),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.heightIn(max = 300.dp)
                     ){
                         items(memberList!!){ item ->
-                            GroupItem(item = item)
+                            GroupItem(item = item, petInfo[index], settingViewModel)
                         }
                     }
                 }
@@ -241,7 +259,12 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 }
 
 @Composable
-fun GroupItem(item:Member){
+fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
+
+    var deleteMember by remember{ mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+    var scope = rememberCoroutineScope()
+
     Row (
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -290,7 +313,6 @@ fun GroupItem(item:Member){
 
         Box (
             modifier= Modifier
-                .padding(end = 12.dp)
                 .border(
                     when (item.mngrType) {
                         "M" -> 0.dp
@@ -310,6 +332,22 @@ fun GroupItem(item:Member){
                         else -> design_DDDDDD
                     },
                     shape = RoundedCornerShape(10.dp)
+                )
+                .clip(RoundedCornerShape(10.dp))
+                .clickable(
+                    enabled = item.mngrType == "I",
+                    onClick = {
+                        scope.launch {
+                            if (deleteMember) {
+                                expanded = !deleteMember
+                                delay(450)
+                                deleteMember = !deleteMember
+                            } else {
+                                expanded = !deleteMember
+                                deleteMember = !deleteMember
+                            }
+                        }
+                    }
                 ),
             contentAlignment = Alignment.Center
         ){
@@ -317,7 +355,7 @@ fun GroupItem(item:Member){
                 text =
                 when(item.mngrType){
                     "M" -> "관리중"
-                    "I" -> "참여중"
+                    "I" -> if (!deleteMember)"참여중" else "참여를 중단하시겠습니까?"
                     "C" -> "동참중단"
                     else -> "에러"
                 },
@@ -333,6 +371,54 @@ fun GroupItem(item:Member){
                 },
                 modifier = Modifier.padding(horizontal = 9.dp, vertical = 2.dp)
             )
+        }
+
+        Spacer(modifier = Modifier.padding(start = 16.dp))
+
+        if (item.mngrType == "C"){
+            Text(
+                text = item.endDt,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                fontSize = 12.sp, letterSpacing = (-0.6).sp,
+                color = design_skip
+            )
+        }
+
+        AnimatedVisibility(
+            visible =  expanded,
+            enter = scaleIn(tween(delayMillis = 300)),
+            exit = scaleOut(tween(durationMillis = 300))
+        ) {
+            Box (
+                modifier= Modifier
+                    .background(
+                        color = design_button_bg,
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable {
+                        scope.launch {
+                            val result = viewModel.relClose(petInfo.ownrPetUnqNo, item.petRelUnqNo)
+                            if (result) {
+                                expanded = false
+                                viewModel.getPetInfoDetail(petInfo)
+                            } else {
+                                Log.d("LOG", "실패")
+                            }
+                        }
+
+                    },
+                contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text = "네",
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.6).sp,
+                    color = design_white,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
+                )
+            }
         }
     }// row
 }

@@ -149,6 +149,12 @@ fun WalkScreen(
         homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  getFormattedTodayDate())
     }
 
+    LaunchedEffect(key1 = toMonthCalendar){
+        if (!toMonthCalendar){
+            backBtnOn(false)
+        }
+    }
+
     SideEffect {
         if(toMonthCalendar){
             backBtnOn(true)
@@ -161,11 +167,6 @@ fun WalkScreen(
         Column(modifier = Modifier
             .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
         ){
-            BackHandler (enabled = toDetail){
-                walkViewModel.updateToDetail(false)
-                backBtnOn(false)
-            }
-
             BackHandler (enabled = toMonthCalendar){
                 walkViewModel.updateToMonthCalendar(false)
                 if (!toDetail){
@@ -283,15 +284,22 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                     )
                 }
             }
-            Icon(painter = painterResource(id = R.drawable.arrow_next), contentDescription = "", tint = Color.Unspecified,
-                modifier = Modifier.clickable {
-                    walkViewModel.viewModelScope.launch{
-                        walkViewModel.updateIsLoading(true)
-                        walkViewModel.getDailyDetail(walk.schUnqNo)
-                        walkViewModel.updateWalkListItem(walk)
-                    }
-                    navController.navigate(Screen.WalkDetailContent.route)
-                })
+            Box(
+                modifier = Modifier
+                    .size(30.dp)
+                    .clip(shape = CircleShape)
+                    .clickable {
+                        walkViewModel.viewModelScope.launch {
+                            walkViewModel.updateIsLoading(true)
+                            walkViewModel.getDailyDetail(walk.schUnqNo)
+                            walkViewModel.updateWalkListItem(walk)
+                        }
+                        navController.navigate(Screen.WalkDetailContent.route)
+                    },
+                contentAlignment = Alignment.Center
+            ){
+                Icon(painter = painterResource(id = R.drawable.arrow_next), contentDescription = "", tint = Color.Unspecified)
+            }
         }
 
         Row (modifier = Modifier

@@ -261,7 +261,7 @@ fun InquiryScreen(navController: NavHostController, viewModel: SettingViewModel)
             .background(color = design_textFieldOutLine))
 
         LazyColumn(
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
+            contentPadding = PaddingValues(horizontal = 20.dp),
             state = rememberLazyListState(),
             //verticalArrangement = Arrangement.spacedBy(20.dp)
         ){

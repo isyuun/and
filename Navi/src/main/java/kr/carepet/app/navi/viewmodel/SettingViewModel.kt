@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.wear.compose.material.contentColorFor
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,8 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.cmm.commonRes
-import kr.carepet.data.pet.CurrentPetData
-import kr.carepet.data.pet.DeletePetReq
 import kr.carepet.data.pet.InviteCodeReq
 import kr.carepet.data.pet.InviteCodeRes
 import kr.carepet.data.pet.Member
@@ -26,12 +23,12 @@ import kr.carepet.data.pet.PetDetailRes
 import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.LogoutRes
 import kr.carepet.data.user.NickNameCheckRes
+import kr.carepet.data.user.RelCloseReq
 import kr.carepet.data.user.ResetNickNameReq
 import kr.carepet.data.user.ResetPwReq
 import kr.carepet.singleton.G
 import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
-import kr.carepet.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -456,6 +453,37 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
 
             })
 
+        }
+    }
+
+    suspend fun relClose(ownrPetUnqNo:String, petRelUnqNo:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = RelCloseReq(ownrPetUnqNo, petRelUnqNo)
+
+        val call = apiService.relClose(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (body.statusCode == 200){
+                                continuation.resume(true)
+                            }else{
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
         }
     }
 }

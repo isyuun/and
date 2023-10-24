@@ -37,6 +37,7 @@ import kr.carepet.data.user.LoginData
 import kr.carepet.data.user.LoginResModel
 import kr.carepet.data.user.LogoutRes
 import kr.carepet.data.user.NickNameCheckRes
+import kr.carepet.data.user.RelCloseReq
 import kr.carepet.data.user.ResetNickNameReq
 import kr.carepet.data.user.ResetPwReq
 import kr.carepet.data.user.UserDataModel
@@ -68,6 +69,9 @@ interface ApiService {
 
     @POST("/api/v1/member/withdraw")
     fun withdraw(): Call<commonRes>
+
+    @POST("/api/v1/mypet/rel-close")
+    fun relClose(@Body data : RelCloseReq): Call<commonRes>
 
     @POST("api/v1/member/refresh-token")
     fun sendRefreshToken(@Body refreshToken: RefreshToken): Call<RefreshRes>

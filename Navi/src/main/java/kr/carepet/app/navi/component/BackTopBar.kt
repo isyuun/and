@@ -7,6 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -15,14 +17,18 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
+import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.ui.theme.design_login_text
 import kr.carepet.app.navi.ui.theme.design_white
 
@@ -44,13 +50,21 @@ fun BackTopBar(title: String, navController: NavHostController, backVisible:Bool
                     enter = scaleIn(),
                     exit = scaleOut()
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.arrow_back),
-                        contentDescription = "",
-                        tint = Color.Unspecified,
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .clickable { navController.popBackStack() }
-                    )
+                            .size(30.dp)
+                            .clip(shape = CircleShape)
+                            .clickable {
+                                navController.popBackStack()
+                            }
+                            .align(Alignment.CenterStart),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Icon(painter = painterResource(id = R.drawable.arrow_back),
+                            contentDescription = "",
+                            tint = Color.Unspecified
+                        )
+                    }
                 }
 
 
