@@ -99,7 +99,7 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
     override fun onUnbind(intent: Intent): Boolean {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$intent")
         if (!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this)) {
-            if (notification == null) notification = generateNotification(location)
+            if (notification == null) notification = generateNotification(lastLocation)
             startForeground(NOTIFICATION_ID, notification)
             serviceRunningInForeground = true
             notificationManager.notify(NOTIFICATION_ID, notification)
@@ -112,7 +112,6 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$intent")
         timer.cancel()
         timer.purge()
-        timer == null
         super.onRebind(intent)
     }
 
@@ -120,10 +119,10 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
         Log.w(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
         if (start && pause) {
             val exit = exit(locationResult)
-            Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit]$location$locationResult")
-            location = locationResult.lastLocation
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit]$lastLocation$locationResult")
+            lastLocation = locationResult.lastLocation
             if (exit) return
-            location?.let { _pauses.add(Track(it)) }
+            lastLocation?.let { _pauses.add(Track(it)) }
             Log.i(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
         } else {
             super.onLocationResult(locationResult)
@@ -136,8 +135,8 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
 
     fun pause() {
         //val loc = location    //ㅆㅂ
-        val loc = location?.let { Location(it) }
-        Log.wtf(__CLASSNAME__, "${getMethodName()}::write[${(start && pause)}][start:$start][pause:$pause][${location == loc}][${tracks.size}]")
+        val loc = lastLocation?.let { Location(it) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::write[${(start && pause)}][start:$start][pause:$pause][${lastLocation == loc}][${tracks.size}]")
         if (!start or pause) return else pause = true
         loc?.let {
             it.time = System.currentTimeMillis()
@@ -150,8 +149,8 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
 
     fun resume() {
         //val loc = location    //ㅆㅂ
-        val loc = location?.let { Location(it) }
-        Log.wtf(__CLASSNAME__, "${getMethodName()}::write[${(start && pause)}][start:$start][pause:$pause][${location == loc}][${tracks.size}]")
+        val loc = lastLocation?.let { Location(it) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::write[${(start && pause)}][start:$start][pause:$pause][${lastLocation == loc}][${tracks.size}]")
         if (!start or !pause) return else pause = false
         if (_tracks.contains(_pause)) _tracks.remove(_pause)
         if (_pauses.isNotEmpty()) _tracks.addAll(_pauses)
@@ -160,13 +159,13 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
     }
 
     override fun start() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][$start][$pause][$location]")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][$start][$pause][$lastLocation]")
         super.start()
         pause = false
     }
 
     override fun stop() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][$start][$pause][$location]")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][$start][$pause][$lastLocation]")
         super.stop()
         pause = false
     }

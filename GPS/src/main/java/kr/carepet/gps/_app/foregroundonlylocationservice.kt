@@ -87,7 +87,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
     // Used only for local storage of the last known location. Usually, this would be saved to your
     // database, but because this is a simplified sample without a full database, we only need the
     // last location to create a Notification if the user navigates away from the app.
-    protected var location: Location? = null
+    protected var lastLocation: Location? = null
 
     //https://stackoverflow.com/questions/74264850/localbroadcastmanager-is-now-deprecated-how-to-send-data-from-service-to-activi
     //Define a LiveData to observe in activity
@@ -144,26 +144,19 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         //Log.wtf(__CLASSNAME__, "${getMethodName()}$fusedLocationProviderClient")
     }
 
-    private fun actionForegroundIntent(): Intent {
-        val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
-        intent.putExtra(EXTRA_LOCATION, location)
-        return intent
-    }
-
     protected open fun onLocationResult(locationResult: LocationResult) {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$serviceRunningInForeground], $locationResult")
         // Normally, you want to save a new location to a database. We are simplifying
         // things a bit and just saving it as a local variable, as we only need it again
         // if a Notification is created (when the user navigates away from app).
-        location = locationResult.lastLocation
+        lastLocation = locationResult.lastLocation
 
         // Notify our Activity that a new location was added. Again, if this was a
         // production app, the Activity would be listening for changes to a database
         // with new locations, but we are simplifying things a bit to focus on just
         // learning the location side of things.
-        //val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
-        //intent.putExtra(EXTRA_LOCATION, currentLocation)
-        val intent = actionForegroundIntent()
+        val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
+        intent.putExtra(EXTRA_LOCATION, lastLocation)
         LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
 
         // Updates notification content if this service is running as a foreground
@@ -289,7 +282,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
 
     private fun cancelIntent(): Intent {
         val intent: Intent = Intent(this, this::class.java)
-        //Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
+        Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
         return intent
     }
 
@@ -308,6 +301,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
      * existing notification channel with its original values performs
      * no operation, so it's safe to perform the below sequence.
      */
+    //https://developer.android.com/training/notify-user/channels?hl=ko
     protected fun generateNotificationChannel() {
         val title = getString(R.string.app_name)
         val notificationChannel = NotificationChannel(

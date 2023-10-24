@@ -66,7 +66,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
     }
 
     protected fun exit(locationResult: LocationResult): Boolean {
-        val trk1 = location?.let { Track(it) }
+        val trk1 = lastLocation?.let { Track(it) }
         val trk2 = locationResult.lastLocation?.let { Track(it) }
         val dist = distance(trk1, trk2)
         val size = _tracks.size
@@ -78,11 +78,11 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
 
     override fun onLocationResult(locationResult: LocationResult) {
         val exit = exit(locationResult)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit]$location$locationResult")
-        location = locationResult.lastLocation
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit]$lastLocation$locationResult")
+        lastLocation = locationResult.lastLocation
         if (exit) return
         super.onLocationResult(locationResult)
-        location?.let { _tracks.add(Track(it)) }
+        lastLocation?.let { _tracks.add(Track(it)) }
         /*if (_tracks.size == 1) */this.write()
     }
 
@@ -139,21 +139,21 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
 
     internal fun pee() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = location?.let { Track(it, no = no, pee = 1) }
+        val track = lastLocation?.let { Track(it, no = no, pee = 1) }
         track?.let { _tracks.add(it) }
         this.write()
     }
 
     internal fun poo() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = location?.let { Track(it, no = no, poo = 1) }
+        val track = lastLocation?.let { Track(it, no = no, poo = 1) }
         track?.let { _tracks.add(it) }
         this.write()
     }
 
     internal fun mrk() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = location?.let { Track(it, no = no, mrk = 1) }
+        val track = lastLocation?.let { Track(it, no = no, mrk = 1) }
         track?.let { _tracks.add(it) }
         this.write()
     }
@@ -164,14 +164,14 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
 
     override fun start() {
         _start = System.currentTimeMillis()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start], ${location.toText()}, $location")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start], ${lastLocation.toText()}, $lastLocation")
         super.start()
         _tracks.clear()
     }
 
     override fun stop() {
         _start = 0L
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start], ${location.toText()}, $location")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start], ${lastLocation.toText()}, $lastLocation")
         super.stop()
         this.write()
     }
