@@ -20,153 +20,160 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 10. 18.   description...
+ *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
 package kr.carepet.gps._app
 
-import android.app.Notification
-import android.app.PendingIntent
-import android.content.Intent
-import android.location.Location
-import androidx.core.app.NotificationCompat
-import com.google.android.gms.location.LocationResult
-import kr.carepet.gps.R
+import android.Manifest
+import android.content.ComponentName
+import android.content.ContentResolver
+import android.content.ServiceConnection
+import android.net.Uri
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.provider.MediaStore
+import androidx.annotation.RequiresPermission
+import kr.carepet.gps.app.CameraContentObserver
+import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
 import kr.carepet.gpx.Track
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
+import java.io.File
 import java.util.Collections
-import java.util.Timer
-import java.util.TimerTask
 
 /**
  * @Project     : carepet-android
- * @FileName    : foregroundonlylocationservice4.kt
- * @Date        : 2023. 10. 18.
+ * @FileName    : foregroundonlylocationservice3.kt
+ * @Date        : 2023. 09. 14.
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class foregroundonlylocationservice4 : foregroundonlylocationservice3() {
+open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), ServiceConnection {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-    override fun generateNotification(location: Location?): Notification {
-        //var ret = super.generateNotification(location)
-        val title = "${getString(R.string.walk_title_walking)} - ${duration}"
-        val text = "${getString(R.string.app_name)}이 ${getString(R.string.walk_text_in_tracking)}"
-        val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent(), PendingIntent.FLAG_MUTABLE)
-        val ret = notificationCompatBuilder
-            //.setStyle(style)      //ㅆㅂ
-            .setContentTitle(title)
-            .setContentText(text)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setOngoing(true)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .addAction(
-                R.drawable.ic_launch,
-                getString(R.string.open),
-                activityPendingIntent
-            )
-            //.addAction(
-            //    R.drawable.ic_cancel,
-            //    getString(R.string.stop),
-            //    servicePendingIntent
-            //)
-            .setContentIntent(activityPendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setOnlyAlertOnce(true)
-            .build()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $ret")
-        return ret
+
+    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+        Log.i(__CLASSNAME__, "${getMethodName()}...")
     }
 
-    private lateinit var timer: Timer
-    private fun timer() {
-        if (!serviceRunningInForeground) return
-        timer = Timer()
-        timer.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                val title = "${getString(R.string.walk_title_walking)} - ${duration}"
-                //Log.wtf(__CLASSNAME__, "${getMethodName()} $title")
-                notification = notificationCompatBuilder.setContentTitle(title).build()
-                notificationManager.notify(NOTIFICATION_ID, notification)
+    override fun onServiceDisconnected(name: ComponentName) {
+        Log.i(__CLASSNAME__, "${getMethodName()}...")
+    }
+
+    private lateinit var cameraContentObserver: CameraContentObserver
+    private val handler: Handler = Handler(Looper.getMainLooper())
+
+    @RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
+    override fun onCreate() {
+        super.onCreate()
+
+        cameraContentObserver = CameraContentObserver(this, handler)
+        val contentResolver: ContentResolver = contentResolver
+        val cameraImageUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        contentResolver.registerContentObserver(
+            cameraImageUri,
+            true,
+            cameraContentObserver
+        )
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        contentResolver.unregisterContentObserver(cameraContentObserver)
+    }
+
+    private fun path(uri: Uri): String? {
+        var path: String? = null
+        try {
+            val projection = arrayOf(MediaStore.Images.Media.DATA)
+            val cursor = contentResolver.query(uri, projection, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val columnIndex = it.getColumnIndex(projection[0])
+                    path = it.getString(columnIndex)
+                }
             }
-        }, 1000, 1000) // 1초마다 실행
-    }
-
-    private var notification: Notification? = null
-    override fun onUnbind(intent: Intent): Boolean {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$intent")
-        if (!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this)) {
-            if (notification == null) notification = generateNotification(location)
-            startForeground(NOTIFICATION_ID, notification)
-            serviceRunningInForeground = true
-            notificationManager.notify(NOTIFICATION_ID, notification)
-            timer()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        return super.onUnbind(intent)
+        return path
     }
 
-    override fun onRebind(intent: Intent) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$intent")
-        timer.cancel()
-        timer.purge()
-        timer == null
-        super.onRebind(intent)
-    }
-
-    override fun onLocationResult(locationResult: LocationResult) {
-        Log.w(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
-        if (start && pause) {
-            val exit = exit(locationResult)
-            Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit]$location$locationResult")
-            location = locationResult.lastLocation
-            if (exit) return
-            location?.let { _pauses.add(Track(it)) }
-            Log.i(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
-        } else {
-            super.onLocationResult(locationResult)
+    private fun time(uri: Uri): Long? {
+        var time: Long? = null
+        try {
+            val projection = arrayOf(MediaStore.Images.Media.DATE_ADDED)
+            val cursor = contentResolver.query(uri, projection, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val columnIndex = it.getColumnIndex(projection[0])
+                    time = it.getLong(columnIndex)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+        return time
     }
 
-    private var pause = false
-    private var _pause: Track? = null
-    private val _pauses = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
+    private fun camera(uri: Uri): Boolean {
+        val projection = arrayOf(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
 
-    fun pause() {
-        //val loc = location    //ㅆㅂ
-        val loc = location?.let { Location(it) }
-        Log.wtf(__CLASSNAME__, "${getMethodName()}::write[${(start && pause)}][start:$start][pause:$pause][${location == loc}][${tracks.size}]")
-        if (!start or pause) return else pause = true
-        loc?.let {
-            it.time = System.currentTimeMillis()
-            _pause = Track(it)
-            if (!_tracks.contains(_pause)) _tracks.add(_pause)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndex(projection[0])
+                val bucketName = it.getString(columnIndex)
+                return bucketName.contains("DCIM/Camera") || mime(uri)
+            }
         }
-        write()
-        _pauses.clear()
+
+        return false
     }
 
-    fun resume() {
-        //val loc = location    //ㅆㅂ
-        val loc = location?.let { Location(it) }
-        Log.wtf(__CLASSNAME__, "${getMethodName()}::write[${(start && pause)}][start:$start][pause:$pause][${location == loc}][${tracks.size}]")
-        if (!start or !pause) return else pause = false
-        if (_tracks.contains(_pause)) _tracks.remove(_pause)
-        if (_pauses.isNotEmpty()) _tracks.addAll(_pauses)
-        write()
-        _pauses.clear()
+    private fun mime(imageUri: Uri): Boolean {
+        val mimeType = contentResolver.getType(imageUri)
+        return mimeType?.startsWith("image/") == true
     }
+
 
     override fun start() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][$start][$pause][$location]")
         super.start()
-        pause = false
+        _imgs.clear()
     }
 
-    override fun stop() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][$start][$pause][$location]")
-        super.stop()
-        pause = false
+    private fun img(path: String) {
+        if (_imgs.size > 0 && _imgs.contains(path)) return
+        _imgs.add(path)
+        val loc = location
+        val img = _imgs.size
+        val trk = loc?.let { Track(it/*, no = this.no*/, img = img, uri = Uri.parse(path)) }
+        Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${_imgs.size}], ${_imgs[img - 1]}, $trk")
+        trk?.let { _tracks.add(it) }
+        write()
     }
 
+    fun onChange(selfChange: Boolean, uri: Uri?) {
+        if (uri != null) {
+            val path = path(uri)
+            val time = time(uri)
+            //Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
+            if (path == null || time == null) return
+            val file = File(path)
+            val name = file.name
+            val exists = file.exists()
+            val camera = exists && camera(uri) && !_imgs.contains(path) && !name.startsWith(".")
+            if (camera) {
+                Log.i(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][$name]: path:$path, time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}")
+                img(path)
+            }
+        }
+    }
+
+    private val _imgs = Collections.synchronizedList(ArrayList<String>()) // The list of Tracks
+    internal val images
+        get() = _imgs
 }

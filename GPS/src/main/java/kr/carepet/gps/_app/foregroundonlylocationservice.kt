@@ -301,6 +301,21 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
 
     protected lateinit var notificationCompatBuilder: NotificationCompat.Builder
 
+    /**
+     * <a href = "https://developer.android.com/training/notify-user/channels?hl=ko">알림 채널 만들기 및 관리</a>
+     * 1. Create Notification Channel for O+ and beyond devices (26+).
+     * Adds NotificationChannel to system. Attempting to create an
+     * existing notification channel with its original values performs
+     * no operation, so it's safe to perform the below sequence.
+     */
+    protected fun generateNotificationChannel() {
+        val title = getString(R.string.app_name)
+        val notificationChannel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID, title, NotificationManager.IMPORTANCE_HIGH
+        )
+        notificationManager.createNotificationChannel(notificationChannel)
+    }
+
     /*
      * Generates a BIG_TEXT_STYLE Notification that represent latest location.
      */
@@ -318,11 +333,6 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         val title = getString(R.string.app_name)
 
         // 1. Create Notification Channel for O+ and beyond devices (26+).
-
-        val notificationChannel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID, title, NotificationManager.IMPORTANCE_DEFAULT
-        )
-
         // Adds NotificationChannel to system. Attempting to create an
         // existing notification channel with its original values performs
         // no operation, so it's safe to perform the below sequence.
@@ -337,7 +347,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         //    // no operation, so it's safe to perform the below sequence.
         //    notificationManager.createNotificationChannel(notificationChannel)
         //}
-        notificationManager.createNotificationChannel(notificationChannel)
+        generateNotificationChannel()
 
         // 2. Build the BIG_TEXT_STYLE.
         val style = NotificationCompat.BigTextStyle()

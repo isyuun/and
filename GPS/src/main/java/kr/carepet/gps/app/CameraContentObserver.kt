@@ -28,7 +28,7 @@ package kr.carepet.gps.app
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
-import kr.carepet.gps._app.foregroundonlylocationservice3
+import kr.carepet.gps._app.foregroundonlylocationservice4
 
 /**
  * @Project     : carepet-android
@@ -37,7 +37,7 @@ import kr.carepet.gps._app.foregroundonlylocationservice3
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class CameraContentObserver(private val context: foregroundonlylocationservice3, handler: Handler) : ContentObserver(handler) {
+class CameraContentObserver(private val context: foregroundonlylocationservice4, handler: Handler) : ContentObserver(handler) {
     override fun onChange(selfChange: Boolean, uri: Uri?) {
         super.onChange(selfChange, uri)
         context.onChange(selfChange, uri)
