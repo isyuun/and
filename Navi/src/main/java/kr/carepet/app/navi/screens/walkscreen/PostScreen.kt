@@ -153,15 +153,6 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
         OnDialog(navController = navController, onDismiss = { showDiagLog = false })
     }
 
-    DisposableEffect(Unit){
-        onDispose {
-            val updatedImageList = state.listOfSelectedImages.toMutableList()
-            viewModel.viewModelScope.launch {
-                updatedImageList.clear()
-            }
-        }
-    }
-
     BackHandler {
         showDiagLog = true
     }

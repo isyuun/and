@@ -31,6 +31,7 @@ import kr.carepet.data.daily.WeekData
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.RetrofitClientServer
+import kr.carepet.util.Log
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -125,11 +126,11 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         _sheetChange.value = newValue
     }
 
-    private val _photoRes = MutableStateFlow<List<PhotoData>>(emptyList())
+    private val _photoRes = MutableStateFlow<List<PhotoData>?>(emptyList())
 
     // 검색 중인지 여부를 StateFlow로 노출
     val photoRes = _photoRes.asStateFlow()
-    fun updatePhotoRes(newValue: List<PhotoData>) {
+    fun updatePhotoRes(newValue: List<PhotoData>?) {
         _photoRes.value = newValue
     }
 
@@ -294,6 +295,16 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         val parts = ArrayList<MultipartBody.Part>()
         //var files: File?
 
+        gpxFile?.let { gpxFile ->
+            val copyFile = copyToFile(gpxFile, context)
+            Log.d("GPX",copyFile?.path.toString())
+            copyFile?.let{
+                val requestBody = copyFile.asRequestBody("application/gpx+xml".toMediaType())
+                val part = MultipartBody.Part.createFormData("gpx", copyFile?.name, requestBody)
+                parts.add(part)
+            }
+        }
+
         val maxImages = 5
 
         for (i in 0 until min(maxImages, state.listOfSelectedImages.size - 1)) {
@@ -303,16 +314,6 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
             resizedFile?.let {
                 val requestBody = it.asRequestBody("image/*".toMediaType())
                 val part = MultipartBody.Part.createFormData("files", "image$i.jpg", requestBody)
-                parts.add(part)
-            }
-        }
-
-        gpxFile?.let { gpxFile ->
-            val copyFile = copyToFile(gpxFile, context)
-
-            copyFile?.let{
-                val requestBody = copyFile.asRequestBody("application/gpx+xml".toMediaType())
-                val part = MultipartBody.Part.createFormData("gpx", copyFile?.name, requestBody)
                 parts.add(part)
             }
         }
