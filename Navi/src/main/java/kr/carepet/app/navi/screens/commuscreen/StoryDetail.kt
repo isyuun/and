@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -79,7 +80,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     )
 
     Scaffold (
-        topBar = {BackTopBar(title = "스토리", navController = navController)}
+        topBar = {BackTopBar(title = stringResource(R.string.title_story), navController = navController)}
     ){ paddingValues ->
         Column (
             modifier = Modifier
@@ -186,7 +187,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                         letterSpacing = (-0.7).sp
                     ),
                     placeholder = {
-                        Text(text = "댓글을 남겨보세요", style = TextStyle(
+                        Text(text = stringResource(R.string.ph_comment), style = TextStyle(
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp,
                             letterSpacing = (-0.7).sp
@@ -214,7 +215,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                         .clip(shape = RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ){
-                    Text(text = "등록", style = TextStyle(
+                    Text(text = stringResource(R.string.comment_apply), style = TextStyle(
                         color = design_white,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
@@ -398,7 +399,7 @@ fun StoryDetailTime(){
                 .weight(1f)
         ){
             Text(
-                text = "산책 날짜",
+                text = stringResource(R.string.story_walk_date),
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
@@ -426,7 +427,7 @@ fun StoryDetailTime(){
         ){
 
             Text(
-                text = "산책 시간",
+                text = stringResource(R.string.story_walk_time),
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
@@ -456,7 +457,7 @@ fun StoryDetailTime(){
         ){
 
             Text(
-                text = "산책 거리",
+                text = stringResource(R.string.story_walk_dist),
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,

@@ -3,16 +3,13 @@ package kr.carepet.app.navi.viewmodel
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.Coil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,7 +33,6 @@ import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.RetrofitClientServer
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -47,9 +43,8 @@ import java.io.IOException
 import java.lang.Integer.min
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Random
 import kotlin.coroutines.resume
-import kotlin.math.roundToInt
-import kotlin.math.sqrt
 
 
 class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() {
@@ -98,6 +93,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
 
     private val _dailyDetail = MutableStateFlow<DailyDetailData?>(null)
     val dailyDetail: StateFlow<DailyDetailData?> = _dailyDetail.asStateFlow()
+    fun updateDailyDetail(newValue : DailyDetailData?){ _dailyDetail.value = newValue }
 
     private val _selectPet = MutableStateFlow<List<PetDetailData>>(emptyList())
     val selectPet: StateFlow<List<PetDetailData>> = _selectPet.asStateFlow()
@@ -211,7 +207,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
                             if (body.statusCode == 200) {
                                 _walkList.value = body.data.dailyLifeWalkList
                                 _page.value = body.data.paginate
-                                Log.d("LOG", body.data.dailyLifeWalkList.toString())
+
                                 continuation.resume(true)
                             } else {
                                 continuation.resume(false)
@@ -292,7 +288,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         }
     }
 
-    suspend fun photoUpload(context: Context): Boolean {
+    suspend fun fileUpload(context: Context, gpxFile:File?): Boolean {
         val apiService = RetrofitClientServer.instance
 
         val parts = ArrayList<MultipartBody.Part>()
@@ -307,6 +303,16 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
             resizedFile?.let {
                 val requestBody = it.asRequestBody("image/*".toMediaType())
                 val part = MultipartBody.Part.createFormData("files", "image$i.jpg", requestBody)
+                parts.add(part)
+            }
+        }
+
+        gpxFile?.let { gpxFile ->
+            val copyFile = copyToFile(gpxFile, context)
+
+            copyFile?.let{
+                val requestBody = copyFile.asRequestBody("application/gpx+xml".toMediaType())
+                val part = MultipartBody.Part.createFormData("gpx", copyFile?.name, requestBody)
                 parts.add(part)
             }
         }
@@ -407,6 +413,38 @@ fun formatTimestampToCustomString(timestamp: Long): String {
     return sdf.format(date)
 }
 
+fun copyToFile(gpxFile: File?, context : Context):File?{
+
+    val gpxFilePath = gpxFile?.path
+    val uri: Uri = Uri.fromFile(File(gpxFilePath))
+
+    val contentResolver = context.contentResolver
+    val inputStream = contentResolver.openInputStream(uri)
+
+    if (inputStream != null) {
+        // 복사할 파일 경로와 이름 설정
+
+        val randomNumber = Random().nextInt(10000)
+        val fileName = gpxFile?.name ?: "${randomNumber}.gpx"
+        val file = File(context.filesDir, fileName)
+        val files = try {
+            val outputStream = FileOutputStream(file)
+            inputStream?.copyTo(outputStream)
+
+            outputStream.close()
+            inputStream?.close()
+
+            file
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null// 변환 실패 시 null로 업데이트
+        }
+        return files
+    }
+    return null
+
+}
+
 suspend fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
     try {
         val contentResolver = context.contentResolver
@@ -417,8 +455,6 @@ suspend fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
 
             // 원본 이미지 파일 크기가 2MB 이하면 원본 이미지 반환
             if (originalBitmap.byteCount <= 2 * 1024 * 1024) {
-
-                Log.d("RESIZE","ORIGIN")
 
                 val fileName = "image${index}.jpg"
                 val file = File(context.filesDir, fileName)
@@ -438,7 +474,6 @@ suspend fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
 
             }else{
 
-                Log.d("RESIZE","RESIZE")
                 val quality = 100 // 원하는 품질로 조절
 
                 // 이미지의 종횡비 비율 유지하며 크기 조절

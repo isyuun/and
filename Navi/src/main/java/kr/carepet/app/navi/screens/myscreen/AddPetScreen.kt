@@ -1470,7 +1470,7 @@ fun integrityCheck(viewModel: UserCreateViewModel, context: Context):Boolean{
     }else if(viewModel.petName.value==""){
         Toast.makeText(context, "이름을 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
-    }else if (viewModel.petBirth.value=="" && !viewModel.petBirthUnknown.value){
+    }else if ( !viewModel.petBirthUnknown.value && viewModel.petBirth.value.length<10 ){
         Toast.makeText(context, "생일을 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
     }else if(viewModel.petWght.value==""){

@@ -113,7 +113,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var id by remember { mutableStateOf("") }
+    var id by remember { mutableStateOf(MySharedPreference.getUserEmail()) }
     var password by remember { mutableStateOf("") }
 
     val snsEmail by viewModel.email.collectAsState()
@@ -221,11 +221,10 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
-                        scope.launch { viewModel.onLoginButtonClick(
-                            id,
-                            password,
-                            "EMAIL"
-                        )}}),
+                        scope.launch {
+                            viewModel.onLoginButtonClick( id, password, "EMAIL")
+                        }
+                    }),
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp)
@@ -250,6 +249,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         scope.launch {
                             val result = viewModel.onLoginButtonClick(userId = id, userPw = password, loginMethod = "EMAIL")
                             if (result){
+                                MySharedPreference.setUserEmail(id)
                                 sharedViewModel.updateInit(true)
                                 navController.navigate(Screen.MainScreen.route){
                                     popUpTo(0)
@@ -406,23 +406,23 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                     }
                 }
 
-                Button(onClick = { /*TODO 네이버*/ },
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = design_login_facebookbtn, contentColor = design_white)
-                ) {
-                    Box (modifier = Modifier.fillMaxSize()){
-                        Icon(painter = painterResource(id = R.drawable.icon_facebook), contentDescription = "",
-                            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
-                        Text(text = "페이스북으로 로그인", modifier = Modifier.align(Alignment.Center),
-                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-                    }
-                }
+                //Button(onClick = { /*TODO 네이버*/ },
+                //    modifier = Modifier
+                //        .padding(top = 8.dp)
+                //        .fillMaxWidth()
+                //        .height(48.dp)
+                //        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
+                //    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                //    colors = ButtonDefaults.buttonColors(containerColor = design_login_facebookbtn, contentColor = design_white)
+                //) {
+                //    Box (modifier = Modifier.fillMaxSize()){
+                //        Icon(painter = painterResource(id = R.drawable.icon_facebook), contentDescription = "",
+                //            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
+                //        Text(text = "페이스북으로 로그인", modifier = Modifier.align(Alignment.Center),
+                //            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                //            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                //    }
+                //}
 
                 Button(onClick = {
                     scope.launch {

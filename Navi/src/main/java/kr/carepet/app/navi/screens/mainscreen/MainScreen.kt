@@ -28,10 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -43,7 +40,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,6 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -81,10 +78,8 @@ import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.singleton.G
-import kr.carepet.util.Log
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainScreen(
     navController: NavHostController,
@@ -111,9 +106,6 @@ fun MainScreen(
 
     // logoTopbar back on/off
     var backBtnOnLT by remember { mutableStateOf(false) }
-
-    // backTopbar back on/off
-    var backBtnOnBT by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -143,7 +135,6 @@ fun MainScreen(
             ) {
                 FloatingActionButton(
                     onClick = {
-                        //navController.navigate(Screen.WalkWithMap.route)
                         if (currentPet[0].ownrPetUnqNo==""){
                             showDialog = true
                         }else{
@@ -170,7 +161,7 @@ fun MainScreen(
                         )
 
                         Text(
-                            text = "산책 GO",
+                            text = stringResource(R.string.walk_go),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 12.sp,
                             letterSpacing = (-0.6).sp,
@@ -200,9 +191,9 @@ fun MainScreen(
                         backBtnOnChange = { newValue -> backBtnOnLT = newValue}
                     )
                 "commu" ->
-                    BackTopBar(title = "커뮤니티", navController = navController, false)
+                    BackTopBar(title = stringResource(R.string.title_commu), navController = navController, false)
                 "my" ->
-                    BackTopBar(title = "마이페이지", navController = navController, false)
+                    BackTopBar(title = stringResource(R.string.title_mypage), navController = navController, false)
             }
         }
     ) { innerPadding ->
@@ -368,85 +359,86 @@ fun BottomNavigationComponent(
 }
 
 // 일단 사용안하는걸로
-@Composable
-fun RowScope.AddItem(
-    screen: BottomNav,
-    currentDestination: NavDestination?,
-    navController: NavHostController,
-    selectedIndex: Int,
-    itemIndex: Int
-) {
-    val isSelected = currentDestination?.hierarchy?.any {
-        it.route == screen.route
-    } == true
-
-    BottomNavigationItem(
-        label = {
-            Text(
-                text = screen.title,
-                fontSize = 12.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                color = if(isSelected){design_select_btn_border}else{
-                    design_bottomnav_text}
-            )
-        },
-        icon = {
-            val iconPainter = if (isSelected) {
-                // 선택된 상태의 아이콘
-                screen.selectedIcon
-            } else {
-                // 선택되지 않은 상태의 아이콘
-                screen.unSelectedIcon
-            }
-            androidx.compose.material.Icon(
-                painter = painterResource(id = iconPainter),
-                contentDescription = "Navigation Icon",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-        },
-        selected = currentDestination?.hierarchy?.any {
-            it.route == screen.route
-        } == true,
-        onClick = {
-            navController.navigate(screen.route) {
-                navController.graph.startDestinationRoute?.let {
-                    popUpTo(it) { saveState = true }
-                }
-                launchSingleTop = true
-                restoreState = true
-            }
-        },
-        alwaysShowLabel = true,
-        unselectedContentColor = Color.Unspecified,
-        selectedContentColor = Color.Unspecified
-    )
-
-    // Indicator
-    val indicatorWidth = 40.dp // Indicator width
-    val indicatorHeight = 2.dp // Indicator height
-    val indicatorOffset = selectedIndex * indicatorWidth // Calculate the offset based on the selected index
-
-    Box(
-        modifier = Modifier
-            .width(indicatorWidth)
-            .height(indicatorHeight)
-    ) {
-        Spacer(
-            modifier = Modifier
-                .width(indicatorWidth)
-                .height(indicatorHeight)
-                .background(Color.Blue) // Customize the indicator color here
-                .offset(x = indicatorOffset) // Offset based on the selected index
-        )
-    }
-
-}
+//@Composable
+//fun RowScope.AddItem(
+//    screen: BottomNav,
+//    currentDestination: NavDestination?,
+//    navController: NavHostController,
+//    selectedIndex: Int,
+//    itemIndex: Int
+//) {
+//    val isSelected = currentDestination?.hierarchy?.any {
+//        it.route == screen.route
+//    } == true
+//
+//    BottomNavigationItem(
+//        label = {
+//            Text(
+//                text = screen.title,
+//                fontSize = 12.sp,
+//                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+//                color = if(isSelected){design_select_btn_border}else{
+//                    design_bottomnav_text}
+//            )
+//        },
+//        icon = {
+//            val iconPainter = if (isSelected) {
+//                // 선택된 상태의 아이콘
+//                screen.selectedIcon
+//            } else {
+//                // 선택되지 않은 상태의 아이콘
+//                screen.unSelectedIcon
+//            }
+//            androidx.compose.material.Icon(
+//                painter = painterResource(id = iconPainter),
+//                contentDescription = "Navigation Icon",
+//                modifier = Modifier.padding(bottom = 4.dp)
+//            )
+//        },
+//        selected = currentDestination?.hierarchy?.any {
+//            it.route == screen.route
+//        } == true,
+//        onClick = {
+//            navController.navigate(screen.route) {
+//                navController.graph.startDestinationRoute?.let {
+//                    popUpTo(it) { saveState = true }
+//                }
+//                launchSingleTop = true
+//                restoreState = true
+//            }
+//        },
+//        alwaysShowLabel = true,
+//        unselectedContentColor = Color.Unspecified,
+//        selectedContentColor = Color.Unspecified
+//    )
+//
+//    // Indicator
+//    val indicatorWidth = 40.dp // Indicator width
+//    val indicatorHeight = 2.dp // Indicator height
+//    val indicatorOffset = selectedIndex * indicatorWidth // Calculate the offset based on the selected index
+//
+//    Box(
+//        modifier = Modifier
+//            .width(indicatorWidth)
+//            .height(indicatorHeight)
+//    ) {
+//        Spacer(
+//            modifier = Modifier
+//                .width(indicatorWidth)
+//                .height(indicatorHeight)
+//                .background(Color.Blue) // Customize the indicator color here
+//                .offset(x = indicatorOffset) // Offset based on the selected index
+//        )
+//    }
+//
+//}
 
 @Composable
 fun BackOnPressed() {
     val context = LocalContext.current
     var backPressedState by remember { mutableStateOf(true) }
     var backPressedTime = 0L
+    val closeCmt = stringResource(id = R.string.app_close_cmt)
 
     BackHandler(enabled = backPressedState) {
         if(System.currentTimeMillis() - backPressedTime <= 1000L) {
@@ -454,13 +446,8 @@ fun BackOnPressed() {
             (context as Activity).finish()
         } else {
             backPressedState = true
-            Toast.makeText(context, "한 번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, closeCmt, Toast.LENGTH_SHORT).show()
         }
         backPressedTime = System.currentTimeMillis()
     }
 }
-
-//@Composable
-//public fun NavController.currentBackStackEntryAsState():State<NavBackStackEntry?>{
-//    return currentBackStackEntryFlow.collectAsState(null)
-//}

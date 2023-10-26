@@ -33,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -78,17 +79,41 @@ import kr.carepet.util.Log
 @Composable
 fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedViewModel, settingViewModel: SettingViewModel,index: String?){
 
-    val petInfo by sharedViewModel.petInfo.collectAsState()
-    val index = index?.toInt() ?: 0
+    DisposableEffect(Unit){
+        onDispose {
+            Log.d("LOG","DISPOS")
+            settingViewModel.updateMemberList(null)
+        }
+    }
 
-    val memberList by settingViewModel.memberList.collectAsState()
+    val originPetInfo by sharedViewModel.petInfo.collectAsState()
+    val petInfo = originPetInfo.sortedBy {
+        when (it.mngrType) {
+            "M" -> 1
+            "I" -> 2
+            "C" -> 3
+            else -> 4
+        }
+    }
+
+    val indexInt = index?.toInt() ?: 0
+
+    val originMemberList by settingViewModel.memberList.collectAsState()
+    val memberList = originMemberList?.sortedBy {
+        when (it.mngrType) {
+            "M" -> 1
+            "I" -> 2
+            "C" -> 3
+            else -> 4
+        }
+    }
 
     LaunchedEffect(Unit){
-        settingViewModel.getPetInfoDetail(petInfo[index])
+        settingViewModel.getPetInfoDetail(petInfo[indexInt])
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = "${petInfo[index].petNm} 프로필", navController = navController) }
+        topBar = { BackTopBar(title = "${petInfo[indexInt].petNm} 프로필", navController = navController) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -97,17 +122,25 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 .background(design_white),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "${petInfo[indexInt].stdgCtpvNm} ${petInfo[indexInt].stdgSggNm} ${petInfo[indexInt].stdgUmdNm}",
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                letterSpacing = (-0.7).sp,
+                color = design_skip
+            )
+
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             CircleImage(
                 size = 180,
-                imageUri = petInfo[index].petRprsImgAddr
+                imageUri = petInfo[indexInt].petRprsImgAddr
             )
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
             Text(
-                text = petInfo[index].petKindNm,
+                text = petInfo[indexInt].petKindNm,
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
@@ -115,7 +148,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             )
 
             Text(
-                text = petInfo[index].petNm,
+                text = petInfo[indexInt].petNm,
                 fontSize = 30.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 letterSpacing = (-0.7).sp,
@@ -137,10 +170,10 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 }
 
                 Text(
-                    text = if (petInfo[index].petBrthYmd=="미상"){
+                    text = if (petInfo[indexInt].petBrthYmd=="미상"){
                         "미상"
                     }else{
-                        sharedViewModel.changeBirth(petInfo[index].petBrthYmd)
+                        sharedViewModel.changeBirth(petInfo[indexInt].petBrthYmd)
                     },
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -162,7 +195,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 }
 
                 Text(
-                    text = petInfo[index].sexTypNm?:"",
+                    text = petInfo[indexInt].sexTypNm?:"",
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
@@ -183,7 +216,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 }
 
                 Text(
-                    text = "${petInfo[index].wghtVl}kg",
+                    text = "${petInfo[indexInt].wghtVl}kg",
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
@@ -196,8 +229,8 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Button(
-                enabled = petInfo[index].mngrType == "M",
-                onClick = { navController.navigate("modifyPetInfoScreen/${index}") },
+                enabled = petInfo[indexInt].mngrType == "M",
+                onClick = { navController.navigate("modifyPetInfoScreen/${indexInt}") },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = design_white,
@@ -212,7 +245,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                     .height(48.dp)
             ) {
                 Text(
-                    text = if(petInfo[index].mngrType == "M"){"정보 수정하기"}else{"관리중인 반려동물만 수정 가능합니다"},
+                    text = if(petInfo[indexInt].mngrType == "M"){"정보 수정하기"}else{"관리중인 반려동물만 수정 가능합니다"},
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
                     color = design_login_text
@@ -221,38 +254,40 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = design_login_bg)
-            ){
-                Text(
-                    text = "참여중인 그룹",
-                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    fontSize = 20.sp, letterSpacing = (-1.0).sp,
-                    color = design_login_text,
-                    modifier = Modifier.padding(start = 20.dp, top = 20.dp)
-                )
+            if (petInfo[indexInt].mngrType != "C"){
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = design_login_bg)
+                ){
+                    Text(
+                        text = "참여중인 그룹",
+                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                        fontSize = 20.sp, letterSpacing = (-1.0).sp,
+                        color = design_login_text,
+                        modifier = Modifier.padding(start = 20.dp, top = 20.dp)
+                    )
 
-                Spacer(modifier = Modifier.padding(bottom = 16.dp))
+                    Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
-                AnimatedVisibility(
-                    visible = memberList?.isNotEmpty()==true,
-                    enter = expandVertically(),
-                    exit = shrinkVertically()
-                ) {
-                    LazyColumn(
-                        state = rememberLazyListState(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.heightIn(max = 300.dp)
-                    ){
-                        items(memberList!!){ item ->
-                            GroupItem(item = item, petInfo[index], settingViewModel)
+                    AnimatedVisibility(
+                        visible = memberList?.isNotEmpty()==true,
+                        enter = expandVertically(),
+                        exit = shrinkVertically()
+                    ) {
+                        LazyColumn(
+                            state = rememberLazyListState(),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.heightIn(max = 300.dp)
+                        ){
+                            items(memberList!!){ item ->
+                                GroupItem(item = item, petInfo[indexInt], settingViewModel)
+                            }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.padding(bottom = 20.dp))
+                    Spacer(modifier = Modifier.padding(bottom = 20.dp))
+                }
             }
         }// Col
     }

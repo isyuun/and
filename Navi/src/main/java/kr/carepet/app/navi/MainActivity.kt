@@ -61,15 +61,13 @@ import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.SCDLocalData
 
 class MainActivity : ComponentActivity() {
-
-    private val loginViewModel:LoginViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             AppTheme {
                 Surface {
-                    MyApp(loginViewModel)
+                    MyApp()
                 }
             }
         }
@@ -78,18 +76,19 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun MyApp(viewModel: LoginViewModel){
+fun MyApp(){
     val navController = rememberNavController()
 
-    AppNavigation(navController = navController, viewModel)
+    AppNavigation(navController = navController)
 }
 
 
 @Composable
-fun AppNavigation(navController: NavHostController, viewModel: LoginViewModel){
+fun AppNavigation(navController: NavHostController){
 
     val scdLocalData = remember { SCDLocalData() }
 
+    val viewModel = remember{ LoginViewModel()}
     val userCreateViewModel = remember{UserCreateViewModel(scdLocalData)}
     val sharedViewModel = remember{ SharedViewModel() }
     val homeViewModel = remember { HomeViewModel(sharedViewModel) }
@@ -269,18 +268,3 @@ sealed class BottomNav(val route: String, val title: String, val unSelectedIcon:
     object MyScreen : BottomNav("my", "MY", R.drawable.mypage, R.drawable.mypage_active)
 }
 
-
-private fun share(context: Context, title: String, summary: String) {
-    // Create an ACTION_SEND implicit intent with order details in the intent extras
-    val intent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_TITLE, title)
-        putExtra(Intent.EXTRA_TEXT, summary)
-    }
-    context.startActivity(
-        Intent.createChooser(
-            intent,
-            "walk send"
-        )
-    )
-}

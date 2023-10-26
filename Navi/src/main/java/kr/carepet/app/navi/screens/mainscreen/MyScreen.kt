@@ -77,6 +77,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -119,9 +120,15 @@ import java.util.Date
 @Composable
 fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, sharedViewModel: SharedViewModel){
 
-    val petInfo by sharedViewModel.petInfo.collectAsState()
-
-    val scope = rememberCoroutineScope()
+    val originPetInfo by sharedViewModel.petInfo.collectAsState()
+    val petInfo = originPetInfo.sortedBy {
+        when (it.mngrType) {
+            "M" -> 1
+            "I" -> 2
+            "C" -> 3
+            else -> 4
+        }
+    }
 
     val bottomSheetState =
         androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -206,7 +213,8 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                     contentPadding = PaddingValues(0.dp)
                 )
                 {
-                    Text(text = "로그아웃",
+                    Text(
+                        text = stringResource(R.string.logout),
                         color = design_white,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -223,7 +231,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 Text(
-                    text = "반려동물 관리",
+                    text = stringResource(R.string.management_pet),
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 20.sp, letterSpacing = (-1.0).sp,
                     color = design_login_text, modifier = Modifier.padding(start = 20.dp)
@@ -240,10 +248,13 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                             containerColor = design_btn_border
                         ),
                         contentPadding = PaddingValues(0.dp),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 4.dp
+                        ),
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
                         Text(
-                            text = "초대하기",
+                            text = stringResource(R.string.invite),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
                             color = design_white,
@@ -261,10 +272,13 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         ),
                         border = BorderStroke(width = 1.dp, color = design_btn_border),
                         contentPadding = PaddingValues(0.dp),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 4.dp
+                        ),
                         modifier = Modifier.padding(end = 20.dp)
                     ) {
                         Text(
-                            text = "초대등록",
+                            text = stringResource(R.string.ivt_code_reg),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
                             color = design_login_text,
@@ -290,7 +304,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         ), contentAlignment = Alignment.Center
                 ){
                     Text(
-                        text = "관리중인 반려동물이 없어요",
+                        text = stringResource(R.string.no_manage_pet),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, color = design_login_text
                     )
@@ -325,7 +339,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         contentDescription = "", tint = Color.Unspecified,
                         modifier = Modifier.padding(end = 8.dp))
 
-                    Text(text = "댕냥이 등록하기", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                    Text(text = stringResource(R.string.dog_cat_reg), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
                 }
             }
 
@@ -345,7 +359,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         verticalAlignment = Alignment.CenterVertically
                     ){
                         Text(
-                            text = "고객센터",
+                            text = stringResource(R.string.service_center),
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             fontSize = 16.sp, letterSpacing = (-0.8).sp,
                             color = design_login_text
@@ -368,7 +382,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                     
                     Spacer(modifier = Modifier.padding(top = 8.dp))
                     
-                    Text(text = "공지사항, FAQ, 1:1문의 서비스를\n이용하실 수 있습니다.",
+                    Text(text = stringResource(R.string.noti_faq_inqu_info),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                         lineHeight = 20.sp,
@@ -414,9 +428,6 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
             val confirmEnabled = remember{derivedStateOf { datePickerState.selectedDateMillis != null }}
             DatePickerDialog(
                 onDismissRequest = {
-                    // Dismiss the dialog when the user clicks outside the dialog or on the back
-                    // button. If you want to disable that functionality, simply use an empty
-                    // onDismissRequest.
                     openDialog = false
                 },
                 confirmButton = {
@@ -431,7 +442,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         },
                         enabled = confirmEnabled.value
                     ) {
-                        Text(text = "OK", color = design_intro_bg)
+                        Text(text = stringResource(R.string.ok), color = design_intro_bg)
                     }
                 },
                 dismissButton = {
@@ -440,7 +451,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                             openDialog = false
                         }
                     ) {
-                        Text(text = "Cancel", color = design_intro_bg)
+                        Text(text = stringResource(R.string.cancel), color = design_intro_bg)
                     }
                 },
                 colors = DatePickerDefaults.colors(
@@ -462,6 +473,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
 
         if (openTimePicker){
             TimePickerDialog(
+                title = stringResource(id = R.string.select_time),
                 onCancel = { newValue -> openTimePicker =newValue},
                 state = timePickerState,
                 onConfirm = {newValue -> viewModel.updateSelectedTime(newValue)}
@@ -542,10 +554,10 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                 Text(
                     text =
                     when(petDetailData.mngrType){
-                        "M" -> "관리중"
-                        "I" -> "참여중"
-                        "C" -> "동참중단"
-                        else -> "에러"
+                        "M" -> stringResource(R.string.ing_manage)
+                        "I" -> stringResource(R.string.ing_join)
+                        "C" -> stringResource(R.string.stop_join)
+                        else -> stringResource(R.string.error)
                     },
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
@@ -574,8 +586,8 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(
-                text = if (petDetailData.petBrthYmd=="미상"){
-                    "미상"
+                text = if (petDetailData.petBrthYmd== stringResource(id = R.string.age_unknown)){
+                    stringResource(id = R.string.age_unknown)
                 }else{
                     sharedViewModel.changeBirth(petDetailData.petBrthYmd)
                 },
@@ -611,7 +623,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
             )
             if (petDetailData.ntrTypCd=="001"){
                 Text(
-                    text = "(중성화수술 완료)",
+                    text = stringResource(R.string.neutering_comp),
                     fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                     fontSize = 12.sp, letterSpacing = (-0.6).sp,
                     color = design_skip, modifier = Modifier.alignByBaseline()
@@ -647,7 +659,7 @@ fun MyBottomSheet(
     val formattedDate = sdfDate.format(Date(dateState.selectedDateMillis?:Date().time))
 
     val selectedTime by settingViewModel.selectedTime.collectAsState()
-
+    
     LaunchedEffect(Unit){
         selectedPet.clear()
     }
@@ -661,7 +673,7 @@ fun MyBottomSheet(
         Spacer(modifier = Modifier.padding(top = 20.dp))
 
         Text(
-            text = "누구를 위해 초대를 할까요?",
+            text = stringResource(R.string.invite_cmt),
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 20.sp,
             letterSpacing = (-1.0).sp,
@@ -701,7 +713,7 @@ fun MyBottomSheet(
                     checkmarkColor = design_white)
             )
 
-            Text(text = "종료기간이 있어요!", fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            Text(text = stringResource(R.string.end_cmt), fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 color = design_login_text, modifier=Modifier.offset(x = (-8).dp), letterSpacing = (-0.7).sp
             )
         }
@@ -725,7 +737,7 @@ fun MyBottomSheet(
                         modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 16.dp))
 
                     Text(
-                        text = "종료일자",
+                        text = stringResource(R.string.end_date),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                         color = design_skip, modifier = Modifier.padding(start = 4.dp)
@@ -773,7 +785,7 @@ fun MyBottomSheet(
                         val currentDate = sdfCurrentDate.format(Date().time)
 
                         if(currentDate > selectedDate+selectedTime){
-                            Toast.makeText(context, "이미 만료된 시간입니다", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.already_end_date), Toast.LENGTH_SHORT).show()
                         }else{
                             if (settingViewModel.updateSelectedPetSave(selectedPet)) {
                                 scope.launch {
@@ -784,10 +796,10 @@ fun MyBottomSheet(
                             }
                         }
                     }else{
-                        Toast.makeText(context, "종료 시간을 선택해주세요", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.select_end_date), Toast.LENGTH_SHORT).show()
                     }
                 }else{
-                    Toast.makeText(context, "펫을 선택해주세요", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.select_pet_toast), Toast.LENGTH_SHORT).show()
                 }
                       },
             modifier = Modifier
@@ -797,7 +809,7 @@ fun MyBottomSheet(
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
             colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
         ){
-            Text(text = "초대하기", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+            Text(text = stringResource(id = R.string.invite), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
         }
 
         Spacer(modifier = Modifier.padding(top = 20.dp))
@@ -859,7 +871,6 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
                 modifier = Modifier
                     .size(46.dp)
                     .border(shape = CircleShape, border = BorderStroke(3.dp, color = design_white))
-                    //.shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
                     .shadow(
                         color = design_shadow,
                         offsetY = 10.dp,
@@ -900,7 +911,7 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
-    title: String = "시간 선택",
+    title: String,
     onCancel: (Boolean) -> Unit,
     onConfirm: (String) -> Unit,
     toggle: @Composable () -> Unit = {},
@@ -961,7 +972,7 @@ fun TimePickerDialog(
                         onClick = {onCancel(false)}
                     ) {
                         Text(
-                            text = "Cancel",
+                            text = stringResource(id = R.string.cancel),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 16.sp
                         )
@@ -980,7 +991,7 @@ fun TimePickerDialog(
                         }
                     ) {
                         Text(
-                            text = "Ok",
+                            text = stringResource(id = R.string.ok),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 16.sp
                         )

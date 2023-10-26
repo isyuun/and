@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.IntSize
@@ -153,7 +154,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
             ){
                 Row (verticalAlignment = Alignment.CenterVertically){
                     Text(
-                        text = "최신순",
+                        text = stringResource(R.string.commu_latest),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -170,7 +171,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
 
                 Row (verticalAlignment = Alignment.CenterVertically){
                     Text(
-                        text = "모든 글 보기",
+                        text = stringResource(R.string.commu_all_story),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -307,7 +308,7 @@ fun EventItem(eventItemData: EventItemData,navController: NavHostController){
                     contentAlignment = Alignment.Center
                 ){
                     Text(
-                        text = "종료된 이벤트",
+                        text = stringResource(R.string.commu_ended_event),
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 16.sp,
                         letterSpacing = (-0.8).sp,
@@ -377,7 +378,7 @@ fun EventEndItem(eventItemData: EventItemData,navController: NavHostController){
                     contentAlignment = Alignment.Center
                 ){
                     Text(
-                        text = "종료된 이벤트",
+                        text = stringResource(id = R.string.commu_ended_event),
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 16.sp,
                         letterSpacing = (-0.8).sp,

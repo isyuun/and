@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,7 +42,7 @@ import kr.carepet.app.navi.ui.theme.design_white
 fun EventDetail(navController: NavHostController){
 
     Scaffold (
-        topBar = { BackTopBar(title = "이벤트", navController = navController) }
+        topBar = { BackTopBar(title = stringResource(R.string.title_event), navController = navController) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -78,13 +79,13 @@ fun EventDetail(navController: NavHostController){
                         .padding(start = 20.dp)
                         .width(60.dp)
                 ){
-                    EventDetailMainText(text = "모집기간", bottomPadding = 12)
-                    EventDetailMainText(text = "모집인원", bottomPadding = 12)
-                    EventDetailMainText(text = "응모조건", bottomPadding = 12)
-                    EventDetailMainText(text = "제공혜택", bottomPadding = 12)
-                    EventDetailMainText(text = "발표일", bottomPadding = 12)
-                    EventDetailMainText(text = "선정방식", bottomPadding = 12)
-                    EventDetailMainText(text = "미션기한", bottomPadding = 0)
+                    EventDetailMainText(text = stringResource(R.string.event_period), bottomPadding = 12)
+                    EventDetailMainText(text = stringResource(R.string.event_people), bottomPadding = 12)
+                    EventDetailMainText(text = stringResource(R.string.event_condition), bottomPadding = 12)
+                    EventDetailMainText(text = stringResource(R.string.event_benefit), bottomPadding = 12)
+                    EventDetailMainText(text = stringResource(R.string.event_announce), bottomPadding = 12)
+                    EventDetailMainText(text = stringResource(R.string.event_method), bottomPadding = 12)
+                    EventDetailMainText(text = stringResource(R.string.event_deadline), bottomPadding = 0)
                 }
 
                 Column (
@@ -113,7 +114,7 @@ fun EventDetail(navController: NavHostController){
                 colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
             )
             {
-                Text(text = "응모하기", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                Text(text = stringResource(R.string.event_apply), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
             }
         }//col
 

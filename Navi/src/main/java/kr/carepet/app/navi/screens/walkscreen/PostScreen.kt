@@ -54,6 +54,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
@@ -73,7 +74,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -86,6 +86,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
@@ -94,7 +95,6 @@ import kr.carepet.app.navi.component.CircleImageTopBar
 import kr.carepet.app.navi.component.CustomTextField
 import kr.carepet.app.navi.component.LoadingDialog
 import kr.carepet.app.navi.screens.mainscreen.getFormattedDate
-import kr.carepet.app.navi.screens.mainscreen.getFormattedTodayDate
 import kr.carepet.app.navi.ui.theme.design_DDDDDD
 import kr.carepet.app.navi.ui.theme.design_alpha50_black
 import kr.carepet.app.navi.ui.theme.design_button_bg
@@ -111,11 +111,9 @@ import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
-import kr.carepet.app.navi.viewmodel.getDateTime
 import kr.carepet.data.daily.Pet
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.app.GPSApplication
-import kr.carepet.map.app.naver.navigationBarHeight
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
 
@@ -153,6 +151,15 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
         exit = scaleOut()
     ) {
         OnDialog(navController = navController, onDismiss = { showDiagLog = false })
+    }
+
+    DisposableEffect(Unit){
+        onDispose {
+            val updatedImageList = state.listOfSelectedImages.toMutableList()
+            viewModel.viewModelScope.launch {
+                updatedImageList.clear()
+            }
+        }
     }
 
     BackHandler {
@@ -493,6 +500,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
 
                     scope.launch {
                         isLoading = true
+                        Log.d("GPX",file?.path ?: "")
 
                         val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
                         val matches = pattern.findAll(hashString)
@@ -500,7 +508,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
 
                         viewModel.updateHashTag(hashtagList)
 
-                        if(state.listOfSelectedImages.size<=1){
+                        if(state.listOfSelectedImages.size<=1 && file == null){
                             var dailyUpload = viewModel.uploadDaily()
                             if (dailyUpload){
                                 navController.popBackStack()
@@ -515,7 +523,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                                 )
                             }
                         }else{
-                            val photoUpload = viewModel.photoUpload(context = context)
+                            val photoUpload = viewModel.fileUpload(context = context, gpxFile = file)
                             if (photoUpload) {
                                 var dailyUpload = viewModel.uploadDaily()
                                 if (dailyUpload){

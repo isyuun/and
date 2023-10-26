@@ -81,8 +81,11 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
 
     // -------------------PetInfo Screen---------------------
 
-    private val _memberList = MutableStateFlow<List<Member>?>(null) // Data 저장
-    val memberList: StateFlow<List<Member>?> = _memberList.asStateFlow() // state 노출
+    private val _memberList = MutableStateFlow<List<Member>?>(null)
+    val memberList: StateFlow<List<Member>?> = _memberList.asStateFlow()
+    fun updateMemberList(newValue: List<Member>?){
+        _memberList.value = newValue
+    }
 
     // -------------------PetInfo Screen---------------------
 
