@@ -64,7 +64,6 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
     }
 
     override fun generateNotification(location: Location?): Notification {
-        //var ret = super.generateNotification(location)
         generateNotificationChannel()
         val title = "${getString(R.string.walk_title_walking)} - ${duration}"
         val text = "${getString(R.string.app_name)}이 ${getString(R.string.walk_text_in_tracking)}"
