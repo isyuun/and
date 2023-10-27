@@ -18,19 +18,21 @@ android {
     }
     buildTypes {
         getByName("debug") {
-            isMinifyEnabled = false
-            isDebuggable = true
-            signingConfig = signingConfigs.getByName("debug")
-            manifestPlaceholders["enableCrashlytics"] = "false"
-            extra.set("alwaysUpdateBuildId", false)
+            //signingConfig = signingConfigs.getByName("debug")
+            //proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            //isMinifyEnabled = false
+            //shrinkResources = true
+            //isDebuggable = true
+            //manifestPlaceholders["enableCrashlytics"] = "false"
+            //extra.set("alwaysUpdateBuildId", false)
         }
         getByName("release") {
-            //shrinkResources = true
-            isMinifyEnabled = true
-            isDebuggable = false
             signingConfig = signingConfigs.getByName("release")
-            manifestPlaceholders["enableCrashlytics"] = "true"
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            isMinifyEnabled = true
+            //shrinkResources = true
+            isDebuggable = false
+            manifestPlaceholders["enableCrashlytics"] = "true"
         }
     }
 
