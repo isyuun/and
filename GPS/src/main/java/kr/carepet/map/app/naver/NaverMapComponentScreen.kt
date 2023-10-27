@@ -367,7 +367,7 @@ fun ImageButton(
 internal fun NaverMapApp(source: FusedLocationSource) {
     Log.v(__CLASSNAME__, "${getMethodName()}[ST]")
     val application = GPSApplication.instance
-    if (G.mapPetInfo.isEmpty()) {   //test
+    if (G.mapPetInfo.isEmpty()) {
         val pet = CurrentPetData("", TRACK_ZERO_NUM, "읎따", "", "", "", 0.0f)
         application.add(pet)
         application.add(pet)
@@ -710,7 +710,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 IconButton(
                     onClick = {
                         Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                        if (!start) return@IconButton     //test
+                        if (!start) return@IconButton
                         event = Track.EVENT.pee
                         if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
                         else showPetsSheet = true
@@ -725,7 +725,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 IconButton(
                     onClick = {
                         Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                        if (!start) return@IconButton     //test
+                        if (!start) return@IconButton
                         event = Track.EVENT.poo
                         if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
                         else showPetsSheet = true
@@ -740,7 +740,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 IconButton(
                     onClick = {
                         Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                        if (!start) return@IconButton     //test
+                        if (!start) return@IconButton
                         event = Track.EVENT.mrk
                         if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
                         else showPetsSheet = true
@@ -894,7 +894,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             text = pet.petNm,
                             onClick = {
                                 Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                                if (!start) return@ImageButton    //test
+                                if (!start) return@ImageButton
                                 showPetsSheet = false
                                 mark(pet, event, position, mapView)?.let { markers.add(it) }
                             },
