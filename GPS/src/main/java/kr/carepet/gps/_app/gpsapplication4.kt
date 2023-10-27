@@ -163,4 +163,6 @@ open class gpsapplication4 : gpsapplication3() {
     }
 
     fun rotate(context: Context, uri: Uri) = this.service?.rotate(context, uri)
+
+    fun orient(context: Context, uri: Uri) = this.service?.orient(context, uri)
 }

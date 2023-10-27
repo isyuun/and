@@ -202,10 +202,10 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
                     cursor.moveToFirst()
                     orientation = cursor.getInt(0)
                     when (orientation) {
-                        ExifInterface.ORIENTATION_ROTATE_270 -> rotate = ROTATE.ROTATE_270
-                        ExifInterface.ORIENTATION_ROTATE_180 -> rotate = ROTATE.ROTATE_180
-                        ExifInterface.ORIENTATION_ROTATE_90 -> rotate = ROTATE.ROTATE_90
-                        ExifInterface.ORIENTATION_NORMAL -> rotate = ROTATE.ROTATE_0
+                        270 -> rotate = ROTATE.ROTATE_270
+                        180 -> rotate = ROTATE.ROTATE_180
+                        90 -> rotate = ROTATE.ROTATE_90
+                        0 -> rotate = ROTATE.ROTATE_0
                     }
                 }
                 cursor.close()
