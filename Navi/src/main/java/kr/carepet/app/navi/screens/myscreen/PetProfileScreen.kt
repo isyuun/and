@@ -74,6 +74,7 @@ import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.pet.Member
 import kr.carepet.data.pet.PetDetailData
+import kr.carepet.singleton.G
 import kr.carepet.util.Log
 
 @Composable
@@ -296,9 +297,9 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 @Composable
 fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
 
-    var deleteMember by remember{ mutableStateOf(false) }
-    var expanded by remember { mutableStateOf(false) }
-    var scope = rememberCoroutineScope()
+    var expandText by remember{ mutableStateOf(false) }
+    var expandButton by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     Row (
         modifier = Modifier
@@ -370,16 +371,16 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                 )
                 .clip(RoundedCornerShape(10.dp))
                 .clickable(
-                    enabled = item.mngrType == "I",
+                    enabled = (item.mngrType == "I" && petInfo.petMngrYn == "Y") || (petInfo.petMngrYn =="N" && item.userId == G.userId),
                     onClick = {
                         scope.launch {
-                            if (deleteMember) {
-                                expanded = !deleteMember
+                            if (expandText) {
+                                expandButton = !expandText
                                 delay(450)
-                                deleteMember = !deleteMember
+                                expandText = !expandText
                             } else {
-                                expanded = !deleteMember
-                                deleteMember = !deleteMember
+                                expandButton = !expandText
+                                expandText = !expandText
                             }
                         }
                     }
@@ -390,7 +391,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                 text =
                 when(item.mngrType){
                     "M" -> "관리중"
-                    "I" -> if (!deleteMember)"참여중" else "참여를 중단하시겠습니까?"
+                    "I" -> if (!expandText)"참여중" else "참여를 중단하시겠습니까?"
                     "C" -> "동참중단"
                     else -> "에러"
                 },
@@ -420,7 +421,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
         }
 
         AnimatedVisibility(
-            visible =  expanded,
+            visible =  expandButton,
             enter = scaleIn(tween(delayMillis = 300)),
             exit = scaleOut(tween(durationMillis = 300))
         ) {
@@ -435,7 +436,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                         scope.launch {
                             val result = viewModel.relClose(petInfo.ownrPetUnqNo, item.petRelUnqNo)
                             if (result) {
-                                expanded = false
+                                expandButton = false
                                 viewModel.getPetInfoDetail(petInfo)
                             } else {
                                 Log.d("LOG", "실패")

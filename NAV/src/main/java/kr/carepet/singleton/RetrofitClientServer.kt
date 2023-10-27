@@ -20,6 +20,7 @@ import kr.carepet.data.RefreshRes
 import kr.carepet.data.RefreshToken
 import kr.carepet.service.ApiService
 import kr.carepet.service.OAuthAuthenticator
+import kr.carepet.service.RetryInterceptor
 import kr.carepet.service.TokenInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -40,6 +41,7 @@ object RetrofitClientServer {
 
     private const val BASE_URL = "http://carepet.hopto.org:8020/"
     private val tokenInterceptor = TokenInterceptor()
+    private val retryInterceptor = RetryInterceptor(3)
 
     val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY // 로깅 레벨 설정
@@ -58,6 +60,7 @@ object RetrofitClientServer {
         OkHttpClient.Builder()
             .addInterceptor(tokenInterceptor)
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(retryInterceptor)
             .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }

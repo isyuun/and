@@ -10,6 +10,7 @@ import okhttp3.Response
 import okhttp3.internal.commonNewBuilder
 import okhttp3.internal.stripBody
 import org.json.JSONObject
+import java.io.IOException
 import kotlin.reflect.typeOf
 
 class TokenInterceptor() : Interceptor {
@@ -59,4 +60,31 @@ class TokenInterceptor() : Interceptor {
         return response
     }
 
+}
+
+class RetryInterceptor(private val maxRetries: Int) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        var response: Response? = null
+        var retryCount = 0
+
+        // 최대 재시도 횟수에 도달할 때까지 재시도합니다.
+        while (retryCount < maxRetries) {
+            try {
+                response = chain.proceed(request)
+                if (response.isSuccessful) {
+                    return response
+                }
+            } catch (e: IOException) {
+                // 네트워크 오류가 발생한 경우 재시도합니다.
+                if (retryCount >= maxRetries) {
+                    throw e
+                }
+            } finally {
+                retryCount++
+            }
+        }
+
+        return response ?: throw IOException("Request failed after $maxRetries retries")
+    }
 }

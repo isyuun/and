@@ -56,7 +56,7 @@ data class DailyDetailData(
     @SerializedName("totDstnc")
     var totDstnc: Int, // 0
     @SerializedName("totMvmnPathFile")
-    var totMvmnPathFile: Any?, // null
+    var totMvmnPathFile: String?, // null
     @SerializedName("userId")
     var userId: String, // 9d93728e-c71e-41ee-ad8d-6ee741201921
     @SerializedName("walkDptreDt")

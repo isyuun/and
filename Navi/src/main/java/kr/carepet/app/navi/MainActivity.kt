@@ -15,6 +15,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -23,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import kr.carepet._app.application
 import kr.carepet.app.navi.screens.EasyRegScreen
 import kr.carepet.app.navi.screens.IdFindScreen
 import kr.carepet.app.navi.screens.IdPwSearchScreen
@@ -59,6 +61,7 @@ import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.SCDLocalData
+import kr.carepet.gps.app.GPSApplication
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,6 +98,7 @@ fun AppNavigation(navController: NavHostController){
     val walkViewModel = remember{WalkViewModel(sharedViewModel)}
     val communityViewModel = remember{CommunityViewModel(sharedViewModel)}
     val settingViewModel = remember{SettingViewModel(sharedViewModel)}
+
 
     NavHost(
         navController = navController,

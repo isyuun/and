@@ -116,6 +116,7 @@ import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
+import okhttp3.internal.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -519,6 +520,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                                 var dailyUpload = viewModel.uploadDaily()
                                 if (dailyUpload){
                                     navController.popBackStack()
+                                    viewModel.updateSelectedImageList(emptyList())
                                     isLoading = false
                                 }else{
                                     isLoading = false

@@ -80,7 +80,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
 
     private val _walkListItem = MutableStateFlow<DailyLifeWalk?>(null)
     val walkListItem: StateFlow<DailyLifeWalk?> = _walkListItem.asStateFlow()
-    fun updateWalkListItem(newValue: DailyLifeWalk) {
+    fun updateWalkListItem(newValue: DailyLifeWalk?) {
         _walkListItem.value = newValue
     }
 
@@ -226,6 +226,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
 
     suspend fun getDailyDetail(schUnqNo: Int): Boolean {
         val apiService = RetrofitClientServer.instance
+        _isLoading.value = true
 
         val data = kr.carepet.data.daily.DailyDetailReq(schUnqNo = schUnqNo, cmntYn = "N")
 
@@ -243,15 +244,22 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
 
                                 _dailyDetail.value = body.data
 
+                                _isLoading.value = false
                                 continuation.resume(true)
                             } else {
+
+                                _isLoading.value = false
                                 continuation.resume(false)
                             }
                         }
+                    }else{
+                        _isLoading.value = false
+                        continuation.resume(false)
                     }
                 }
 
                 override fun onFailure(call: Call<DailyDetailRes>, t: Throwable) {
+                    _isLoading.value = false
                     continuation.resume(false)
                 }
 
