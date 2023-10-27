@@ -281,7 +281,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
     }
 
     private fun cancelIntent(): Intent {
-        val intent: Intent = Intent(this, this::class.java)
+        val intent = Intent(this, this::class.java)
         Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
         return intent
     }
@@ -302,10 +302,10 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
      * no operation, so it's safe to perform the below sequence.
      */
     //https://developer.android.com/training/notify-user/channels?hl=ko
-    protected fun generateNotificationChannel() {
+    protected fun generateNotificationChannel(importance: Int) {
         val title = getString(R.string.app_name)
         val notificationChannel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID, title, NotificationManager.IMPORTANCE_HIGH
+            NOTIFICATION_CHANNEL_ID, title, importance
         )
         notificationManager.createNotificationChannel(notificationChannel)
     }
@@ -341,7 +341,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         //    // no operation, so it's safe to perform the below sequence.
         //    notificationManager.createNotificationChannel(notificationChannel)
         //}
-        generateNotificationChannel()
+        generateNotificationChannel(NotificationManager.IMPORTANCE_DEFAULT)
 
         // 2. Build the BIG_TEXT_STYLE.
         val style = NotificationCompat.BigTextStyle()

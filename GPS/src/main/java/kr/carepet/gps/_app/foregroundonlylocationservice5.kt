@@ -26,6 +26,7 @@
 package kr.carepet.gps._app
 
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.location.Location
@@ -64,7 +65,7 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
     }
 
     override fun generateNotification(location: Location?): Notification {
-        generateNotificationChannel()
+        generateNotificationChannel(NotificationManager.IMPORTANCE_DEFAULT)
         val title = "${getString(R.string.walk_title_walking)} - ${duration}"
         val text = "${getString(R.string.app_name)}이 ${getString(R.string.walk_text_in_tracking)}"
         val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent(), PendingIntent.FLAG_MUTABLE)

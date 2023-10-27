@@ -40,6 +40,6 @@ import kr.carepet.gps._app.foregroundonlylocationservice4
 class CameraContentObserver(private val context: foregroundonlylocationservice4, handler: Handler) : ContentObserver(handler) {
     override fun onChange(selfChange: Boolean, uri: Uri?) {
         super.onChange(selfChange, uri)
-        context.onChange(selfChange, uri)
+        uri?.let { context.onChange(selfChange, uri) }
     }
 }
