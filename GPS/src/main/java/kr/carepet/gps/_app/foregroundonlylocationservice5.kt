@@ -116,7 +116,7 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
     }
 
     override fun onLocationResult(locationResult: LocationResult) {
-        Log.w(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
+        Log.d(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
         if (start && pause) {
             val exit = exit(locationResult)
             Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit]$lastLocation$locationResult")
