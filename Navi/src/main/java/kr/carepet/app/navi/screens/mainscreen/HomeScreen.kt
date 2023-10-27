@@ -7,6 +7,7 @@ package kr.carepet.app.navi.screens.mainscreen
 import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -105,6 +106,7 @@ import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.CustomBottomSheet
 import kr.carepet.app.navi.component.CustomDialog
+import kr.carepet.app.navi.component.LoadingAnimation1
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_grad_end
 import kr.carepet.app.navi.ui.theme.design_icon_5E6D7B
@@ -193,99 +195,102 @@ fun HomeScreen(
         backChange(false)
     }
 
-    if(!isLoading){
-
-        AnimatedVisibility(
-            visible = showDialog,
-            enter = scaleIn(),
-            exit = scaleOut()
-        ) {
-            CustomDialog(
-                onDismiss = { newValue -> showDialogChange(newValue) },
-                navController = navController,
-                confirm = stringResource(R.string.dialog_regist),
-                dismiss = stringResource(R.string.dialog_later),
-                title = stringResource(R.string.dialog_any_pet),
-                text = stringResource(R.string.dialog_sub_regist)
-            )
-        }
-
-        Column (modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .background(color = design_select_btn_bg)
-        ){
-            ProfileContent(viewModel = viewModel, pagerState = pagerState, sharedViewModel = sharedViewModel, navController = navController)
-
-            Spacer(modifier = Modifier.padding(top = 40.dp))
-
-            WalkInfoContent(viewModel, pagerState = pagerState)
-
-            Spacer(modifier = Modifier.padding(top = 40.dp))
-
-            StoryContent()
-
-            Spacer(modifier = Modifier.padding(top = 16.dp))
-
-            Row (
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ){
-                Button(
-                    modifier = Modifier
-                        .width(160.dp)
-                        .height(48.dp),
-                    shape = RoundedCornerShape(100.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = design_btn_border),
-                    onClick = {
-                        sharedViewModel.updateMoreStoryClick(true)
-                        bottomNavController.navigate("commu") {
-                            bottomNavController.graph.startDestinationRoute?.let {
-                                popUpTo(it) { saveState = true }
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_story_more),
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 14.sp,
-                        letterSpacing = (-0.7).sp,
-                        color = design_white
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.padding(top = 40.dp))
-
-            BottomInfo()
-
-            Spacer(modifier = Modifier.padding(top = 80.dp))
-
-            if (openBottomSheet){
-                ModalBottomSheet(
-                    onDismissRequest = { onDissMiss(false) },
-                    sheetState = bottomSheetState,
-                    containerColor = Color.Transparent,
-                    dragHandle = {}
-                ) {
-                    Column {
-                        CustomBottomSheet(viewModel = sharedViewModel,  title = stringResource(R.string.select_pet), btnText = stringResource(R.string.confirm), onDismiss = { newValue -> onDissMiss(newValue)})
-                        Spacer(modifier = Modifier
-                            .height(navigationBarHeight)
-                            .fillMaxWidth()
-                            .background(color = design_white))
-                    }
-                }
-            }
-        }
-
-    }else{
-        CircularProgressAnimated()
+    AnimatedVisibility(
+        visible = showDialog,
+        enter = scaleIn(tween(durationMillis = 1000)),
+        exit = scaleOut(tween(durationMillis = 1000))
+    ) {
+        CustomDialog(
+            onDismiss = { newValue -> showDialogChange(newValue) },
+            navController = navController,
+            confirm = stringResource(R.string.dialog_regist),
+            dismiss = stringResource(R.string.dialog_later),
+            title = stringResource(R.string.dialog_any_pet),
+            text = stringResource(R.string.dialog_sub_regist)
+        )
     }
+
+    Column (modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState())
+        .background(color = design_select_btn_bg)
+    ){
+        ProfileContent(viewModel = viewModel, pagerState = pagerState, sharedViewModel = sharedViewModel, navController = navController)
+
+        Spacer(modifier = Modifier.padding(top = 40.dp))
+
+        WalkInfoContent(viewModel, pagerState = pagerState)
+
+        Spacer(modifier = Modifier.padding(top = 40.dp))
+
+        StoryContent()
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ){
+            Button(
+                modifier = Modifier
+                    .width(160.dp)
+                    .height(48.dp),
+                shape = RoundedCornerShape(100.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = design_btn_border),
+                onClick = {
+                    sharedViewModel.updateMoreStoryClick(true)
+                    bottomNavController.navigate("commu") {
+                        bottomNavController.graph.startDestinationRoute?.let {
+                            popUpTo(it) { saveState = true }
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            ) {
+                Text(
+                    text = stringResource(R.string.home_story_more),
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 14.sp,
+                    letterSpacing = (-0.7).sp,
+                    color = design_white
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.padding(top = 40.dp))
+
+        BottomInfo()
+
+        Spacer(modifier = Modifier.padding(top = 80.dp))
+
+        if (openBottomSheet){
+            ModalBottomSheet(
+                onDismissRequest = { onDissMiss(false) },
+                sheetState = bottomSheetState,
+                containerColor = Color.Transparent,
+                dragHandle = {}
+            ) {
+                Column {
+                    CustomBottomSheet(viewModel = sharedViewModel,  title = stringResource(R.string.select_pet), btnText = stringResource(R.string.confirm), onDismiss = { newValue -> onDissMiss(newValue)})
+                    Spacer(modifier = Modifier
+                        .height(navigationBarHeight)
+                        .fillMaxWidth()
+                        .background(color = design_white))
+                }
+            }
+        }
+    }
+
+
+    //if(!isLoading){
+    //
+    //
+    //
+    //}else{
+    //    CircularProgressAnimated()
+    //}
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -298,6 +303,7 @@ fun ProfileContent(
 ){
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val isLoading by viewModel.isLoading.collectAsState()
 
     val context = LocalContext.current
     val density = LocalDensity.current.density
@@ -317,7 +323,12 @@ fun ProfileContent(
 
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
 
-    Log.d("LOG",currentPetInfo.isEmpty().toString())
+    // run catching
+    val petKindNm = runCatching {currentPetInfo[pagerState.currentPage].petKindNm}.getOrElse {""}
+    val petNm = runCatching { currentPetInfo[pagerState.currentPage].petNm }.getOrElse { "" }
+    val petAge = runCatching { currentPetInfo[pagerState.currentPage].age }.getOrElse { "" }
+    val sexTypNm = runCatching { currentPetInfo[pagerState.currentPage].sexTypNm }.getOrElse { "" }
+    val wghtVl = runCatching { currentPetInfo[pagerState.currentPage].wghtVl }.getOrElse { "" }
 
     Column (modifier = Modifier
         .fillMaxWidth()
@@ -386,52 +397,66 @@ fun ProfileContent(
 
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
-                HorizontalPager(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    state = pagerState,
-                    beyondBoundsPageCount = 1,
-                    flingBehavior = PagerDefaults.flingBehavior(
-                        state = pagerState, snapVelocityThreshold = 20.dp)
-                ) { page ->
-                    val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
+                Crossfade(
+                    targetState = isLoading,
+                    label = "" ,
+                    animationSpec = tween(durationMillis = 700)
+                ) { isLoading ->
+                    when(isLoading){
+                        true ->
+                            Box (modifier = Modifier.fillMaxWidth().height(180.dp),
+                                contentAlignment = Alignment.Center
+                            ){
+                                LoadingAnimation1(circleColor = design_intro_bg)
+                            }
+                        false ->
+                            HorizontalPager(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                state = pagerState,
+                                beyondBoundsPageCount = 1,
+                                flingBehavior = PagerDefaults.flingBehavior(
+                                    state = pagerState, snapVelocityThreshold = 20.dp)
+                            ) { page ->
+                                val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
 
-                    // 선택된 아이템의 Z-index를 높게 설정
-                    val zIndexModifier = if (isSelected) Modifier.zIndex(1f) else Modifier
+                                // 선택된 아이템의 Z-index를 높게 설정
+                                val zIndexModifier = if (isSelected) Modifier.zIndex(1f) else Modifier
 
-                    Box(Modifier
-                        .then(zIndexModifier)
-                        .graphicsLayer {
-                            val pageOffset = pagerState.calculateCurrentOffsetForPage(page)
-                            // translate the contents by the size of the page, to prevent the pages from sliding in from left or right and stays in the center
-                            translationX = pageOffset * size.width / 4 * 3
-                            // apply an alpha to fade the current page in and the old page out
-                            alpha = 1 - pageOffset.absoluteValue / 2
-                            scaleX = 1 - pageOffset.absoluteValue / 4
-                            scaleY = 1 - pageOffset.absoluteValue / 4
-                        }
-                        .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
+                                Box(Modifier
+                                    .then(zIndexModifier)
+                                    .graphicsLayer {
+                                        val pageOffset = pagerState.calculateCurrentOffsetForPage(page)
+                                        // translate the contents by the size of the page, to prevent the pages from sliding in from left or right and stays in the center
+                                        translationX = pageOffset * size.width / 4 * 3
+                                        // apply an alpha to fade the current page in and the old page out
+                                        alpha = 1 - pageOffset.absoluteValue / 2
+                                        scaleX = 1 - pageOffset.absoluteValue / 4
+                                        scaleY = 1 - pageOffset.absoluteValue / 4
+                                    }
+                                    .fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
 
-                        CircleImageHome(size = 180, imageUri = currentPetInfo[page].petRprsImgAddr, page, pagerState)
+                                    CircleImageHome(size = 180, imageUri = currentPetInfo[page].petRprsImgAddr, page, pagerState)
+                                }
+                            }
                     }
                 }
+
 
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
                 Text(
-                    text = currentPetInfo[pagerState.currentPage].petKindNm,
+                    text = petKindNm,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
                     color = design_skip
                 )
 
-                //Spacer(modifier = Modifier.padding(top = 8.dp))
-
                 Text(
-                    text = currentPetInfo[pagerState.currentPage].petNm,
+                    text = petNm,
                     fontSize = 30.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     letterSpacing = (-0.7).sp,
@@ -454,10 +479,10 @@ fun ProfileContent(
                     }
 
                     Text(
-                        text = if (currentPetInfo[pagerState.currentPage].age==""){
+                        text = if (petAge==""){
                             stringResource(R.string.age_unknown)
                         }else{
-                            currentPetInfo[pagerState.currentPage].age
+                            petAge
                         },
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -479,7 +504,7 @@ fun ProfileContent(
                     }
 
                     Text(
-                        text = currentPetInfo[pagerState.currentPage].sexTypNm ?: stringResource(R.string.type_uk),
+                        text = sexTypNm ?: stringResource(R.string.type_uk),
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -500,7 +525,7 @@ fun ProfileContent(
                     }
 
                     Text(
-                        text = "${currentPetInfo[pagerState.currentPage].wghtVl}kg",
+                        text = "${wghtVl}kg",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -598,6 +623,12 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
     val weekRecord by viewModel.weekRecord.collectAsState()
 
+    val petName = runCatching {
+        currentPetInfo[pagerState.currentPage].petNm
+    }.getOrElse {
+        ""
+    }
+
     Box (
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -607,7 +638,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
             
             Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
                 Text(
-                    text = currentPetInfo[pagerState.currentPage].petNm,
+                    text = petName,
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 20.sp,
                     letterSpacing = (-1.0).sp,

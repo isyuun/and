@@ -290,9 +290,8 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                     .clip(shape = CircleShape)
                     .clickable {
                         walkViewModel.viewModelScope.launch {
-                            walkViewModel.updateIsLoading(true)
-                            walkViewModel.getDailyDetail(walk.schUnqNo)
                             walkViewModel.updateWalkListItem(walk)
+                            walkViewModel.getDailyDetail(walk.schUnqNo)
                         }
                         navController.navigate(Screen.WalkDetailContent.route)
                     },

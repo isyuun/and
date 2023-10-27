@@ -77,6 +77,7 @@ import kr.carepet.app.navi.viewmodel.HomeViewModel
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
+import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.G
 
 
@@ -108,14 +109,22 @@ fun MainScreen(
     var backBtnOnLT by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val application = GPSApplication.instance
+
+    LaunchedEffect(Unit){
+        if (application.start){
+            val intent = Intent(context,MapActivity::class.java)
+            context.startActivity(intent)
+        }
+    }
 
     LaunchedEffect(key1 = init){
         if (init){
             homeViewModel.updateIsLoading(true)
             delay(500)
-            val result = sharedViewModel.loadCurrentPetInfo()
-            sharedViewModel.loadPetInfo()
-            homeViewModel.updateIsLoading(!result)
+            val result1 = sharedViewModel.loadCurrentPetInfo()
+            val result2 = sharedViewModel.loadPetInfo()
+            homeViewModel.updateIsLoading(!(result1 && result2))
             sharedViewModel.updateInit(false)
         }
     }

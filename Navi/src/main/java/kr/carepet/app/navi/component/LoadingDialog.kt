@@ -51,8 +51,6 @@ import kr.carepet.app.navi.ui.theme.design_login_text
 @Composable
 fun LoadingDialog(
     cornerRadius: Dp = 16.dp,
-    progressIndicatorColor: Color = Color(0xFF35898f),
-    progressIndicatorSize: Dp = 80.dp,
     loadingText: String,
     loadingState: Boolean
 ) {
@@ -72,12 +70,6 @@ fun LoadingDialog(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                // 회전 애니메이션
-                //ProgressIndicatorLoading(
-                //    progressIndicatorSize = progressIndicatorSize,
-                //    progressIndicatorColor = progressIndicatorColor
-                //)
 
                 // 퍼져나가는 애니메이션
                 LoadingAnimation1(

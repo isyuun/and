@@ -472,6 +472,8 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                         val body = response.body()
                         body?.let {
                             if (body.statusCode == 200){
+                                updatePetInfo()
+                                updateCurrentPetInfo()
                                 continuation.resume(true)
                             }else{
                                 continuation.resume(false)

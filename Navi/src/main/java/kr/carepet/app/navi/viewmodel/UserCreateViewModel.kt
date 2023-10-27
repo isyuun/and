@@ -406,7 +406,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                 }
 
                 override fun onFailure(call: Call<SggListRes>, t: Throwable) {
-                    TODO("Not yet implemented")
+
                 }
             })
         }

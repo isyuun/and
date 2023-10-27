@@ -239,13 +239,7 @@ fun SetKeyTemp(settingViewModel: SettingViewModel){
                                         if (clipboardText.length == 6) {
                                             settingViewModel.updateOtpValue(clipboardText)
                                         } else {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    "복사된 초대코드가 없습니다",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
+                                            Toast.makeText(context,"복사된 초대코드가 없습니다",Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 },

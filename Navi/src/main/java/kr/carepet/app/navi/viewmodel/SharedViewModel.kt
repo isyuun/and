@@ -239,14 +239,17 @@ class SharedViewModel:ViewModel(){
                                 _weekRecord.value=body.data
                                 continuation.resume(true)
                             }else{
+                                _weekRecord.value = null
                                 continuation.resume(false)
                             }
                         }
                     }else{
+                        _weekRecord.value = null
                         continuation.resume(false)
                     }
                 }
                 override fun onFailure(call: Call<WeekRecordRes>, t: Throwable) {
+                    _weekRecord.value = null
                     continuation.resume(false)
                 }
             })
@@ -296,8 +299,8 @@ class SharedViewModel:ViewModel(){
         _moreStoryClick.value =false
         _weekRecord.value = null
         _init.value = true
-        //_petInfo.value = emptyList()
-       // _currentPetInfo.value = emptyList()
+        _petInfo.value = arrayListOf(emptyPet)
+        _currentPetInfo.value = arrayListOf(emptyCurrentPet)
         _selectPet.value = null
     }
 }
