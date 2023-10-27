@@ -25,6 +25,8 @@
 
 package kr.carepet.gps._app
 
+import android.content.Context
+import android.net.Uri
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gpx.TRACK_ZERO_NO
 import kr.carepet.gpx.Track
@@ -43,6 +45,7 @@ open class gpsapplication4 : gpsapplication3() {
 
     override fun start() {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
+        if (start) return
         super.start()
         tracks?.clear()
         images?.clear()
@@ -158,4 +161,6 @@ open class gpsapplication4 : gpsapplication3() {
             Track.EVENT.mrk -> mrk(pet)
         }
     }
+
+    fun rotate(context: Context, uri: Uri) = this.service?.rotate(context, uri)
 }

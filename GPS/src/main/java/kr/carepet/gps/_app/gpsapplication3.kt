@@ -26,8 +26,6 @@
 package kr.carepet.gps._app
 
 import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
 import android.os.IBinder
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -52,13 +50,5 @@ open class gpsapplication3 : gpsapplication2() {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceDisconnected(name)
         this.service?.onServiceDisconnected(name)
-    }
-
-    override fun onReceive(context: Context, intent: Intent) {
-        Log.i(__CLASSNAME__, "${getMethodName()}...")
-        super.onReceive(context, intent)
-        //post { pee("") }    //test
-        //post { poo("") }    //test
-        //post { mark("") }    //test
     }
 }

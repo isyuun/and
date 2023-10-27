@@ -28,7 +28,9 @@ package kr.carepet.gps._app
 import android.Manifest
 import android.content.ComponentName
 import android.content.ContentResolver
+import android.content.Context
 import android.content.ServiceConnection
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Handler
 import android.os.IBinder
@@ -42,6 +44,7 @@ import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.io.File
 import java.util.Collections
+
 
 /**
  * @Project     : carepet-android
@@ -84,8 +87,8 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
         contentResolver.unregisterContentObserver(cameraContentObserver)
     }
 
-    private fun path(uri: Uri): String? {
-        var path: String? = null
+    private fun path(uri: Uri): String {
+        var path = ""
         try {
             val projection = arrayOf(MediaStore.Images.Media.DATA)
             val cursor = contentResolver.query(uri, projection, null, null, null)
@@ -156,7 +159,65 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
         write()
     }
 
-    fun onChange(selfChange: Boolean, uri: Uri?) {
+    enum class ROTATE {
+        ROTATE_NG,
+        ROTATE_0,
+        ROTATE_90,
+        ROTATE_180,
+        ROTATE_270,
+    }
+
+    internal fun rotate(context: Context, uri: Uri): ROTATE {
+        val path = path(uri)
+        val file = File(path)
+        var rotate = ROTATE.ROTATE_NG
+        var orientation: Int
+        try {
+            context.contentResolver.notifyChange(uri!!, null)
+            val exif = ExifInterface(file.absolutePath)
+            //val exif = ExifInterface(path)
+            orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_270 -> rotate = ROTATE.ROTATE_270
+                ExifInterface.ORIENTATION_ROTATE_180 -> rotate = ROTATE.ROTATE_180
+                ExifInterface.ORIENTATION_ROTATE_90 -> rotate = ROTATE.ROTATE_90
+                ExifInterface.ORIENTATION_NORMAL -> rotate = ROTATE.ROTATE_0
+            }
+            Log.i(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file.absolutePath}]")
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+        return rotate
+    }
+
+    internal fun orient(context: Context, uri: Uri): ROTATE {
+        val path = path(uri)
+        val file = File(path)
+        var rotate = ROTATE.ROTATE_NG
+        var orientation: Int = -1
+        try {
+            var cursor = context.contentResolver.query(uri, arrayOf(MediaStore.Images.ImageColumns.ORIENTATION), null, null, null)
+            cursor?.let { cursor ->
+                if (cursor.count == 1) {
+                    cursor.moveToFirst()
+                    orientation = cursor.getInt(0)
+                    when (orientation) {
+                        ExifInterface.ORIENTATION_ROTATE_270 -> rotate = ROTATE.ROTATE_270
+                        ExifInterface.ORIENTATION_ROTATE_180 -> rotate = ROTATE.ROTATE_180
+                        ExifInterface.ORIENTATION_ROTATE_90 -> rotate = ROTATE.ROTATE_90
+                        ExifInterface.ORIENTATION_NORMAL -> rotate = ROTATE.ROTATE_0
+                    }
+                }
+                cursor.close()
+            }
+            Log.w(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file.absolutePath}]")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return rotate
+    }
+
+    fun onChange(selfChange: Boolean, uri: Uri) {
         if (uri != null) {
             val path = path(uri)
             val time = time(uri)
@@ -167,7 +228,9 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
             val exists = file.exists()
             val camera = exists && camera(uri) && !_imgs.contains(path) && !name.startsWith(".")
             if (camera) {
-                Log.i(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][$name]: path:$path, time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}")
+                val rotate = rotate(this, uri)
+                val orient = orient(this, uri)
+                Log.wtf(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][orient:$orient][rotate:$rotate][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
                 img(path)
             }
         }

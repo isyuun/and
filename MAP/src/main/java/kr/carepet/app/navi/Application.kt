@@ -35,6 +35,8 @@ package kr.carepet.app.navi
  * @description :
  */
 import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.os.IBinder
 import kr.carepet.map.app.MapApplication
 import kr.carepet.util.Log
@@ -45,6 +47,14 @@ open class Application : MapApplication() {
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
-        //if (!start) start()   //test
+        //start()   //test
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        Log.i(__CLASSNAME__, "${getMethodName()}...")
+        super.onReceive(context, intent)
+        //post { pee("") }    //test
+        //post { poo("") }    //test
+        //post { mark("") }    //test
     }
 }
