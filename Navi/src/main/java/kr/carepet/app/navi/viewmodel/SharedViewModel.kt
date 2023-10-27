@@ -114,7 +114,7 @@ class SharedViewModel:ViewModel(){
                 override fun onResponse(call: Call<MyPetListRes>, response: Response<MyPetListRes>) {
                     if(response.isSuccessful){
                         val body = response.body()
-                        body?.let {
+                        body?.petDetailData?.let {
                             if(body.petDetailData.isEmpty()){
                                 _petInfo.value= arrayListOf(emptyPet)
                                 //updatePetInfo(arrayListOf(emptyPet))

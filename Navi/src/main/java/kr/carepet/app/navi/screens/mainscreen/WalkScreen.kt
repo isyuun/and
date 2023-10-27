@@ -7,6 +7,7 @@ package kr.carepet.app.navi.screens.mainscreen
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -22,6 +23,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -64,6 +66,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,6 +74,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -91,6 +95,7 @@ import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.CircleImageTopBar
 import kr.carepet.app.navi.component.CustomBottomSheet
+import kr.carepet.app.navi.component.LoadingAnimation1
 import kr.carepet.app.navi.component.MonthCalendar
 import kr.carepet.app.navi.component.WalkTimeNDis
 import kr.carepet.app.navi.screens.walkscreen.WalkDetailContent
@@ -113,6 +118,7 @@ import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.DailyLifeWalk
 import kr.carepet.data.daily.Day
+import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.pet.PetDetailData
 
 
@@ -130,6 +136,7 @@ fun WalkScreen(
     val toDetail by walkViewModel.toDetail.collectAsState()
     val toMonthCalendar by walkViewModel.toMonthCalendar.collectAsState()
     val selectPet by sharedViewModel.selectPet.collectAsState()
+    var isLoading by remember{ mutableStateOf(false) }
 
 
     val bottomSheetState =
@@ -145,8 +152,15 @@ fun WalkScreen(
         0.dp
     }
 
+    var selectPetPre:String? by rememberSaveable { mutableStateOf(null) }
+
     LaunchedEffect(key1 = selectPet){
-        homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  getFormattedTodayDate())
+        if (selectPet?.ownrPetUnqNo != selectPetPre){
+            isLoading = true
+            selectPetPre = selectPet?.ownrPetUnqNo
+            val result = homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  getFormattedTodayDate())
+            isLoading = !result
+        }
     }
 
     LaunchedEffect(key1 = toMonthCalendar){
@@ -165,7 +179,7 @@ fun WalkScreen(
         modifier = Modifier.fillMaxSize()
     ){
         Column(modifier = Modifier
-            .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+            .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
         ){
             BackHandler (enabled = toMonthCalendar){
                 walkViewModel.updateToMonthCalendar(false)
@@ -176,8 +190,25 @@ fun WalkScreen(
 
             WeekContent(walkViewModel,navController,backBtnOn)
 
-            WalkListContent(walkViewModel, navController)
+            Crossfade(
+                targetState = isLoading,
+                label = "",
+            ) { isLoading ->
+                when(isLoading){
+                    true ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(design_home_bg),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            Spacer(modifier = Modifier.padding(top = 60.dp))
+                            LoadingAnimation1(circleColor = design_intro_bg)
+                        }
 
+                    else -> WalkListContent(walkViewModel, navController)
+                }
+            }
         }
 
         AnimatedVisibility(

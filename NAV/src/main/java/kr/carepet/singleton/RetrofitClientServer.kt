@@ -60,7 +60,7 @@ object RetrofitClientServer {
         OkHttpClient.Builder()
             .addInterceptor(tokenInterceptor)
             .addInterceptor(loggingInterceptor)
-            .addInterceptor(retryInterceptor)
+            //.addInterceptor(retryInterceptor)
             .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }

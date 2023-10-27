@@ -23,8 +23,8 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
         sharedViewModel.updateSelectPet(newData)
     }
 
-    suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String){
-        sharedViewModel.getWeekRecord(ownrPetUnqNo, searchDay)
+    suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String):Boolean{
+        return sharedViewModel.getWeekRecord(ownrPetUnqNo, searchDay)
     }
 
     fun changeBirth(birth:String):String{

@@ -437,6 +437,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                             val result = viewModel.relClose(petInfo.ownrPetUnqNo, item.petRelUnqNo)
                             if (result) {
                                 expandButton = false
+                                expandText = false
                                 viewModel.getPetInfoDetail(petInfo)
                             } else {
                                 Log.d("LOG", "실패")

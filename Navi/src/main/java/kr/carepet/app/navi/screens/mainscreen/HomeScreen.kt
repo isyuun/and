@@ -101,6 +101,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
@@ -171,6 +172,7 @@ fun HomeScreen(
     }
 
     LaunchedEffect(key1 = pagerState.currentPage, key2 = currentPetInfo){
+        delay(100)
         if (currentPetInfo.isNotEmpty()){
             viewModel.getWeekRecord(currentPetInfo[pagerState.currentPage].ownrPetUnqNo, getFormattedTodayDate())
             viewModel.updateSeletedPet(currentPetInfo[pagerState.currentPage])
