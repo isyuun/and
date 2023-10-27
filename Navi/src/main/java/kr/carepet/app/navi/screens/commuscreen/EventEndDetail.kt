@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,7 +58,7 @@ fun EventEndDetail(navController: NavHostController){
     )
 
     Scaffold (
-        topBar = { BackTopBar(title = "이벤트", navController = navController) }
+        topBar = { BackTopBar(title = stringResource(R.string.title_event), navController = navController) }
     ) { paddingValues ->
         Column(
             modifier = Modifier

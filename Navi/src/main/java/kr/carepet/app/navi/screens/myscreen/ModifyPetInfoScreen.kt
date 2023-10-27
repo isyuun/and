@@ -116,7 +116,15 @@ fun ModifyPetInfoScreen(
     sharedViewModel: SharedViewModel,
     index: String? = null
 ){
-    val petInfo by sharedViewModel.petInfo.collectAsState()
+    val originPetInfo by sharedViewModel.petInfo.collectAsState()
+    val petInfo = originPetInfo.sortedBy {
+        when (it.mngrType) {
+            "M" -> 1
+            "I" -> 2
+            "C" -> 3
+            else -> 4
+        }
+    }
     val selectPet = petInfo[index?.toInt() ?: 0]
 
     val scope = rememberCoroutineScope()

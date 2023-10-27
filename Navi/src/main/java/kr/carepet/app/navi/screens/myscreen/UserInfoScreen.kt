@@ -56,6 +56,7 @@ import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_login_text
 import kr.carepet.app.navi.ui.theme.design_placeHolder
 import kr.carepet.app.navi.ui.theme.design_sharp
+import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
@@ -78,6 +79,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
     var snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
     var showDialog by remember{ mutableStateOf(false) }
     var withDraw by remember { mutableStateOf(false) }
+    val loginMethod = MySharedPreference.getLastLoginMethod()
 
     LaunchedEffect(key1 = withDraw){
         if (withDraw){
@@ -263,10 +265,28 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            Text(text = "비밀번호 변경", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier=Modifier.padding(start = 20.dp), color = design_login_text)
+            Row {
+                Text(text = "비밀번호 변경", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    modifier=Modifier
+                        .padding(start = 20.dp)
+                        .alignByBaseline(),
+                    color = design_login_text)
+
+                if (loginMethod!="EMAIL"){
+
+                    Text(text = "(간편가입시 비밀번호 변경이 불가능합니다)",
+                        fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                        letterSpacing = (-0.6).sp,
+                        modifier=Modifier
+                            .padding(start = 8.dp)
+                            .alignByBaseline(),
+                        color = design_skip
+                    )
+                }
+            }
 
             CustomTextField(
+                enabled = loginMethod == "EMAIL",
                 value = userPw,
                 onValueChange = {settingViewModel.updateUserPw(it)},
                 singleLine = true,
@@ -291,6 +311,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
             )
 
             CustomTextField(
+                enabled = loginMethod == "EMAIL",
                 value = userPwCheck,
                 onValueChange = {settingViewModel.updateUserPwCheck(it)},
                 singleLine = true,

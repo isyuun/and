@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
@@ -36,7 +38,7 @@ import kr.carepet.app.navi.ui.theme.design_white
 @Composable
 fun BackTopBar(title: String, navController: NavHostController, backVisible:Boolean=true){
 
-    TopAppBar(
+    CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
         modifier = Modifier.height(60.dp),
         title = {
@@ -74,7 +76,8 @@ fun BackTopBar(title: String, navController: NavHostController, backVisible:Bool
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     letterSpacing = (-1.0).sp,
                     color = design_login_text,
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
+                    textAlign = TextAlign.Center
                 )
             }
         }

@@ -259,13 +259,13 @@ class SharedViewModel:ViewModel(){
         ownrPetUnqNo = "",
         petKindNm = "",
         petRprsImgAddr = "",
-        sexTypNm = "",
+        sexTypNm = "모름",
         wghtVl =0.0f
     )
 
-    val emptyPet = kr.carepet.data.pet.PetDetailData(
+    val emptyPet = PetDetailData(
         ownrPetUnqNo = "",
-        petBrthYmd = "",
+        petBrthYmd = "미상",
         petInfoUnqNo = 0,
         petKindNm = "웨스트 하이랜드 화이트 테리어",
         petMngrYn = "",
@@ -277,7 +277,7 @@ class SharedViewModel:ViewModel(){
         petRprsImgAddr = "",
         petRprsYn = "Y",
         sexTypCd = "",
-        sexTypNm = "수컷",
+        sexTypNm = "모름",
         stdgCtpvCd = "",
         stdgCtpvNm = "",
         stdgSggCd = "",
@@ -286,7 +286,7 @@ class SharedViewModel:ViewModel(){
         stdgUmdNm = "",
         wghtVl = 0.0f,
         ntrTypCd = "",
-        ntrTypNm = "",
+        ntrTypNm = "모름",
         endDt = "",
         mngrType = "M",
         memberList = emptyList()

@@ -39,9 +39,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -74,13 +78,20 @@ import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.DailyLifePet
+import kr.carepet.util.Log
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostController){
 
-    val isLoading by walkViewModel.isLoading.collectAsState()
+    DisposableEffect(Unit){
+        onDispose {
+            walkViewModel.updateDailyDetail(null)
+        }
+    }
+
+    var isLoading by remember{ mutableStateOf(false) }
     val dailyDetail by walkViewModel.dailyDetail.collectAsState()
     val walkListItem by walkViewModel.walkListItem.collectAsState()
 
@@ -169,6 +180,12 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                                 , contentAlignment = Alignment.Center) {
 
                                 AsyncImage(
+                                    onLoading = {
+                                        isLoading = true
+                                        Log.d("LOG", "onloading")
+                                                },
+                                    onError = {isLoading = false},
+                                    onSuccess = {isLoading = false},
                                     model = ImageRequest.Builder(LocalContext.current)
                                         .data(
                                             "http://carepet.hopto.org/img/"+
@@ -504,6 +521,9 @@ fun LoadingComposable(){
     )
 
     Box(
-        modifier = Modifier.fillMaxWidth().height(400.dp).background(design_login_bg.copy(alpha))
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(400.dp)
+            .background(design_login_bg.copy(alpha))
     )
 }

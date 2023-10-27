@@ -83,6 +83,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -202,10 +203,10 @@ fun HomeScreen(
             CustomDialog(
                 onDismiss = { newValue -> showDialogChange(newValue) },
                 navController = navController,
-                confirm = "등록하기",
-                dismiss = "나중에",
-                title = "같이 산책할 펫이 없어요",
-                text = "펫을 등록하시겠어요?"
+                confirm = stringResource(R.string.dialog_regist),
+                dismiss = stringResource(R.string.dialog_later),
+                title = stringResource(R.string.dialog_any_pet),
+                text = stringResource(R.string.dialog_sub_regist)
             )
         }
 
@@ -214,7 +215,7 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState())
             .background(color = design_select_btn_bg)
         ){
-            ProfileContent(viewModel = viewModel, pagerState = pagerState, navController)
+            ProfileContent(viewModel = viewModel, pagerState = pagerState, sharedViewModel = sharedViewModel, navController = navController)
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
@@ -249,7 +250,7 @@ fun HomeScreen(
                     }
                 ) {
                     Text(
-                        text = "스토리 더보기",
+                        text = stringResource(R.string.home_story_more),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -272,7 +273,7 @@ fun HomeScreen(
                     dragHandle = {}
                 ) {
                     Column {
-                        CustomBottomSheet(viewModel = sharedViewModel,  title = "나의 반려동물을 선택하여 주세요.", btnText = "확인", onDismiss = {newValue -> onDissMiss(newValue)})
+                        CustomBottomSheet(viewModel = sharedViewModel,  title = stringResource(R.string.select_pet), btnText = stringResource(R.string.confirm), onDismiss = { newValue -> onDissMiss(newValue)})
                         Spacer(modifier = Modifier
                             .height(navigationBarHeight)
                             .fillMaxWidth()
@@ -291,6 +292,7 @@ fun HomeScreen(
 @Composable
 fun ProfileContent(
     viewModel: HomeViewModel,
+    sharedViewModel: SharedViewModel,
     pagerState: PagerState,
     navController : NavHostController
 ){
@@ -453,7 +455,7 @@ fun ProfileContent(
 
                     Text(
                         text = if (currentPetInfo[pagerState.currentPage].age==""){
-                            "미상"
+                            stringResource(R.string.age_unknown)
                         }else{
                             currentPetInfo[pagerState.currentPage].age
                         },
@@ -477,7 +479,7 @@ fun ProfileContent(
                     }
 
                     Text(
-                        text = currentPetInfo[pagerState.currentPage].sexTypNm ?: "",
+                        text = currentPetInfo[pagerState.currentPage].sexTypNm ?: stringResource(R.string.type_uk),
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -549,7 +551,7 @@ fun ProfileContent(
             }
 
             Text(
-                text = "반려동물 리스트",
+                text = stringResource(R.string.pet_list),
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 12.sp, letterSpacing = (-0.6).sp,
                 textDecoration = TextDecoration.Underline,
@@ -612,7 +614,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                     color = design_login_text
                     )
                 Text(
-                    text = "와 즐거운 산책해요",
+                    text = stringResource(R.string.with_walk),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 20.sp,
                     letterSpacing = (-1.0).sp,
@@ -652,7 +654,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                     }
 
                     Text(
-                        text = "총 산책시간",
+                        text = stringResource(R.string.total_walk_time),
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -661,7 +663,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                     )
 
                     Text(
-                        text = weekRecord?.runTime ?: "0분",
+                        text = weekRecord?.runTime ?: stringResource(R.string.zero_min),
                         fontSize = 22.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         letterSpacing = 0.sp,
@@ -690,7 +692,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                     }
 
                     Text(
-                        text = "총 산책거리",
+                        text = stringResource(R.string.total_walk_distance),
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -749,7 +751,7 @@ fun StoryContent(){
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "실시간",
+                    text = stringResource(R.string.real_time),
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 20.sp,
                     letterSpacing = (-1.0).sp,
@@ -757,7 +759,7 @@ fun StoryContent(){
                     modifier = Modifier.padding(start = 20.dp)
                 )
                 Text(
-                    text = "스토리",
+                    text = stringResource(id = R.string.title_story),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 20.sp,
                     letterSpacing = (-1.0).sp,
@@ -890,11 +892,20 @@ fun BottomSheetContent(
     navController: NavHostController,
     onDisMiss: (Boolean) -> Unit ){
     
-    val petList by viewModel.petInfo.collectAsState()
+    val originPetList by viewModel.petInfo.collectAsState()
     val index by viewModel.petListSelectIndex.collectAsState()
 
+    val petList = originPetList.sortedBy {
+        when(it.mngrType){
+            "M" -> 1
+            "I" -> 2
+            "C" -> 3
+            else -> 4
+        }
+    }
+
     LaunchedEffect(Unit){
-        viewModel.updatePetListSelect(petList[0].ownrPetUnqNo)
+        viewModel.updateSelectPetManage(petList[0])
         viewModel.updatePetListSelectIndex("0")
     }
 
@@ -908,7 +919,7 @@ fun BottomSheetContent(
         Spacer(modifier = Modifier.padding(top = 20.dp))
 
         Text(
-            text = "반려동물 리스트",
+            text = stringResource(id = R.string.pet_list),
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 20.sp,
             letterSpacing = (-1.0).sp,
@@ -942,7 +953,7 @@ fun BottomSheetContent(
                 onClick = { },
                 border = BorderStroke(1.dp, design_textFieldOutLine)
             ) {
-                Text(text = "새로운 반려동물 추가", color = Color.Black)
+                Text(text = stringResource(R.string.regist_new_pet), color = Color.Black)
             }
         }
 
@@ -965,7 +976,7 @@ fun BottomSheetContent(
                 }
             ) {
                 Text(
-                    text = "반려동물 추가하기",
+                    text = stringResource(R.string.add_pet),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
@@ -989,7 +1000,7 @@ fun BottomSheetContent(
                 }
             ) {
                 Text(
-                    text = "반려동물 관리하기",
+                    text = stringResource(R.string.manage_pet),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
@@ -1003,23 +1014,23 @@ fun BottomSheetContent(
 }
 
 @Composable
-fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData, index: Int){
+fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData, index: Int){
 
     val petName:String = petList.petNm
     val imageUri:String? = petList.petRprsImgAddr
     val petKind:String = petList.petKindNm
-    val petAge:String = if(petList.petBrthYmd == "미상"){
-        "미상"
+    val petAge:String = if(petList.petBrthYmd == stringResource(id = R.string.age_unknown)){
+        stringResource(id = R.string.age_unknown)
     }else{
         viewModel.changeBirth(petList.petBrthYmd)
     }
     val petGender:String = petList.sexTypNm?:""
 
-    val selectPet by viewModel.petListSelect.collectAsState()
+    val selectPet by viewModel.selectPetManage.collectAsState()
 
     Button(
         onClick = {
-            viewModel.updatePetListSelect(petList.ownrPetUnqNo)
+            viewModel.updateSelectPetManage(petList)
             viewModel.updatePetListSelectIndex(index.toString())
                   },
         modifier = Modifier
@@ -1029,18 +1040,18 @@ fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData, index: Int
             .shadow(ambientColor = design_shadow, elevation = 0.dp)
         ,
         shape = RoundedCornerShape(12.dp),
-        colors = if(petList.ownrPetUnqNo == selectPet) {
+        colors = if(petList == selectPet) {
             ButtonDefaults.buttonColors(design_select_btn_bg)
         } else {
             ButtonDefaults.buttonColors(design_white)
         },
-        border = if(petList.ownrPetUnqNo == selectPet) {
+        border = if(petList == selectPet) {
             BorderStroke(1.dp, color = design_select_btn_text)
         } else {
             BorderStroke(1.dp, color = design_textFieldOutLine)
         },
         contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-        elevation = if(petList.ownrPetUnqNo == selectPet){
+        elevation = if(petList == selectPet){
             ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
         } else {
             ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -1057,7 +1068,6 @@ fun BottomSheetItem(viewModel: HomeViewModel, petList: PetDetailData, index: Int
                 modifier = Modifier
                     .size(46.dp)
                     .border(shape = CircleShape, border = BorderStroke(3.dp, color = design_white))
-                    //.shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
                     .shadow(
                         color = design_shadow,
                         offsetY = 10.dp,
@@ -1159,7 +1169,7 @@ fun BottomInfo(){
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(
-                text = "이용약관",
+                text = stringResource(R.string.terms_of_use),
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.6).sp,
@@ -1174,7 +1184,7 @@ fun BottomInfo(){
             )
 
             Text(
-                text = "개인정보처리방침",
+                text = stringResource(R.string.privacy_policy),
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 letterSpacing = (-0.6).sp,
@@ -1189,7 +1199,7 @@ fun BottomInfo(){
             )
 
             Text(
-                text = "회사소개",
+                text = stringResource(R.string.introduc_corp),
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.6).sp,
@@ -1200,7 +1210,7 @@ fun BottomInfo(){
         Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
         Text(
-            text = "㈜케어펫 서울별시 성동구 아차산로17길 49 생각공장 데시앙플렉스\n대표이사 : ㅇㅇㅇ 사업자번호 : 000-00-00000\n업종 : ㅇㅇㅇㅇㅇ 개인정보보호책임자 : ㅇㅇㅇ",
+            text = stringResource(R.string.corp_info),
             fontSize = 12.sp,
             lineHeight = 16.sp,
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -1211,7 +1221,6 @@ fun BottomInfo(){
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CircleImage(size: Int, imageUri: String?){
 
@@ -1219,7 +1228,6 @@ fun CircleImage(size: Int, imageUri: String?){
         modifier = Modifier
             .size(size.dp)
             .border(shape = CircleShape, border = BorderStroke(5.dp, color = design_white))
-            //.shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
             .shadow(
                 color = design_shadow,
                 offsetY = 10.dp,
@@ -1256,7 +1264,6 @@ fun CircleImageHome(size: Int, imageUri: String?, page: Int, pagerState: PagerSt
         modifier = Modifier
             .size(size.dp)
             .border(shape = CircleShape, border = BorderStroke(5.dp, color = design_white))
-            //.shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
             .shadow(
                 color = design_shadow,
                 offsetY = 10.dp,
@@ -1334,15 +1341,6 @@ fun CircularProgressAnimated(){
 
 }
 
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun preview(){
-    val navController = rememberNavController()
-    val sharedViewModel = SharedViewModel()
-    val viewModel = HomeViewModel(sharedViewModel)
-    //HomeScreen(navController, viewModel, onChange = {}) { newValue -> backBtnOn = newValue }
-}
 
 fun Modifier.shadow(
     color: Color = Color.Black,

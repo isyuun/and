@@ -74,20 +74,19 @@ object MySharedPreference {
         return sharedPreferences.getString("lastLoginMethod", "").toString()
     }
 
-
-    fun setProfileImage(imageUri: Uri?) {
-        sharedPreferences.edit().putString("imageUri", imageUri.toString()).apply()
-    }
-
-    fun getProfileImage(): String? {
-        return sharedPreferences.getString("imageUri", "")
-    }
-
     fun setUserId(userId: String) {
         sharedPreferences.edit().putString("userId", userId).apply()
     }
 
     fun getUserId(): String {
         return sharedPreferences.getString("userId", "").toString()
+    }
+
+    fun setUserEmail(userEmail: String) {
+        sharedPreferences.edit().putString("userEmail", userEmail).apply()
+    }
+
+    fun getUserEmail(): String {
+        return sharedPreferences.getString("userEmail", "").toString()
     }
 }

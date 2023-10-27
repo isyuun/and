@@ -133,7 +133,7 @@ interface ApiService {
 
     @Multipart
     @POST("api/v1/daily-life/upload")
-    fun uploadPhoto(@Part photos: ArrayList<MultipartBody.Part>): Call<PhotoRes>
+    fun uploadPhoto(@Part files: ArrayList<MultipartBody.Part>): Call<PhotoRes>
 
     @POST("api/v1/daily-life/create")
     fun uploadDaily(@Body data: DailyCreateReq): Call<DailyCreateRes>

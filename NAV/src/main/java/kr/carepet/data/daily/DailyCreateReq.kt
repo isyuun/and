@@ -7,7 +7,7 @@ data class DailyCreateReq(
     @SerializedName("cmntUseYn")
     var cmntUseYn: String, // Y
     @SerializedName("files")
-    var files: List<PhotoData>,
+    var files: List<PhotoData>?,
     @SerializedName("hashTag")
     var hashTag: List<String>,
     @SerializedName("pet")
