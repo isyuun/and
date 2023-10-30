@@ -38,7 +38,7 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class MainActivity : kr.carepet.map.app.MapActivity() {
+open class MapActivity : kr.carepet.map.app.MapActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun setContent() {
