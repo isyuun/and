@@ -1,6 +1,5 @@
 package kr.carepet.gps._app
 
-import android.content.Intent
 import kr.carepet.gps.app.GPSApplication
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
