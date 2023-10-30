@@ -64,6 +64,13 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
         }, 1000, 1000) // 1초마다 실행
     }
 
+    internal var launchActivityIntent: Intent? = null
+    override fun launchActivityIntent(): Intent? {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${super.launchActivityIntent()}][$launchActivityIntent]")
+        if (launchActivityIntent == null) return super.launchActivityIntent()
+        return launchActivityIntent
+    }
+
     override fun generateNotification(location: Location?): Notification {
         generateNotificationChannel(NotificationManager.IMPORTANCE_DEFAULT)
         val title = "${getString(R.string.walk_title_walking)} - ${duration}"
@@ -116,7 +123,7 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
     }
 
     override fun onLocationResult(locationResult: LocationResult) {
-        Log.d(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
+        Log.i(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
         if (start && pause) {
             val exit = exit(locationResult)
             Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit]$lastLocation$locationResult")

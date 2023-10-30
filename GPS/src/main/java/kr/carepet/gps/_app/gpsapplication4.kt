@@ -26,6 +26,7 @@
 package kr.carepet.gps._app
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gpx.TRACK_ZERO_NO
@@ -165,4 +166,10 @@ open class gpsapplication4 : gpsapplication3() {
     fun rotate(context: Context, uri: Uri) = this.service?.rotate(context, uri)
 
     fun orient(context: Context, uri: Uri) = this.service?.orient(context, uri)
+
+    var launchActivityIntent: Intent?
+        get() = this.service?.launchActivityIntent
+        set(intent) {
+            this.service?.launchActivityIntent = intent
+        }
 }

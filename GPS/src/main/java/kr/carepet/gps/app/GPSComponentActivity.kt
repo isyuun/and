@@ -31,6 +31,7 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import kr.carepet.gps._app.gpscomponentactivity
+import kr.carepet.gps._app.gpscomponentactivity2
 import kr.carepet.gps.app.GPSApplication.Companion.permissions
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -42,7 +43,7 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class GPSComponentActivity : gpscomponentactivity() {
+open class GPSComponentActivity : gpscomponentactivity2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private val requestPermission = registerForActivityResult(

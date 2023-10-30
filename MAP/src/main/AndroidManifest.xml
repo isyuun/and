@@ -12,27 +12,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MAP"
         tools:replace="android:name,android:theme,android:icon">
+        <!--<activity-->
+        <!--    android:name=".MainActivity"-->
+        <!--    android:exported="true"-->
+        <!--    android:label="@string/app_name"-->
+        <!--    android:theme="@style/Theme.AppCompat">-->
         <activity
-            android:name=".MapActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat">
+            android:name=".MainActivity"
+            android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<activity-->
-        <!--    android:name=".MainActivity"-->
-        <!--    android:exported="true"-->
-        <!--    android:label="@string/app_name"-->
-        <!--    android:theme="@style/Theme.AppCompat">-->
-        <!--    <intent-filter>-->
-        <!--        <action android:name="android.intent.action.MAIN" />-->
-        <!--        <category android:name="android.intent.category.LAUNCHER" />-->
-        <!--    </intent-filter>-->
-        <!--</activity>-->
+        <activity
+            android:name=".MapActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

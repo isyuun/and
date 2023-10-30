@@ -286,7 +286,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         return intent
     }
 
-    protected fun launchActivityIntent(): Intent? {
+    protected open fun launchActivityIntent(): Intent? {
         val intent = packageManager.getLaunchIntentForPackage(packageName)
         //Log.i(__CLASSNAME__, "${getMethodName()}$EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, $intent, $this, ${this::class.java}")
         return intent

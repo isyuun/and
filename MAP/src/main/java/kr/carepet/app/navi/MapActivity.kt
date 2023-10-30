@@ -51,7 +51,7 @@ open class MapActivity : kr.carepet.map.app.MapActivity() {
         }
     }
 
-    override fun finish() {
-        //super.finish()    //test
-    }
+    //override fun finish() {
+    //    //super.finish()    //test
+    //}
 }
