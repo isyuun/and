@@ -51,14 +51,4 @@ open class MapActivity : kr.carepet.map.app.MapActivity() {
             }
         }
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        val intent = Intent(this, MainActivity::class.java)
-        intent.action = Intent.ACTION_MAIN
-        intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-        startActivity(intent)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$intent]")
-    }
 }
