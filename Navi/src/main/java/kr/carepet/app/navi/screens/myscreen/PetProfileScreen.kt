@@ -3,6 +3,8 @@ package kr.carepet.app.navi.screens.myscreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
@@ -255,7 +257,11 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
-            if (petInfo[indexInt].mngrType != "C"){
+            AnimatedVisibility(
+                visible = petInfo[indexInt].mngrType != "C",
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
                 Column (
                     modifier = Modifier
                         .fillMaxWidth()
@@ -271,19 +277,13 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
                     Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
-                    AnimatedVisibility(
-                        visible = memberList?.isNotEmpty()==true,
-                        enter = expandVertically(),
-                        exit = shrinkVertically()
-                    ) {
-                        LazyColumn(
-                            state = rememberLazyListState(),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.heightIn(max = 300.dp)
-                        ){
-                            items(memberList!!){ item ->
-                                GroupItem(item = item, petInfo[indexInt], settingViewModel)
-                            }
+                    LazyColumn(
+                        state = rememberLazyListState(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.heightIn(max = 300.dp)
+                    ){
+                        items(memberList?: emptyList()){ item ->
+                            GroupItem(item = item, petInfo[indexInt], settingViewModel)
                         }
                     }
 
@@ -371,7 +371,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                 )
                 .clip(RoundedCornerShape(10.dp))
                 .clickable(
-                    enabled = (item.mngrType == "I" && petInfo.petMngrYn == "Y") || (petInfo.petMngrYn =="N" && item.userId == G.userId),
+                    enabled = (item.mngrType == "I" && petInfo.petMngrYn == "Y") || (petInfo.petMngrYn == "N" && item.userId == G.userId),
                     onClick = {
                         scope.launch {
                             if (expandText) {

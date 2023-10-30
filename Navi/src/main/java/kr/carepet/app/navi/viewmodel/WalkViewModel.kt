@@ -3,6 +3,9 @@ package kr.carepet.app.navi.viewmodel
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.graphics.Path
+import android.media.ExifInterface
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,9 +32,11 @@ import kr.carepet.data.daily.PhotoRes
 import kr.carepet.data.daily.WalkListRes
 import kr.carepet.data.daily.WeekData
 import kr.carepet.data.pet.PetDetailData
+import kr.carepet.gps._app.foregroundonlylocationservice4
 import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.RetrofitClientServer
 import kr.carepet.util.Log
+import kr.carepet.util.getMethodName
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -39,6 +44,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.Integer.min
@@ -301,7 +307,6 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         val apiService = RetrofitClientServer.instance
 
         val parts = ArrayList<MultipartBody.Part>()
-        //var files: File?
 
         gpxFile?.let { gpxFile ->
             val copyFile = copyToFile(gpxFile, context)
@@ -317,7 +322,8 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
 
         for (i in 0 until min(maxImages, state.listOfSelectedImages.size - 1)) {
             val fileUri = state.listOfSelectedImages[i]
-            val resizedFile = resizeImage(context, fileUri, i)
+
+            val resizedFile = resizeImage(context, fileUri , i)
 
             resizedFile?.let {
                 val requestBody = it.asRequestBody("image/*".toMediaType())
@@ -325,8 +331,6 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
                 parts.add(part)
             }
         }
-
-        Log.d("LOG", parts.size.toString())
 
         val call = apiService.uploadPhoto(parts)
         return suspendCancellableCoroutine { continuation ->
@@ -456,7 +460,7 @@ fun copyToFile(gpxFile: File?, context : Context):File?{
 
 }
 
-suspend fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
+fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
     try {
         val contentResolver = context.contentResolver
         val inputStream = contentResolver.openInputStream(fileUri)
@@ -484,14 +488,33 @@ suspend fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
                 return files
 
             }else{
+                val inputStreamForRote = contentResolver.openInputStream(fileUri)
+                val exifInterface = inputStreamForRote?.let { ExifInterface(it) } // Exif 정보를 읽어오기 위해
+
+                // 이미지 회전 각도 가져오기 (Exif 정보 사용)
+                var orientation =
+                    exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+
+                when (orientation) {
+                    ExifInterface.ORIENTATION_NORMAL -> orientation = 0
+                    ExifInterface.ORIENTATION_ROTATE_90 -> orientation = 90
+                    ExifInterface.ORIENTATION_ROTATE_180 -> orientation = 180
+                    ExifInterface.ORIENTATION_ROTATE_270 -> orientation = 270
+                }
+                Log.d("LOG",orientation.toString())
+
+                // 이미지를 회전시키기
+                val matrix = Matrix()
+                matrix.setRotate(orientation?.toFloat() ?: 0f)
+                val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
+
 
                 val quality = 100 // 원하는 품질로 조절
-
-                // 이미지의 종횡비 비율 유지하며 크기 조절
                 val maxWidth = 1920 // 최대 가로 크기 (원하는 크기로 조절)
                 val maxHeight = 1080 // 최대 세로 크기 (원하는 크기로 조절)
                 val newWidth: Int
                 val newHeight: Int
+                Log.d("WH",originalBitmap.width.toString() +" : "+ originalBitmap.height.toString())
                 if (originalBitmap.width > originalBitmap.height) {
                     newWidth = min(originalBitmap.width, maxWidth)
                     newHeight = (newWidth.toFloat() / originalBitmap.width * originalBitmap.height).toInt()
@@ -501,19 +524,29 @@ suspend fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
                 }
 
                 // 크기 조절된 이미지를 생성
-                val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
+                val resizedBitmap =
+                    if (orientation == 0){
+                        Bitmap.createScaledBitmap(rotatedBitmap, newWidth, newHeight,  true)
+                    }else {
+                        Bitmap.createScaledBitmap(rotatedBitmap, newHeight, newWidth,  true)
+                    }
+
+
 
                 // 이미지 파일 저장
                 val cacheDir = context.cacheDir
                 val fileName = "image${index}"
                 val resizedFile = File(cacheDir, fileName)
+                if (!resizedFile.exists()) {
+                    resizedFile.mkdirs()
+                }
                 val outputStream = FileOutputStream(resizedFile)
 
                 // 이미지를 JPEG 형식으로 저장 (품질 설정 적용)
                 resizedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
                 outputStream.close()
 
-                inputStream.run { close() }
+                inputStream?.run { close() }
                 return resizedFile
             }
         }
