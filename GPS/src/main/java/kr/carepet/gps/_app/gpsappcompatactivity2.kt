@@ -13,4 +13,14 @@ open class gpsappcompatactivity2 : gpsappcompatactivity() {
         application.launchActivityIntent = intent
         super.onPause()
     }
+
+    //override fun onBackPressed() {
+    //    super.onBackPressed()
+    //    val intent = packageManager.getLaunchIntentForPackage(packageName)/*Intent(this, MainActivity::class.java)*/
+    //    intent?.action = Intent.ACTION_MAIN
+    //    intent?.addCategory(Intent.CATEGORY_LAUNCHER)
+    //    intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+    //    startActivity(intent)
+    //    Log.wtf(__CLASSNAME__, "${getMethodName()}[$intent]")
+    //}
 }
