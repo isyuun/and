@@ -54,7 +54,7 @@ class MapActivity : kr.carepet.map.app.MapActivity() {
         val intent = Intent(this, MainActivity::class.java)
         intent.action = Intent.ACTION_MAIN
         intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
         Log.wtf(__CLASSNAME__, "${getMethodName()}[$intent]")
     }
