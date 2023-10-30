@@ -109,14 +109,6 @@ fun MainScreen(
     var backBtnOnLT by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val application = GPSApplication.instance
-
-    LaunchedEffect(Unit){
-        if (application.start){
-            val intent = Intent(context,MapActivity::class.java)
-            context.startActivity(intent)
-        }
-    }
 
     LaunchedEffect(key1 = init){
         if (init){
