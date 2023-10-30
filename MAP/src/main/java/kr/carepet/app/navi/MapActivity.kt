@@ -26,6 +26,7 @@
 package kr.carepet.app.navi
 
 /**import kr.carepet.util.__CLASSNAME__*/
+import android.content.Intent
 import androidx.activity.compose.setContent
 import kr.carepet.app.navi.ui.theme.AppTheme
 import kr.carepet.util.Log
@@ -51,7 +52,13 @@ open class MapActivity : kr.carepet.map.app.MapActivity() {
         }
     }
 
-    //override fun finish() {
-    //    //super.finish()    //test
-    //}
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(this, MainActivity::class.java)
+        intent.action = Intent.ACTION_MAIN
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$intent]")
+    }
 }
