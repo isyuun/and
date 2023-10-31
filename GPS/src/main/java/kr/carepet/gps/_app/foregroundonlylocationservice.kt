@@ -37,6 +37,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -185,7 +186,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
     override fun onBind(intent: Intent): IBinder {
         // MainActivity (client) comes into foreground and binds to service, so the service can
         // become a background services.
-        stopForeground(STOP_FOREGROUND_REMOVE)      //stopForeground(true)
+        //stopForeground(STOP_FOREGROUND_REMOVE)      //stopForeground(true)
         serviceRunningInForeground = false
         configurationChange = false
         Log.w(__CLASSNAME__, "${getMethodName()}[$serviceRunningInForeground], $localBinder")
@@ -246,7 +247,8 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         // ensure this Service can be promoted to a foreground service, i.e., the service needs to
         // be officially started (which we do here).
         Log.wtf(__CLASSNAME__, "${getMethodName()}${applicationContext}, ${this::class.java}")
-        startService(Intent(applicationContext, this::class.java))
+        //startService(Intent(this, this::class.java))
+        ContextCompat.startForegroundService(this, Intent(applicationContext, this::class.java))
 
         try {
             // TODO: Step 1.5, Subscribe to location changes.

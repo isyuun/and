@@ -164,14 +164,14 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
 
     override fun start() {
         _start = System.currentTimeMillis()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start], ${lastLocation.toText()}, $lastLocation")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start][${lastLocation.toText()}][$lastLocation]")
         super.start()
         _tracks.clear()
     }
 
     override fun stop() {
         _start = 0L
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start], ${lastLocation.toText()}, $lastLocation")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start][${lastLocation.toText()}][$lastLocation]")
         super.stop()
         this.write()
     }

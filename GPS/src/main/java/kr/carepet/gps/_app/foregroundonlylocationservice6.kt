@@ -2,7 +2,10 @@ package kr.carepet.gps._app
 
 import android.app.Notification
 import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.IBinder
+import androidx.core.app.ServiceCompat
 import kr.carepet.gps.R
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -30,15 +33,24 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
     private fun startForeground() {
         Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
         if (notification == null) notification = generateNotification(lastLocation)
-        startForeground(NOTIFICATION_ID, notification)
-        serviceRunningInForeground = true
-        notificationManager.notify(NOTIFICATION_ID, notification)
-        timer()
+        notification?.let {
+            ServiceCompat.startForeground(
+                this,
+                NOTIFICATION_ID,
+                it,
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+                } else 0
+            )
+            serviceRunningInForeground = true
+            notificationManager.notify(NOTIFICATION_ID, it)
+            timer()
+        }
     }
 
     private fun stopForeground() {
         Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
-        stopForeground(STOP_FOREGROUND_REMOVE)      //stopForeground(true)
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         timer.cancel()
         timer.purge()
         notification = null
@@ -46,20 +58,19 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
 
     override fun onBind(intent: Intent): IBinder {
         Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         return super.onBind(intent)
     }
 
-    //override fun onUnbind(intent: Intent): Boolean {
-    //    Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
-    //    startForeground()
-    //    return super.onUnbind(intent)
-    //}
-    //
-    //override fun onRebind(intent: Intent) {
-    //    Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
-    //    super.onRebind(intent)
-    //    stopForeground()
-    //}
+    override fun onUnbind(intent: Intent): Boolean {
+        Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
+        return super.onUnbind(intent)
+    }
+
+    override fun onRebind(intent: Intent) {
+        Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
+        super.onRebind(intent)
+    }
 
     override fun start() {
         Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
