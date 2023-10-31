@@ -21,8 +21,15 @@ import kr.carepet.data.pet.PetDetailData
 import kr.carepet.data.pet.PetDetailReq
 import kr.carepet.data.pet.PetDetailRes
 import kr.carepet.data.pet.SetInviteCodeRes
+import kr.carepet.data.user.BbsFaq
+import kr.carepet.data.user.BbsReq
+import kr.carepet.data.user.FAQData
+import kr.carepet.data.user.FAQRes
 import kr.carepet.data.user.LogoutRes
 import kr.carepet.data.user.NickNameCheckRes
+import kr.carepet.data.user.QnaData
+import kr.carepet.data.user.QnaReq
+import kr.carepet.data.user.QnaRes
 import kr.carepet.data.user.RelCloseReq
 import kr.carepet.data.user.ResetNickNameReq
 import kr.carepet.data.user.ResetPwReq
@@ -169,6 +176,13 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     // -----------------UserInfo Screen------------------------
 
 
+    // ----------------- 게시판 ------------------------
+    private val _faqData = MutableStateFlow<FAQData?>(null)
+    val faqData: StateFlow<FAQData?> = _faqData.asStateFlow()
+
+    private val _qnaData = MutableStateFlow<QnaRes?>(null)
+    val qnaData: StateFlow<QnaRes?> = _qnaData.asStateFlow()
+    // ----------------- 게시판 ------------------------
     suspend fun logOut():Boolean{
         val apiService = RetrofitClientServer.instance
 
@@ -491,6 +505,66 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
             })
         }
     }
+
+    // 게시판
+    suspend fun getFaqList(page:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsReq(8, page, 10, 20)
+
+        val call = apiService.getFaqList(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<FAQRes>{
+                override fun onResponse(call: Call<FAQRes>, response: Response<FAQRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _faqData.value = body.data
+                            continuation.resume(true)
+                        }
+                    }else{
+                        _faqData.value = null
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<FAQRes>, t: Throwable) {
+                    _faqData.value = null
+                    continuation.resume(false)
+                }
+            })
+        }
+    }
+
+    suspend fun getQnaList(page: Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = QnaReq(10, page, 10, 20, G.userId)
+
+        val call = apiService.getQnaList(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<QnaRes>{
+                override fun onResponse(call: Call<QnaRes>, response: Response<QnaRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _qnaData.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        _qnaData.value = response.body()
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<QnaRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
 }
 
 fun getDateTime(date: Date): String {

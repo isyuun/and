@@ -33,10 +33,14 @@ import kr.carepet.data.pet.PetListModel
 import kr.carepet.data.pet.PetListResModel
 import kr.carepet.data.pet.PetModel
 import kr.carepet.data.pet.SetInviteCodeRes
+import kr.carepet.data.user.BbsReq
+import kr.carepet.data.user.FAQRes
 import kr.carepet.data.user.LoginData
 import kr.carepet.data.user.LoginResModel
 import kr.carepet.data.user.LogoutRes
 import kr.carepet.data.user.NickNameCheckRes
+import kr.carepet.data.user.QnaReq
+import kr.carepet.data.user.QnaRes
 import kr.carepet.data.user.RelCloseReq
 import kr.carepet.data.user.ResetNickNameReq
 import kr.carepet.data.user.ResetPwReq
@@ -173,4 +177,12 @@ interface ApiService {
 
     @POST("api/v1/mypet/delete")
     fun deletePet(@Body data : DeletePetReq) : Call<commonRes>
+
+    // 게시판
+    @POST("api/v1/bbs/faq/list")
+    fun getFaqList(@Body data : BbsReq) : Call<FAQRes>
+
+    @POST("api/v1/bbs/qna/bsc/list")
+    fun getQnaList(@Body data : QnaReq) : Call<QnaRes>
+
 }

@@ -310,7 +310,6 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
 
         gpxFile?.let { gpxFile ->
             val copyFile = copyToFile(gpxFile, context)
-            Log.d("GPX",copyFile?.path.toString())
             copyFile?.let{
                 val requestBody = copyFile.asRequestBody("application/xml".toMediaType())
                 val part = MultipartBody.Part.createFormData("files", copyFile?.name, requestBody)
@@ -471,7 +470,7 @@ fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
             // 원본 이미지 파일 크기가 2MB 이하면 원본 이미지 반환
             if (originalBitmap.byteCount <= 2 * 1024 * 1024) {
 
-                val fileName = "image${index}.jpg"
+                val fileName = "image${index}"
                 val file = File(context.filesDir, fileName)
                 val files = try {
                     val outputStream = FileOutputStream(file)
@@ -480,6 +479,7 @@ fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
                     outputStream.close()
                     inputStream?.close()
 
+                    Log.d("LOG","2MB 이하 파일")
                     file // 변환된 File 객체를 StateFlow에 업데이트
                 } catch (e: IOException) {
                     e.printStackTrace()
@@ -537,8 +537,8 @@ fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
                 val cacheDir = context.cacheDir
                 val fileName = "image${index}"
                 val resizedFile = File(cacheDir, fileName)
-                if (!resizedFile.exists()) {
-                    resizedFile.mkdirs()
+                if (resizedFile.exists()) {
+                    resizedFile.delete() // 이미 존재하는 파일 삭제
                 }
                 val outputStream = FileOutputStream(resizedFile)
 

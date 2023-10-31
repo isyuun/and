@@ -146,11 +146,8 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
     var init by rememberSaveable { mutableStateOf(true) }
     var hashString by remember { mutableStateOf("") }
 
-    AnimatedVisibility(
-        visible = showDiagLog,
-        enter = scaleIn(),
-        exit = scaleOut()
-    ) {
+
+    if (showDiagLog){
         OnDialog(navController = navController, onDismiss = { showDiagLog = false })
     }
 
@@ -492,7 +489,6 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
 
                     scope.launch {
                         isLoading = true
-                        Log.d("GPX",file?.path ?: "")
 
                         val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
                         val matches = pattern.findAll(hashString)

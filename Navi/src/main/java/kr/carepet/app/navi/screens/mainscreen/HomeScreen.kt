@@ -8,9 +8,6 @@ import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -51,9 +48,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -90,7 +86,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -98,7 +93,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
@@ -127,7 +121,6 @@ import kr.carepet.app.navi.viewmodel.HomeViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
-import kr.carepet.util.Log
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -217,7 +210,7 @@ fun HomeScreen(
         .verticalScroll(rememberScrollState())
         .background(color = design_select_btn_bg)
     ){
-        ProfileContent(viewModel = viewModel, pagerState = pagerState, sharedViewModel = sharedViewModel, navController = navController)
+        ProfileContent(viewModel = viewModel, pagerState = pagerState, navController = navController)
 
         Spacer(modifier = Modifier.padding(top = 40.dp))
 
@@ -299,7 +292,6 @@ fun HomeScreen(
 @Composable
 fun ProfileContent(
     viewModel: HomeViewModel,
-    sharedViewModel: SharedViewModel,
     pagerState: PagerState,
     navController : NavHostController
 ){
@@ -540,10 +532,12 @@ fun ProfileContent(
         }
 
 
-        Divider(modifier= Modifier
-            .fillMaxWidth()
-            .padding(start = 40.dp, end = 40.dp, top = 16.dp, bottom = 18.dp),
-            thickness = 1.dp, color = design_textFieldOutLine)
+        HorizontalDivider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 40.dp, end = 40.dp, top = 16.dp, bottom = 18.dp),
+            thickness = 1.dp, color = design_textFieldOutLine
+        )
 
 
         Row (
@@ -554,7 +548,7 @@ fun ProfileContent(
             if(currentPetInfo.size>=2){
                 CircleImageOffset(imageUri = currentPetInfo[1].petRprsImgAddr, index = 1)
             }
-            if(currentPetInfo.size>=1 && currentPetInfo[0].sexTypNm != ""){
+            if(currentPetInfo.isNotEmpty() && currentPetInfo[0].sexTypNm != ""){
                 CircleImageOffset(imageUri = currentPetInfo[0].petRprsImgAddr, index = 0)
             }
 
@@ -735,7 +729,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
 
                     Row (modifier=Modifier.fillMaxWidth()){
                         Text(
-                            text = weekRecord?.runDstnc?.toString() ?: "",
+                            text = metersToKilometers(weekRecord?.runDstnc?:0),
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = 0.sp,
@@ -1355,26 +1349,6 @@ fun CircleImageOffset(imageUri: String?, index: Int){
     }
 }
 
-
-@Composable
-fun CircularProgressAnimated(){
-
-    val progressValue = 1.0f
-    val infiniteTransition = rememberInfiniteTransition()
-
-    val progressAnimationValue by infiniteTransition.animateFloat(
-        initialValue = 0.0f,
-        targetValue = progressValue,animationSpec = infiniteRepeatable(animation = tween(900)))
-
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(color = design_white), contentAlignment = Alignment.Center){
-        CircularProgressIndicator(progress = progressAnimationValue, color = design_intro_bg)
-    }
-
-}
-
-
 fun Modifier.shadow(
     color: Color = Color.Black,
     borderRadius: Dp = 0.dp,
@@ -1435,3 +1409,8 @@ fun getFormattedDate(): String {
 }
 
 data class StoryList(val imageUri: Any?,val title: String, val petName: String, val likeCount: String, val commentCount: String)
+
+fun metersToKilometers(meters: Int): String {
+    val kilometers = meters / 1000.0
+    return String.format("%.2f", kilometers)
+}

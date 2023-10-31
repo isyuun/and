@@ -160,7 +160,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                             Box (modifier = Modifier
                                 .padding(top = 20.dp)
                                 .fillMaxWidth()
-                                .height(if (dailyDetail?.dailyLifeFileList?.isNotEmpty() == true) 258.dp else 0.dp),
+                                .height(258.dp),
                                 contentAlignment = Alignment.Center
                             ){
                                 LoadingAnimation1(circleColor = design_intro_bg)

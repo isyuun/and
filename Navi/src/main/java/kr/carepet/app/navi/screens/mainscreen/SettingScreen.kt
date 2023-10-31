@@ -41,6 +41,8 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -74,6 +76,8 @@ import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
+import kr.carepet.data.user.BbsFaq
+import kr.carepet.data.user.BbsQnaBsc
 import java.time.DayOfWeek
 import java.time.Instant
 import java.util.Calendar
@@ -86,6 +90,11 @@ fun SettingScreen(navController: NavHostController, viewModel:SettingViewModel){
     val pagerState = rememberPagerState(initialPage = 0)
     val coroutineScope = rememberCoroutineScope()
     var tabVisible by remember { mutableFloatStateOf(1f) }
+
+    LaunchedEffect(Unit){
+        viewModel.getFaqList(1)
+        viewModel.getQnaList(1)
+    }
 
     Scaffold (
         modifier = Modifier.fillMaxSize(),
@@ -167,20 +176,7 @@ fun NotiScreen(navController: NavHostController, viewModel: SettingViewModel){
 @Composable
 fun FAQScreen(navController: NavHostController, viewModel: SettingViewModel){
 
-    val dummy = arrayListOf(
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-        FAQItemData("1","1"),
-    )
+    val faqData by viewModel.faqData.collectAsState()
 
     Box (
         modifier = Modifier
@@ -192,7 +188,7 @@ fun FAQScreen(navController: NavHostController, viewModel: SettingViewModel){
                 .fillMaxWidth(),
             state = rememberLazyListState()
         ){
-            items(dummy){ item->
+            items(faqData?.bbsFaqList?: emptyList()){ item ->
                 FAQItem(faqItemData = item)
             }
         }
@@ -214,6 +210,7 @@ fun InquiryScreen(navController: NavHostController, viewModel: SettingViewModel)
         InquiryItemData(false),
         InquiryItemData(false),
     )
+    val qnaRes by viewModel.qnaData.collectAsState()
 
     Column (
         modifier = Modifier
@@ -260,13 +257,27 @@ fun InquiryScreen(navController: NavHostController, viewModel: SettingViewModel)
             .height(1.dp)
             .background(color = design_textFieldOutLine))
 
-        LazyColumn(
-            contentPadding = PaddingValues(horizontal = 20.dp),
-            state = rememberLazyListState(),
-            //verticalArrangement = Arrangement.spacedBy(20.dp)
-        ){
-            items(dummy){ item ->
-                InquiryItem(inquiryItemData = item, navController)
+        if (qnaRes?.data?.bbsQnaBscList?.isEmpty() == true){
+            Box (
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text = "나의 문의 내역이 없습니다",
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                    color = design_login_text
+                )
+            }
+        }else{
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                state = rememberLazyListState(),
+                //verticalArrangement = Arrangement.spacedBy(20.dp)
+            ){
+                items(qnaRes?.data?.bbsQnaBscList ?: emptyList()){ item ->
+                    InquiryItem(inquiryItemData = item, navController)
+                }
             }
         }
     }// col
@@ -306,7 +317,7 @@ fun NotiItem(notiItemData: NotiItemData, navController: NavHostController){
 }
 
 @Composable
-fun FAQItem(faqItemData: FAQItemData){
+fun FAQItem(faqItemData: BbsFaq){
 
     var expanded by remember {
         mutableStateOf(false)
@@ -333,7 +344,7 @@ fun FAQItem(faqItemData: FAQItemData){
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(
-                text = "산책기능 이용 가능 안드로이드 버전 안내사항",
+                text = faqItemData.pstTtl,
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,
@@ -376,7 +387,7 @@ fun FAQItem(faqItemData: FAQItemData){
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
                 Text(
-                    text = "현재 케어펫에서 제공되는 품종의 경우 표준품종데이터를 기준으로 제공해 드리고 있으며 당 품종의 정확은 품종명을 검색 부탁드립니다. 믹스견일 경우 품종명 (mixed)로 등록 부탁드립니다.",
+                    text = faqItemData.pstCn,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
@@ -395,7 +406,7 @@ fun FAQItem(faqItemData: FAQItemData){
 }
 
 @Composable
-fun InquiryItem(inquiryItemData: InquiryItemData, navController: NavHostController){
+fun InquiryItem(inquiryItemData: BbsQnaBsc, navController: NavHostController){
     Column (
         modifier = Modifier.clickable { navController.navigate(Screen.InquiryDetail.route) }
     ){
@@ -403,7 +414,7 @@ fun InquiryItem(inquiryItemData: InquiryItemData, navController: NavHostControll
             modifier= Modifier
                 .padding(top = 20.dp)
                 .border(
-                    width = if (inquiryItemData.complete) {
+                    width = if (inquiryItemData.pstAnw != 0) {
                         0.dp
                     } else {
                         1.dp
@@ -412,7 +423,7 @@ fun InquiryItem(inquiryItemData: InquiryItemData, navController: NavHostControll
                     shape = RoundedCornerShape(10.dp)
                 )
                 .background(
-                    color = if (inquiryItemData.complete) {
+                    color = if (inquiryItemData.pstAnw != 0) {
                         design_button_bg
                     } else {
                         design_white
@@ -421,7 +432,7 @@ fun InquiryItem(inquiryItemData: InquiryItemData, navController: NavHostControll
             contentAlignment = Alignment.Center
         ){
             Text(
-                text = if (inquiryItemData.complete){
+                text = if (inquiryItemData.pstAnw!=0){
                     "답변 완료"
                 }else{
                     "문의 접수"
@@ -429,7 +440,7 @@ fun InquiryItem(inquiryItemData: InquiryItemData, navController: NavHostControll
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 12.sp,
                 letterSpacing = (-0.6).sp,
-                color = if(inquiryItemData.complete){
+                color = if(inquiryItemData.pstAnw!=0){
                     design_white
                 }else{
                     design_login_text
