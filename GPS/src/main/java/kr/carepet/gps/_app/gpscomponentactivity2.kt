@@ -9,12 +9,6 @@ open class gpscomponentactivity2 : gpscomponentactivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
     private val application: GPSApplication = GPSApplication.instance
 
-    override fun onPause() {
-        Log.i(__CLASSNAME__, "${getMethodName()}$intent")
-        application.launchActivityIntent = intent
-        super.onPause()
-    }
-
     fun main() {
         val intent = packageManager.getLaunchIntentForPackage(packageName)/*Intent(this, MainActivity::class.java)*/
         intent?.action = Intent.ACTION_MAIN

@@ -45,7 +45,7 @@ import kr.carepet.util.getMethodName
 open class Application : MapApplication() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+        Log.i(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
         //start()   //test
     }

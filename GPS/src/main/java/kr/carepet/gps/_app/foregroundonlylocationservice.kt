@@ -197,7 +197,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
 
         // MainActivity (client) returns to the foreground and rebinds to service, so the service
         // can become a background services.
-        stopForeground(STOP_FOREGROUND_REMOVE)      //stopForeground(true)
+        //stopForeground(STOP_FOREGROUND_REMOVE)      //stopForeground(true)
         serviceRunningInForeground = false
         configurationChange = false
         Log.w(__CLASSNAME__, "${getMethodName()}[$serviceRunningInForeground]")
@@ -206,7 +206,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
 
     override fun onUnbind(intent: Intent): Boolean {
         //Log.d(__CLASSNAME__, "onUnbind()")
-
+        //
         ////Log.i(__CLASSNAME__, "${getMethodName()}:${(!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this))}")
         //// MainActivity (client) leaves foreground, so service needs to become a foreground service
         //// to maintain the 'while-in-use' label.
@@ -214,13 +214,13 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         //// we do nothing.
         //if (!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this)) {
         //    //Log.d(__CLASSNAME__, "Start foreground service")
-        //    val notification = generateNotification(currentLocation)
+        //    val notification = generateNotification(lastLocation)
         //    //Log.w(__CLASSNAME__, "${getMethodName()}$notification")
         //    startForeground(NOTIFICATION_ID, notification)
         //    serviceRunningInForeground = true
         //}
-
-        // Ensures onRebind() is called if MainActivity (client) rebinds.
+        //
+        //// Ensures onRebind() is called if MainActivity (client) rebinds.
         return true
     }
 

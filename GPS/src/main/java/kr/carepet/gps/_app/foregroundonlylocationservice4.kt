@@ -228,9 +228,10 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
             val exists = file.exists()
             val camera = exists && camera(uri) && !_imgs.contains(path) && !name.startsWith(".")
             if (camera) {
-                val rotate = rotate(this, uri)
-                val orient = orient(this, uri)
-                Log.wtf(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][orient:$orient][rotate:$rotate][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
+                //val rotate = rotate(this, uri)
+                //val orient = orient(this, uri)
+                //Log.wtf(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][orient:$orient][rotate:$rotate][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
+                Log.wtf(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
                 img(path)
             }
         }

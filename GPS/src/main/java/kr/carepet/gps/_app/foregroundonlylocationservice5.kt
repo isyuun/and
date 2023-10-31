@@ -37,8 +37,6 @@ import kr.carepet.gpx.Track
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 import java.util.Collections
-import java.util.Timer
-import java.util.TimerTask
 
 /**
  * @Project     : carepet-android
@@ -50,25 +48,10 @@ import java.util.TimerTask
 open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private lateinit var timer: Timer
-    private fun timer() {
-        if (!serviceRunningInForeground) return
-        timer = Timer()
-        timer.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                val title = "${getString(R.string.walk_title_walking)} - ${duration}"
-                //Log.wtf(__CLASSNAME__, "${getMethodName()} $title")
-                notification = notificationCompatBuilder.setContentTitle(title).build()
-                notificationManager.notify(NOTIFICATION_ID, notification)
-            }
-        }, 1000, 1000) // 1초마다 실행
-    }
-
     internal var launchActivityIntent: Intent? = null
     override fun launchActivityIntent(): Intent? {
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${super.launchActivityIntent()}][$launchActivityIntent]")
-        if (launchActivityIntent == null) return super.launchActivityIntent()
-        return launchActivityIntent
+        return launchActivityIntent ?: super.launchActivityIntent()
     }
 
     override fun generateNotification(location: Location?): Notification {
@@ -100,26 +83,6 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
             .build()
         Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $ret")
         return ret
-    }
-
-    private var notification: Notification? = null
-    override fun onUnbind(intent: Intent): Boolean {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$intent")
-        if (!configurationChange && SharedPreferenceUtil.getLocationTrackingPref(this)) {
-            if (notification == null) notification = generateNotification(lastLocation)
-            startForeground(NOTIFICATION_ID, notification)
-            serviceRunningInForeground = true
-            notificationManager.notify(NOTIFICATION_ID, notification)
-            timer()
-        }
-        return super.onUnbind(intent)
-    }
-
-    override fun onRebind(intent: Intent) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$intent")
-        timer.cancel()
-        timer.purge()
-        super.onRebind(intent)
     }
 
     override fun onLocationResult(locationResult: LocationResult) {

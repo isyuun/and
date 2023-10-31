@@ -25,7 +25,6 @@
 
 package kr.carepet._app
 
-import android.view.View
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 
@@ -37,7 +36,7 @@ import com.google.android.material.snackbar.Snackbar
  * @description :
  */
 open class application3 : application2() {
-    private lateinit var root: View
+    //private lateinit var root: View
 
     override fun onCreate() {
         super.onCreate()
@@ -56,7 +55,7 @@ open class application3 : application2() {
     private lateinit var snackbar: Snackbar
 
     fun snack(text: CharSequence, duration: Int = Snackbar.LENGTH_LONG) {
-        snackbar = Snackbar.make(root, text, duration)
-        snackbar.show()
+        //snackbar = Snackbar.make(root, text, duration)
+        //snackbar.show()
     }
 }
