@@ -124,6 +124,7 @@ import com.naver.maps.map.widget.LocationButtonView
 import com.naver.maps.map.widget.ZoomControlView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kr.carepet.DEBUG
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.R
 import kr.carepet.gps.app.GPSApplication
@@ -1051,8 +1052,8 @@ fun WalkInfoNavi(start: Boolean) {
             while (true) {
                 delay(1000) // 1초마다 업데이트
                 if (start) count++ else count = 0
-                duration = application.duration.toString()
-                distance = application.distance.toString()
+                duration = if (DEBUG) "${application.duration}" else "${application.duration}"
+                distance = if (DEBUG) "${application.distance}" else "${application.distance}"
             }
         }
     }

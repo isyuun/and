@@ -25,6 +25,8 @@
 
 package kr.carepet.util
 
+import kr.carepet.DEBUG
+
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 /** getMethodLine() */
@@ -43,7 +45,6 @@ class Log {
         //const val INFO = 4
         //const val VERBOSE = 2
         //const val WARN = 5
-        private val DEBUG = kr.carepet.BuildConfig.DEBUG
 
         private fun Log() { /* compiled code */
         }
