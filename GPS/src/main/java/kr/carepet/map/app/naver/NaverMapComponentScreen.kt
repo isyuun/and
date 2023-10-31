@@ -32,6 +32,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.MediaStore
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -121,7 +122,6 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.widget.LocationButtonView
-import com.naver.maps.map.widget.ZoomControlView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.DEBUG
@@ -470,6 +470,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     getMapAsync { naverMap ->
                         Log.wtf(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                         naverMap.apply {
+                            uiSettings.isCompassEnabled = source.isCompassEnabled
                             uiSettings.isZoomGesturesEnabled = !uiSettings.isZoomControlEnabled
                             locationSource = source
                             locationTrackingMode = LocationTrackingMode.Follow
@@ -838,14 +839,20 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 )
             }
         }
-        val zoomControlButton = mapView.findViewById<ZoomControlView>(com.naver.maps.map.R.id.navermap_zoom_control)
         val density = LocalDensity.current.density
         val metrics = context.resources.displayMetrics
         val width = metrics.widthPixels / density
         val height = metrics.heightPixels / density
         val right = (width - 64)
-        zoomControlButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        val top = (height - height + 100)
+        val zoom = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
+        zoom?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             rightMargin = right.dp.toPx(context).toInt()
+        }
+        val compass = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
+        compass?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            rightMargin = right.dp.toPx(context).toInt()
+            topMargin = top.dp.toPx(context).toInt()
         }
     }
 
