@@ -1,6 +1,10 @@
 package kr.carepet.app.navi.viewmodel
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -382,12 +386,6 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     }
 
     val petCreateSuccess = MutableStateFlow<Boolean>(false)
-    fun petCreate() {
-        viewModelScope.launch {
-            // 결과물을 날리기
-            petCreateSuccess.emit(createPet())
-        }
-    }
 
     fun sggListLoad(sidoCd:String){
         val apiService = RetrofitClientServer.instance
@@ -467,11 +465,12 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
         }
     }
 
-    suspend fun createPet():Boolean=
+    suspend fun createPet(context: Context):Boolean=
         suspendCoroutine<Boolean> { continuation ->
             val apiService = RetrofitClientServer.instance
 
-            val fileRequestBody = _imageFile.value?.asRequestBody("image/*".toMediaType()) ?: RequestBody.create("image/*".toMediaType(), ByteArray(0))
+            val imageFile = _imageUri.value?.let { resizeProfileImage(context, it) }
+            val fileRequestBody = imageFile?.asRequestBody("image/*".toMediaType()) ?: RequestBody.create("image/*".toMediaType(), ByteArray(0))
             val filePart = MultipartBody.Part.createFormData("file", _imageFile.value?.name, fileRequestBody)
 
             // 일단 받아올수있는 데이터, 이름,생일,종,성별,중성화,몸무게 정도 받아오기
@@ -553,10 +552,11 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
             })
         }
 
-    suspend fun modifyPet(ownrPetUnqNo:String):Boolean{
+    suspend fun modifyPet(context: Context,ownrPetUnqNo:String):Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val fileRequestBody = _imageFile.value?.asRequestBody("image/*".toMediaType()) ?: RequestBody.create("image/*".toMediaType(), ByteArray(0))
+        val imageFile = _imageUri.value?.let { resizeProfileImage(context, it) }
+        val fileRequestBody = imageFile?.asRequestBody("image/*".toMediaType()) ?: RequestBody.create("image/*".toMediaType(), ByteArray(0))
         val filePart = MultipartBody.Part.createFormData("file", _imageFile.value?.name, fileRequestBody)
 
         // 일단 받아올수있는 데이터, 이름,생일,종,성별,중성화,몸무게 정도 받아오기
@@ -736,4 +736,99 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
 
 class PickerState {
     var selectedItem by mutableStateOf("")
+}
+
+fun resizeProfileImage(context: Context, fileUri: Uri): File? {
+    try {
+        val contentResolver = context.contentResolver
+        val inputStream = contentResolver.openInputStream(fileUri)
+        if (inputStream != null) {
+            // 원본 이미지를 Bitmap으로 디코딩
+            val originalBitmap = BitmapFactory.decodeStream(inputStream)
+
+            // 원본 이미지 파일 크기가 2MB 이하면 원본 이미지 반환
+            if (originalBitmap.byteCount <= 2 * 1024 * 1024) {
+
+                val fileName = "profile"
+                val file = File(context.filesDir, fileName)
+                val files = try {
+                    val outputStream = FileOutputStream(file)
+                    inputStream?.copyTo(outputStream)
+
+                    outputStream.close()
+                    inputStream?.close()
+
+                    file // 변환된 File 객체를 StateFlow에 업데이트
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    null// 변환 실패 시 null로 업데이트
+                }
+                return files
+
+            }else{
+                val inputStreamForRote = contentResolver.openInputStream(fileUri)
+                val exifInterface = inputStreamForRote?.let { ExifInterface(it) } // Exif 정보를 읽어오기 위해
+
+                // 이미지 회전 각도 가져오기 (Exif 정보 사용)
+                var orientation =
+                    exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+
+                when (orientation) {
+                    ExifInterface.ORIENTATION_NORMAL -> orientation = 0
+                    ExifInterface.ORIENTATION_ROTATE_90 -> orientation = 90
+                    ExifInterface.ORIENTATION_ROTATE_180 -> orientation = 180
+                    ExifInterface.ORIENTATION_ROTATE_270 -> orientation = 270
+                }
+                kr.carepet.util.Log.d("LOG",orientation.toString())
+
+                // 이미지를 회전시키기
+                val matrix = Matrix()
+                matrix.setRotate(orientation?.toFloat() ?: 0f)
+                val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
+
+
+                val quality = 100 // 원하는 품질로 조절
+                val maxWidth = 1920 // 최대 가로 크기 (원하는 크기로 조절)
+                val maxHeight = 1080 // 최대 세로 크기 (원하는 크기로 조절)
+                val newWidth: Int
+                val newHeight: Int
+                if (originalBitmap.width > originalBitmap.height) {
+                    newWidth = Integer.min(originalBitmap.width, maxWidth)
+                    newHeight = (newWidth.toFloat() / originalBitmap.width * originalBitmap.height).toInt()
+                } else {
+                    newHeight = Integer.min(originalBitmap.height, maxHeight)
+                    newWidth = (newHeight.toFloat() / originalBitmap.height * originalBitmap.width).toInt()
+                }
+
+                // 크기 조절된 이미지를 생성
+                val resizedBitmap =
+                    if (orientation == 0){
+                        Bitmap.createScaledBitmap(rotatedBitmap, newWidth, newHeight,  true)
+                    }else {
+                        Bitmap.createScaledBitmap(rotatedBitmap, newHeight, newWidth,  true)
+                    }
+
+
+
+                // 이미지 파일 저장
+                val cacheDir = context.cacheDir
+                val fileName = "profile"
+                val resizedFile = File(cacheDir, fileName)
+                if (resizedFile.exists()) {
+                    resizedFile.delete() // 이미 존재하는 파일 삭제
+                }
+                val outputStream = FileOutputStream(resizedFile)
+
+                // 이미지를 JPEG 형식으로 저장 (품질 설정 적용)
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+                outputStream.close()
+
+                inputStream?.run { close() }
+                return resizedFile
+            }
+        }
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+    return null
 }

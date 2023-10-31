@@ -76,7 +76,6 @@ import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewModel){
 
@@ -140,15 +139,13 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
                     onClick = {
                         settingViewModel.viewModelScope.launch {
                             val result = settingViewModel.setInviteCode()
-
                             if (result){
+                                scope.launch { Toast.makeText(context, dm , Toast.LENGTH_SHORT).show() }
                                 settingViewModel.updateCurrentPetInfo()
                                 settingViewModel.updatePetInfo()
                                 navController.popBackStack()
                             }else{
-                                scope.launch {
-                                    Toast.makeText(context, dm , Toast.LENGTH_SHORT).show()
-                                }
+                                scope.launch { Toast.makeText(context, dm , Toast.LENGTH_SHORT).show() }
                             }
                         }
 

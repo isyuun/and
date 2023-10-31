@@ -165,8 +165,6 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
         }
     }
 
-
-
     LaunchedEffect(Unit) {
         if (init) {
             val petList: List<Pet> = pets.map { petData ->
@@ -191,10 +189,10 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     urineNmtm = pee.toString()
                 )
             }
-
-
-
-            Log.d("Log",petList.toString())
+            Log.d("IMAGE",images?.size.toString())
+            if (images != null) {
+                viewModel.updateSelectedImageList(images)
+            }
             viewModel.updateSelectedImageList(listOf(dummyUri))
             viewModel.updatePetCount(petList)
             init = false

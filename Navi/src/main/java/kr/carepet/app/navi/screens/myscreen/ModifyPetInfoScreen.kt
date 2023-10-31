@@ -893,15 +893,14 @@ fun ModifyPetInfoScreen(
                 onClick = {
                     scope.launch {
                         if (integrityCheck(viewModel, context)){
-                            val result = viewModel.modifyPet(selectPet.ownrPetUnqNo)
+                            val result = viewModel.modifyPet(context,selectPet.ownrPetUnqNo)
 
                             if(result){
-                                Toast.makeText(context, "수정 성공", Toast.LENGTH_SHORT).show()
                                 sharedViewModel.loadCurrentPetInfo()
                                 sharedViewModel.loadPetInfo()
                                 navController.popBackStack()
                             }else{
-                                Toast.makeText(context, "수정 실패", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "수정에 실패했습니다", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }

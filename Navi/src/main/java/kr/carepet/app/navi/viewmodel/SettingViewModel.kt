@@ -317,6 +317,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                     if(response.isSuccessful){
                         val body = response.body()
                         if (body?.statusCode == 200){
+                            _detailMessage.value = body.detailMessage
                             continuation.resume(true)
                         }else{
                             _detailMessage.value = body?.detailMessage.toString()

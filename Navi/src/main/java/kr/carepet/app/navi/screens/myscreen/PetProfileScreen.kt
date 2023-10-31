@@ -1,6 +1,9 @@
 package kr.carepet.app.navi.screens.myscreen
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -29,6 +32,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -160,74 +165,82 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            Row (modifier=Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
-
-                Box (
-                    modifier= Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(color = design_icon_bg),
-                    contentAlignment = Alignment.Center
+            Box (
+                modifier = Modifier
+                    .fillMaxWidth()
+            ){
+                Row (
+                    modifier=Modifier.align(Alignment.Center),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ){
-                    Icon(painter = painterResource(id = R.drawable.icon_age), contentDescription = "", tint = Color.Unspecified)
-                }
 
-                Text(
-                    text = if (petInfo[indexInt].petBrthYmd=="미상"){
-                        "미상"
-                    }else{
-                        sharedViewModel.changeBirth(petInfo[indexInt].petBrthYmd)
-                    },
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    letterSpacing = (-0.7).sp,
-                    color = design_login_text,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                    Box (
+                        modifier= Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(color = design_icon_bg),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Icon(painter = painterResource(id = R.drawable.icon_age), contentDescription = "", tint = Color.Unspecified)
+                    }
 
-                Spacer(modifier = Modifier.padding(start = 20.dp))
+                    Text(
+                        text = if (petInfo[indexInt].petBrthYmd=="미상"){
+                            "미상"
+                        }else{
+                            sharedViewModel.changeBirth(petInfo[indexInt].petBrthYmd)
+                        },
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        letterSpacing = (-0.7).sp,
+                        color = design_login_text,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
 
-                Box (
-                    modifier= Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(color = design_icon_bg),
-                    contentAlignment = Alignment.Center
-                ){
-                    Icon(painter = painterResource(id = R.drawable.icon_gender), contentDescription = "", tint = Color.Unspecified)
-                }
+                    Spacer(modifier = Modifier.padding(start = 20.dp))
 
-                Text(
-                    text = petInfo[indexInt].sexTypNm?:"",
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    letterSpacing = (-0.7).sp,
-                    color = design_login_text,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                    Box (
+                        modifier= Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(color = design_icon_bg),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Icon(painter = painterResource(id = R.drawable.icon_gender), contentDescription = "", tint = Color.Unspecified)
+                    }
 
-                Spacer(modifier = Modifier.padding(start = 20.dp))
+                    Text(
+                        text = petInfo[indexInt].sexTypNm?:"",
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        letterSpacing = (-0.7).sp,
+                        color = design_login_text,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
 
-                Box (
-                    modifier= Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(color = design_icon_bg),
-                    contentAlignment = Alignment.Center
-                ){
-                    Icon(painter = painterResource(id = R.drawable.icon_weight), contentDescription = "", tint = Color.Unspecified)
-                }
+                    Spacer(modifier = Modifier.padding(start = 20.dp))
 
-                Text(
-                    text = "${petInfo[indexInt].wghtVl}kg",
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    letterSpacing = (-0.7).sp,
-                    color = design_login_text,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                    Box (
+                        modifier= Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(color = design_icon_bg),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Icon(painter = painterResource(id = R.drawable.icon_weight), contentDescription = "", tint = Color.Unspecified)
+                    }
 
-            } // Row
+                    Text(
+                        text = "${petInfo[indexInt].wghtVl}kg",
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        letterSpacing = (-0.7).sp,
+                        color = design_login_text,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                } // Row
+            }
 
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
@@ -258,9 +271,9 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
             AnimatedVisibility(
-                visible = petInfo[indexInt].mngrType != "C",
-                enter = fadeIn(),
-                exit = fadeOut()
+                visible = petInfo[indexInt].mngrType != "C" && memberList?.isNotEmpty()==true,
+                enter = fadeIn(tween(durationMillis = 700, delayMillis = 200)).plus(expandVertically()),
+                exit = fadeOut(tween(durationMillis = 700, delayMillis = 200)).plus(shrinkVertically())
             ) {
                 Column (
                     modifier = Modifier
@@ -384,7 +397,8 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                             }
                         }
                     }
-                ),
+                )
+                .animateContentSize(tween(durationMillis = 400, easing = LinearOutSlowInEasing)),
             contentAlignment = Alignment.Center
         ){
             Text(

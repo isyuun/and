@@ -120,6 +120,7 @@ import kr.carepet.data.SCD
 import kr.carepet.data.SggList
 import kr.carepet.data.UmdList
 import kr.carepet.data.pet.PetListData
+import java.text.SimpleDateFormat
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -782,7 +783,7 @@ fun AddPetScreen(
                     scope.launch {
                         if (integrityCheck(viewModel, context)){
                             isLoading = true
-                            val result = viewModel.createPet()
+                            val result = viewModel.createPet(context)
 
                             if(result){
                                 isLoading = false
@@ -961,10 +962,42 @@ fun integrityCheck(viewModel: UserCreateViewModel, context: Context):Boolean{
     }else if ( !viewModel.petBirthUnknown.value && viewModel.petBirth.value.length<8 ){
         Toast.makeText(context, "생일을 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
+    }else if (!isDateInPastOrToday(viewModel.petBirth.value) || !isDateValid(viewModel.petBirth.value)){
+        Toast.makeText(context, "올바른 날짜가 아닙니다", Toast.LENGTH_SHORT).show()
+        return false
     }else if(viewModel.petWght.value==""){
         Toast.makeText(context, "몸무게를 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
     }else{
         return true
+    }
+}
+
+fun isDateInPastOrToday(dateString: String): Boolean {
+    return try {
+        val dateFormat = SimpleDateFormat("yyyyMMdd")
+        val date = dateFormat.parse(dateString)
+
+        val today = Calendar.getInstance().time
+        !date.after(today)
+    } catch (e: Exception) {
+        // 날짜 파싱 오류 처리
+        false
+    }
+}
+
+fun isDateValid(dateString: String): Boolean {
+    if (dateString.length != 8) {
+        return false
+    }
+
+    val dateFormat = SimpleDateFormat("yyyyMMdd")
+    dateFormat.isLenient = false
+
+    try {
+        dateFormat.parse(dateString)
+        return true
+    } catch (e: Exception) {
+        return false
     }
 }

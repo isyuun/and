@@ -843,7 +843,7 @@ fun PetCreateScreen(
                             if (userCreateSuccess){
                                 val loginSuccess = loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)
                                 if (loginSuccess){
-                                    val petCreateSuccess = viewModel.createPet()
+                                    val petCreateSuccess = viewModel.createPet(context)
                                     if(petCreateSuccess){
                                         isLoading = false
                                         sharedViewModel.updateInit(true)

@@ -8,10 +8,15 @@ import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,12 +51,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Surface
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.PullRefreshState
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.pullRefreshIndicatorTransform
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -68,10 +80,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
@@ -101,6 +119,7 @@ import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.CustomBottomSheet
 import kr.carepet.app.navi.component.CustomDialog
+import kr.carepet.app.navi.component.CustomIndicator
 import kr.carepet.app.navi.component.LoadingAnimation1
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_grad_end
@@ -145,14 +164,20 @@ fun HomeScreen(
     showDialogChange : (Boolean) -> Unit
 ){
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
 
     //petInfo.size가 갱신되기 전에, 뷰가 만들어지면서 에러발생
-    var pagerState = rememberPagerState(pageCount = { currentPetInfo.size })
+    val pagerState = rememberPagerState(pageCount = { currentPetInfo.size })
+    var refreshing by remember{ mutableStateOf(false) }
 
     val selectedPet by sharedViewModel.selectPet.collectAsState()
 
+    val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = refreshing,
+        onRefresh = {
+            refreshing = true
+        })
 
     val context = LocalContext.current
     val density = LocalDensity.current.density
@@ -186,6 +211,16 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(key1 = refreshing){
+        if (refreshing){
+            viewModel.updateIsLoading(true)
+            val result1 = sharedViewModel.loadCurrentPetInfo()
+            val result2 = sharedViewModel.loadPetInfo()
+            viewModel.updateIsLoading(!(result1 && result2))
+            refreshing = false
+        }
+    }
+
     SideEffect {
         backChange(false)
     }
@@ -205,87 +240,87 @@ fun HomeScreen(
         )
     }
 
-    Column (modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState())
-        .background(color = design_select_btn_bg)
+    Box (
+        modifier = Modifier
+            .fillMaxSize()
+            .pullRefresh(pullRefreshState)
+            .verticalScroll(rememberScrollState())
+            .background(color = design_select_btn_bg),
+        contentAlignment = Alignment.TopCenter
     ){
-        ProfileContent(viewModel = viewModel, pagerState = pagerState, navController = navController)
-
-        Spacer(modifier = Modifier.padding(top = 40.dp))
-
-        WalkInfoContent(viewModel, pagerState = pagerState)
-
-        Spacer(modifier = Modifier.padding(top = 40.dp))
-
-        StoryContent()
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        Row (
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+        Column (modifier = Modifier
         ){
-            Button(
-                modifier = Modifier
-                    .width(160.dp)
-                    .height(48.dp),
-                shape = RoundedCornerShape(100.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_btn_border),
-                onClick = {
-                    sharedViewModel.updateMoreStoryClick(true)
-                    bottomNavController.navigate("commu") {
-                        bottomNavController.graph.startDestinationRoute?.let {
-                            popUpTo(it) { saveState = true }
+            ProfileContent(viewModel = viewModel, pagerState = pagerState, navController = navController)
+
+            Spacer(modifier = Modifier.padding(top = 40.dp))
+
+            WalkInfoContent(viewModel, pagerState = pagerState)
+
+            Spacer(modifier = Modifier.padding(top = 40.dp))
+
+            StoryContent()
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ){
+                Button(
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(48.dp),
+                    shape = RoundedCornerShape(100.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = design_btn_border),
+                    onClick = {
+                        sharedViewModel.updateMoreStoryClick(true)
+                        bottomNavController.navigate("commu") {
+                            bottomNavController.graph.startDestinationRoute?.let {
+                                popUpTo(it) { saveState = true }
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_story_more),
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 14.sp,
+                        letterSpacing = (-0.7).sp,
+                        color = design_white
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.padding(top = 40.dp))
+
+            BottomInfo()
+
+            Spacer(modifier = Modifier.padding(top = 80.dp))
+
+            if (openBottomSheet){
+                ModalBottomSheet(
+                    onDismissRequest = { onDissMiss(false) },
+                    sheetState = bottomSheetState,
+                    containerColor = Color.Transparent,
+                    dragHandle = {}
+                ) {
+                    Column {
+                        CustomBottomSheet(viewModel = sharedViewModel,  title = stringResource(R.string.select_pet), btnText = stringResource(R.string.confirm), onDismiss = { newValue -> onDissMiss(newValue)})
+                        Spacer(modifier = Modifier
+                            .height(navigationBarHeight)
+                            .fillMaxWidth()
+                            .background(color = design_white))
                     }
                 }
-            ) {
-                Text(
-                    text = stringResource(R.string.home_story_more),
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 14.sp,
-                    letterSpacing = (-0.7).sp,
-                    color = design_white
-                )
             }
         }
-
-        Spacer(modifier = Modifier.padding(top = 40.dp))
-
-        BottomInfo()
-
-        Spacer(modifier = Modifier.padding(top = 80.dp))
-
-        if (openBottomSheet){
-            ModalBottomSheet(
-                onDismissRequest = { onDissMiss(false) },
-                sheetState = bottomSheetState,
-                containerColor = Color.Transparent,
-                dragHandle = {}
-            ) {
-                Column {
-                    CustomBottomSheet(viewModel = sharedViewModel,  title = stringResource(R.string.select_pet), btnText = stringResource(R.string.confirm), onDismiss = { newValue -> onDissMiss(newValue)})
-                    Spacer(modifier = Modifier
-                        .height(navigationBarHeight)
-                        .fillMaxWidth()
-                        .background(color = design_white))
-                }
-            }
-        }
+        CustomIndicator(state = pullRefreshState, refreshing = refreshing)
     }
 
 
-    //if(!isLoading){
-    //
-    //
-    //
-    //}else{
-    //    CircularProgressAnimated()
-    //}
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -398,7 +433,9 @@ fun ProfileContent(
                 ) { isLoading ->
                     when(isLoading){
                         true ->
-                            Box (modifier = Modifier.fillMaxWidth().height(180.dp),
+                            Box (modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp),
                                 contentAlignment = Alignment.Center
                             ){
                                 LoadingAnimation1(circleColor = design_intro_bg)
@@ -937,7 +974,6 @@ fun BottomSheetContent(
     }
 
 
-
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -1414,3 +1450,4 @@ fun metersToKilometers(meters: Int): String {
     val kilometers = meters / 1000.0
     return String.format("%.2f", kilometers)
 }
+

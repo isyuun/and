@@ -3,6 +3,7 @@ package kr.carepet.app.navi.screens.walkscreen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -153,7 +154,8 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                 Crossfade(
                     targetState = isLoading,
                     label = "",
-                    animationSpec = tween(700)
+                    animationSpec = tween(700),
+                    modifier = Modifier.animateContentSize()
                 ) { isLoading ->
                     when(isLoading){
                         true ->
