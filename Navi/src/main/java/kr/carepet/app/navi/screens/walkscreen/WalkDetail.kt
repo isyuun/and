@@ -10,10 +10,12 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -321,7 +323,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                         )
 
                         Text(
-                            text = walkListItem?.runDstnc.toString()+"km",
+                            text = walkListItem?.runDstnc.toString()+"m",
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = 0.sp,
@@ -335,17 +337,24 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
 
                 Spacer(modifier = Modifier.padding(top = 20.dp))
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 300.dp),
-                    state = rememberLazyListState(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ){
-                    items(dailyDetail?.dailyLifePetList ?: emptyList()){ item ->
-                        DetailLazyColItem(item)
+                AnimatedVisibility(
+                    visible = !isLoading && dailyDetail?.dailyLifePetList?.isNotEmpty() == true,
+                    enter = fadeIn(tween(durationMillis = 700, delayMillis = 200)).plus(expandVertically()),
+                    exit = fadeOut(tween(durationMillis = 700, delayMillis = 200)).plus(shrinkVertically())
+                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 300.dp),
+                        state = rememberLazyListState(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ){
+                        items(dailyDetail?.dailyLifePetList ?: emptyList()){ item ->
+                            DetailLazyColItem(item)
+                        }
                     }
                 }
+
 
 
                 Spacer(modifier = Modifier.padding(top = 20.dp))

@@ -1,8 +1,8 @@
 package kr.carepet.app.navi.screens.myscreen
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -32,13 +32,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -57,8 +62,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -66,6 +74,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.BackTopBar
+import kr.carepet.app.navi.component.CustomTextField
 import kr.carepet.app.navi.screens.mainscreen.CircleImage
 import kr.carepet.app.navi.ui.theme.design_999999
 import kr.carepet.app.navi.ui.theme.design_DDDDDD
@@ -75,7 +84,10 @@ import kr.carepet.app.navi.ui.theme.design_icon_bg
 import kr.carepet.app.navi.ui.theme.design_intro_bg
 import kr.carepet.app.navi.ui.theme.design_login_bg
 import kr.carepet.app.navi.ui.theme.design_login_text
+import kr.carepet.app.navi.ui.theme.design_placeHolder
+import kr.carepet.app.navi.ui.theme.design_select_btn_text
 import kr.carepet.app.navi.ui.theme.design_skip
+import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
@@ -83,7 +95,10 @@ import kr.carepet.data.pet.Member
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
+import java.text.SimpleDateFormat
+import java.util.Date
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedViewModel, settingViewModel: SettingViewModel,index: String?){
 
@@ -116,6 +131,8 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
         }
     }
 
+    var weightRgstDialog by remember{ mutableStateOf(false) }
+
     LaunchedEffect(Unit){
         settingViewModel.getPetInfoDetail(petInfo[indexInt])
     }
@@ -123,6 +140,18 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
     Scaffold (
         topBar = { BackTopBar(title = "${petInfo[indexInt].petNm} 프로필", navController = navController) }
     ) { paddingValues ->
+
+        if (weightRgstDialog){
+            WeightDialog(
+                onDismiss = {newValue -> weightRgstDialog = newValue},
+                viewModel = settingViewModel,
+                confirm = "등록",
+                dismiss = "취소",
+                ownrPetUnqNo = petInfo[indexInt].ownrPetUnqNo
+            )
+        }
+
+
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -244,28 +273,58 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
-            Button(
-                enabled = petInfo[indexInt].mngrType == "M",
-                onClick = { navController.navigate("modifyPetInfoScreen/${indexInt}") },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = design_white,
-                    disabledContainerColor = design_white
-                ),
-                border = BorderStroke(width = 1.dp, color = design_btn_border),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp, pressedElevation = 0.dp),
-                contentPadding = PaddingValues(0.dp),
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .fillMaxWidth()
-                    .height(48.dp)
-            ) {
-                Text(
-                    text = if(petInfo[indexInt].mngrType == "M"){"정보 수정하기"}else{"관리중인 반려동물만 수정 가능합니다"},
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                    color = design_login_text
-                )
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Button(
+                    enabled = petInfo[indexInt].mngrType == "M",
+                    onClick = { navController.navigate("modifyPetInfoScreen/${indexInt}") },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = design_select_btn_text,
+                        disabledContainerColor = design_select_btn_text
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp, pressedElevation = 0.dp),
+                    contentPadding = PaddingValues(0.dp),
+                    modifier = Modifier
+                        .padding(start = 20.dp)
+                        .weight(1f)
+                        .height(48.dp)
+                ) {
+                    Text(
+                        text = if(petInfo[indexInt].mngrType == "M"){"정보 수정하기"}else{"관리자만 수정가능"},
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                        color = design_white
+                    )
+                }
+
+                Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                
+                Button(
+                    enabled = petInfo[indexInt].mngrType != "C",
+                    onClick = { weightRgstDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = design_white,
+                        disabledContainerColor = design_white
+                    ),
+                    border = BorderStroke(width = 1.dp, color = design_btn_border),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp, pressedElevation = 0.dp),
+                    contentPadding = PaddingValues(0.dp),
+                    modifier = Modifier
+                        .padding(end = 20.dp)
+                        .weight(1f)
+                        .height(48.dp)
+                ) {
+                    Text(
+                        text = if(petInfo[indexInt].mngrType != "C"){"몸무게 등록"}else{"참여자만 등록가능"},
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                        color = design_login_text
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
@@ -472,5 +531,263 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
             }
         }
     }// row
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WeightDialog(
+    onDismiss: (Boolean) -> Unit,
+    viewModel: SettingViewModel,
+    confirm: String,
+    dismiss: String,
+    ownrPetUnqNo: String
+){
+
+    val petWeight by viewModel.petWeight.collectAsState()
+
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    var weight by remember{ mutableStateOf("") }
+
+    DisposableEffect(Unit){
+        onDispose {
+            viewModel.updatePetWeight("")
+            viewModel.updatePetWeightRgDate("")
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = { onDismiss(false) },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ){
+        AnimatedVisibility(
+            visible = showDatePicker,
+            enter = fadeIn(tween(durationMillis = 500)),
+            exit = fadeOut()
+        ) {
+            Box (
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .fillMaxWidth()
+                    .background(color = design_white, shape = RoundedCornerShape(20.dp))
+            ) {
+                Column {
+                    DatePicker(
+                        state = datePickerState,
+                        colors = DatePickerDefaults.colors(
+                            selectedDayContainerColor = design_intro_bg,
+                            selectedDayContentColor = design_white,
+                            todayDateBorderColor = design_intro_bg,
+                            todayContentColor = design_intro_bg
+                        )
+                    )
+
+                    Row (
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                    ){
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(design_DDDDDD)
+                                .clickable { showDatePicker = false },
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = "취소",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                color = design_login_text,
+                                modifier = Modifier.padding(vertical = 16.dp)
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(design_intro_bg)
+                                .clickable {
+                                    val sdfDateForSend = SimpleDateFormat("yyyyMMdd")
+                                    val dateForSend = sdfDateForSend.format(Date(datePickerState.selectedDateMillis ?: Date().time))
+
+                                    val sdfDate = SimpleDateFormat("yyyy년 MM월 dd일")
+                                    val date = sdfDate.format(Date(datePickerState.selectedDateMillis ?: Date().time))
+
+                                    weight = date
+                                    viewModel.updatePetWeightRgDate(dateForSend)
+                                    showDatePicker = false
+                                },
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = "확인",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                color = design_white,
+                                modifier = Modifier.padding(vertical = 16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = !showDatePicker,
+            enter = fadeIn(tween(durationMillis = 500)),
+            exit = fadeOut()
+        ) {
+            Box (
+                modifier = Modifier
+                    .padding(horizontal = 40.dp)
+                    .fillMaxWidth()
+                    .background(color = design_white, shape = RoundedCornerShape(20.dp))
+            ){
+                Column (
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    Text(
+                        text = "등록일자",
+                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                        fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                        color = design_login_text,
+                        modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 8.dp)
+                    )
+
+                    Button(
+                        onClick = { showDatePicker = true },
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        border = BorderStroke(width = 1.dp, color = design_textFieldOutLine),
+                        shape = RoundedCornerShape(4.dp),
+                        contentPadding = PaddingValues(0.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = design_white
+                        )
+                    ) {
+                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart){
+                            Text(
+                                text =
+                                if(weight ==""){ "등록일자를 입력해주세요" } else { weight },
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                color = if(weight ==""){ design_placeHolder } else { design_login_text },
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = "몸무게",
+                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                        fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                        color = design_login_text,
+                        modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 8.dp)
+                    )
+
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        CustomTextField(
+                            value = petWeight,
+                            onValueChange = { viewModel.updatePetWeight(it) },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Decimal,
+                                imeAction = ImeAction.Done),
+                            modifier = Modifier
+                                .padding(start = 20.dp)
+                                .weight(1f)
+                                .height(48.dp),
+                            placeholder = { Text(text = "몸무게를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedPlaceholderColor = design_placeHolder,
+                                focusedPlaceholderColor = design_placeHolder,
+                                unfocusedBorderColor = design_textFieldOutLine,
+                                focusedBorderColor = design_login_text,
+                                unfocusedContainerColor = design_white,
+                                focusedContainerColor = design_white,
+                                unfocusedLeadingIconColor = design_placeHolder,
+                                focusedLeadingIconColor = design_login_text),
+                            shape = RoundedCornerShape(4.dp),
+                            innerPadding = PaddingValues(start = 8.dp)
+                        )
+
+                        Text(
+                            text = "kg",
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = design_login_text,
+                            modifier = Modifier.padding(start = 8.dp,end = 20.dp)
+                        )
+                    }
+
+
+                    Row (
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                    ){
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(design_DDDDDD)
+                                .clickable { onDismiss(false) },
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = dismiss,
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                color = design_login_text,
+                                modifier = Modifier.padding(vertical = 16.dp)
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(design_intro_bg)
+                                .clickable {
+                                    scope.launch {
+                                        val result = viewModel.regPetWgt(ownrPetUnqNo)
+                                        if (result) {
+                                            onDismiss(false)
+                                            Toast
+                                                .makeText(context, "등록되었습니다", Toast.LENGTH_SHORT)
+                                                .show()
+                                        } else {
+                                            Toast
+                                                .makeText(context, "등록에 실패했습니다", Toast.LENGTH_SHORT)
+                                                .show()
+                                        }
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = confirm,
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                color = design_white,
+                                modifier = Modifier.padding(vertical = 16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 

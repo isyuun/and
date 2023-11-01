@@ -291,7 +291,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            if (petInfo[0].ownrPetUnqNo==""){
+            if (petInfo.isNotEmpty() && petInfo[0].ownrPetUnqNo == ""){
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 20.dp)

@@ -151,6 +151,12 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
         OnDialog(navController = navController, onDismiss = { showDiagLog = false })
     }
 
+    DisposableEffect(Unit){
+        onDispose {
+            viewModel.clearSelectedImages()
+        }
+    }
+
     BackHandler {
         showDiagLog = true
     }

@@ -113,6 +113,7 @@ import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CustomTextField
 import kr.carepet.app.navi.component.LoadingDialog
+import kr.carepet.app.navi.screens.myscreen.integrityCheck
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_camera_bg
@@ -838,7 +839,7 @@ fun PetCreateScreen(
 
                         isLoading = true
 
-                        if (IntegrityCheck(viewModel, context)){
+                        if (integrityCheck(viewModel, context)){
                             val userCreateSuccess = viewModel.sendUserToServer()
                             if (userCreateSuccess){
                                 val loginSuccess = loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)
@@ -1510,25 +1511,4 @@ fun rememberPickerState() = remember { PickerState() }
 
 class PickerState {
     var selectedItem by mutableStateOf("")
-}
-
-fun IntegrityCheck(viewModel: UserCreateViewModel,context: Context):Boolean{
-    if (viewModel.petKind.value.petNm=="사이즈/품종 선택"){
-        Toast.makeText(context, "펫 종류를 선택해주세요", Toast.LENGTH_SHORT).show()
-        return false
-    }else if(viewModel.address.value=="주소 선택"){
-        Toast.makeText(context, "주소를 입력해주세요", Toast.LENGTH_SHORT).show()
-        return false
-    }else if(viewModel.petName.value==""){
-        Toast.makeText(context, "이름을 입력해주세요", Toast.LENGTH_SHORT).show()
-        return false
-    }else if (viewModel.petBirth.value=="" && !viewModel.petBirthUnknown.value){
-        Toast.makeText(context, "생일을 입력해주세요", Toast.LENGTH_SHORT).show()
-        return false
-    }else if(viewModel.petWght.value==""){
-        Toast.makeText(context, "몸무게를 입력해주세요", Toast.LENGTH_SHORT).show()
-        return false
-    }else{
-        return true
-    }
 }

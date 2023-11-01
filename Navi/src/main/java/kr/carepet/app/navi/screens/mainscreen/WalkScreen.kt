@@ -175,19 +175,20 @@ fun WalkScreen(
         }
     }
 
+    BackHandler (enabled = toMonthCalendar){
+        walkViewModel.updateToMonthCalendar(false)
+        if (!toDetail){
+            backBtnOn(false)
+        }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ){
         Column(modifier = Modifier
-            .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ){
-            BackHandler (enabled = toMonthCalendar){
-                walkViewModel.updateToMonthCalendar(false)
-                if (!toDetail){
-                    backBtnOn(false)
-                }
-            }
-
             WeekContent(walkViewModel,navController,backBtnOn)
 
             Crossfade(
@@ -409,7 +410,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
 
                 Row (modifier= Modifier.fillMaxWidth()){
                     Text(
-                        text = walk.runDstnc.toString()+"km",
+                        text = walk.runDstnc.toString()+"m",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         letterSpacing = 0.sp,
@@ -512,7 +513,7 @@ fun WeekContent(
 
                         Row (modifier= Modifier.fillMaxWidth()){
                             Text(
-                                text = weekRecord?.runDstnc?.toString() ?: "",
+                                text = metersToKilometers(weekRecord?.runDstnc?:0),
                                 fontSize = 22.sp,
                                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                                 letterSpacing = 0.sp,

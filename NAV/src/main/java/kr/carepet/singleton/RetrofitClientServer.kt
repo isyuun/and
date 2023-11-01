@@ -43,7 +43,7 @@ object RetrofitClientServer {
     private val tokenInterceptor = TokenInterceptor()
     private val retryInterceptor = RetryInterceptor(3)
 
-    val loggingInterceptor = HttpLoggingInterceptor().apply {
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY // 로깅 레벨 설정
     }
 
@@ -56,12 +56,12 @@ object RetrofitClientServer {
         retrofit.create()
     }
 
-    val okHttpClient: OkHttpClient by lazy {
+    private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(tokenInterceptor)
             .addInterceptor(loggingInterceptor)
-            //.addInterceptor(retryInterceptor)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 

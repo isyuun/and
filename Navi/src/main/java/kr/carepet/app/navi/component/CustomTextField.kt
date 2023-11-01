@@ -44,7 +44,7 @@ fun CustomTextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = TextFieldDefaults.filledShape,
+    shape: Shape = TextFieldDefaults.shape,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
     innerPadding:PaddingValues = PaddingValues(0.dp)
 ) {
