@@ -60,12 +60,21 @@ open class GPSApplication : gpsapplication4() {
 
         internal val permissions: Array<String> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arrayOf(
+                Manifest.permission.FOREGROUND_SERVICE,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.CAMERA,
                 Manifest.permission.POST_NOTIFICATIONS,
                 Manifest.permission.READ_MEDIA_IMAGES,
                 Manifest.permission.READ_MEDIA_VIDEO,
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            arrayOf(
+                Manifest.permission.FOREGROUND_SERVICE,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.CAMERA,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
             )
         } else {
             arrayOf(
@@ -81,10 +90,5 @@ open class GPSApplication : gpsapplication4() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate()
         singleton = this
-    }
-
-    override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
-        super.onServiceConnected(name, service)
     }
 }

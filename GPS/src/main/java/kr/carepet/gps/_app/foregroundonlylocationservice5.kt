@@ -55,7 +55,7 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
     }
 
     override fun generateNotification(location: Location?): Notification {
-        generateNotificationChannel(NotificationManager.IMPORTANCE_DEFAULT)
+        generateNotificationChannel(NotificationManager.IMPORTANCE_MAX)
         val title = "${getString(R.string.walk_title_walking)} - ${duration}"
         val text = "${getString(R.string.app_name)}이 ${getString(R.string.walk_text_in_tracking)}"
         val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent(), PendingIntent.FLAG_MUTABLE)
@@ -80,6 +80,7 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
             .setContentIntent(activityPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setOnlyAlertOnce(true)
+            .setAutoCancel(false)
             .build()
         Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $ret")
         return ret

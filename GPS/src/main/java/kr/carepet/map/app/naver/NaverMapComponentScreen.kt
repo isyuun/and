@@ -32,6 +32,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.MediaStore
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -121,7 +122,6 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.widget.LocationButtonView
-import com.naver.maps.map.widget.ZoomControlView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.DEBUG
@@ -136,6 +136,7 @@ import kr.carepet.gpx.Track
 import kr.carepet.map._app.getRounded
 import kr.carepet.map._app.toPx
 import kr.carepet.map._app.toText
+import kr.carepet.map.app.LoadingDialog
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -199,7 +200,7 @@ fun marker(position: LatLng, event: Track.EVENT): Marker? {
 
 fun mark(pet: CurrentPetData, event: Track.EVENT, position: LatLng, mapView: MapView): Marker? {
     GPSApplication.instance.mark(pet, event)
-    var marker = marker(position, event)
+    val marker = marker(position, event)
     marker?.let {
         mapView.getMapAsync { naverMap ->
             it.map = naverMap
@@ -399,7 +400,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var position by remember { mutableStateOf(LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
     source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }
     source.isCompassEnabled = true
-    var pasition by remember { mutableStateOf(LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
 
     Log.w(__CLASSNAME__, "${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
 
@@ -424,12 +424,20 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val departure = stringResource(id = R.string.departure)
     val arrival = stringResource(id = R.string.arrival)
 
+
+    var isLoading by remember { mutableStateOf(false) }
+    Log.wtf(__CLASSNAME__, "${getMethodName()}[isLoading:$isLoading][${coords.size}")
+    if (coords.isNotEmpty()) {
+        isLoading = false
+    }
+
     var refresh by remember { mutableStateOf(false) }
     LaunchedEffect(refresh, position, coords) {
         scope.launch {
             Log.w(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
             mapView.getMapAsync { naverMap ->
                 if (coords.isNotEmpty()) {
+                    isLoading = false
                     val starter = marker(context = context, position = coords.first(), captionText = departure)
                     starter.map = naverMap
                     if (coords.size > 1) {
@@ -470,6 +478,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     getMapAsync { naverMap ->
                         Log.wtf(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                         naverMap.apply {
+                            uiSettings.isCompassEnabled = source.isCompassEnabled
                             uiSettings.isZoomGesturesEnabled = !uiSettings.isZoomControlEnabled
                             locationSource = source
                             locationTrackingMode = LocationTrackingMode.Follow
@@ -601,11 +610,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                         showBottomSheet = false
                                     }
                                 }
-                                if (!start) {
-                                    application.start()
-                                } else {
-                                    application.stop()
-                                }
+                                application.start()
+                                isLoading = true
                             },
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
@@ -649,11 +655,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                             showBottomSheet = false
                                         }
                                     }
-                                    if (!start) {
-                                        application.start()
-                                    } else {
-                                        application.stop()
-                                    }
+                                    application.stop()
                                     if (start) {
                                         mapView.getMapAsync { naverMap ->
                                             val ender = marker(context = context, position = position, captionText = arrival)
@@ -809,6 +811,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
                 if (pets.size == 1 && !start) {
                     application.start()
+                    isLoading = true
                 } else {
                     showBottomSheet = !showBottomSheet
                 }
@@ -838,14 +841,20 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 )
             }
         }
-        val zoomControlButton = mapView.findViewById<ZoomControlView>(com.naver.maps.map.R.id.navermap_zoom_control)
         val density = LocalDensity.current.density
         val metrics = context.resources.displayMetrics
         val width = metrics.widthPixels / density
         val height = metrics.heightPixels / density
         val right = (width - 64)
-        zoomControlButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        val top = (height - height + 100)
+        val zoom = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
+        zoom?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             rightMargin = right.dp.toPx(context).toInt()
+        }
+        val compass = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
+        compass?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            rightMargin = right.dp.toPx(context).toInt()
+            topMargin = top.dp.toPx(context).toInt()
         }
     }
 
@@ -909,6 +918,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
         }
     }
+
+    LoadingDialog(
+        loadingText = stringResource(id = R.string.walk_text_in_tracking),
+        loadingState = isLoading
+    )
     Log.v(__CLASSNAME__, "${getMethodName()}[ED]")
 }
 
