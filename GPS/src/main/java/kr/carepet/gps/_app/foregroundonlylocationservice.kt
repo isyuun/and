@@ -246,9 +246,11 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         // Binding to this service doesn't actually trigger onStartCommand(). That is needed to
         // ensure this Service can be promoted to a foreground service, i.e., the service needs to
         // be officially started (which we do here).
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${applicationContext}, ${this::class.java}")
-        //startService(Intent(this, this::class.java))
-        ContextCompat.startForegroundService(this, Intent(applicationContext, this::class.java))
+        val intent = Intent(applicationContext, this::class.java)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$applicationContext][${this::class.java}][$intent]")
+        //startService(intent)
+        ContextCompat.startForegroundService(applicationContext, intent)
+
 
         try {
             // TODO: Step 1.5, Subscribe to location changes.
@@ -382,6 +384,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
             .setContentIntent(activityPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setOnlyAlertOnce(true)
+            .setAutoCancel(false)
             .build()
         //Log.i(__CLASSNAME__, "${getMethodName()}$ret, ${this.notificationCompatBuilder}")
         return ret
