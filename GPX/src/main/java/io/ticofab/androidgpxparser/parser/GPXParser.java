@@ -501,6 +501,7 @@ public class GPXParser {
         parser.require(XmlPullParser.END_TAG, namespace, TAG_TIME);
         return time;
     }
+
     private String readSym(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, namespace, TAG_SYM);
         String value = readText(parser);

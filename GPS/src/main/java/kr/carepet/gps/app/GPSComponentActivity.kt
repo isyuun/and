@@ -30,7 +30,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
-import kr.carepet.gps._app.gpscomponentactivity
 import kr.carepet.gps._app.gpscomponentactivity2
 import kr.carepet.gps.app.GPSApplication.Companion.permissions
 import kr.carepet.util.Log

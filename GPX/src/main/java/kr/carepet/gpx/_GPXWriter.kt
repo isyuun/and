@@ -49,6 +49,7 @@ const val GPX_INTERVAL_UPDATE_MIllIS = 1L
 const val GPX_INTERVAL_UPDATE_METERS = 3.0f
 const val GPX_LATITUDE_ZERO = 37.546855      //37.5
 const val GPX_LONGITUDE_ZERO = 127.065330    //127.0
+
 //const val GPX_LATITUDE_ZERO = 37.5      //37.5
 //const val GPX_LONGITUDE_ZERO = 127.0    //127.0
 const val GPX_CAMERA_ZOOM_ZERO = 16.8

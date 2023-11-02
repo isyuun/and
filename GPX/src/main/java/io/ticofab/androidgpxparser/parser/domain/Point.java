@@ -148,6 +148,7 @@ public abstract class Point {
             mSym = sym;
             return this;
         }
+
         public Builder setCmt(String cmt) {
             mCmt = cmt;
             return this;

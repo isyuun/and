@@ -5,7 +5,7 @@ import co.beeline.gpx.xml.XmlWrite
 import io.reactivex.Observable
 
 data class TrackSegment(
-        val points: Observable<TrackPoint>
+    val points: Observable<TrackPoint>
 ) : XmlWritable {
 
     override val writeOperations: Observable<XmlWrite>

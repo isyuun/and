@@ -5,7 +5,9 @@ import co.beeline.gpx.xml.XmlWrite
 import io.reactivex.Observable
 import java.text.FieldPosition
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 /**
  * @param date: Timestamp in milliseconds since epoch
@@ -31,6 +33,6 @@ data class Time(val date: Long?) : XmlWritable {
 
     override val writeOperations: Observable<XmlWrite>
         get() = if (date != null) newTag("time", withText(dateFormat.format(Date(date))))
-                else Observable.empty()
+        else Observable.empty()
 
 }

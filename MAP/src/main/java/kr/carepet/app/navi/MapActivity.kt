@@ -26,7 +26,6 @@
 package kr.carepet.app.navi
 
 /**import kr.carepet.util.__CLASSNAME__*/
-import android.content.Intent
 import androidx.activity.compose.setContent
 import kr.carepet.app.navi.ui.theme.AppTheme
 import kr.carepet.util.Log

@@ -26,9 +26,7 @@
 package kr.carepet.gps.app
 
 import android.Manifest
-import android.content.ComponentName
 import android.os.Build
-import android.os.IBinder
 import kr.carepet.gps._app.gpsapplication4
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName

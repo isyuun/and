@@ -21,9 +21,13 @@ public class Gpx {
         mTracks = Collections.unmodifiableList(new ArrayList<>(builder.mTracks));
     }
 
-    public String getVersion() { return mVersion; }
+    public String getVersion() {
+        return mVersion;
+    }
 
-    public String getCreator() { return mCreator; }
+    public String getCreator() {
+        return mCreator;
+    }
 
     public Metadata getMetadata() {
         return mMetadata;

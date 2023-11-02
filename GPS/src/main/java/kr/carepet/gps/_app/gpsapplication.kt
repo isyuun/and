@@ -315,15 +315,15 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     }
 
     private fun updateButtonState(trackingLocation: Boolean) {
-        //if (trackingLocation) {
-        //    foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
-        //} else {
-        //    foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
-        //}
+        if (trackingLocation) {
+            //foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
+        } else {
+            //foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
+        }
     }
 
     protected fun logResultsToScreen(output: String) {
-        //Log.wtf(__CLASSNAME__, "${getMethodName()}$output")
+        Log.v(__CLASSNAME__, "${getMethodName()}$output")
         //val outputWithPreviousLogs = "$output\n${outputTextView.text}"
         //outputTextView.text = outputWithPreviousLogs
     }

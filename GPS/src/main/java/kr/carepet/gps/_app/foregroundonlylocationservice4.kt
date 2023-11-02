@@ -173,7 +173,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
         var rotate = ROTATE.ROTATE_NG
         var orientation: Int
         try {
-            context.contentResolver.notifyChange(uri!!, null)
+            context.contentResolver.notifyChange(uri, null)
             val exif = ExifInterface(file.absolutePath)
             //val exif = ExifInterface(path)
             orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
@@ -197,10 +197,10 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
         var orientation: Int = -1
         try {
             var cursor = context.contentResolver.query(uri, arrayOf(MediaStore.Images.ImageColumns.ORIENTATION), null, null, null)
-            cursor?.let { cursor ->
-                if (cursor.count == 1) {
-                    cursor.moveToFirst()
-                    orientation = cursor.getInt(0)
+            cursor?.let {
+                if (it.count == 1) {
+                    it.moveToFirst()
+                    orientation = it.getInt(0)
                     when (orientation) {
                         270 -> rotate = ROTATE.ROTATE_270
                         180 -> rotate = ROTATE.ROTATE_180
@@ -208,7 +208,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
                         0 -> rotate = ROTATE.ROTATE_0
                     }
                 }
-                cursor.close()
+                it.close()
             }
             Log.w(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file.absolutePath}]")
         } catch (e: Exception) {
@@ -218,22 +218,18 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
     }
 
     fun onChange(selfChange: Boolean, uri: Uri) {
-        if (uri != null) {
-            val path = path(uri)
-            val time = time(uri)
-            //Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
-            if (path == null || time == null) return
-            val file = File(path)
-            val name = file.name
-            val exists = file.exists()
-            val camera = exists && camera(uri) && !_imgs.contains(uri) && !name.startsWith(".")
-            if (camera) {
-                //val rotate = rotate(this, uri)
-                //val orient = orient(this, uri)
-                //Log.wtf(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][orient:$orient][rotate:$rotate][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
-                Log.wtf(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
-                img(uri)
-            }
+        val path = path(uri)
+        val time = time(uri) ?: return
+        //Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
+        val file = File(path)
+        val name = file.name
+        val exists = file.exists()
+        val camera = exists && camera(uri) && !_imgs.contains(uri) && !name.startsWith(".")
+        if (camera) {
+            val rotate = rotate(this, uri)
+            val orient = orient(this, uri)
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][orient:$orient][rotate:$rotate][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
+            img(uri)
         }
     }
 

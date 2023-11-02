@@ -473,7 +473,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     /** map */
     Box {
         AndroidView(
-            factory = { context ->
+            factory = {
                 mapView.apply {
                     getMapAsync { naverMap ->
                         Log.wtf(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")

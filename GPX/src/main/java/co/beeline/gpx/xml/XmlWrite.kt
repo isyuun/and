@@ -15,13 +15,13 @@ fun Observable<XmlWrite>.writeTo(writer: Writer, charset: Charset = StandardChar
         xml.setOutput(writer)
         xml.startDocument(charset.name(), null)
     }
-            .concatWith(Observable.just { xml ->
-                xml.endDocument()
-                writer.close()
-            })
-            .reduce(
-                    Xml.newSerializer().apply { setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true) },
-                    { xml, write -> xml.apply { write(this) } }
-            )
-            .map { writer }
+        .concatWith(Observable.just { xml ->
+            xml.endDocument()
+            writer.close()
+        })
+        .reduce(
+            Xml.newSerializer().apply { setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true) },
+            { xml, write -> xml.apply { write(this) } }
+        )
+        .map { writer }
 }

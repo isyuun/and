@@ -29,7 +29,6 @@ package kr.carepet.gps.app
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import kr.carepet.gps._app.foregroundonlylocationservice5
 import kr.carepet.gps._app.foregroundonlylocationservice6
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName

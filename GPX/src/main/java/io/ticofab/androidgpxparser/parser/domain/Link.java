@@ -47,12 +47,12 @@ public class Link {
             return this;
         }
 
-        public Builder setLinkType(String linkType ) {
+        public Builder setLinkType(String linkType) {
             mLinkType = linkType;
             return this;
         }
 
-        public Link build(){
+        public Link build() {
             return new Link(this);
         }
     }

@@ -5,13 +5,13 @@ import co.beeline.gpx.xml.XmlWrite
 import io.reactivex.Observable
 
 data class Route(
-        val name: String? = null,
-        val points: Observable<RoutePoint>
+    val name: String? = null,
+    val points: Observable<RoutePoint>
 ) : XmlWritable {
 
     override val writeOperations: Observable<XmlWrite>
         get() = newTag("rte",
-                optionalTagWithText("name", name),
-                points.concatMap { it.writeOperations }
+            optionalTagWithText("name", name),
+            points.concatMap { it.writeOperations }
         )
 }
