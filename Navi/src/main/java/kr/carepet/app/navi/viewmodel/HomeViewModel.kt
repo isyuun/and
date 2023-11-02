@@ -1,12 +1,25 @@
 package kr.carepet.app.navi.viewmodel
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kr.carepet.data.cmm.WeatherReq
+import kr.carepet.data.cmm.WeatherRes
 import kr.carepet.data.daily.WeekData
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.pet.PetDetailData
+import kr.carepet.singleton.RetrofitClientServer
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import kotlin.coroutines.resume
 
 class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
 
@@ -92,4 +105,65 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
     val petListSelectIndex: StateFlow<String> = _petListSelectIndex.asStateFlow()
     fun updatePetListSelectIndex(newValue: String) { _petListSelectIndex.value = newValue }
 
+    private val _weatherReq= MutableStateFlow(WeatherReq(0.0,0.0))
+
+    private val _weatherData= MutableStateFlow<WeatherRes?>(null)
+    val weatherData: StateFlow<WeatherRes?> = _weatherData.asStateFlow()
+
+    private val _weatherRefresh = MutableStateFlow(true)
+    val weatherRefresh: StateFlow<Boolean> = _weatherRefresh.asStateFlow()
+    fun updateWeatherRefresh(newValue: Boolean) { _weatherRefresh.value = newValue }
+
+    suspend fun getWeather():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = _weatherReq.value
+
+        val call = apiService.getWeather(data)
+
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<WeatherRes>{
+                override fun onResponse(call: Call<WeatherRes>, response: Response<WeatherRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _weatherData.value = it
+
+                            continuation.resume(true)
+                        }
+                    }else{
+                        _weatherData.value = response.body()
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<WeatherRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+
+        }
+    }
+
+    suspend fun getLocation(context: Context):Boolean = suspendCancellableCoroutine{ continuation ->
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+        // 권한 체크와 위치 업데이트
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    val latitude = it.latitude
+                    val longitude = it.longitude
+
+                    _weatherReq.value = WeatherReq(latitude,longitude)
+
+                    continuation.resume(true)
+                }
+            }
+        } else {
+            continuation.resume(false)
+        }
+    }
 }
+

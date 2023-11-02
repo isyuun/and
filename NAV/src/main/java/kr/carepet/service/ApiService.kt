@@ -8,6 +8,8 @@ import kr.carepet.data.SggListRes
 import kr.carepet.data.UmdListReq
 import kr.carepet.data.UmdListRes
 import kr.carepet.data.cmm.NidUserInfoResponse
+import kr.carepet.data.cmm.WeatherReq
+import kr.carepet.data.cmm.WeatherRes
 import kr.carepet.data.cmm.commonRes
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
@@ -32,6 +34,7 @@ import kr.carepet.data.pet.PetDetailRes
 import kr.carepet.data.pet.PetListModel
 import kr.carepet.data.pet.PetListResModel
 import kr.carepet.data.pet.PetModel
+import kr.carepet.data.pet.RegPetWgtReq
 import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.BbsReq
 import kr.carepet.data.user.FAQRes
@@ -185,4 +188,9 @@ interface ApiService {
     @POST("api/v1/bbs/qna/bsc/list")
     fun getQnaList(@Body data : QnaReq) : Call<QnaRes>
 
+    @POST("api/v1/weather")
+    fun getWeather(@Body data : WeatherReq) : Call<WeatherRes>
+
+    @POST("/api/v1/mypet/wght/create")
+    fun regPetWgt(@Body data : RegPetWgtReq) : Call<commonRes>
 }

@@ -69,4 +69,5 @@
     <string name="select_pet_toast">펫을 선택해주세요</string>
     <string name="select_time">시간 선택</string>
     <string name="type_uk">모름</string>
+    <string name="fab_daily">일상 등록</string>
 </resources>

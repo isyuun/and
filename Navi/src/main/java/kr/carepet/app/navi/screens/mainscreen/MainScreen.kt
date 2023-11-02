@@ -7,6 +7,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
@@ -71,6 +72,7 @@ import kr.carepet.app.navi.component.LogoTopBar
 import kr.carepet.app.navi.ui.theme.design_bottomnav_text
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_select_btn_border
+import kr.carepet.app.navi.ui.theme.design_sharp
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.CommunityViewModel
 import kr.carepet.app.navi.viewmodel.HomeViewModel
@@ -134,42 +136,84 @@ fun MainScreen(
                     animationSpec = tween(durationMillis = 200, easing = FastOutLinearInEasing)
                 )
             ) {
-                FloatingActionButton(
-                    onClick = {
-                        if (currentPet[0].ownrPetUnqNo==""){
-                            showDialog = true
-                        }else{
-                            G.mapPetInfo = currentPet
-                            val intent = Intent(context,MapActivity::class.java)
-                            context.startActivity(intent)
-                        }
-                    },
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .size(60.dp),
-                    backgroundColor = design_button_bg,
-                    shape = CircleShape
-                ) {
-                    Column (
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ){
-                        Icon(
-                            painter = painterResource(id = R.drawable.icon_sole),
-                            contentDescription = "",
-                            tint = Color.Unspecified
-                        )
 
-                        Text(
-                            text = stringResource(R.string.walk_go),
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 12.sp,
-                            letterSpacing = (-0.6).sp,
-                            color = design_white
-                        )
+                Crossfade(
+                    targetState = topBarChange,
+                    label = ""
+                ) { topBarChange ->
+                    when(topBarChange){
+                        "home" ->
+                            FloatingActionButton(
+                                onClick = {
+                                    if (currentPet[0].ownrPetUnqNo==""){
+                                        showDialog = true
+                                    }else{
+                                        G.mapPetInfo = currentPet
+                                        val intent = Intent(context,MapActivity::class.java)
+                                        context.startActivity(intent)
+                                    }
+                                },
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .size(65.dp),
+                                backgroundColor = design_button_bg,
+                                shape = CircleShape
+                            ) {
+                                Column (
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ){
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.icon_sole),
+                                        contentDescription = "",
+                                        tint = Color.Unspecified
+                                    )
+
+                                    Text(
+                                        text = stringResource(R.string.walk_go),
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 12.sp,
+                                        letterSpacing = (-0.6).sp,
+                                        color = design_white
+                                    )
+                                }
+                            }
+
+                        "commu" ->
+
+                            FloatingActionButton(
+                                onClick = {  },
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .size(65.dp),
+                                backgroundColor = design_sharp,
+                                shape = CircleShape
+                            ) {
+                                Column (
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ){
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.icon_daily),
+                                        contentDescription = "",
+                                        tint = Color.Unspecified
+                                    )
+
+                                    Text(
+                                        text = stringResource(R.string.fab_daily),
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 12.sp,
+                                        letterSpacing = (-0.6).sp,
+                                        color = design_white
+                                    )
+                                }
+                            }
                     }
+
                 }
+
             }
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -280,7 +324,7 @@ fun BottomNavigationComponent(
                 onTopbarChange("walk")
             }
             BottomNav.CommuScreen.route -> {
-                onChange(false)
+                onChange(true)
                 onTopbarChange("commu")
             }
             BottomNav.MyScreen.route -> {

@@ -20,6 +20,7 @@ import kr.carepet.data.pet.Pet
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.data.pet.PetDetailReq
 import kr.carepet.data.pet.PetDetailRes
+import kr.carepet.data.pet.RegPetWgtReq
 import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.BbsFaq
 import kr.carepet.data.user.BbsReq
@@ -93,6 +94,15 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     fun updateMemberList(newValue: List<Member>?){
         _memberList.value = newValue
     }
+
+    private val _petWeight = MutableStateFlow<String>("")
+    val petWeight: StateFlow<String> = _petWeight.asStateFlow()
+    fun updatePetWeight(newValue: String){_petWeight.value = newValue}
+
+    private val _petWeightRgDate = MutableStateFlow<String>("")
+    val petWeightRgDate: StateFlow<String> = _petWeightRgDate.asStateFlow()
+    fun updatePetWeightRgDate(newValue: String){_petWeightRgDate.value = newValue}
+
 
     // -------------------PetInfo Screen---------------------
 
@@ -559,6 +569,37 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                 }
 
                 override fun onFailure(call: Call<QnaRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun regPetWgt(ownrPetUnqNo: String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = RegPetWgtReq(_petWeightRgDate.value.toInt(), ownrPetUnqNo, _petWeight.value.toFloat())
+
+        val call = apiService.regPetWgt(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object :Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (body.statusCode ==200){
+                                continuation.resume(true)
+                            }else{
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
                     continuation.resume(false)
                 }
 

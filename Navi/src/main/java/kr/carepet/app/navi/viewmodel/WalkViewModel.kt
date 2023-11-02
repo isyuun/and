@@ -199,6 +199,10 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         }
     }
 
+    fun clearSelectedImages() {
+        state = state.copy(listOfSelectedImages = emptyList())
+    }
+
     suspend fun getWalkList(page: Int, petUnqNo: String): Boolean {
         val apiService = RetrofitClientServer.instance
 

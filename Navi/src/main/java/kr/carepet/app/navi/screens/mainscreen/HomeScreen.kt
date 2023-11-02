@@ -8,9 +8,12 @@ import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
@@ -140,6 +143,7 @@ import kr.carepet.app.navi.viewmodel.HomeViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
+import kr.carepet.util.Log
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -345,12 +349,10 @@ fun ProfileContent(
     }
 
     val weatherColor = design_weather_1 // 나중에 날씨받아와서 when으로 구성
-    val wtCont1 = "맑음"
-    val wtCont2 = "미세먼지 좋음"
-    val wtCont3 = "구의동"
-    val dustIcon= R.drawable.dust_good
 
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
+    val weatherData by viewModel.weatherData.collectAsState()
+    val weatherRefresh by viewModel.weatherRefresh.collectAsState()
 
     // run catching
     val petKindNm = runCatching {currentPetInfo[pagerState.currentPage].petKindNm}.getOrElse {""}
@@ -358,6 +360,39 @@ fun ProfileContent(
     val petAge = runCatching { currentPetInfo[pagerState.currentPage].age }.getOrElse { "" }
     val sexTypNm = runCatching { currentPetInfo[pagerState.currentPage].sexTypNm }.getOrElse { "" }
     val wghtVl = runCatching { currentPetInfo[pagerState.currentPage].wghtVl }.getOrElse { "" }
+    val temp = runCatching { weatherData?.data?.find { it.category =="TMP" }?.fcstValue}.getOrElse { "" }
+    val sky = runCatching { weatherData?.data?.find { it.category =="SKY" }?.fcstValue }.getOrElse { "" }
+    val pty = runCatching { weatherData?.data?.find { it.category =="PTY" }?.fcstValue }.getOrElse { "" }
+    val pop = runCatching { weatherData?.data?.find { it.category =="POP" }?.fcstValue }.getOrElse { "" }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    val alphaWeather by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 1f,
+        // `infiniteRepeatable` repeats the specified duration-based `AnimationSpec` infinitely.
+        animationSpec = infiniteRepeatable(
+            // The `keyframes` animates the value by specifying multiple timestamps.
+            animation = keyframes {
+                // One iteration is 1000 milliseconds.
+                durationMillis = 1000
+                // 0.7f at the middle of an iteration.
+                0.7f at 500
+            },
+            // When the value finishes animating from 0f to 1f, it repeats by reversing the
+            // animation direction.
+            repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
+
+    LaunchedEffect(key1 = weatherRefresh){
+        if (weatherRefresh){
+            val getLocation = viewModel.getLocation(context)
+            if (getLocation){
+                viewModel.getWeather()
+                viewModel.updateWeatherRefresh(false)
+            }
+        }
+    }
 
     Column (modifier = Modifier
         .fillMaxWidth()
@@ -387,35 +422,75 @@ fun ProfileContent(
                     .padding(top = 20.dp)
                     .wrapContentWidth()
                     .height(26.dp)
+                    .animateContentSize()
                     .clip(shape = RoundedCornerShape(50.dp))
-                    .background(color = weatherColor, shape = RoundedCornerShape(50.dp)),
+                    .background(
+                        color = if(weatherRefresh){
+                             design_weather_1.copy(alphaWeather)
+                        }else{
+                             weatherColor
+                             },
+                        shape = RoundedCornerShape(50.dp)),
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
                 ){
-                    Text(text = wtCont1,
+                    Text(text =
+                        if(weatherRefresh || sky == null){
+                            "            "
+                        }else{
+                            if (pty == "0"){
+                                when(sky){
+                                    "1" -> "맑음"
+                                    "3" -> "구름많음"
+                                    "4" -> "흐림"
+                                    else -> "맑음"
+                                }
+                            }else{
+                                when(pty){
+                                    "1" -> "비"
+                                    "2" -> "비/눈"
+                                    "3" -> "눈"
+                                    "4" -> "소나기"
+                                    else -> "비"
+                                }
+                            }
+                        },
                         fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         color = design_white, letterSpacing = (-0.6).sp,
                         modifier = Modifier.padding(start = 16.dp),
                         textAlign = TextAlign.Center)
 
-                    Spacer(modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .size(2.dp, 8.dp)
-                        .background(color = design_white))
+                    if (!weatherRefresh){
+                        Spacer(modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .size(2.dp, 8.dp)
+                            .background(color = design_white))
+                    }
 
-                    Icon(painter = painterResource(id = dustIcon), contentDescription = "",
-                        modifier = Modifier.padding(end = 2.dp), tint = Color.Unspecified)
+                    //Icon(painter = painterResource(id = dustIcon), contentDescription = "",
+                    //    modifier = Modifier.padding(end = 2.dp), tint = Color.Unspecified)
 
-                    Text(text = wtCont2,
+                    Text(text =
+                        if(weatherRefresh || temp == null){
+                            "            "
+                        }else{
+                            "현재 기온 : $temp℃ " }
+                        ,
                         fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         color = design_white, letterSpacing = (-0.6).sp,
                         textAlign = TextAlign.Center)
 
-                    Spacer(modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .size(2.dp, 8.dp)
-                        .background(color = design_white))
+                    if (!weatherRefresh){
+                        Spacer(modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .size(2.dp, 8.dp)
+                            .background(color = design_white))
+                    }
 
-                    Text(text = wtCont3,
+                    Text(text =
+                        if(weatherRefresh || pop == null){
+                            "            "
+                        }else{
+                            "강수 : $pop% " },
                         fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         color = design_white, letterSpacing = (-0.6).sp,
                         modifier = Modifier.padding(end = 16.dp),

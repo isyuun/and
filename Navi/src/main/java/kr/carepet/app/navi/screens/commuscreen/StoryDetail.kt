@@ -226,7 +226,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
 
                 Box(
                     modifier = Modifier
-                        .padding(end = 8.dp)
+                        .padding(end = 4.dp)
                         .size(40.dp)
                         .background(color = design_white, shape = RoundedCornerShape(12.dp))
                         .clip(shape = RoundedCornerShape(12.dp))
@@ -234,6 +234,19 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                     contentAlignment = Alignment.Center
                 ){
                     Icon(painter = painterResource(id = R.drawable.icon_like),
+                        contentDescription = "", tint = Color.Unspecified)
+                }
+
+                Box(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(40.dp)
+                        .background(color = design_white, shape = RoundedCornerShape(12.dp))
+                        .clip(shape = RoundedCornerShape(12.dp))
+                        .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ){
+                    Icon(painter = painterResource(id = R.drawable.icon_dislike),
                         contentDescription = "", tint = Color.Unspecified)
                 }
             }
@@ -278,62 +291,78 @@ fun StoryDetailTopContent(){
                     color = design_login_text
                 )
 
-                Row (
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ){
-                    Text(
-                        text = "2023.08.16 16:05:00",
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 12.sp,
-                        letterSpacing = (-0.6).sp,
-                        color = design_skip
-                    )
-
-                    Row (
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-                        Icon(painter = painterResource(id = R.drawable.icon_like), contentDescription = "", tint = Color.Unspecified)
-
-                        Text(
-                            text = "37",
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 12.sp,
-                            letterSpacing = (-0.6).sp,
-                            color = design_skip,
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
-
-                        Icon(
-                            painter = painterResource(id = R.drawable.icon_comment_line),
-                            contentDescription = "", tint = Color.Unspecified,
-                            modifier = Modifier.padding(start = 12.dp))
-
-                        Text(
-                            text = "22",
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 12.sp,
-                            letterSpacing = (-0.6).sp,
-                            color = design_skip,
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
-
-                        Icon(
-                            painter = painterResource(id = R.drawable.icon_view),
-                            contentDescription = "", tint = Color.Unspecified,
-                            modifier = Modifier.padding(start = 12.dp))
-
-                        Text(
-                            text = "218",
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 12.sp,
-                            letterSpacing = (-0.6).sp,
-                            color = design_skip,
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
-                    }
-                }
+                Text(
+                    text = "2023.08.16 16:05:00",
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.6).sp,
+                    color = design_skip
+                )
             }
+        }
+
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Row (verticalAlignment = Alignment.CenterVertically){
+                Icon(painter = painterResource(id = R.drawable.icon_like), contentDescription = "", tint = Color.Unspecified)
+
+                Text(
+                    text = "37",
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.6).sp,
+                    color = design_skip,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_comment_line),
+                    contentDescription = "", tint = Color.Unspecified,
+                    modifier = Modifier.padding(start = 12.dp))
+
+                Text(
+                    text = "22",
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.6).sp,
+                    color = design_skip,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_view),
+                    contentDescription = "", tint = Color.Unspecified,
+                    modifier = Modifier.padding(start = 12.dp))
+
+                Text(
+                    text = "218",
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.6).sp,
+                    color = design_skip,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+
+            Row (verticalAlignment = Alignment.CenterVertically){
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_report),
+                    contentDescription = "", tint = Color.Unspecified,
+                    modifier = Modifier.padding(start = 12.dp))
+
+                Text(
+                    text = "신고하기",
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.6).sp,
+                    color = design_skip,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+
         }
     }
 }
@@ -491,14 +520,40 @@ fun CommentListItem(comment:String){
         
         Spacer(modifier = Modifier.padding(start = 8.dp))
         
-        Column {
-            Text(
-                text = "강레오",
-                fontSize = 14.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                letterSpacing = (-0.7).sp,
-                color = design_skip
-            )
+        Column (
+            modifier = Modifier.fillMaxWidth()
+        ){
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Text(
+                    text = "강레오",
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    letterSpacing = (-0.7).sp,
+                    color = design_skip
+                )
+
+                Row (verticalAlignment = Alignment.CenterVertically){
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_like_default),
+                        contentDescription = "", tint = Color.Unspecified,
+                        modifier = Modifier.padding(start = 12.dp))
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_dislike_default),
+                        contentDescription = "", tint = Color.Unspecified,
+                        modifier = Modifier.padding(start = 12.dp))
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_report),
+                        contentDescription = "", tint = Color.Unspecified,
+                        modifier = Modifier.padding(start = 12.dp))
+                }
+            }
+
 
             Text(
                 text = comment,
