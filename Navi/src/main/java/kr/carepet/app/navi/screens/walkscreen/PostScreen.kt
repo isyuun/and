@@ -10,9 +10,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -69,6 +67,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -86,7 +85,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
@@ -116,7 +114,6 @@ import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
-import okhttp3.internal.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,11 +144,11 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
     var hashString by remember { mutableStateOf("") }
 
 
-    if (showDiagLog){
+    if (showDiagLog) {
         OnDialog(navController = navController, onDismiss = { showDiagLog = false })
     }
 
-    DisposableEffect(Unit){
+    DisposableEffect(Unit) {
         onDispose {
             viewModel.clearSelectedImages()
         }
@@ -180,7 +177,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                 var mrk = 0
 
                 tracks?.forEach { track ->
-                    if (track.no==petData.ownrPetUnqNo){
+                    if (track.no == petData.ownrPetUnqNo) {
                         pee += track.pee
                         poo += track.poo
                         mrk += track.mrk
@@ -195,7 +192,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     urineNmtm = pee.toString()
                 )
             }
-            Log.d("IMAGE",images?.size.toString())
+            Log.d("IMAGE", images?.size.toString())
             if (images != null) {
                 viewModel.updateSelectedImageList(images)
             }
@@ -273,7 +270,17 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     .fillMaxWidth()
                     .height(200.dp)
                     .background(color = design_icon_bg)
-            )
+            ) {
+                application.preview?.let {
+                    Image(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        bitmap = it.asImageBitmap(),
+                        contentDescription = "",
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
@@ -500,12 +507,12 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
 
                         viewModel.updateHashTag(hashtagList)
 
-                        if(state.listOfSelectedImages.size<=1 && file == null){
+                        if (state.listOfSelectedImages.size <= 1 && file == null) {
                             var dailyUpload = viewModel.uploadDaily()
-                            if (dailyUpload){
+                            if (dailyUpload) {
                                 navController.popBackStack()
                                 isLoading = false
-                            }else{
+                            } else {
                                 isLoading = false
                                 snackState.showSnackbar(
                                     message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
@@ -514,15 +521,15 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                                     withDismissAction = false
                                 )
                             }
-                        }else{
+                        } else {
                             val photoUpload = viewModel.fileUpload(context = context, gpxFile = file)
                             if (photoUpload) {
                                 var dailyUpload = viewModel.uploadDaily()
-                                if (dailyUpload){
+                                if (dailyUpload) {
                                     navController.popBackStack()
                                     viewModel.updateSelectedImageList(emptyList())
                                     isLoading = false
-                                }else{
+                                } else {
                                     isLoading = false
                                     snackState.showSnackbar(
                                         message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
@@ -565,7 +572,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
 }
 
 @Composable
-fun BwlMvmNmtmContent(walkViewModel: WalkViewModel, pet: List<Pet>, selectPet : List<CurrentPetData>) {
+fun BwlMvmNmtmContent(walkViewModel: WalkViewModel, pet: List<Pet>, selectPet: List<CurrentPetData>) {
 
     Column(
         modifier = Modifier
@@ -595,7 +602,7 @@ fun BwlMvmNmtmContent(walkViewModel: WalkViewModel, pet: List<Pet>, selectPet : 
 }
 
 @Composable
-fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: Pet, selectPet : List<CurrentPetData>) {
+fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: Pet, selectPet: List<CurrentPetData>) {
 
     var bwlCount by remember { mutableIntStateOf(petInfo.bwlMvmNmtm.toInt()) }
     var peeCount by remember { mutableIntStateOf(petInfo.urineNmtm.toInt()) }
@@ -690,28 +697,28 @@ fun PlusMinusItem(
             modifier = Modifier.padding(start = 4.dp, end = 8.dp)
         )
 
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .background(
-                    color =
-                    if (count == 0) {
-                        design_DDDDDD
-                    } else {
-                        design_intro_bg
-                    },
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .clip(RoundedCornerShape(8.dp))
-                .clickable(enabled = count != 0) { onClick(-1) },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.stepper_minus),
-                contentDescription = "",
-                tint = Color.Unspecified
-            )
-        }
+        //Box(
+        //    modifier = Modifier
+        //        .size(24.dp)
+        //        .background(
+        //            color =
+        //            if (count == 0) {
+        //                design_DDDDDD
+        //            } else {
+        //                design_intro_bg
+        //            },
+        //            shape = RoundedCornerShape(8.dp)
+        //        )
+        //        .clip(RoundedCornerShape(8.dp))
+        //        .clickable(enabled = count != 0) { onClick(-1) },
+        //    contentAlignment = Alignment.Center
+        //) {
+        //    Icon(
+        //        painter = painterResource(id = R.drawable.stepper_minus),
+        //        contentDescription = "",
+        //        tint = Color.Unspecified
+        //    )
+        //}
 
         Box(
             modifier = Modifier.width(40.dp),
@@ -726,23 +733,23 @@ fun PlusMinusItem(
             )
         }
 
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .background(
-                    color = design_intro_bg,
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .clip(RoundedCornerShape(8.dp))
-                .clickable { onClick(1) },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.stepper_plus),
-                contentDescription = "",
-                tint = Color.Unspecified
-            )
-        }
+        //Box(
+        //    modifier = Modifier
+        //        .size(24.dp)
+        //        .background(
+        //            color = design_intro_bg,
+        //            shape = RoundedCornerShape(8.dp)
+        //        )
+        //        .clip(RoundedCornerShape(8.dp))
+        //        .clickable { onClick(1) },
+        //    contentAlignment = Alignment.Center
+        //) {
+        //    Icon(
+        //        painter = painterResource(id = R.drawable.stepper_plus),
+        //        contentDescription = "",
+        //        tint = Color.Unspecified
+        //    )
+        //}
 
 
         Spacer(modifier = Modifier.padding(end = 20.dp))
@@ -897,18 +904,18 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
 
 
 
-    Row (modifier = Modifier
-        .padding(top = 16.dp, start = 20.dp, end = 20.dp)
-        .fillMaxWidth()
-        .clip(shape = RoundedCornerShape(20.dp))
-        .background(color = design_login_bg, shape = RoundedCornerShape(20.dp))
-        , horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
-    ){
-        Column (
-            modifier= Modifier
+    Row(
+        modifier = Modifier
+            .padding(top = 16.dp, start = 20.dp, end = 20.dp)
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(20.dp))
+            .background(color = design_login_bg, shape = RoundedCornerShape(20.dp)), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier
                 .padding(start = 24.dp, top = 16.dp, bottom = 16.dp)
                 .weight(1f)
-        ){
+        ) {
             Text(
                 text = "산책시간",
                 fontSize = 14.sp,
@@ -927,15 +934,17 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
             )
         }
 
-        Spacer(modifier = Modifier
-            .size(1.dp, 46.dp)
-            .background(color = design_textFieldOutLine))
+        Spacer(
+            modifier = Modifier
+                .size(1.dp, 46.dp)
+                .background(color = design_textFieldOutLine)
+        )
 
-        Column (
-            modifier= Modifier
+        Column(
+            modifier = Modifier
                 .padding(start = 24.dp, top = 16.dp, bottom = 16.dp)
                 .weight(1f)
-        ){
+        ) {
 
             Text(
                 text = "산책거리",
@@ -945,7 +954,7 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
                 color = design_skip
             )
 
-            Row (modifier= Modifier.fillMaxWidth()){
+            Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = String.format("%.2f", distance?.div(1000) ?: 0),
                     fontSize = 22.sp,
@@ -972,15 +981,16 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
     }
 }
 
-class HashTagTransformation(): VisualTransformation{
+class HashTagTransformation() : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         return TransformedText(
             buildAnnotatedStringWithColors(text.toString()),
-            OffsetMapping.Identity)
+            OffsetMapping.Identity
+        )
     }
 }
 
-fun buildAnnotatedStringWithColors(text:String): AnnotatedString{
+fun buildAnnotatedStringWithColors(text: String): AnnotatedString {
 
     val pattern = "#\\S+".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
     val matches = pattern.findAll(text)

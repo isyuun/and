@@ -112,7 +112,9 @@ import androidx.lifecycle.LifecycleOwner
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.CameraPosition
+import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
@@ -133,6 +135,7 @@ import kr.carepet.gpx.GPX_LATITUDE_ZERO
 import kr.carepet.gpx.GPX_LONGITUDE_ZERO
 import kr.carepet.gpx.TRACK_ZERO_NUM
 import kr.carepet.gpx.Track
+import kr.carepet.gpx._GPXWriter
 import kr.carepet.map._app.getRounded
 import kr.carepet.map._app.toPx
 import kr.carepet.map._app.toText
@@ -660,6 +663,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                         mapView.getMapAsync { naverMap ->
                                             val ender = marker(context = context, position = position, captionText = arrival)
                                             ender.map = naverMap
+                                            naverMap.takeSnapshot(false) {
+                                                application.preview = it
+                                            }
                                         }
                                         G.toPost = true
                                         activity.finish()
@@ -814,6 +820,22 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     isLoading = true
                 } else {
                     showBottomSheet = !showBottomSheet
+                    mapView.getMapAsync { naverMap ->
+                        val latLng = tracks?.last()?.let { LatLng(it.latitude, it.longitude) }
+                        latLng?.let {
+                            val position = CameraPosition(it, 17.0)
+                            val update = CameraUpdate.toCameraPosition(position)
+                            naverMap.moveCamera(update)
+                        }
+                        val distance = application._distance
+                        if (distance != null && distance > 100) {
+                            val latLng1 = tracks?.first()?.let { LatLng(it.latitude, it.longitude) }
+                            val latLng2 = tracks?.last()?.let { LatLng(it.latitude, it.longitude) }
+                            val bounds = latLng1?.let { latLng2?.let { it1 -> LatLngBounds(it, it1) } }
+                            val padding = 48.dp.toPx(context).toInt()
+                            bounds?.let { naverMap.moveCamera(CameraUpdate.fitBounds(it, padding)) }
+                        }
+                    }
                 }
             },
             shape = RoundedCornerShape(12.dp),

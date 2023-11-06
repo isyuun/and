@@ -27,6 +27,7 @@ package kr.carepet.gps._app
 
 import android.content.ComponentName
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.IBinder
 import kr.carepet.data.pet.CurrentPetData
@@ -50,6 +51,7 @@ open class gpsapplication4 : gpsapplication3() {
         super.start()
         tracks?.clear()
         images?.clear()
+        preview = null
     }
 
     override fun stop() {
@@ -173,4 +175,6 @@ open class gpsapplication4 : gpsapplication3() {
         this.service?.launchActivityIntent = getActivity()?.intent
         Log.v(__CLASSNAME__, "${getMethodName()}[${getActivity()?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
     }
+
+    var preview: Bitmap? = null
 }
