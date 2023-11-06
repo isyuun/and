@@ -821,19 +821,21 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 } else {
                     showBottomSheet = !showBottomSheet
                     mapView.getMapAsync { naverMap ->
-                        val latLng = tracks?.last()?.let { LatLng(it.latitude, it.longitude) }
-                        latLng?.let {
-                            val position = CameraPosition(it, 17.0)
-                            val update = CameraUpdate.toCameraPosition(position)
-                            naverMap.moveCamera(update)
-                        }
-                        val distance = application._distance
-                        if (distance != null && distance > 100) {
-                            val latLng1 = tracks?.first()?.let { LatLng(it.latitude, it.longitude) }
-                            val latLng2 = tracks?.last()?.let { LatLng(it.latitude, it.longitude) }
-                            val bounds = latLng1?.let { latLng2?.let { it1 -> LatLngBounds(it, it1) } }
-                            val padding = 48.dp.toPx(context).toInt()
-                            bounds?.let { naverMap.moveCamera(CameraUpdate.fitBounds(it, padding)) }
+                        if (tracks?.isNotEmpty() == true) {
+                            val latLng = tracks?.last()?.let { LatLng(it.latitude, it.longitude) }
+                            latLng?.let {
+                                val position = CameraPosition(it, 17.0)
+                                val update = CameraUpdate.toCameraPosition(position)
+                                naverMap.moveCamera(update)
+                            }
+                            val distance = application._distance
+                            if (distance != null && distance > 100) {
+                                val latLng1 = tracks?.first()?.let { LatLng(it.latitude, it.longitude) }
+                                val latLng2 = tracks?.last()?.let { LatLng(it.latitude, it.longitude) }
+                                val bounds = latLng1?.let { latLng2?.let { it1 -> LatLngBounds(it, it1) } }
+                                val padding = 48.dp.toPx(context).toInt()
+                                bounds?.let { naverMap.moveCamera(CameraUpdate.fitBounds(it, padding)) }
+                            }
                         }
                     }
                 }
