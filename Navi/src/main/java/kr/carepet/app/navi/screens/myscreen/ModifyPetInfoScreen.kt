@@ -619,54 +619,54 @@ fun ModifyPetInfoScreen(
             }
 
 
-            Text(text = "몸무게", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
-            )
-
-            Row (modifier= Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically){
-                CustomTextField(
-                    value = petWght,
-                    onValueChange = { viewModel.updatePetWght(it) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal,
-                        imeAction = ImeAction.Done),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                    placeholder = { Text(text = "몸무게를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text
-                    ),
-                    shape = RoundedCornerShape(4.dp),
-                    innerPadding = PaddingValues(start=16.dp)
-                )
-
-                Row (modifier = Modifier.width(100.dp),verticalAlignment = Alignment.CenterVertically){
-                    Text(text = "kg", fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        color = design_login_text, modifier= Modifier.padding(start = 14.dp), letterSpacing = (-0.7).sp
-                    )
-                }
-
-
-            }
-
-            Text(text = "* 1kg 미만의 경우, 600g = 0.6으로 입력",
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                fontSize = 12.sp, color = design_skip,
-                modifier= Modifier
-                    .padding(start = 20.dp, top = 8.dp),
-                letterSpacing = (-0.6).sp
-            )
+            //Text(text = "몸무게", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //    modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+            //)
+            //
+            //Row (modifier= Modifier
+            //    .fillMaxWidth()
+            //    .padding(start = 20.dp, end = 20.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically){
+            //    CustomTextField(
+            //        value = petWght,
+            //        onValueChange = { viewModel.updatePetWght(it) },
+            //        singleLine = true,
+            //        keyboardOptions = KeyboardOptions(
+            //            keyboardType = KeyboardType.Decimal,
+            //            imeAction = ImeAction.Done),
+            //        modifier = Modifier
+            //            .weight(1f)
+            //            .height(48.dp),
+            //        placeholder = { Text(text = "몸무게를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
+            //        colors = OutlinedTextFieldDefaults.colors(
+            //            unfocusedPlaceholderColor = design_placeHolder,
+            //            focusedPlaceholderColor = design_placeHolder,
+            //            unfocusedBorderColor = design_textFieldOutLine,
+            //            focusedBorderColor = design_login_text,
+            //            unfocusedContainerColor = design_white,
+            //            focusedContainerColor = design_white,
+            //            unfocusedLeadingIconColor = design_placeHolder,
+            //            focusedLeadingIconColor = design_login_text
+            //        ),
+            //        shape = RoundedCornerShape(4.dp),
+            //        innerPadding = PaddingValues(start=16.dp)
+            //    )
+            //
+            //    Row (modifier = Modifier.width(100.dp),verticalAlignment = Alignment.CenterVertically){
+            //        Text(text = "kg", fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //            color = design_login_text, modifier= Modifier.padding(start = 14.dp), letterSpacing = (-0.7).sp
+            //        )
+            //    }
+            //
+            //
+            //}
+            //
+            //Text(text = "* 1kg 미만의 경우, 600g = 0.6으로 입력",
+            //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //    fontSize = 12.sp, color = design_skip,
+            //    modifier= Modifier
+            //        .padding(start = 20.dp, top = 8.dp),
+            //    letterSpacing = (-0.6).sp
+            //)
 
             Text(text = "성별", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text

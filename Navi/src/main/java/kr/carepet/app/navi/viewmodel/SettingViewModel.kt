@@ -7,12 +7,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.user.UserApiClient
+import com.patrykandpatrick.vico.core.extension.getFieldValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.cmm.commonRes
+import kr.carepet.data.pet.ChangePetWgtReq
 import kr.carepet.data.pet.InviteCodeReq
 import kr.carepet.data.pet.InviteCodeRes
 import kr.carepet.data.pet.Member
@@ -20,6 +22,8 @@ import kr.carepet.data.pet.Pet
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.data.pet.PetDetailReq
 import kr.carepet.data.pet.PetDetailRes
+import kr.carepet.data.pet.PetWgtData
+import kr.carepet.data.pet.PetWgtRes
 import kr.carepet.data.pet.RegPetWgtReq
 import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.BbsFaq
@@ -37,6 +41,8 @@ import kr.carepet.data.user.ResetPwReq
 import kr.carepet.singleton.G
 import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
+import kr.carepet.util.Log
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -103,7 +109,15 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     val petWeightRgDate: StateFlow<String> = _petWeightRgDate.asStateFlow()
     fun updatePetWeightRgDate(newValue: String){_petWeightRgDate.value = newValue}
 
+    private val _petWeightList = MutableStateFlow<List<PetWgtData>?>(emptyList())
+    val petWeightList: StateFlow<List<PetWgtData>?> = _petWeightList.asStateFlow()
 
+    private val _selectMarker = MutableStateFlow("") // Data 저장
+    val selectMarker: StateFlow<String> = _selectMarker.asStateFlow() // state 노출
+    fun updateSelectMarker(newValue: String) { _selectMarker.value = newValue }
+
+    private val _regDM = MutableStateFlow<String>("")
+    val regDM: StateFlow<String> = _regDM.asStateFlow()
     // -------------------PetInfo Screen---------------------
 
     // -----------------Setting Screen------------------------
@@ -591,10 +605,110 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                             if (body.statusCode ==200){
                                 continuation.resume(true)
                             }else{
+                                _regDM.value = it.detailMessage
+                                Log.d("LOG",_regDM.value)
                                 continuation.resume(false)
                             }
                         }
                     }else{
+                        val errorBodyString = response.errorBody()?.string()
+
+                        _regDM.value = errorBodyParse(errorBodyString)
+
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun getPetWgt(ownrPetUnqNo:String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.getPetWgt(ownrPetUnqNo)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<PetWgtRes>{
+                override fun onResponse(call: Call<PetWgtRes>, response: Response<PetWgtRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (body.data != null){
+                                _petWeightList.value = it.data
+                                continuation.resume(true)
+                            }else{
+                                _petWeightList.value = emptyList()
+                                continuation.resume(true)
+                            }
+                        }
+                    }else{
+                        _petWeightList.value = emptyList()
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<PetWgtRes>, t: Throwable) {
+                    _petWeightList.value = emptyList()
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun changePetWgt(crtrYmd:String, petDtlUnqNo:Int, wghtVl:Float):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val cleanedString = crtrYmd.replace(".", "")
+        val dateInt = cleanedString.toInt()
+
+        val data = ChangePetWgtReq(dateInt, petDtlUnqNo, wghtVl)
+
+        val call = apiService.changePetWgt(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            continuation.resume(true)
+                        }
+                    }else{
+                        val errorBodyString = response.errorBody()!!.string()
+
+                        _regDM.value = errorBodyParse(errorBodyString)
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun deletePetWgt(petDtlUnqNo:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.deletePetWgt(petDtlUnqNo)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            continuation.resume(true)
+                        }
+                    }else{
+                        val errorBodyString = response.errorBody()!!.string()
+
+                        _regDM.value = errorBodyParse(errorBodyString)
                         continuation.resume(false)
                     }
                 }
@@ -618,3 +732,19 @@ data class InquiryKindList(val kind:String)
 data class MyScreenState(
     val listOfSelectedImages:List<Uri> = emptyList()
 )
+
+fun errorBodyParse(errorBodyString: String?):String{
+    if (errorBodyString != null) {
+        // errorBodyString은 JSON 형식으로 보이므로 파싱하여 detailMessage를 얻을 수 있습니다.
+        val json = JSONObject(errorBodyString)
+        val detailMessage = json.optString("detailMessage")
+
+        return if (detailMessage.isNotEmpty()) {
+            detailMessage
+        } else {
+            "통신에 실패했습니다"
+        }
+    }
+
+    return "통신에 실패했습니다"
+}

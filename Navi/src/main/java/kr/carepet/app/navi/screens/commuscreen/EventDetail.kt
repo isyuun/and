@@ -19,8 +19,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -29,6 +33,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.ui.theme.design_button_bg
@@ -36,10 +42,13 @@ import kr.carepet.app.navi.ui.theme.design_login_text
 import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
+import kr.carepet.app.navi.viewmodel.CommunityViewModel
+import kr.carepet.util.Log
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventDetail(navController: NavHostController){
+fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel){
+
+    val detailData by viewModel.eventDetail.collectAsState()
 
     Scaffold (
         topBar = { BackTopBar(title = stringResource(R.string.title_event), navController = navController) }
@@ -51,13 +60,21 @@ fun EventDetail(navController: NavHostController){
                 .background(color = design_white)
                 .verticalScroll(rememberScrollState())
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.event_thumb1),
+            AsyncImage(
+                onLoading = {  },
+                onError = { Log.d("LOG", "onError")},
+                onSuccess = { Log.d("LOG", "onSuccess")},
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data( detailData?.data?.bbsEvntDtl?.get(0)?.rprsImgUrl )
+                    .crossfade(true)
+                    .build(),
                 contentDescription = "",
-                modifier= Modifier.fillMaxWidth(),
+                placeholder = painterResource(id = R.drawable.profile_default),
+                error= painterResource(id = R.drawable.profile_default),
+                modifier= Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillWidth
             )
-            
+
             Text(
                 text = "본아페티 관절 영양제 무료 체험단",
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),

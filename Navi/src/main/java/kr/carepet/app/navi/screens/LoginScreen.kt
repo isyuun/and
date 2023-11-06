@@ -83,6 +83,8 @@ import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CustomTextField
+import kr.carepet.app.navi.component.LoadingAnimation1
+import kr.carepet.app.navi.component.LoadingDialog
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_intro_bg
@@ -115,6 +117,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
 
     var id by remember { mutableStateOf(MySharedPreference.getUserEmail()) }
     var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
     val snsEmail by viewModel.email.collectAsState()
     val snsUnqId by viewModel.unqId.collectAsState()
@@ -160,6 +163,11 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
     Scaffold (
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ){ paddingValues ->
+
+        LoadingDialog(
+            loadingText = "로그인..",
+            loadingState = isLoading
+        )
 
         Column(modifier = Modifier
             .padding(paddingValues)
@@ -247,14 +255,17 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                 Button(
                     onClick = {
                         scope.launch {
+                            isLoading = true
                             val result = viewModel.onLoginButtonClick(userId = id, userPw = password, loginMethod = "EMAIL")
                             if (result){
+                                isLoading = false
                                 MySharedPreference.setUserEmail(id)
                                 sharedViewModel.updateInit(true)
                                 navController.navigate(Screen.MainScreen.route){
                                     popUpTo(0)
                                 }
                             }else{
+                                isLoading = false
                                 focusManager.clearFocus()
                                 snackbarHostState.showSnackbar(
                                     message = "아이디 및 패스워드를 확인해주세요.",

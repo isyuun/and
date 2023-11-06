@@ -48,6 +48,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -92,6 +93,7 @@ import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.CircleImageTopBar
+import kr.carepet.app.navi.component.LoadingDialog
 import kr.carepet.app.navi.ui.theme.design_999999
 import kr.carepet.app.navi.ui.theme.design_DDDDDD
 import kr.carepet.app.navi.ui.theme.design_EFECFE
@@ -144,9 +146,10 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
     }
 
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     val timePickerState = rememberTimePickerState()
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(selectableDates = MySelectableDates2())
     val snackState = remember { SnackbarHostState() }
     var openDialog by remember { mutableStateOf(false) }
     var openTimePicker by remember { mutableStateOf(false) }
@@ -154,6 +157,12 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
     Scaffold (
         snackbarHost = {SnackbarHost(hostState = snackState, Modifier)}
     ){ paddingValues ->
+
+        LoadingDialog(
+            loadingText = "로그아웃..",
+            loadingState = isLoading
+        )
+
         Column (
             modifier= Modifier
                 .padding(paddingValues)
@@ -194,12 +203,17 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
 
                 Button(
                     onClick = {
+                        isLoading = true
                         viewModel.viewModelScope.launch {
                             val result = viewModel.logOut()
                             if (result){
+                                isLoading = false
                                 navController.navigate(Screen.Login.route){
                                     popUpTo(0)
                                 }
+                            }else{
+                                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                                isLoading = true
                             }
                         }
                     },
@@ -603,7 +617,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
             )
 
             Text(
-                text = "${petDetailData.wghtVl}kg",
+                text = "${formatWghtVl(petDetailData.wghtVl)}kg",
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                 color = design_skip
@@ -945,7 +959,8 @@ fun TimePickerDialog(
                         .padding(bottom = 20.dp),
                     text = title,
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    fontSize = 16.sp, letterSpacing = (-0.8).sp
+                    fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                    color = design_login_text
                 )
                 TimePicker(
                     state = state,
@@ -974,7 +989,7 @@ fun TimePickerDialog(
                         Text(
                             text = stringResource(id = R.string.cancel),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 16.sp
+                            fontSize = 16.sp,color = design_login_text
                         )
                     }
                     TextButton(
@@ -993,11 +1008,20 @@ fun TimePickerDialog(
                         Text(
                             text = stringResource(id = R.string.ok),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 16.sp
+                            fontSize = 16.sp,color = design_login_text
                         )
                     }
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+class MySelectableDates2 : SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+        val now = System.currentTimeMillis()
+        val yesterday = now - 24 * 60 * 60 * 1000
+        return utcTimeMillis > yesterday
     }
 }

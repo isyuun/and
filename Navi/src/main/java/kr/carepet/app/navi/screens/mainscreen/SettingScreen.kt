@@ -107,11 +107,12 @@ fun SettingScreen(navController: NavHostController, viewModel:SettingViewModel){
                 modifier = Modifier.alpha(tabVisible),
                 selectedTabIndex = pagerState.currentPage,
                 indicator = { tabPositions -> TabRowDefaults.Indicator(Modifier.pagerTabIndicatorOffset(pagerState, tabPositions), color = design_login_text, height = 2.dp) },
-                backgroundColor = design_white
+                backgroundColor = design_white,
+                contentColor = design_login_text
             ) {
                 MyScreenTabItems.forEachIndexed { index, item ->
                     Tab(
-                        text = { Text(text = item.title, fontSize = 16.sp,
+                        text = { Text(text = item.title, fontSize = 16.sp, color = design_login_text,
                             fontFamily =
                             if(index == pagerState.currentPage) FontFamily(Font(R.font.pretendard_bold))
                             else FontFamily(Font(R.font.pretendard_regular))

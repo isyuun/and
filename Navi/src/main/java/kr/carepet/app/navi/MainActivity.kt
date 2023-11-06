@@ -170,7 +170,7 @@ fun AppNavigation(navController: NavHostController){
             StoryDetail(viewModel = communityViewModel, sharedViewModel = sharedViewModel, navController = navController)
         }
         composable("eventDetail"){
-            EventDetail(navController = navController)
+            EventDetail(navController = navController, viewModel = communityViewModel)
         }
         composable("eventEndDetail"){
             EventEndDetail(navController = navController)

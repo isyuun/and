@@ -64,7 +64,7 @@ data class PetDetailData(
     @SerializedName("stdgUmdCd")
     var stdgUmdCd: String, // 103
     @SerializedName("stdgUmdNm")
-    var stdgUmdNm: String, // 공릉동
+    var stdgUmdNm: String?, // 공릉동
     @SerializedName("wghtVl")
     var wghtVl: Float // 4.1
 )

@@ -968,7 +968,11 @@ fun integrityCheck(viewModel: UserCreateViewModel, context: Context):Boolean{
     }else if(viewModel.petWght.value==""){
         Toast.makeText(context, "몸무게를 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
-    }else{
+    }else if(!isValidFloat(viewModel.petWght.value)){
+        Toast.makeText(context, "올바른 몸무게를 입력해주세요", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    else{
         return true
     }
 }

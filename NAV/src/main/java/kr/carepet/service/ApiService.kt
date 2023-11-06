@@ -7,6 +7,8 @@ import kr.carepet.data.RefreshToken
 import kr.carepet.data.SggListRes
 import kr.carepet.data.UmdListReq
 import kr.carepet.data.UmdListRes
+import kr.carepet.data.bbs.EventDetailRes
+import kr.carepet.data.bbs.EventListRes
 import kr.carepet.data.cmm.NidUserInfoResponse
 import kr.carepet.data.cmm.WeatherReq
 import kr.carepet.data.cmm.WeatherRes
@@ -22,6 +24,7 @@ import kr.carepet.data.daily.WalkListReq
 import kr.carepet.data.daily.WalkListRes
 import kr.carepet.data.daily.WeekRecordReq
 import kr.carepet.data.daily.WeekRecordRes
+import kr.carepet.data.pet.ChangePetWgtReq
 import kr.carepet.data.pet.CurrentPetRes
 import kr.carepet.data.pet.DeletePetReq
 import kr.carepet.data.pet.InviteCodeReq
@@ -34,6 +37,7 @@ import kr.carepet.data.pet.PetDetailRes
 import kr.carepet.data.pet.PetListModel
 import kr.carepet.data.pet.PetListResModel
 import kr.carepet.data.pet.PetModel
+import kr.carepet.data.pet.PetWgtRes
 import kr.carepet.data.pet.RegPetWgtReq
 import kr.carepet.data.pet.SetInviteCodeRes
 import kr.carepet.data.user.BbsReq
@@ -62,33 +66,59 @@ import retrofit2.http.Query
 
 interface ApiService {
 
+    // --------------------- 게시판 ----------------------- //
+    @POST("api/v1/bbs/faq/list")
+    fun getFaqList(@Body data : BbsReq) : Call<FAQRes>
+    @POST("api/v1/bbs/qna/bsc/list")
+    fun getQnaList(@Body data : QnaReq) : Call<QnaRes>
+    @POST("api/v1/bbs/event/list")
+    fun getEventList(@Body data : BbsReq) : Call<EventListRes>
+    @POST("api/v1/bbs/event/dtl/list")
+    fun getEventDetail(@Body data : Int) : Call<EventDetailRes>
+
+    // --------------------- 게시판 ----------------------- //
+
+
+    // --------------------- 회원 ----------------------- //
     @POST("/api/v1/member/chk-ncknm")
     fun nickNameCheck(@Body data: String): Call<NickNameCheckRes>
-
     @POST("api/v1/member/create-user")
     fun sendUserToServer(@Body data: UserDataModel): Call<UserDataResponse>
-
-    @POST("api/v1/member/login")
-    fun sendLoginToServer(@Body data: LoginData): Call<LoginResModel>
-
     @POST("api/v1/member/logOut")
     fun sendLogout(): Call<LogoutRes>
-
+    @POST("api/v1/member/login")
+    fun sendLoginToServer(@Body data: LoginData): Call<LoginResModel>
+    @POST("api/v1/member/refresh-token")
+    fun sendRefreshToken(@Body refreshToken: RefreshToken): Call<RefreshRes>
+    @POST("api/v1/member/reset-ncknm")
+    fun resetNickName(@Body data: ResetNickNameReq): Call<commonRes>
+    @POST("api/v1/member/reset-password")
+    fun resetPw(@Body data : ResetPwReq) : Call<commonRes>
     @POST("/api/v1/member/withdraw")
     fun withdraw(): Call<commonRes>
 
-    @POST("/api/v1/mypet/rel-close")
-    fun relClose(@Body data : RelCloseReq): Call<commonRes>
+    // --------------------- 회원 ----------------------- //
 
-    @POST("api/v1/member/refresh-token")
-    fun sendRefreshToken(@Body refreshToken: RefreshToken): Call<RefreshRes>
+    // --------------------- 일상생활 ----------------------- //
 
-    @POST("api/v1/cmm/code-list")
-    fun commonCodeList(@Body data: CommonCodeModel) : Call<CommonCodeResModel>
+    @POST("api/v1/daily-life/create")
+    fun uploadDaily(@Body data: DailyCreateReq): Call<DailyCreateRes>
+    @POST("api/v1/daily-life/list")
+    fun getWalkList(@Body data: WalkListReq): Call<WalkListRes>
+    @POST("api/v1/daily-life/month/recode")
+    fun getMonthData(@Body data: DailyMonthReq): Call<DailyMonthRes>
+    @POST("/api/v1/daily-life/pet/list")
+    fun myPetListCurrent(@Body data: MyPetListReq) : Call<CurrentPetRes>
+    @Multipart
+    @POST("api/v1/daily-life/upload")
+    fun uploadPhoto(@Part files: ArrayList<MultipartBody.Part>): Call<PhotoRes>
+    @POST("api/v1/daily-life/view")
+    fun getDailyDetail(@Body data: DailyDetailReq): Call<DailyDetailRes>
+    @POST("api/v1/daily-life/week/recode")
+    fun getWeekRecord(@Body data: WeekRecordReq) : Call<WeekRecordRes>
+    // --------------------- 일상생활 ----------------------- //
 
-    @POST("api/v1/cmm/pet-list")
-    fun petList(@Body data: PetListModel) : Call<PetListResModel>
-
+    // --------------------- 마이펫 ----------------------- //
     @Multipart
     @POST("api/v1/mypet/create")
     fun createPet(
@@ -108,7 +138,16 @@ interface ApiService {
         @Part("stdgCtpvCd") stdgCtpvCd: RequestBody,
         @Part("wghtVl") wghtVl: Float,
     ):Call<MyPetResModel>
-
+    @POST("api/v1/mypet/delete")
+    fun deletePet(@Body data : DeletePetReq) : Call<commonRes>
+    @POST("/api/v1/mypet/detail")
+    fun myPetDetail(@Body data: PetDetailReq) : Call<PetDetailRes>
+    @POST("api/v1/mypet/invtt/create")
+    fun getInviteCode(@Body data: InviteCodeReq): Call<InviteCodeRes>
+    @POST("api/v1/mypet/invtt/setKey")
+    fun setInviteCode(@Body data: String): Call<SetInviteCodeRes>
+    @POST("api/v1/mypet/list")
+    fun myPetList(@Body data: MyPetListReq) : Call<MyPetListRes>
     @Multipart
     @POST("api/v1/mypet/update")
     fun modifyPet(
@@ -128,69 +167,28 @@ interface ApiService {
         @Part("petMngrYn") petMngrYn: RequestBody,
         @Part("stdgCtpvCd") stdgCtpvCd: RequestBody,
     ):Call<MyPetResModel>
-
-    @POST("api/v1/mypet/list")
-    fun myPetList(@Body data: MyPetListReq) : Call<MyPetListRes>
-
-    @POST("/api/v1/mypet/detail")
-    fun myPetDetail(@Body data: PetDetailReq) : Call<PetDetailRes>
-
-    @POST("/api/v1/daily-life/pet/list")
-    fun myPetListCurrent(@Body data: MyPetListReq) : Call<CurrentPetRes>
-
-    @Multipart
-    @POST("api/v1/daily-life/upload")
-    fun uploadPhoto(@Part files: ArrayList<MultipartBody.Part>): Call<PhotoRes>
-
-    @POST("api/v1/daily-life/create")
-    fun uploadDaily(@Body data: DailyCreateReq): Call<DailyCreateRes>
-
-    @POST("api/v1/cmm/sgg-list")
-    fun getSggList(@Body data: String): Call<SggListRes>
-
-    @POST("api/v1/cmm/umd-list")
-    fun getUmdList(@Body data: UmdListReq): Call<UmdListRes>
-
-    @POST("api/v1/daily-life/week/recode")
-    fun getWeekRecord(@Body data: WeekRecordReq) : Call<WeekRecordRes>
-
-    @POST("api/v1/daily-life/list")
-    fun getWalkList(@Body data: WalkListReq): Call<WalkListRes>
-
-    @POST("api/v1/daily-life/view")
-    fun getDailyDetail(@Body data: DailyDetailReq): Call<DailyDetailRes>
-
-    @POST("api/v1/daily-life/month/recode")
-    fun getMonthData(@Body data: DailyMonthReq): Call<DailyMonthRes>
-
-    @POST("api/v1/mypet/invtt/create")
-    fun getInviteCode(@Body data: InviteCodeReq): Call<InviteCodeRes>
-
-    @POST("api/v1/mypet/invtt/setKey")
-    fun setInviteCode(@Body data: String): Call<SetInviteCodeRes>
-
-    @GET("/v1/nid/me")
-    fun getNidUserInfo(@Header("Authorization") authorization:String): Call<NidUserInfoResponse>
-
-    @POST("api/v1/member/reset-ncknm")
-    fun resetNickName(@Body data: ResetNickNameReq): Call<commonRes>
-
-    @POST("api/v1/member/reset-password")
-    fun resetPw(@Body data : ResetPwReq) : Call<commonRes>
-
-    @POST("api/v1/mypet/delete")
-    fun deletePet(@Body data : DeletePetReq) : Call<commonRes>
-
-    // 게시판
-    @POST("api/v1/bbs/faq/list")
-    fun getFaqList(@Body data : BbsReq) : Call<FAQRes>
-
-    @POST("api/v1/bbs/qna/bsc/list")
-    fun getQnaList(@Body data : QnaReq) : Call<QnaRes>
-
-    @POST("api/v1/weather")
-    fun getWeather(@Body data : WeatherReq) : Call<WeatherRes>
-
+    @POST("/api/v1/mypet/rel-close")
+    fun relClose(@Body data : RelCloseReq): Call<commonRes>
     @POST("/api/v1/mypet/wght/create")
     fun regPetWgt(@Body data : RegPetWgtReq) : Call<commonRes>
+    @POST("/api/v1/mypet/wght/delete")
+    fun deletePetWgt(@Body data : Int) : Call<commonRes>
+    @POST("/api/v1/mypet/wght/list")
+    fun getPetWgt(@Body data : String) : Call<PetWgtRes>
+    @POST("/api/v1/mypet/wght/update")
+    fun changePetWgt(@Body data : ChangePetWgtReq) : Call<commonRes>
+    // --------------------- 마이펫 ----------------------- //
+
+    // --------------------- 공통 코드 ----------------------- //
+    @POST("api/v1/cmm/code-list")
+    fun commonCodeList(@Body data: CommonCodeModel) : Call<CommonCodeResModel>
+    @POST("api/v1/cmm/pet-list")
+    fun petList(@Body data: PetListModel) : Call<PetListResModel>
+    @POST("api/v1/cmm/sgg-list")
+    fun getSggList(@Body data: String): Call<SggListRes>
+    @POST("api/v1/cmm/umd-list")
+    fun getUmdList(@Body data: UmdListReq): Call<UmdListRes>
+    @POST("api/v1/weather")
+    fun getWeather(@Body data : WeatherReq) : Call<WeatherRes>
+    // --------------------- 공통 코드 ----------------------- //
 }

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class commonRes(
     @SerializedName("data")
-    var `data`: Data,
+    var data: Data?,
     @SerializedName("detailMessage")
     var detailMessage: String, // 처리중 오류 발생시 상세 메세지 노출.
     @SerializedName("resultMessage")

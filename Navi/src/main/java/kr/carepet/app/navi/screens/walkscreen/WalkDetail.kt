@@ -105,6 +105,8 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
     val dailyDetail by walkViewModel.dailyDetail.collectAsState()
     val walkListItem by walkViewModel.walkListItem.collectAsState()
 
+    var imageLoading by remember{ mutableStateOf(false) }
+
     val pagerState = rememberPagerState( pageCount = {dailyDetail?.dailyLifeFileList?.size ?: 0 })
 
     val annotatedString = buildAnnotatedString {
@@ -201,11 +203,9 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                                         , contentAlignment = Alignment.Center) {
 
                                         AsyncImage(
-                                            onLoading = {
-
-                                            },
+                                            onLoading = { imageLoading = true },
                                             onError = {Log.d("LOG", "onError")},
-                                            onSuccess = {Log.d("LOG", "onSuccess")},
+                                            onSuccess = { imageLoading = false},
                                             model = ImageRequest.Builder(LocalContext.current)
                                                 .data(
                                                     "http://carepet.hopto.org/img/"+
@@ -215,8 +215,8 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                                                 .crossfade(true)
                                                 .build(),
                                             contentDescription = "",
-                                            placeholder = painterResource(id = R.drawable.profile_default),
-                                            error= painterResource(id = R.drawable.profile_default),
+                                            //placeholder = painterResource(id = R.drawable.profile_default),
+                                            //error= painterResource(id = R.drawable.profile_default),
                                             modifier= Modifier.fillMaxSize(),
                                             contentScale = ContentScale.Fit
                                         )

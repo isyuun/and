@@ -12,9 +12,11 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,9 +32,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -42,6 +46,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -49,6 +54,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,7 +62,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -67,15 +75,42 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.compose.chart.scroll.rememberChartScrollState
+import com.patrykandpatrick.vico.compose.component.lineComponent
+import com.patrykandpatrick.vico.compose.component.shape.shader.fromBrush
+import com.patrykandpatrick.vico.compose.component.shapeComponent
+import com.patrykandpatrick.vico.compose.component.textComponent
+import com.patrykandpatrick.vico.compose.style.currentChartStyle
+import com.patrykandpatrick.vico.core.axis.AxisItemPlacer
+import com.patrykandpatrick.vico.core.chart.DefaultPointConnector
+import com.patrykandpatrick.vico.core.chart.copy
+import com.patrykandpatrick.vico.core.chart.line.LineChart
+import com.patrykandpatrick.vico.core.chart.scale.AutoScaleUp
+import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
+import com.patrykandpatrick.vico.core.dimensions.MutableDimensions
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.entry.FloatEntry
+import com.patrykandpatrick.vico.core.marker.Marker
+import com.patrykandpatrick.vico.core.marker.MarkerVisibilityChangeListener
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CustomTextField
+import kr.carepet.app.navi.component.rememberMarker
 import kr.carepet.app.navi.screens.mainscreen.CircleImage
+import kr.carepet.app.navi.screens.mainscreen.formatWghtVl
 import kr.carepet.app.navi.ui.theme.design_999999
 import kr.carepet.app.navi.ui.theme.design_DDDDDD
 import kr.carepet.app.navi.ui.theme.design_btn_border
@@ -86,6 +121,7 @@ import kr.carepet.app.navi.ui.theme.design_login_bg
 import kr.carepet.app.navi.ui.theme.design_login_text
 import kr.carepet.app.navi.ui.theme.design_placeHolder
 import kr.carepet.app.navi.ui.theme.design_select_btn_text
+import kr.carepet.app.navi.ui.theme.design_sharp
 import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
@@ -98,13 +134,13 @@ import kr.carepet.util.Log
 import java.text.SimpleDateFormat
 import java.util.Date
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedViewModel, settingViewModel: SettingViewModel,index: String?){
 
     DisposableEffect(Unit){
         onDispose {
-            Log.d("LOG","DISPOS")
             settingViewModel.updateMemberList(null)
         }
     }
@@ -132,9 +168,98 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
     }
 
     var weightRgstDialog by remember{ mutableStateOf(false) }
+    var weightCNDDialog by remember{ mutableStateOf(false) }
+
+    val modelProducer = remember{ChartEntryModelProducer()}
+    val datasetForModel = remember{ mutableStateListOf(listOf<FloatEntry>()) }
+    val datasetLineSpec = remember{ arrayListOf<LineChart.LineSpec>() }
+
+    var refreshPetList by remember{ mutableStateOf(false) }
+    var updatePetWgt by remember{ mutableStateOf(false) }
+
+    val scrollState = rememberChartScrollState()
+    val petwgtList by settingViewModel.petWeightList.collectAsState()
+
+    val defaultLines = currentChartStyle.lineChart.lines
+    val pointConnector = DefaultPointConnector(cubicStrength = 0.2f)
+    val circleComponent = shapeComponent(
+        shape = CircleShape,
+        color = design_white,
+        strokeWidth = 2.5.dp,
+        strokeColor = design_sharp
+    )
+
+    val markerVisibilityChangeListener = MyMarkerVisibilityChangeListener()
+    val xValue by markerVisibilityChangeListener.xValue.collectAsState()
+    
+    val lineChart = lineChart(
+        remember(defaultLines) {
+            defaultLines.map { defaultLine -> defaultLine.copy(
+                pointConnector = pointConnector,
+                lineColor = design_sharp.toArgb(),
+                lineBackgroundShader = null,
+                lineThicknessDp = 2.5f,
+                point = circleComponent,
+                pointSizeDp = 10.0f
+            ) }
+        }
+    )
+
+    LaunchedEffect(key1 = updatePetWgt){
+        if (updatePetWgt){
+            settingViewModel.viewModelScope.launch {
+                sharedViewModel.loadPetInfo()
+                sharedViewModel.loadCurrentPetInfo()
+            }
+            val result = settingViewModel.getPetWgt(petInfo[indexInt].ownrPetUnqNo)
+            if (result){
+                datasetForModel.clear()
+                var xPos = 0f
+                val dataPoints = arrayListOf<FloatEntry>()
+
+                for (petWgt in petwgtList?: emptyList()){
+                    dataPoints.add(FloatEntry(x= xPos, y= petWgt.wghtVl.toFloat()))
+                    xPos += 1f
+                }
+
+                datasetForModel.add(dataPoints)
+                modelProducer.setEntries(datasetForModel)
+                updatePetWgt = false
+            }
+        }
+    }
 
     LaunchedEffect(Unit){
         settingViewModel.getPetInfoDetail(petInfo[indexInt])
+        settingViewModel.getPetWgt(petInfo[indexInt].ownrPetUnqNo)
+
+        datasetForModel.clear()
+        datasetLineSpec.clear()
+        var xPos = 0f
+        val dataPoints = arrayListOf<FloatEntry>()
+
+        datasetLineSpec.add(
+            LineChart.LineSpec(
+                lineColor = design_sharp.toArgb(),
+                lineBackgroundShader = DynamicShaders.fromBrush(
+                    brush = Brush.verticalGradient(
+                        listOf(
+                            design_sharp.copy(com.patrykandpatrick.vico.core.DefaultAlpha.LINE_BACKGROUND_SHADER_START),
+                            design_sharp.copy(com.patrykandpatrick.vico.core.DefaultAlpha.LINE_BACKGROUND_SHADER_END)
+                        )
+                    )
+                ),
+                //lineBackgroundShader = null,
+                pointConnector = pointConnector
+            )
+        )
+        for (petWgt in petwgtList?: emptyList()){
+            dataPoints.add(FloatEntry(x= xPos, y= petWgt.wghtVl.toFloat()))
+            xPos += 1f
+        }
+        datasetForModel.add(dataPoints)
+
+        modelProducer.setEntries(datasetForModel)
     }
 
     Scaffold (
@@ -147,7 +272,17 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 viewModel = settingViewModel,
                 confirm = "등록",
                 dismiss = "취소",
-                ownrPetUnqNo = petInfo[indexInt].ownrPetUnqNo
+                ownrPetUnqNo = petInfo[indexInt].ownrPetUnqNo,
+                refresh = {newValue -> updatePetWgt = newValue}
+            )
+        }
+
+        if (weightCNDDialog){
+            WeightCNDDialog(
+                onDismiss = {newValue -> weightCNDDialog = newValue},
+                viewModel = settingViewModel,
+                index = xValue,
+                refresh = {newValue -> updatePetWgt = newValue}
             )
         }
 
@@ -155,12 +290,13 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
         Column(
             modifier = Modifier
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
                 .fillMaxSize()
                 .background(design_white),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "${petInfo[indexInt].stdgCtpvNm} ${petInfo[indexInt].stdgSggNm} ${petInfo[indexInt].stdgUmdNm}",
+                text = "${petInfo[indexInt].stdgCtpvNm} ${petInfo[indexInt].stdgSggNm} ${petInfo[indexInt].stdgUmdNm ?: ""}",
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
@@ -261,7 +397,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                     }
 
                     Text(
-                        text = "${petInfo[indexInt].wghtVl}kg",
+                        text = "${formatWghtVl(petInfo[indexInt].wghtVl)}kg",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -271,7 +407,62 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 } // Row
             }
 
-            Spacer(modifier = Modifier.padding(top = 20.dp))
+            if (datasetForModel.isNotEmpty()){
+                val marker = rememberMarker()
+
+                Chart(
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .fillMaxWidth()
+                        .background(design_white)
+                        .combinedClickable(
+                            onLongClick = { weightCNDDialog = true },
+                            onClick = {}
+                        ),
+                    chart = lineChart,
+                    chartModelProducer = modelProducer,
+                    startAxis = rememberStartAxis(
+                        label = textComponent(
+                            color = design_skip,
+                            textSize = 12.sp,
+                            margins = MutableDimensions(10f, 0f),
+                        ),
+                        tickLength = 0.dp,
+                        valueFormatter = { value,_ ->
+                            String.format("%.1f", value)
+                        },
+                        itemPlacer = AxisItemPlacer.Vertical.default(
+                            maxItemCount = 6
+                        ),
+                        axis = null
+                    ),
+                    bottomAxis = rememberBottomAxis(
+                        label = textComponent(
+                            color = design_skip,
+                            textSize = 12.sp,
+                            margins = MutableDimensions(0f, 10f),
+                        ),
+                        axis = lineComponent(color = design_textFieldOutLine, thickness = 1.dp),
+                        tickLength = 0.dp,
+                        valueFormatter = { value,_ ->
+                            if (petwgtList != null && value.toInt() in 0 until petwgtList!!.size) {
+                                petwgtList?.getOrNull(value.toInt())?.crtrYmd ?: ""
+                            } else {
+                                ""
+                            }
+                        },
+                        itemPlacer = AxisItemPlacer.Horizontal.default(
+
+                        ),
+                        guideline = null,
+                    ),
+                    marker = marker,
+                    chartScrollState = scrollState,
+                    markerVisibilityChangeListener = markerVisibilityChangeListener,
+                    isZoomEnabled = true,
+                    autoScaleUp = AutoScaleUp.None
+                )
+            }
 
             Row (
                 modifier = Modifier.fillMaxWidth(),
@@ -535,18 +726,228 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun WeightCNDDialog(
+    onDismiss: (Boolean) -> Unit,
+    viewModel: SettingViewModel,
+    index: Int,
+    refresh:(Boolean) -> Unit
+){
+
+    val petWeightList by viewModel.petWeightList.collectAsState()
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val petWeight by viewModel.petWeight.collectAsState()
+    val dm by viewModel.regDM.collectAsState()
+
+    DisposableEffect(Unit){
+
+        viewModel.updatePetWeight(petWeightList?.getOrNull(index)?.wghtVl.toString())
+
+        onDispose {
+            viewModel.updatePetWeight("")
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = { onDismiss(false) },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ){
+        Box (
+            modifier = Modifier
+                .padding(horizontal = 40.dp)
+                .fillMaxWidth()
+                .background(color = design_white, shape = RoundedCornerShape(20.dp))
+        ){
+            Column (
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Text(
+                    text = "등록일자",
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                    color = design_login_text,
+                    modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 8.dp)
+                )
+
+                Button(
+                    enabled = false,
+                    onClick = {  },
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    border = BorderStroke(width = 1.dp, color = design_textFieldOutLine),
+                    shape = RoundedCornerShape(4.dp),
+                    contentPadding = PaddingValues(0.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = design_white,
+                        disabledContainerColor = design_white
+                    )
+                ) {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart){
+                        Text(
+                            text = runCatching<String?> { petWeightList?.get(index)?.crtrYmd }.getOrElse { "" } ?: "",
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = design_login_text,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
+
+                Text(
+                    text = "몸무게",
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                    color = design_login_text,
+                    modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 8.dp)
+                )
+
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    CustomTextField(
+                        value = petWeight,
+                        onValueChange = { viewModel.updatePetWeight(it) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Decimal,
+                            imeAction = ImeAction.Done),
+                        modifier = Modifier
+                            .padding(start = 20.dp)
+                            .weight(1f)
+                            .height(48.dp),
+                        placeholder = { Text(text = "몸무게를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedPlaceholderColor = design_placeHolder,
+                            focusedPlaceholderColor = design_placeHolder,
+                            unfocusedBorderColor = design_textFieldOutLine,
+                            focusedBorderColor = design_login_text,
+                            unfocusedContainerColor = design_white,
+                            focusedContainerColor = design_white,
+                            unfocusedLeadingIconColor = design_placeHolder,
+                            focusedLeadingIconColor = design_login_text),
+                        shape = RoundedCornerShape(4.dp),
+                        innerPadding = PaddingValues(start = 8.dp)
+                    )
+
+                    Text(
+                        text = "kg",
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                        color = design_login_text,
+                        modifier = Modifier.padding(start = 8.dp,end = 20.dp)
+                    )
+                }
+
+
+                Row (
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                ){
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(design_DDDDDD)
+                            .clickable {
+                                scope.launch {
+                                    val petDtlUnqNo = petWeightList?.get(index)?.petDtlUnqNo ?: 0
+
+                                    val result = viewModel.deletePetWgt(petDtlUnqNo)
+                                    if (result) {
+                                        onDismiss(false)
+                                        refresh(true)
+                                        Toast
+                                            .makeText(context, "삭제되었습니다" , Toast.LENGTH_SHORT)
+                                            .show()
+                                    } else {
+                                        Toast
+                                            .makeText(context, dm , Toast.LENGTH_SHORT)
+                                            .show()
+                                    }
+                                }
+                                       },
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = "삭제",
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = design_login_text,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(design_intro_bg)
+                            .clickable {
+                                if (isValidFloat(petWeight)){
+                                    scope.launch {
+                                        val crtrYmd = petWeightList?.get(index)?.crtrYmd ?: ""
+                                        val petDtlUnqNo = petWeightList?.get(index)?.petDtlUnqNo ?: 0
+                                        val wghtVl = petWeight.toFloat()
+
+                                        val result = viewModel.changePetWgt(crtrYmd, petDtlUnqNo, wghtVl)
+                                        if (result) {
+                                            onDismiss(false)
+                                            refresh(true)
+                                            Toast
+                                                .makeText(context, "수정되었습니다" , Toast.LENGTH_SHORT)
+                                                .show()
+                                        } else {
+                                            Toast
+                                                .makeText(context, dm , Toast.LENGTH_SHORT)
+                                                .show()
+                                        }
+                                    }
+                                }else{
+                                    Toast
+                                        .makeText(context, "올바른 체중을 입력해주세요", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+
+                            },
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = "변경",
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = design_white,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun WeightDialog(
     onDismiss: (Boolean) -> Unit,
     viewModel: SettingViewModel,
     confirm: String,
     dismiss: String,
-    ownrPetUnqNo: String
+    ownrPetUnqNo: String,
+    refresh:(Boolean) -> Unit
 ){
 
     val petWeight by viewModel.petWeight.collectAsState()
+    val regDM by viewModel.regDM.collectAsState()
 
     var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(selectableDates = MySelectableDates() )
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -760,19 +1161,27 @@ fun WeightDialog(
                                 .weight(1f)
                                 .background(design_intro_bg)
                                 .clickable {
-                                    scope.launch {
-                                        val result = viewModel.regPetWgt(ownrPetUnqNo)
-                                        if (result) {
-                                            onDismiss(false)
-                                            Toast
-                                                .makeText(context, "등록되었습니다", Toast.LENGTH_SHORT)
-                                                .show()
-                                        } else {
-                                            Toast
-                                                .makeText(context, "등록에 실패했습니다", Toast.LENGTH_SHORT)
-                                                .show()
+                                    if (isValidFloat(petWeight)){
+                                        scope.launch {
+                                            val result = viewModel.regPetWgt(ownrPetUnqNo)
+                                            if (result) {
+                                                onDismiss(false)
+                                                refresh(true)
+                                                Toast
+                                                    .makeText(context, "등록되었습니다", Toast.LENGTH_SHORT)
+                                                    .show()
+                                            } else {
+                                                Toast
+                                                    .makeText(context, regDM, Toast.LENGTH_SHORT)
+                                                    .show()
+                                            }
                                         }
+                                    }else{
+                                        Toast
+                                            .makeText(context, "올바른 체중을 입력해주세요", Toast.LENGTH_SHORT)
+                                            .show()
                                     }
+
                                 },
                             contentAlignment = Alignment.Center
                         ){
@@ -791,3 +1200,35 @@ fun WeightDialog(
     }
 }
 
+class MyMarkerVisibilityChangeListener() : MarkerVisibilityChangeListener {
+
+    private val _xValue = MutableStateFlow(0)
+    val xValue: StateFlow<Int> = _xValue.asStateFlow()
+
+    override fun onMarkerShown(marker: Marker, markerEntryModels: List<Marker.EntryModel>) {
+
+        val firstEntryModel = markerEntryModels.firstOrNull()
+        if (firstEntryModel != null) {
+            val index = firstEntryModel.index
+            _xValue.value = index
+            
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+class MySelectableDates : SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+        val now = System.currentTimeMillis()
+        return utcTimeMillis <= now // 현재 날짜 및 이전 날짜는 선택 가능, 이후 날짜는 선택 불가능
+    }
+}
+
+fun isValidFloat(input: String): Boolean {
+    return try {
+        input.toFloat()
+        true
+    } catch (e: NumberFormatException) {
+        false
+    }
+}

@@ -144,8 +144,10 @@ import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Date
@@ -354,12 +356,16 @@ fun ProfileContent(
     val weatherData by viewModel.weatherData.collectAsState()
     val weatherRefresh by viewModel.weatherRefresh.collectAsState()
 
+    val currentTime = LocalTime.now() // 현재 시간을 가져옵니다
+    val afternoon6 = LocalTime.of(18, 0) // 오후 6시
+    val morning6 = LocalTime.of(6, 0) // 아침 6시
+
     // run catching
     val petKindNm = runCatching {currentPetInfo[pagerState.currentPage].petKindNm}.getOrElse {""}
     val petNm = runCatching { currentPetInfo[pagerState.currentPage].petNm }.getOrElse { "" }
     val petAge = runCatching { currentPetInfo[pagerState.currentPage].age }.getOrElse { "" }
     val sexTypNm = runCatching { currentPetInfo[pagerState.currentPage].sexTypNm }.getOrElse { "" }
-    val wghtVl = runCatching { currentPetInfo[pagerState.currentPage].wghtVl }.getOrElse { "" }
+    val wghtVl = runCatching { formatWghtVl(currentPetInfo[pagerState.currentPage].wghtVl)  }.getOrElse { "" }
     val temp = runCatching { weatherData?.data?.find { it.category =="TMP" }?.fcstValue}.getOrElse { "" }
     val sky = runCatching { weatherData?.data?.find { it.category =="SKY" }?.fcstValue }.getOrElse { "" }
     val pty = runCatching { weatherData?.data?.find { it.category =="PTY" }?.fcstValue }.getOrElse { "" }
@@ -421,53 +427,52 @@ fun ProfileContent(
                 Row (modifier = Modifier
                     .padding(top = 20.dp)
                     .wrapContentWidth()
-                    .height(26.dp)
+                    .height(30.dp)
                     .animateContentSize()
                     .clip(shape = RoundedCornerShape(50.dp))
                     .background(
-                        color = if(weatherRefresh){
-                             design_weather_1.copy(alphaWeather)
-                        }else{
-                             weatherColor
-                             },
-                        shape = RoundedCornerShape(50.dp)),
+                        color = if (weatherRefresh) {
+                            design_weather_1.copy(alphaWeather)
+                        } else {
+                            weatherColor
+                        },
+                        shape = RoundedCornerShape(50.dp)
+                    ),
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
                 ){
-                    Text(text =
+                    Icon(
+                        painter =
+                        painterResource(id =
                         if(weatherRefresh || sky == null){
-                            "            "
+                            R.drawable.sunny
                         }else{
                             if (pty == "0"){
                                 when(sky){
-                                    "1" -> "맑음"
-                                    "3" -> "구름많음"
-                                    "4" -> "흐림"
-                                    else -> "맑음"
+                                    "1" -> if (currentTime.isAfter(afternoon6) || currentTime.isBefore(morning6)) R.drawable.night else R.drawable.sunny
+                                    "3" -> if (currentTime.isAfter(afternoon6) || currentTime.isBefore(morning6)) R.drawable.cloudy_night else R.drawable.cloudy_day
+                                    "4" -> R.drawable.fog
+                                    else -> R.drawable.sunny
                                 }
                             }else{
                                 when(pty){
-                                    "1" -> "비"
-                                    "2" -> "비/눈"
-                                    "3" -> "눈"
-                                    "4" -> "소나기"
-                                    else -> "비"
+                                    "1" -> R.drawable.rainy
+                                    "2" -> R.drawable.rainyandsnowy
+                                    "3" -> R.drawable.snowy
+                                    "4" -> R.drawable.shower
+                                    else -> R.drawable.rainy
                                 }
                             }
-                        },
-                        fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                        color = design_white, letterSpacing = (-0.6).sp,
-                        modifier = Modifier.padding(start = 16.dp),
-                        textAlign = TextAlign.Center)
+                        }),
+                        contentDescription = "",
+                        tint = if(weatherRefresh || sky == null) Color.Transparent else Color.Unspecified,
+                        modifier = Modifier.padding(start = 16.dp))
 
-                    if (!weatherRefresh){
+                    if (!weatherRefresh && sky != null){
                         Spacer(modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .size(2.dp, 8.dp)
                             .background(color = design_white))
                     }
-
-                    //Icon(painter = painterResource(id = dustIcon), contentDescription = "",
-                    //    modifier = Modifier.padding(end = 2.dp), tint = Color.Unspecified)
 
                     Text(text =
                         if(weatherRefresh || temp == null){
@@ -479,7 +484,7 @@ fun ProfileContent(
                         color = design_white, letterSpacing = (-0.6).sp,
                         textAlign = TextAlign.Center)
 
-                    if (!weatherRefresh){
+                    if (!weatherRefresh && sky != null){
                         Spacer(modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .size(2.dp, 8.dp)
@@ -1526,3 +1531,6 @@ fun metersToKilometers(meters: Int): String {
     return String.format("%.2f", kilometers)
 }
 
+fun formatWghtVl(wghtVl : Float):String{
+    return String.format("%.1f", wghtVl)
+}

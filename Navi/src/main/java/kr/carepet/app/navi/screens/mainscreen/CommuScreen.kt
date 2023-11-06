@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -53,7 +54,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
@@ -69,6 +73,11 @@ import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.CommunityViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
+import kr.carepet.data.bbs.BbsEvnt
+import kr.carepet.util.Log
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -78,12 +87,11 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
     val coroutineScope = rememberCoroutineScope()
     var tabVisible by remember { mutableFloatStateOf(1f) }
 
-    val moreStoryClick by sharedViewModel.moreStoryClick.collectAsState()
+    var init by remember{ mutableStateOf(true) }
 
-    LaunchedEffect(key1 = sharedViewModel.moreStoryClick){
-        if (moreStoryClick){
-            pagerState.animateScrollToPage(page = 0)
-            sharedViewModel.updateMoreStoryClick(false)
+    LaunchedEffect(init){
+        if (init){
+            communityViewModel.getEventList(1)
         }
     }
 
@@ -97,11 +105,12 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
                 modifier = Modifier.alpha(tabVisible),
                 selectedTabIndex = pagerState.currentPage,
                 indicator = { tabPositions -> TabRowDefaults.Indicator(Modifier.pagerTabIndicatorOffset(pagerState, tabPositions), color = design_login_text, height = 2.dp) },
-                backgroundColor = design_white
+                backgroundColor = design_white,
+                contentColor = design_login_text
             ) {
                 CommunityTabItems.forEachIndexed { index, idpwTabItem ->
                     Tab(
-                        text = { Text(text = idpwTabItem.title, fontSize = 16.sp,
+                        text = { Text(text = idpwTabItem.title, fontSize = 16.sp,color = design_login_text,
                             fontFamily =
                             if(index == pagerState.currentPage) FontFamily(Font(R.font.pretendard_bold))
                             else FontFamily(Font(R.font.pretendard_regular))
@@ -206,19 +215,8 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
 @Composable
 fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
-    val dummyList = arrayListOf(
-        EventItemData("1",true),
-        EventItemData("2",false),
-        EventItemData("3",false),
-        EventItemData("4",true),
-        EventItemData("5",true,),
-        EventItemData("6",false),
-        EventItemData("7",true,),
-        EventItemData("8",true),
-        EventItemData("9",true),
-        EventItemData("10",false)
-    )
-    
+    val eventList by viewModel.eventList.collectAsState()
+
     Box (
         Modifier
             .fillMaxSize()
@@ -232,8 +230,10 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
             contentPadding = PaddingValues(vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(40.dp)
             ){
-            items(dummyList){ item ->
-                EventItem(eventItemData = item, navController)
+            if (eventList?.data?.bbsEvntList != null){
+                items(eventList?.data?.bbsEvntList ?: emptyList()){ item ->
+                    EventItem(eventItemData = item, navController, viewModel)
+                }
             }
         }
     }
@@ -242,18 +242,7 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
 @Composable
 fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
-    val dummyList = arrayListOf(
-        EventItemData("1",true),
-        EventItemData("2",false),
-        EventItemData("3",false),
-        EventItemData("4",true),
-        EventItemData("5",true,),
-        EventItemData("6",false),
-        EventItemData("7",true,),
-        EventItemData("8",true),
-        EventItemData("9",true),
-        EventItemData("10",false)
-    )
+    val eventList by viewModel.eventList.collectAsState()
 
     Box (
         Modifier
@@ -268,24 +257,29 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
             contentPadding = PaddingValues(vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(40.dp)
         ){
-            items(dummyList){ item ->
-                EventEndItem(eventItemData = item, navController)
+            if (eventList?.data?.bbsEvntList != null){
+                items(eventList?.data?.bbsEvntList ?: emptyList()){ item ->
+                    EventEndItem(eventItemData = item, navController)
+                }
             }
         }
     }
 }
 
-data class EventItemData(val title:String, val end:Boolean)
 @Composable
-fun EventItem(eventItemData: EventItemData,navController: NavHostController){
+fun EventItem(eventItemData: BbsEvnt, navController: NavHostController, viewModel: CommunityViewModel){
+
     Column (
         modifier= Modifier
             .wrapContentWidth()
-            .wrapContentHeight()
+            .fillMaxWidth()
             .clickable(
-                enabled = !eventItemData.end
+                enabled = !compareTimes(eventItemData.pstgEndDt)
             ) {
-                navController.navigate(Screen.EventDetail.route)
+                viewModel.viewModelScope.launch {
+                    viewModel.getEventDetail(eventItemData.pstSn)
+                    navController.navigate(Screen.EventDetail.route)
+                }
             }
     ) {
         var sizeImage by remember { mutableStateOf(IntSize.Zero) }
@@ -294,14 +288,22 @@ fun EventItem(eventItemData: EventItemData,navController: NavHostController){
             modifier = Modifier
                 .onGloballyPositioned { sizeImage = it.size }
         ){
-            Image(
-                painter = painterResource(id = R.drawable.event_thumb1),
+            AsyncImage(
+                onLoading = {  },
+                onError = { Log.d("LOG", "onError")},
+                onSuccess = { Log.d("LOG", "onSuccess")},
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data( eventItemData.rprsImgUrl )
+                    .crossfade(true)
+                    .build(),
                 contentDescription = "",
-                modifier= Modifier.fillMaxWidth(),
+                placeholder = painterResource(id = R.drawable.profile_default),
+                error= painterResource(id = R.drawable.profile_default),
+                modifier= Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillWidth
             )
 
-            if (eventItemData.end){
+            if (compareTimes(eventItemData.pstgEndDt?: "")){
                 Box(modifier = Modifier
                     .matchParentSize()
                     .background(color = design_alpha60_black),
@@ -320,11 +322,11 @@ fun EventItem(eventItemData: EventItemData,navController: NavHostController){
 
 
         Text(
-            text =  "본아페티 관절 영양제 무료 체험단",
+            text =  eventItemData.pstTtl,
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
-            color = if(eventItemData.end){
+            color = if(compareTimes(eventItemData.pstgEndDt?: "")){
                 design_B5B9BE
             }else{
                 design_login_text
@@ -333,11 +335,11 @@ fun EventItem(eventItemData: EventItemData,navController: NavHostController){
         )
 
         Text(
-            text =  "2023.08.16(월) ~ 2023.08.19(수)",
+            text =  "${eventItemData.pstgBgngDt} ~ ${eventItemData.pstgEndDt}",
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp,
             letterSpacing = (-0.7).sp,
-            color = if(eventItemData.end){
+            color = if(compareTimes(eventItemData.pstgEndDt?: "")){
                 design_B5B9BE
             }else{
                 design_skip
@@ -347,13 +349,13 @@ fun EventItem(eventItemData: EventItemData,navController: NavHostController){
 }
 
 @Composable
-fun EventEndItem(eventItemData: EventItemData,navController: NavHostController){
+fun EventEndItem(eventItemData: BbsEvnt,navController: NavHostController){
     Column (
         modifier= Modifier
             .wrapContentWidth()
             .wrapContentHeight()
             .clickable(
-                enabled = !eventItemData.end
+                enabled = compareTimes(eventItemData.pstgEndDt ?: "")
             ) {
                 navController.navigate(Screen.EventEndDetail.route)
             }
@@ -371,7 +373,7 @@ fun EventEndItem(eventItemData: EventItemData,navController: NavHostController){
                 contentScale = ContentScale.FillWidth
             )
 
-            if (eventItemData.end){
+            if (compareTimes(eventItemData.pstgEndDt?: "")){
                 Box(modifier = Modifier
                     .matchParentSize()
                     .background(color = design_alpha60_black),
@@ -394,7 +396,7 @@ fun EventEndItem(eventItemData: EventItemData,navController: NavHostController){
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
-            color = if(eventItemData.end){
+            color = if(compareTimes(eventItemData.pstgEndDt?: "")){
                 design_B5B9BE
             }else{
                 design_login_text
@@ -407,7 +409,7 @@ fun EventEndItem(eventItemData: EventItemData,navController: NavHostController){
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp,
             letterSpacing = (-0.7).sp,
-            color = if(eventItemData.end){
+            color = if(compareTimes(eventItemData.pstgEndDt?: "")){
                 design_B5B9BE
             }else{
                 design_skip
@@ -444,3 +446,25 @@ val CommunityTabItems = listOf(
                 viewModel = viewModel
             ) })
 )
+
+fun compareTimes(inputTime: String?) : Boolean {
+
+    if (inputTime == "" || inputTime == null){
+        return false
+    }else{
+        // 현재 시간 가져오기
+        val currentTime = LocalDateTime.now()
+        // 입력된 문자열을 LocalDateTime으로 파싱
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val parsedTime = LocalDateTime.parse(inputTime, inputFormatter)
+
+        // 현재 시간과 비교
+        return if (currentTime.isBefore(parsedTime)) {
+            false
+        } else if (currentTime.isEqual(parsedTime)) {
+            true
+        } else {
+            true
+        }
+    }
+}
