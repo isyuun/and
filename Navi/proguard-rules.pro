@@ -23,6 +23,3 @@
 # settings.gradle.kts : include(":NAV")
 # build.gradle.kts : implementation(project(mapOf("path" to ":NAV")))
 -keep class kr.carepet.data.** { *; }
-#-keep class kr.carepet.singleton.** { *; }
-#-keep class kr.carepet.data.user.** { *; }
-#-keep class kr.carepet.data.pet.** { *; }
