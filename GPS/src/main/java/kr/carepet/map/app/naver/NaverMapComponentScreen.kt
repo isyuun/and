@@ -135,7 +135,6 @@ import kr.carepet.gpx.GPX_LATITUDE_ZERO
 import kr.carepet.gpx.GPX_LONGITUDE_ZERO
 import kr.carepet.gpx.TRACK_ZERO_NUM
 import kr.carepet.gpx.Track
-import kr.carepet.gpx._GPXWriter
 import kr.carepet.map._app.getRounded
 import kr.carepet.map._app.toPx
 import kr.carepet.map._app.toText
@@ -429,7 +428,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 
 
     var isLoading by remember { mutableStateOf(false) }
-    Log.wtf(__CLASSNAME__, "${getMethodName()}[isLoading:$isLoading][${coords.size}")
+    Log.wtf(__CLASSNAME__, "${getMethodName()}[isLoading:$isLoading][${coords.size}]")
     if (coords.isNotEmpty()) {
         isLoading = false
     }
@@ -505,7 +504,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
 
     /** top */
-    WalkInfoNavi(application.start)
+    WalkNaviInfo(application.start)
 
     /** bottom/right/left/walk */
     Box(
@@ -822,19 +821,19 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     showBottomSheet = !showBottomSheet
                     mapView.getMapAsync { naverMap ->
                         if (tracks?.isNotEmpty() == true) {
-                            val latLng = tracks?.last()?.let { LatLng(it.latitude, it.longitude) }
-                            latLng?.let {
-                                val position = CameraPosition(it, 17.0)
+                            val latLng = tracks.last().let { LatLng(it.latitude, it.longitude) }
+                            latLng.let {
+                                val position = CameraPosition(it, GPX_CAMERA_ZOOM_ZERO)
                                 val update = CameraUpdate.toCameraPosition(position)
                                 naverMap.moveCamera(update)
                             }
                             val distance = application._distance
                             if (distance != null && distance > 100) {
-                                val latLng1 = tracks?.first()?.let { LatLng(it.latitude, it.longitude) }
-                                val latLng2 = tracks?.last()?.let { LatLng(it.latitude, it.longitude) }
-                                val bounds = latLng1?.let { latLng2?.let { it1 -> LatLngBounds(it, it1) } }
+                                val latLng1 = tracks.first().let { LatLng(it.latitude, it.longitude) }
+                                val latLng2 = tracks.last().let { LatLng(it.latitude, it.longitude) }
+                                val bounds = latLng1.let { latLng2.let { it1 -> LatLngBounds(it, it1) } }
                                 val padding = 48.dp.toPx(context).toInt()
-                                bounds?.let { naverMap.moveCamera(CameraUpdate.fitBounds(it, padding)) }
+                                bounds.let { naverMap.moveCamera(CameraUpdate.fitBounds(it, padding)) }
                             }
                         }
                     }
@@ -1077,7 +1076,7 @@ fun WalkInfoSheet() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WalkInfoNavi(start: Boolean) {
+fun WalkNaviInfo(start: Boolean) {
     Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
     val application = GPSApplication.instance
     var pet by remember { mutableStateOf(CurrentPetData("", "", "", "", "", "", 0.0f)) }
@@ -1113,8 +1112,8 @@ fun WalkInfoNavi(start: Boolean) {
                     color = MaterialTheme.colorScheme.tertiary,
                     shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
                 )
-                .padding(bottom = 8.dp)
-                .padding(16.dp),
+                .padding(horizontal = 24.dp)
+                .padding(vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {
@@ -1170,16 +1169,17 @@ fun WalkInfoNavi(start: Boolean) {
                     color = MaterialTheme.colorScheme.tertiary,
                     shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
                 )
-                .padding(bottom = 0.dp)
-                .padding(16.dp),
+                .padding(horizontal = 24.dp)
+                .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(0.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            CircleImageTopBar(size = 40, imageUri = pet.petRprsImgAddr)
+            CircleImageTopBar(size = 60, imageUri = pet.petRprsImgAddr)
             Column(
                 modifier = Modifier
-                    .padding(start = 12.dp),
-                verticalArrangement = Arrangement.Top,
+                    .padding(horizontal = 12.dp)
+                    .padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
@@ -1205,7 +1205,7 @@ fun WalkInfoNavi(start: Boolean) {
                     )
                     Text(
                         modifier = Modifier
-                            .weight(2.0f),
+                            .weight(1.5f),
                         text = distance,
                         fontSize = 22.sp,
                         letterSpacing = (-0.0).sp,
