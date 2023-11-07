@@ -1,15 +1,16 @@
 package kr.carepet.app.navi.screens.commuscreen
 
+import android.util.Base64
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -46,13 +47,14 @@ import kr.carepet.app.navi.viewmodel.CommunityViewModel
 import kr.carepet.util.Log
 
 @Composable
-fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel){
+fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel) {
 
     val detailData by viewModel.eventDetail.collectAsState()
-    val txt = "* **123123\\\\**\r\n* **412312**\r\n* **1254123**\r\n* **1524123**\r\n* \r\n* \r\n* \r\n\r\n```\r\n| test | q1212 | 3214 |  | 124123 | 41232 |\r\n| ---- | ----- | ---- | --- | ------ | ----- |\r\n|  |  |  |  |  |  |\r\n```\r\n## fghagasdfsf\r\n* ![](http://carepet.hopto.org/img/bbs/img/20231107/b6b26032fd79434dbf968017a5cb85ee.JPG)"
+    //val detailText =
+    //    "* **123123\\\\**\r\n* **412312**\r\n* **1254123**\r\n* **1524123**\r\n* \r\n* \r\n* \r\n\r\n```\r\n| test | q1212 | 3214 |  | 124123 | 41232 |\r\n| ---- | ----- | ---- | --- | ------ | ----- |\r\n|  |  |  |  |  |  |\r\n```\r\n## fghagasdfsf\r\n* ![](http://carepet.hopto.org/img/bbs/img/20231107/b6b26032fd79434dbf968017a5cb85ee.JPG)"
 
 
-    Scaffold (
+    Scaffold(
         topBar = { BackTopBar(title = stringResource(R.string.title_event), navController = navController) }
     ) { paddingValues ->
         Column(
@@ -63,17 +65,17 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                 .verticalScroll(rememberScrollState())
         ) {
             AsyncImage(
-                onLoading = {  },
-                onError = { Log.d("LOG", "onError")},
-                onSuccess = { Log.d("LOG", "onSuccess")},
+                onLoading = { },
+                onError = { Log.d("LOG", "onError") },
+                onSuccess = { Log.d("LOG", "onSuccess") },
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data( detailData?.data?.bbsEvntDtl?.get(0)?.rprsImgUrl )
+                    .data(detailData?.data?.bbsEvntDtl?.get(0)?.rprsImgUrl)
                     .crossfade(true)
                     .build(),
                 contentDescription = "",
                 placeholder = painterResource(id = R.drawable.profile_default),
-                error= painterResource(id = R.drawable.profile_default),
-                modifier= Modifier.fillMaxSize(),
+                error = painterResource(id = R.drawable.profile_default),
+                modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillWidth
             )
 
@@ -85,17 +87,19 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                 color = design_login_text,
                 modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)
             )
-            
-            Spacer(modifier = Modifier
-                .padding(top = 20.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(design_textFieldOutLine))
+
+            Spacer(
+                modifier = Modifier
+                    .padding(top = 20.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(design_textFieldOutLine)
+            )
 
 
             // ------------------------ html 문 들어갈 자리 --------------------------
-
-
+            val pstCn = detailData?.data?.bbsEvntDtl?.get(0)?.pstCn
+            pstCn?.let { WebViewHtml(html = it, modifier = Modifier.fillMaxSize()) }
             // ------------------------ html 문 들어갈 자리 --------------------------
 
 
@@ -120,7 +124,35 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
 }
 
 @Composable
-fun EventDetailMainText(text:String, bottomPadding:Int){
+fun WebViewUrl(url: String, data: String, modifier: Modifier) {
+    AndroidView(
+        factory = { context ->
+            WebView(context).apply {
+                settings.javaScriptEnabled = true
+                webViewClient = WebViewClient()
+                postUrl(url, Base64.encode(data.toByteArray(), Base64.DEFAULT))
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun WebViewHtml(html: String, modifier: Modifier) {
+    AndroidView(
+        factory = { context ->
+            WebView(context).apply {
+                settings.javaScriptEnabled = true
+                webViewClient = WebViewClient()
+                loadData(html, "text/html; charset=utf-8", "UTF-8")
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun EventDetailMainText(text: String, bottomPadding: Int) {
     Text(
         text = text,
         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -133,7 +165,7 @@ fun EventDetailMainText(text:String, bottomPadding:Int){
 }
 
 @Composable
-fun EventDetailSubText(text:String, bottomPadding:Int){
+fun EventDetailSubText(text: String, bottomPadding: Int) {
     Text(
         text = text,
         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
