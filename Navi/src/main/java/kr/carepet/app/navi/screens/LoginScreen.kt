@@ -257,6 +257,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                 MySharedPreference.setUserEmail(id)
                                 sharedViewModel.updateInit(true)
                                 navController.navigate(Screen.MainScreen.route){
+                                    Log.d("NAV","nav진입")
                                     popUpTo(0)
                                 }
                             }else{

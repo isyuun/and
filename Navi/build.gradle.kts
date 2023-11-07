@@ -24,11 +24,12 @@ android {
     }
     buildTypes {
         getByName("debug") {
-            //isMinifyEnabled = false
+            //isMinifyEnabled = true
             //isDebuggable = true
             //signingConfig = signingConfigs.getByName("debug")
             //manifestPlaceholders["enableCrashlytics"] = "false"
             //extra.set("alwaysUpdateBuildId", false)
+            //proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
         }
         getByName("release") {
             //shrinkResources = true
@@ -36,7 +37,7 @@ android {
             isDebuggable = false
             signingConfig = signingConfigs.getByName("release")
             manifestPlaceholders["enableCrashlytics"] = "true"
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro")
         }
     }
 

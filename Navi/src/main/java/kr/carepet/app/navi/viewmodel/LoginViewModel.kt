@@ -120,9 +120,9 @@ class LoginViewModel() : ViewModel() {
                                     MySharedPreference.setLastLoginMethod(loginMethod)
                                     MySharedPreference.setIsLogin(true)
 
-
                                     continuation.resume(true)
                                 } else {
+
                                     continuation.resume(false)
                                 }
                             }
