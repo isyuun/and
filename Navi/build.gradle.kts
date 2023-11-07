@@ -24,20 +24,18 @@ android {
     }
     buildTypes {
         getByName("debug") {
-            //isMinifyEnabled = true
-            //isDebuggable = true
+            isMinifyEnabled = true
+            //isDebuggable = false
             //signingConfig = signingConfigs.getByName("debug")
             //manifestPlaceholders["enableCrashlytics"] = "false"
-            //extra.set("alwaysUpdateBuildId", false)
-            //proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
         }
         getByName("release") {
-            //shrinkResources = true
             isMinifyEnabled = true
-            isDebuggable = false
-            signingConfig = signingConfigs.getByName("release")
-            manifestPlaceholders["enableCrashlytics"] = "true"
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro")
+            //isDebuggable = false
+            //signingConfig = signingConfigs.getByName("release")
+            //manifestPlaceholders["enableCrashlytics"] = "true"
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
         }
     }
 
@@ -90,8 +88,8 @@ dependencies {
     implementation(project(mapOf("path" to ":_APP")))
     implementation(project(mapOf("path" to ":APP")))
     implementation(project(mapOf("path" to ":GPS")))
-    implementation(project(mapOf("path" to ":NAV")))
     implementation(project(mapOf("path" to ":GPX")))
+    implementation(project(mapOf("path" to ":NAV")))
 
     //기존 implementation
     implementation("androidx.core:core-ktx:1.9.0")

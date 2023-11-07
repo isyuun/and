@@ -1,4 +1,4 @@
 package kr.carepet
 
-val DEBUG = kr.carepet.BuildConfig.DEBUG
-//val DEBUG = false
+//val DEBUG = kr.carepet.BuildConfig.DEBUG
+val DEBUG = false
