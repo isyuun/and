@@ -2,6 +2,7 @@ package kr.carepet.app.navi.viewmodel
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,6 +25,8 @@ import kr.carepet.data.daily.DailyCreateRes
 import kr.carepet.data.daily.Pet
 import kr.carepet.data.daily.PhotoData
 import kr.carepet.data.daily.PhotoRes
+import kr.carepet.data.daily.StoryReq
+import kr.carepet.data.daily.StoryRes
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.user.BbsReq
 import kr.carepet.gps.app.GPSApplication
@@ -40,6 +43,9 @@ import kotlin.coroutines.resume
 
 @GlideModule
 class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(){
+
+    private val _storyRes = MutableStateFlow<StoryRes?>(null)
+    val storyRes: StateFlow<StoryRes?> = _storyRes.asStateFlow()
 
     // ------------------------------------------------------------------
     private val _selectPetMulti = MutableStateFlow<MutableList<CurrentPetData>>(mutableListOf())
@@ -121,6 +127,36 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     private val _eventDetail = MutableStateFlow<EventDetailRes?>(null)
     val eventDetail: StateFlow<EventDetailRes?> = _eventDetail.asStateFlow()
 
+    suspend fun getStoryList(page: Int, orderType:String, viewType:String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val order = if (orderType == "최신순") "001" else "002"
+        val view = if (viewType == "전체") "001" else "002"
+
+        val data = StoryReq(orderType = order,page = page, pageSize = 10, recordSize = 20, viewType = view)
+
+        val call = apiService.getStoryList(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<StoryRes>{
+                override fun onResponse(call: Call<StoryRes>, response: Response<StoryRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _storyRes.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<StoryRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
     suspend fun getEventList(page:Int):Boolean{
         val apiService = RetrofitClientServer.instance
 

@@ -53,6 +53,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -573,58 +574,63 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
 
             Button(
                 onClick = {
-                    //scope.launch {
-                    //    isLoading = true
-                    //
-                    //    val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
-                    //    val matches = pattern.findAll(hashString)
-                    //    val hashtagList = matches.map { it.groupValues[1] }.toList()
-                    //
-                    //    viewModel.updateHashTag(hashtagList)
-                    //
-                    //    if (state.listOfSelectedImages.size <= 1) {
-                    //        var dailyUpload = viewModel.uploadDaily()
-                    //        if (dailyUpload) {
-                    //            navController.popBackStack()
-                    //            isLoading = false
-                    //        } else {
-                    //            isLoading = false
-                    //            snackState.showSnackbar(
-                    //                message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
-                    //                actionLabel = "확인",
-                    //                duration = SnackbarDuration.Short,
-                    //                withDismissAction = false
-                    //            )
-                    //        }
-                    //    } else {
-                    //        val photoUpload = viewModel.fileUpload(context = context)
-                    //        if (photoUpload) {
-                    //            val dailyUpload = viewModel.uploadDaily()
-                    //            if (dailyUpload) {
-                    //                navController.popBackStack()
-                    //                viewModel.updateSelectedImageList(emptyList())
-                    //                isLoading = false
-                    //            } else {
-                    //                isLoading = false
-                    //                snackState.showSnackbar(
-                    //                    message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
-                    //                    actionLabel = "확인",
-                    //                    duration = SnackbarDuration.Short,
-                    //                    withDismissAction = false
-                    //                )
-                    //            }
-                    //        } else {
-                    //            isLoading = false
-                    //            snackState.showSnackbar(
-                    //                message = "사진전송에 실패했습니다. 다시 시도해주세요",
-                    //                actionLabel = "확인",
-                    //                duration = SnackbarDuration.Short,
-                    //                withDismissAction = false
-                    //            )
-                    //        }
-                    //    }
-                    //}
-                          Log.d("LOG",selectedPet.size.toString())
+                    if (selectedPet.size == 0){
+                        Toast.makeText(context, "반려동물을 선택해주세요", Toast.LENGTH_SHORT).show()
+                    }else if (selectedCategory.size == 0 ){
+                        Toast.makeText(context, "일상 구분을 선택해주세요", Toast.LENGTH_SHORT).show()
+                    }else{
+                        scope.launch {
+                            isLoading = true
+
+                            val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
+                            val matches = pattern.findAll(hashString)
+                            val hashtagList = matches.map { it.groupValues[1] }.toList()
+
+                            viewModel.updateHashTag(hashtagList)
+
+                            if (state.listOfSelectedImages.size <= 1) {
+                                var dailyUpload = viewModel.uploadDaily()
+                                if (dailyUpload) {
+                                    navController.popBackStack()
+                                    isLoading = false
+                                } else {
+                                    isLoading = false
+                                    snackState.showSnackbar(
+                                        message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
+                                        actionLabel = "확인",
+                                        duration = SnackbarDuration.Short,
+                                        withDismissAction = false
+                                    )
+                                }
+                            } else {
+                                val photoUpload = viewModel.fileUpload(context = context)
+                                if (photoUpload) {
+                                    val dailyUpload = viewModel.uploadDaily()
+                                    if (dailyUpload) {
+                                        navController.popBackStack()
+                                        viewModel.updateSelectedImageList(emptyList())
+                                        isLoading = false
+                                    } else {
+                                        isLoading = false
+                                        snackState.showSnackbar(
+                                            message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
+                                            actionLabel = "확인",
+                                            duration = SnackbarDuration.Short,
+                                            withDismissAction = false
+                                        )
+                                    }
+                                } else {
+                                    isLoading = false
+                                    snackState.showSnackbar(
+                                        message = "사진전송에 실패했습니다. 다시 시도해주세요",
+                                        actionLabel = "확인",
+                                        duration = SnackbarDuration.Short,
+                                        withDismissAction = false
+                                    )
+                                }
+                            }
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -665,8 +671,6 @@ fun PhotoItem(uri: Uri, index: Int, onClick: () -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-
-
 
             if (index == 0) {
                 Box(

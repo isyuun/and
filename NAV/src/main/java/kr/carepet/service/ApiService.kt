@@ -21,6 +21,9 @@ import kr.carepet.data.daily.DailyDetailRes
 import kr.carepet.data.daily.DailyMonthReq
 import kr.carepet.data.daily.DailyMonthRes
 import kr.carepet.data.daily.PhotoRes
+import kr.carepet.data.daily.RTStoryListRes
+import kr.carepet.data.daily.StoryReq
+import kr.carepet.data.daily.StoryRes
 import kr.carepet.data.daily.WalkListReq
 import kr.carepet.data.daily.WalkListRes
 import kr.carepet.data.daily.WeekRecordReq
@@ -193,5 +196,14 @@ interface ApiService {
     fun getUmdList(@Body data: UmdListReq): Call<UmdListRes>
     @POST("api/v1/weather")
     fun getWeather(@Body data : WeatherReq) : Call<WeatherRes>
+    // --------------------- 공통 코드 ----------------------- //
+
+    // --------------------- 공통 코드 ----------------------- //
+    @POST("api/v1/story/real-time-list")
+    fun getRealTimeList() : Call<RTStoryListRes>
+
+    @POST("/api/v1/story/list")
+    fun getStoryList(@Body data : StoryReq) : Call<StoryRes>
+
     // --------------------- 공통 코드 ----------------------- //
 }

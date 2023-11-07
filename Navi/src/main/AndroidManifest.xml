@@ -29,6 +29,14 @@
         android:theme="@style/Theme.CarePetDemo"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/profile_default" />
+        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/meta_color" />
         <activity
             android:name="kr.carepet.app.navi.MainActivity"
             android:exported="true"
@@ -47,6 +55,7 @@
             android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat" />
 
+
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
@@ -62,7 +71,14 @@
                     android:scheme="kakao55dcd3a241d864c2399f6ca1e466d57d" />
             </intent-filter>
         </activity>
-        
+
+        <service
+            android:name="kr.carepet.app.navi.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
     </application>
 

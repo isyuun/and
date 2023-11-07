@@ -128,6 +128,7 @@ import kr.carepet.app.navi.ui.theme.design_weather_1
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.HomeViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
+import kr.carepet.data.daily.RTStoryData
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
 import java.text.SimpleDateFormat
@@ -249,7 +250,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
-            StoryContent()
+            StoryContent(viewModel = viewModel, navController)
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
@@ -863,14 +864,13 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
 }
 
 @Composable
-fun StoryContent(){
-    val dummyList = arrayListOf(
-        StoryList("","행복한 산책 했어요","핑키","37","22"),
-        StoryList("","꿀잠자는 저희 강아지...","강레오","28","3"),
-        StoryList("","행복한 산책 했어요","핑키","37","22"),
-        StoryList("","꿀잠자는 저희 강아지...","강레오","28","3")
+fun StoryContent(viewModel: HomeViewModel, navController: NavHostController){
 
-    )
+    LaunchedEffect(Unit){
+        viewModel.getRTStoryList()
+    }
+
+    val storyList by viewModel.rtStoryList.collectAsState()
 
     Box (
         modifier = Modifier
@@ -908,8 +908,10 @@ fun StoryContent(){
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(start = 20.dp, end = 20.dp)
             ) {
-                items(dummyList) { dummyList ->
-                    StoryItem(data = dummyList)
+                if (storyList!=null){
+                    items(storyList?.data ?: emptyList()){ item ->
+                        StoryItem(data = item)
+                    }
                 }
             }
         }
@@ -917,7 +919,7 @@ fun StoryContent(){
 }
 
 @Composable
-fun StoryItem(data:StoryList){
+fun StoryItem(data: RTStoryData){
 
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 
@@ -938,7 +940,7 @@ fun StoryItem(data:StoryList){
     ){
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUri)
+                .data(data.storyFile)
                 .crossfade(true)
                 .build(),
             contentDescription = "",
@@ -960,7 +962,7 @@ fun StoryItem(data:StoryList){
             .background(color = Color.Transparent)
         ){
             Text(
-                text = data.title,
+                text = data.schTtl,
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 18.sp,
                 letterSpacing = (-0.9).sp,
@@ -970,7 +972,7 @@ fun StoryItem(data:StoryList){
             )
 
             Text(
-                text = data.petName,
+                text = data.petNm,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,
@@ -986,7 +988,7 @@ fun StoryItem(data:StoryList){
                 Icon(painter = painterResource(id = R.drawable.icon_like), contentDescription = "", tint = Color.Unspecified)
 
                 Text(
-                    text = data.likeCount,
+                    text = data.rcmdtnCnt,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,
@@ -1001,7 +1003,7 @@ fun StoryItem(data:StoryList){
                 Icon(painter = painterResource(id = R.drawable.icon_comment), contentDescription = "", tint = Color.Unspecified)
 
                 Text(
-                    text = data.commentCount,
+                    text = data.cmntCnt,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.cmm.WeatherReq
 import kr.carepet.data.cmm.WeatherRes
+import kr.carepet.data.daily.RTStoryListRes
 import kr.carepet.data.daily.WeekData
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.pet.PetDetailData
@@ -91,6 +92,9 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
 
     val petInfo = sharedViewModel.petInfo
 
+    private val _rtStoryList = MutableStateFlow<RTStoryListRes?>(null)
+    val rtStoryList: StateFlow<RTStoryListRes?> = _rtStoryList.asStateFlow()
+
     private val _repPet = MutableStateFlow<List<PetDetailData>>(emptyList())
     val repPet: StateFlow<List<PetDetailData>> = _repPet.asStateFlow()
 
@@ -163,6 +167,32 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
             }
         } else {
             continuation.resume(false)
+        }
+    }
+
+    suspend fun getRTStoryList():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.getRealTimeList()
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<RTStoryListRes>{
+                override fun onResponse(call: Call<RTStoryListRes>, response: Response<RTStoryListRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _rtStoryList.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<RTStoryListRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
         }
     }
 }
