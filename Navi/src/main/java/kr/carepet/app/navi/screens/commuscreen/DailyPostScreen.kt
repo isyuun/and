@@ -9,7 +9,10 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -25,9 +28,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -36,6 +41,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,7 +53,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -63,10 +70,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -82,8 +93,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.text.HtmlCompat
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -109,6 +118,7 @@ import kr.carepet.app.navi.viewmodel.CommunityViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.cmm.CdDetail
 import kr.carepet.data.pet.CurrentPetData
+import kr.carepet.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,6 +128,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
     val walkMemo by viewModel.walkMemo.collectAsState()
     val postStory by viewModel.postStory.collectAsState()
     val selectedPet by viewModel.selectPetMulti.collectAsState()
+    val selectedCategory by viewModel.selectCategory.collectAsState()
     val schList by viewModel.schList.collectAsState()
     val cdDetailList = if (schList.isNotEmpty()){
         schList[0].cdDetailList.toMutableList().filter { it.cdId != "001" }
@@ -127,6 +138,11 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
     
     val state = viewModel.state
     val dummyUri = Uri.parse("")
+    var expanded by remember { mutableStateOf(false) }
+    val items = listOf("Option 1", "Option 2", "Option 3")
+    val focusManager = LocalFocusManager.current
+    val focusRequester by remember { mutableStateOf(FocusRequester()) }
+    val scrollState = rememberScrollState()
 
     var showDiagLog by remember { mutableStateOf(false) }
 
@@ -142,6 +158,10 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
     DisposableEffect(Unit) {
         onDispose {
             viewModel.clearSelectedImages()
+            viewModel.updateWalkTitle("")
+            viewModel.updateWalkMemo("")
+            viewModel.updatePostStory(false)
+            viewModel.updateHashTag(emptyList())
         }
     }
 
@@ -195,7 +215,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .background(color = design_white)
         ) {
             Row(
@@ -318,7 +338,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             CustomTextField(
                 value = walkTitle,
                 onValueChange = { viewModel.updateWalkTitle(it) },
-                singleLine = false,
+                singleLine = true,
                 maxLines = 3,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -326,8 +346,18 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 ),
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 16.dp)
+                    .imePadding()
                     .fillMaxWidth()
-                    .heightIn(min = 40.dp),
+                    .heightIn(min = 40.dp)
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { focusState ->
+                        if (focusState.isFocused) {
+                            expanded = focusState.isFocused
+                            scope.launch {
+                                scrollState.animateScrollTo(scrollState.maxValue, tween(500))
+                            }
+                        }
+                    },
                 placeholder = {
                     Text(
                         text = "제목을 입력해주세요",
@@ -335,6 +365,21 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                         fontSize = 14.sp
                     )
                 },
+                trailingIcon = {
+                    if (expanded){
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = "", tint = design_login_text,
+                            modifier = Modifier.clickable { expanded = false }
+                        )
+                    } else{
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = "", tint = design_login_text,
+                            modifier = Modifier.clickable { expanded = true }
+                        )
+                    }
+                } ,
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedPlaceholderColor = design_placeHolder,
                     focusedPlaceholderColor = design_placeHolder,
@@ -348,6 +393,51 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
             )
+
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically().plus(fadeIn()),
+                exit = shrinkVertically().plus(fadeOut())
+            ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .fillMaxWidth()
+                        .heightIn(max = 150.dp)
+                        .background(color = design_white),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ){
+                    itemsIndexed(items){ index, item ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    viewModel.updateWalkTitle(item)
+                                    expanded = false
+                                },
+                            contentAlignment = Alignment.CenterStart
+                        ){
+                            Text(
+                                text = item,
+                                color = design_login_text.copy(alpha = 0.8f),
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 14.sp,
+                                letterSpacing = (-0.7).sp,
+                                modifier = Modifier
+                                    .padding(start = 16.dp, top = 3.dp, bottom = 3.dp)
+                            )
+                        }
+
+                        if (index < items.size-1){
+                            Spacer(modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(design_textFieldOutLine))
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
@@ -483,57 +573,58 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
 
             Button(
                 onClick = {
-                    scope.launch {
-                        isLoading = true
-
-                        val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
-                        val matches = pattern.findAll(hashString)
-                        val hashtagList = matches.map { it.groupValues[1] }.toList()
-
-                        viewModel.updateHashTag(hashtagList)
-
-                        if (state.listOfSelectedImages.size <= 1) {
-                            var dailyUpload = viewModel.uploadDaily()
-                            if (dailyUpload) {
-                                navController.popBackStack()
-                                isLoading = false
-                            } else {
-                                isLoading = false
-                                snackState.showSnackbar(
-                                    message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
-                                    actionLabel = "확인",
-                                    duration = SnackbarDuration.Short,
-                                    withDismissAction = false
-                                )
-                            }
-                        } else {
-                            val photoUpload = viewModel.fileUpload(context = context)
-                            if (photoUpload) {
-                                val dailyUpload = viewModel.uploadDaily()
-                                if (dailyUpload) {
-                                    navController.popBackStack()
-                                    viewModel.updateSelectedImageList(emptyList())
-                                    isLoading = false
-                                } else {
-                                    isLoading = false
-                                    snackState.showSnackbar(
-                                        message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
-                                        actionLabel = "확인",
-                                        duration = SnackbarDuration.Short,
-                                        withDismissAction = false
-                                    )
-                                }
-                            } else {
-                                isLoading = false
-                                snackState.showSnackbar(
-                                    message = "사진전송에 실패했습니다. 다시 시도해주세요",
-                                    actionLabel = "확인",
-                                    duration = SnackbarDuration.Short,
-                                    withDismissAction = false
-                                )
-                            }
-                        }
-                    }
+                    //scope.launch {
+                    //    isLoading = true
+                    //
+                    //    val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
+                    //    val matches = pattern.findAll(hashString)
+                    //    val hashtagList = matches.map { it.groupValues[1] }.toList()
+                    //
+                    //    viewModel.updateHashTag(hashtagList)
+                    //
+                    //    if (state.listOfSelectedImages.size <= 1) {
+                    //        var dailyUpload = viewModel.uploadDaily()
+                    //        if (dailyUpload) {
+                    //            navController.popBackStack()
+                    //            isLoading = false
+                    //        } else {
+                    //            isLoading = false
+                    //            snackState.showSnackbar(
+                    //                message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
+                    //                actionLabel = "확인",
+                    //                duration = SnackbarDuration.Short,
+                    //                withDismissAction = false
+                    //            )
+                    //        }
+                    //    } else {
+                    //        val photoUpload = viewModel.fileUpload(context = context)
+                    //        if (photoUpload) {
+                    //            val dailyUpload = viewModel.uploadDaily()
+                    //            if (dailyUpload) {
+                    //                navController.popBackStack()
+                    //                viewModel.updateSelectedImageList(emptyList())
+                    //                isLoading = false
+                    //            } else {
+                    //                isLoading = false
+                    //                snackState.showSnackbar(
+                    //                    message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
+                    //                    actionLabel = "확인",
+                    //                    duration = SnackbarDuration.Short,
+                    //                    withDismissAction = false
+                    //                )
+                    //            }
+                    //        } else {
+                    //            isLoading = false
+                    //            snackState.showSnackbar(
+                    //                message = "사진전송에 실패했습니다. 다시 시도해주세요",
+                    //                actionLabel = "확인",
+                    //                duration = SnackbarDuration.Short,
+                    //                withDismissAction = false
+                    //            )
+                    //        }
+                    //    }
+                    //}
+                          Log.d("LOG",selectedPet.size.toString())
                 },
                 modifier = Modifier
                     .fillMaxWidth()

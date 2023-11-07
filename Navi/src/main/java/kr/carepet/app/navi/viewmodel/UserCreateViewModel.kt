@@ -1,5 +1,6 @@
 package kr.carepet.app.navi.viewmodel
 
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,6 +14,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,11 +39,8 @@ import kr.carepet.data.pet.DeletePetReq
 import kr.carepet.data.pet.MyPetResModel
 import kr.carepet.data.pet.PetListData
 import kr.carepet.data.pet.PetListResModel
-import kr.carepet.data.user.LoginResModel
 import kr.carepet.data.user.NickNameCheckRes
 import kr.carepet.data.user.UserDataResponse
-import kr.carepet.singleton.G
-import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -116,6 +116,17 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     private val _snsLogin = MutableStateFlow<String>("")
     val snsLogin: StateFlow<String> = _snsLogin.asStateFlow()
     fun updateSnsLogin(newValue: String) { _snsLogin.value = newValue }
+
+    private val _appKey = MutableStateFlow<String>("")
+    fun updateAppKey() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(ContentValues.TAG, "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+            _appKey.value = task.result
+        })
+    }
     // --------------   User   -----------------------
 
     // --------------   pet    -----------------------
@@ -220,9 +231,6 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     private val _isSearching = MutableStateFlow(false)
     // 검색 중인지 여부를 StateFlow로 노출
     val isSearching = _isSearching.asStateFlow()
-
-
-
 
     // 전체 pets 리스트를 MutableStateFlow로 생성
     private val _pets = MutableStateFlow<List<PetListData>>(emptyList())
@@ -337,7 +345,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     suspend fun sendUserToServer():Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val appKey = kr.carepet.singleton.MySharedPreference.getFcmToken()
+        val appKey = _appKey.value
         val appOs = "001"
         val appTypNm = Build.MODEL.toString()
 
@@ -397,7 +405,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                     if(response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _sggList.value = body.data
+                            _sggList.value = it.data
                         }
                     }
                 }
@@ -422,7 +430,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                     if(response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _umdList.value = body.data
+                            _umdList.value = it.data
                         }
                     }
                 }
@@ -674,62 +682,6 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
 
             })
         }
-    }
-
-    suspend fun login(): Boolean {
-        val apiService = RetrofitClientServer.instance
-
-        val loginData = kr.carepet.data.user.LoginData(_userID.value, _userPW.value)
-
-        val call = apiService.sendLoginToServer(loginData)
-        return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<LoginResModel> {
-                override fun onResponse(
-                    call: Call<LoginResModel>,
-                    response: Response<LoginResModel>
-                ) {
-                    // Response 결과
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        body?.let {
-                            if (it.statusCode == 200) { // status code 200 검증
-                                // 200이면 login 처리, access/refresh token G 및 shared 에 저장
-
-                                G.accessToken = it.data.accessToken
-                                G.refreshToken = it.data.refreshToken
-                                G.userId = it.data.userId
-                                // shared에 저장
-                                MySharedPreference.setAccessToken(it.data.accessToken)
-                                MySharedPreference.setRefreshToken(it.data.refreshToken)
-                                MySharedPreference.setUserId(it.data.userId)
-                                MySharedPreference.setLastLoginMethod(_snsLogin.value)
-                                MySharedPreference.setIsLogin(true)
-
-                                Log.d(
-                                    "Token",
-                                    "access: ${it.data.accessToken}, refresh: ${it.data.refreshToken}"
-                                )
-
-                                continuation.resume(true)
-                            } else {
-                                Log.d(
-                                    "LOG",
-                                    "" + body.statusCode + body.detailMessage + body.resultMessage
-                                )
-                                continuation.resume(false)
-                            }
-                        }
-                    }else{
-                        continuation.resume(false)
-                    }
-                }
-
-                override fun onFailure(call: Call<LoginResModel>, t: Throwable) {
-                    continuation.resume(false)
-                }
-            })
-        }
-
     }
 }
 

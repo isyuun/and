@@ -1,6 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+buildscript {
+    dependencies {
+        classpath("com.google.gms:google-services:4.4.0")
+    }
+}
+
 // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     id("com.android.application") version "8.1.2" apply false

@@ -410,6 +410,10 @@ fun ProfileContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Row (modifier = Modifier
+                    .clickable(
+                        enabled = (!weatherRefresh && sky == null),
+                        onClick = { viewModel.updateWeatherRefresh(true) }
+                    )
                     .padding(top = 20.dp)
                     .wrapContentWidth()
                     .height(30.dp)
@@ -425,68 +429,67 @@ fun ProfileContent(
                     ),
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
                 ){
-                    Icon(
-                        painter =
-                        painterResource(id =
-                        if(weatherRefresh || sky == null){
-                            R.drawable.sunny
-                        }else{
-                            if (pty == "0"){
-                                when(sky){
-                                    "1" -> if (currentTime.isAfter(afternoon6) || currentTime.isBefore(morning6)) R.drawable.night else R.drawable.sunny
-                                    "3" -> if (currentTime.isAfter(afternoon6) || currentTime.isBefore(morning6)) R.drawable.cloudy_night else R.drawable.cloudy_day
-                                    "4" -> R.drawable.fog
-                                    else -> R.drawable.sunny
-                                }
-                            }else{
-                                when(pty){
-                                    "1" -> R.drawable.rainy
-                                    "2" -> R.drawable.rainyandsnowy
-                                    "3" -> R.drawable.snowy
-                                    "4" -> R.drawable.shower
-                                    else -> R.drawable.rainy
-                                }
+                    if (weatherRefresh){
+                        Spacer(modifier = Modifier.width(200.dp))
+                    }else{
+                        if (sky == null){
+                            Box(
+                                modifier = Modifier
+                                    .width(200.dp)
+                                , contentAlignment = Alignment.Center
+                            ){
+                                Text(text = "날씨정보 불러오기" ,
+                                    fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+                                    color = design_white, letterSpacing = (-0.6).sp,
+                                    textAlign = TextAlign.Center)
                             }
-                        }),
-                        contentDescription = "",
-                        tint = if(weatherRefresh || sky == null) Color.Transparent else Color.Unspecified,
-                        modifier = Modifier.padding(start = 16.dp))
-
-                    if (!weatherRefresh && sky != null){
-                        Spacer(modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .size(2.dp, 8.dp)
-                            .background(color = design_white))
-                    }
-
-                    Text(text =
-                        if(weatherRefresh || temp == null){
-                            "            "
                         }else{
-                            "현재 기온 : $temp℃ " }
-                        ,
-                        fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                        color = design_white, letterSpacing = (-0.6).sp,
-                        textAlign = TextAlign.Center)
+                            Icon(
+                                painter =
+                                painterResource(id =
+                                if (pty == "0"){
+                                    when(sky){
+                                        "1" -> if (currentTime.isAfter(afternoon6) || currentTime.isBefore(morning6)) R.drawable.night else R.drawable.sunny
+                                        "3" -> if (currentTime.isAfter(afternoon6) || currentTime.isBefore(morning6)) R.drawable.cloudy_night else R.drawable.cloudy_day
+                                        "4" -> R.drawable.fog
+                                        else -> R.drawable.sunny
+                                    }
+                                }else{
+                                    when(pty){
+                                        "1" -> R.drawable.rainy
+                                        "2" -> R.drawable.rainyandsnowy
+                                        "3" -> R.drawable.snowy
+                                        "4" -> R.drawable.shower
+                                        else -> R.drawable.rainy
+                                    }
+                                }
+                                ),
+                                contentDescription = "",
+                                tint = Color.Unspecified,
+                                modifier = Modifier.padding(start = 16.dp))
 
-                    if (!weatherRefresh && sky != null){
-                        Spacer(modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .size(2.dp, 8.dp)
-                            .background(color = design_white))
+                            Spacer(modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .size(2.dp, 8.dp)
+                                .background(color = design_white))
+
+                            Text(text = "현재 기온 : $temp℃ " ,
+                                fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+                                color = design_white, letterSpacing = (-0.6).sp,
+                                textAlign = TextAlign.Center)
+
+                            Spacer(modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .size(2.dp, 8.dp)
+                                .background(color = design_white))
+
+                            Text(text = "강수 : $pop% ",
+                                fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+                                color = design_white, letterSpacing = (-0.6).sp,
+                                modifier = Modifier.padding(end = 16.dp),
+                                textAlign = TextAlign.Center)
+                        }
                     }
-
-                    Text(text =
-                        if(weatherRefresh || pop == null){
-                            "            "
-                        }else{
-                            "강수 : $pop% " },
-                        fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                        color = design_white, letterSpacing = (-0.6).sp,
-                        modifier = Modifier.padding(end = 16.dp),
-                        textAlign = TextAlign.Center)
-
-
                 }
 
                 Spacer(modifier = Modifier.padding(top = 16.dp))

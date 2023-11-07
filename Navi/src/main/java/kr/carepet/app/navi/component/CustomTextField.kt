@@ -31,7 +31,7 @@ fun CustomTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
-    textStyle: TextStyle = LocalTextStyle.current,
+    textStyle: TextStyle = LocalTextStyle.current, //TextStyle(fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_login_text, fontSize = 14.sp, letterSpacing = (-0.7).sp),
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,

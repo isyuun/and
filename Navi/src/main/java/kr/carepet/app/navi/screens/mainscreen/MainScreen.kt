@@ -139,12 +139,14 @@ fun MainScreen(
                         "home" ->
                             FloatingActionButton(
                                 onClick = {
-                                    if (currentPet[0].ownrPetUnqNo==""){
-                                        showDialog = true
-                                    }else{
-                                        G.mapPetInfo = currentPet
-                                        val intent = Intent(context,MapActivity::class.java)
-                                        context.startActivity(intent)
+                                    if (currentPet.isNotEmpty()){
+                                        if (currentPet[0].ownrPetUnqNo==""){
+                                            showDialog = true
+                                        }else{
+                                            G.mapPetInfo = currentPet
+                                            val intent = Intent(context,MapActivity::class.java)
+                                            context.startActivity(intent)
+                                        }
                                     }
                                 },
                                 modifier = Modifier
@@ -177,10 +179,12 @@ fun MainScreen(
                         "commu" ->
                             FloatingActionButton(
                                 onClick = {
-                                    if (currentPet[0].ownrPetUnqNo=="") {
-                                        showDialog = true
-                                    }else{
-                                        navController.navigate(Screen.DailyPostScreen.route)
+                                    if (currentPet.isNotEmpty()) {
+                                        if (currentPet[0].ownrPetUnqNo=="") {
+                                            showDialog = true
+                                        }else{
+                                            navController.navigate(Screen.DailyPostScreen.route)
+                                        }
                                     }
                                 },
                                 modifier = Modifier
@@ -225,19 +229,25 @@ fun MainScreen(
             )
         },
         topBar = {
-            when(topBarChange){
-                "home","walk" ->
-                    LogoTopBar(
-                        petDetailData = selectedPet?:homeViewModel.emptyCurrentPet,
-                        openBottomSheet = {newValue -> openBottomSheet = newValue},
-                        backBtnOn = backBtnOnLT,
-                        walkViewModel = walkViewModel,
-                        backBtnOnChange = { newValue -> backBtnOnLT = newValue}
-                    )
-                "commu" ->
-                    BackTopBar(title = stringResource(R.string.title_commu), navController = navController, false)
-                "my" ->
-                    BackTopBar(title = stringResource(R.string.title_mypage), navController = navController, false)
+            Crossfade(
+                targetState = topBarChange,
+                label = "",
+                animationSpec = tween(700)
+            ) { topBarChange ->
+                when(topBarChange){
+                    "home","walk" ->
+                        LogoTopBar(
+                            petDetailData = selectedPet?:homeViewModel.emptyCurrentPet,
+                            openBottomSheet = {newValue -> openBottomSheet = newValue},
+                            backBtnOn = backBtnOnLT,
+                            walkViewModel = walkViewModel,
+                            backBtnOnChange = { newValue -> backBtnOnLT = newValue}
+                        )
+                    "commu" ->
+                        BackTopBar(title = stringResource(R.string.title_commu), navController = navController, false)
+                    "my" ->
+                        BackTopBar(title = stringResource(R.string.title_mypage), navController = navController, false)
+                }
             }
         }
     ) { innerPadding ->

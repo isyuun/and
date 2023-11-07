@@ -102,6 +102,10 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
         }
     }
 
+    LaunchedEffect(Unit){
+        viewModel.updateAppKey()
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {

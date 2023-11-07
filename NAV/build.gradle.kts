@@ -73,7 +73,6 @@ dependencies {
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
-    implementation("com.google.firebase:firebase-messaging-ktx:23.2.1")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.2")
     testImplementation("junit:junit:4.13.2")

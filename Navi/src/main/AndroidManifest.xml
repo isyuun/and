@@ -62,6 +62,8 @@
                     android:scheme="kakao55dcd3a241d864c2399f6ca1e466d57d" />
             </intent-filter>
         </activity>
+        
+
     </application>
 
 </manifest>

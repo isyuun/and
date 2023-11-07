@@ -244,22 +244,4 @@ class LoginViewModel() : ViewModel() {
 
             NaverIdLoginSDK.authenticate(context,oAuthLoginCallback)
     }
-
-    suspend fun googleLogin(){
-
-
-    }
-}
-
-class RetrofitHelper {
-    companion object{
-        fun getRetrofitInstance(baseUrl:String): Retrofit {
-            val retrofit= Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-
-            return retrofit
-        }
-    }
 }

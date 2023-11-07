@@ -10,6 +10,12 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,6 +44,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -66,10 +75,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -93,7 +106,6 @@ import kr.carepet.app.navi.component.CircleImageTopBar
 import kr.carepet.app.navi.component.CustomTextField
 import kr.carepet.app.navi.component.LoadingDialog
 import kr.carepet.app.navi.screens.mainscreen.getFormattedDate
-import kr.carepet.app.navi.ui.theme.design_DDDDDD
 import kr.carepet.app.navi.ui.theme.design_alpha50_black
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_icon_5E6D7B
@@ -120,6 +132,12 @@ import kr.carepet.util.Log
 fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
     val application = GPSApplication.instance
 
+    var expanded by remember { mutableStateOf(false) }
+    val items = listOf("Option 1", "Option 2", "Option 3")
+
+    val focusManager = LocalFocusManager.current
+    val focusRequester by remember { mutableStateOf(FocusRequester()) }
+
     val tracks = application.tracks
     val file = application.file
     val images = application.images
@@ -143,6 +161,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
     var init by rememberSaveable { mutableStateOf(true) }
     var hashString by remember { mutableStateOf("") }
 
+    val scrollState = rememberScrollState()
 
     if (showDiagLog) {
         OnDialog(navController = navController, onDismiss = { showDiagLog = false })
@@ -227,7 +246,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .background(color = design_white)
         ) {
             Row(
@@ -330,7 +349,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
             CustomTextField(
                 value = walkTitle,
                 onValueChange = { viewModel.updateWalkTitle(it) },
-                singleLine = false,
+                singleLine = true,
                 maxLines = 3,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -339,7 +358,15 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 16.dp)
                     .fillMaxWidth()
-                    .heightIn(min = 40.dp),
+                    .heightIn(min = 40.dp)
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { focusState ->
+                        if (focusState.isFocused){
+                            expanded = focusState.isFocused
+                            scope.launch { scrollState.animateScrollTo(scrollState.maxValue, tween(500)) }
+                        }
+                    }
+                ,
                 placeholder = {
                     Text(
                         text = "제목을 입력해주세요",
@@ -347,6 +374,21 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                         fontSize = 14.sp
                     )
                 },
+                trailingIcon = {
+                    if (expanded){
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = "", tint = design_login_text,
+                            modifier = Modifier.clickable { expanded = false }
+                        )
+                    } else{
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = "", tint = design_login_text,
+                            modifier = Modifier.clickable { expanded = true }
+                        )
+                    }
+                               } ,
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedPlaceholderColor = design_placeHolder,
                     focusedPlaceholderColor = design_placeHolder,
@@ -360,6 +402,45 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
             )
+
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically().plus(fadeIn()),
+                exit = shrinkVertically().plus(fadeOut())
+            ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .fillMaxWidth()
+                        .heightIn(max = 150.dp)
+                        .background(color = design_white),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ){
+                    itemsIndexed(items){ index, item ->
+                        Text(
+                            text = item,
+                            color = design_login_text.copy(alpha = 0.8f),
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp,
+                            letterSpacing = (-0.7).sp,
+                            modifier = Modifier
+                                .padding(start = 16.dp)
+                                .clickable {
+                                    viewModel.updateWalkTitle(item)
+                                    expanded = false
+                                }
+                        )
+
+                        if (index < items.size-1){
+                            Spacer(modifier = Modifier
+                                .padding(horizontal = 8.dp, vertical = 6.dp)
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(design_textFieldOutLine))
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.padding(top = 20.dp))
 

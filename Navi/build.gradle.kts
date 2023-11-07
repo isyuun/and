@@ -108,6 +108,7 @@ dependencies {
     implementation("androidx.paging:paging-common-ktx:3.2.1")
     implementation(libs.firebase.auth.ktx)
     implementation(libs.play.services.location)
+    implementation("com.google.firebase:firebase-messaging:23.3.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

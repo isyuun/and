@@ -50,9 +50,6 @@ import kr.carepet.util.Log
 fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel) {
 
     val detailData by viewModel.eventDetail.collectAsState()
-    //val detailText =
-    //    "* **123123\\\\**\r\n* **412312**\r\n* **1254123**\r\n* **1524123**\r\n* \r\n* \r\n* \r\n\r\n```\r\n| test | q1212 | 3214 |  | 124123 | 41232 |\r\n| ---- | ----- | ---- | --- | ------ | ----- |\r\n|  |  |  |  |  |  |\r\n```\r\n## fghagasdfsf\r\n* ![](http://carepet.hopto.org/img/bbs/img/20231107/b6b26032fd79434dbf968017a5cb85ee.JPG)"
-
 
     Scaffold(
         topBar = { BackTopBar(title = stringResource(R.string.title_event), navController = navController) }
