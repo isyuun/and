@@ -504,7 +504,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
 
     /** top */
-    WalkNaviInfo(application.start)
+    WalkInfoNavi(application.start)
 
     /** bottom/right/left/walk */
     Box(
@@ -1076,7 +1076,7 @@ fun WalkInfoSheet() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WalkNaviInfo(start: Boolean) {
+fun WalkInfoNavi(start: Boolean) {
     Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
     val application = GPSApplication.instance
     var pet by remember { mutableStateOf(CurrentPetData("", "", "", "", "", "", 0.0f)) }
@@ -1205,7 +1205,7 @@ fun WalkNaviInfo(start: Boolean) {
                     )
                     Text(
                         modifier = Modifier
-                            .weight(1.5f),
+                            .weight(1.0f),
                         text = distance,
                         fontSize = 22.sp,
                         letterSpacing = (-0.0).sp,
