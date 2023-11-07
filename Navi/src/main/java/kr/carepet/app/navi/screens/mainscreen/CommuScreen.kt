@@ -90,7 +90,9 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
 
     LaunchedEffect(init){
         if (init){
+            communityViewModel.getStoryList(1,"최신순", "전체")
             communityViewModel.getEventList(1)
+            init = false
         }
     }
 
