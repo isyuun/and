@@ -77,7 +77,6 @@ import kr.carepet.data.bbs.BbsEvnt
 import kr.carepet.util.Log
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable

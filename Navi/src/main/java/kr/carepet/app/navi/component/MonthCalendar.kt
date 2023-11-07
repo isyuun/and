@@ -53,7 +53,6 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.MonthDay
-import kr.carepet.util.Log
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter

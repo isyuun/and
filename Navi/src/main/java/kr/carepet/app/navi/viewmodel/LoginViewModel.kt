@@ -1,12 +1,9 @@
 package kr.carepet.app.navi.viewmodel
 
-import android.app.Application
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -19,7 +16,6 @@ import com.navercorp.nid.profile.data.NidProfileResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.user.LoginResModel
 import kr.carepet.singleton.G

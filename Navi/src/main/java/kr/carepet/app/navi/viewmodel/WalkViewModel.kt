@@ -4,13 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.graphics.Path
 import android.media.ExifInterface
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kr.carepet.data.cmm.CmmRes
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
 import kr.carepet.data.daily.DailyDetailData
@@ -32,11 +31,9 @@ import kr.carepet.data.daily.PhotoRes
 import kr.carepet.data.daily.WalkListRes
 import kr.carepet.data.daily.WeekData
 import kr.carepet.data.pet.PetDetailData
-import kr.carepet.gps._app.foregroundonlylocationservice4
 import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.RetrofitClientServer
 import kr.carepet.util.Log
-import kr.carepet.util.getMethodName
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -44,7 +41,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.Integer.min
@@ -417,6 +413,8 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
             })
         }
     }
+
+
 
 
 }

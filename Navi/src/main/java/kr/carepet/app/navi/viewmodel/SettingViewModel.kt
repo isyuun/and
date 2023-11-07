@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.user.UserApiClient
-import com.patrykandpatrick.vico.core.extension.getFieldValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,13 +25,11 @@ import kr.carepet.data.pet.PetWgtData
 import kr.carepet.data.pet.PetWgtRes
 import kr.carepet.data.pet.RegPetWgtReq
 import kr.carepet.data.pet.SetInviteCodeRes
-import kr.carepet.data.user.BbsFaq
 import kr.carepet.data.user.BbsReq
 import kr.carepet.data.user.FAQData
 import kr.carepet.data.user.FAQRes
 import kr.carepet.data.user.LogoutRes
 import kr.carepet.data.user.NickNameCheckRes
-import kr.carepet.data.user.QnaData
 import kr.carepet.data.user.QnaReq
 import kr.carepet.data.user.QnaRes
 import kr.carepet.data.user.RelCloseReq

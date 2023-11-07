@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -85,6 +84,7 @@ import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.CustomTextField
+import kr.carepet.app.navi.component.LoadingDialog
 import kr.carepet.app.navi.ui.theme.design_btn_border
 import kr.carepet.app.navi.ui.theme.design_button_bg
 import kr.carepet.app.navi.ui.theme.design_camera_bg
@@ -156,6 +156,7 @@ fun ModifyPetInfoScreen(
     val petKind by viewModel.petKind.collectAsState()
     val petBirth by viewModel.petBirth.collectAsState()
     val petBirthUK by viewModel.petBirthUnknown.collectAsState()
+    val address by viewModel.address.collectAsState()
     val petWght by viewModel.petWght.collectAsState()
     val petGender by viewModel.petGender.collectAsState()
     val petNtr by viewModel.petNtr.collectAsState()
@@ -163,8 +164,9 @@ fun ModifyPetInfoScreen(
     var showDialog by remember{ mutableStateOf(false) }
     var init by rememberSaveable { mutableStateOf(true) }
     var delete by remember{ mutableStateOf(false) }
+    var isLoading by remember{ mutableStateOf(false) }
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(key1 = init){
         if (init){
             viewModel.updatePetName(selectPet.petNm)
             viewModel.updatePetDorC("강아지")
@@ -186,7 +188,7 @@ fun ModifyPetInfoScreen(
             viewModel.updateAddress(
                 "${selectPet.stdgCtpvNm} " +
                         "${selectPet.stdgSggNm} " +
-                        "${selectPet.stdgUmdNm}"
+                        (selectPet.stdgUmdNm?:"")
             )
             viewModel.updatePetBirth(selectPet.petBrthYmd)
             viewModel.updatePetBirthUnknown(selectPet.petBrthYmd=="미상")
@@ -198,6 +200,7 @@ fun ModifyPetInfoScreen(
 
     LaunchedEffect(key1 = delete){
         if (delete){
+            isLoading = true
             scope.launch {
                 val result = viewModel.deletePet(selectPet.ownrPetUnqNo)
                 if (result) {
@@ -229,13 +232,16 @@ fun ModifyPetInfoScreen(
                     viewModel.updateAddress("주소 선택")
 
                     init = true
+                    isLoading = false
 
                 } else {
+                    isLoading = false
                     Toast
                         .makeText(context, "삭제 실패", Toast.LENGTH_SHORT)
                         .show()
                 }
 
+                isLoading = false
                 delete = false
             }
         }
@@ -291,6 +297,10 @@ fun ModifyPetInfoScreen(
                 valueChange = { newValue -> delete = newValue}
             )
         }
+
+        LoadingDialog(
+            loadingText = if(delete) "삭제 처리중.." else "정보 수정중..",
+            loadingState = isLoading)
 
         Column (modifier= Modifier
             .fillMaxSize()
@@ -417,33 +427,33 @@ fun ModifyPetInfoScreen(
                 }
             }
 
-            // 주소 선택
-            //Text(text = "주소", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-            //    modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
-            //)
-            //
-            //Button(
-            //    onClick = {
-            //        navController.navigate(Screen.LocationPickContent.route)
-            //    },
-            //    modifier = Modifier
-            //        .padding(start = 20.dp, end = 20.dp, top = 8.dp)
-            //        .fillMaxWidth()
-            //        .height(48.dp),
-            //    shape = RoundedCornerShape(12.dp),
-            //    colors = ButtonDefaults.buttonColors(design_white),
-            //    border = BorderStroke(1.dp, color = design_btn_border)
-            //) {
-            //    Row(modifier= Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
-            //        Text(text = address, color = design_login_text,
-            //            fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular))
-            //        )
-            //
-            //        Spacer(modifier = Modifier.weight(1f))
-            //
-            //        Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "", tint = design_login_text)
-            //    }
-            //}
+            //주소 선택
+            Text(text = "주소", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+            )
+
+            Button(
+                onClick = {
+                    navController.navigate(Screen.LocationPickContent.route)
+                },
+                modifier = Modifier
+                    .padding(start = 20.dp, end = 20.dp, top = 8.dp)
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(design_white),
+                border = BorderStroke(1.dp, color = design_btn_border)
+            ) {
+                Row(modifier= Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+                    Text(text = address, color = design_login_text,
+                        fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular))
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "", tint = design_login_text)
+                }
+            }
 
             Text(text = "이름", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
@@ -893,13 +903,15 @@ fun ModifyPetInfoScreen(
                 onClick = {
                     scope.launch {
                         if (integrityCheck(viewModel, context)){
+                            isLoading = true
                             val result = viewModel.modifyPet(context,selectPet.ownrPetUnqNo)
-
                             if(result){
                                 sharedViewModel.loadCurrentPetInfo()
                                 sharedViewModel.loadPetInfo()
+                                isLoading = false
                                 navController.popBackStack()
                             }else{
+                                isLoading = false
                                 Toast.makeText(context, "수정에 실패했습니다", Toast.LENGTH_SHORT).show()
                             }
                         }

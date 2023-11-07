@@ -1,11 +1,8 @@
 package kr.carepet.app.navi
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.EaseOut
@@ -15,7 +12,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -24,7 +20,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import kr.carepet._app.application
 import kr.carepet.app.navi.screens.EasyRegScreen
 import kr.carepet.app.navi.screens.IdFindScreen
 import kr.carepet.app.navi.screens.IdPwSearchScreen
@@ -35,6 +30,7 @@ import kr.carepet.app.navi.screens.PetCreateScreen
 import kr.carepet.app.navi.screens.PetKindContent
 import kr.carepet.app.navi.screens.PwFindScreen
 import kr.carepet.app.navi.screens.UserCreateScreen
+import kr.carepet.app.navi.screens.commuscreen.DailyPostScreen
 import kr.carepet.app.navi.screens.commuscreen.EventDetail
 import kr.carepet.app.navi.screens.commuscreen.EventEndDetail
 import kr.carepet.app.navi.screens.commuscreen.StoryDetail
@@ -61,7 +57,6 @@ import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.SCDLocalData
-import kr.carepet.gps.app.GPSApplication
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -232,6 +227,10 @@ fun AppNavigation(navController: NavHostController){
         ){
             WalkDetailContent(walkViewModel = walkViewModel, navController)
         }
+        
+        composable("dailyPostScreen"){
+            DailyPostScreen(viewModel = communityViewModel, sharedViewModel = sharedViewModel, navController = navController)
+        }
     }
 }
 
@@ -263,6 +262,7 @@ sealed class Screen(val route: String) {
     object WalkDetailContent : Screen("walkDetailContent")
     object ModifyPetInfoScreen : Screen("modifyPetInfoScreen/{index}")
     object PetProfileScreen : Screen("petProfileScreen/{index}")
+    object DailyPostScreen : Screen("dailyPostScreen")
 }
 
 sealed class BottomNav(val route: String, val title: String, val unSelectedIcon: Int, val selectedIcon: Int,){

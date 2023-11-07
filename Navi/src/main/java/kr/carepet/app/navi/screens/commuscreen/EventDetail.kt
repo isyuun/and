@@ -1,6 +1,6 @@
 package kr.carepet.app.navi.screens.commuscreen
 
-import androidx.compose.foundation.Image
+import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,11 +15,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -32,6 +30,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.HtmlCompat
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -49,6 +49,8 @@ import kr.carepet.util.Log
 fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel){
 
     val detailData by viewModel.eventDetail.collectAsState()
+    val txt = "* **123123\\\\**\r\n* **412312**\r\n* **1254123**\r\n* **1524123**\r\n* \r\n* \r\n* \r\n\r\n```\r\n| test | q1212 | 3214 |  | 124123 | 41232 |\r\n| ---- | ----- | ---- | --- | ------ | ----- |\r\n|  |  |  |  |  |  |\r\n```\r\n## fghagasdfsf\r\n* ![](http://carepet.hopto.org/img/bbs/img/20231107/b6b26032fd79434dbf968017a5cb85ee.JPG)"
+
 
     Scaffold (
         topBar = { BackTopBar(title = stringResource(R.string.title_event), navController = navController) }
@@ -90,34 +92,12 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                 .height(1.dp)
                 .background(design_textFieldOutLine))
 
-            Row {
-                Column (
-                    modifier= Modifier
-                        .padding(start = 20.dp)
-                        .width(60.dp)
-                ){
-                    EventDetailMainText(text = stringResource(R.string.event_period), bottomPadding = 12)
-                    EventDetailMainText(text = stringResource(R.string.event_people), bottomPadding = 12)
-                    EventDetailMainText(text = stringResource(R.string.event_condition), bottomPadding = 12)
-                    EventDetailMainText(text = stringResource(R.string.event_benefit), bottomPadding = 12)
-                    EventDetailMainText(text = stringResource(R.string.event_announce), bottomPadding = 12)
-                    EventDetailMainText(text = stringResource(R.string.event_method), bottomPadding = 12)
-                    EventDetailMainText(text = stringResource(R.string.event_deadline), bottomPadding = 0)
-                }
 
-                Column (
-                    modifier= Modifier
-                        .padding(start = 20.dp)
-                ){
-                    EventDetailSubText(text = "2023.07.31(월) ~ 2023.08.11(금)", bottomPadding = 12)
-                    EventDetailSubText(text = "10명", bottomPadding = 12)
-                    EventDetailSubText(text = "3시간 산책시 응모가능", bottomPadding = 12)
-                    EventDetailSubText(text = "강아지 아이스크림", bottomPadding = 12)
-                    EventDetailSubText(text = "2023.08.18(금)", bottomPadding = 12)
-                    EventDetailSubText(text = "무작위 추첨", bottomPadding = 12)
-                    EventDetailSubText(text = "2023.07.31(월) ~ 2023.08.11(금)", bottomPadding = 0)
-                }
-            }
+            // ------------------------ html 문 들어갈 자리 --------------------------
+
+
+            // ------------------------ html 문 들어갈 자리 --------------------------
+
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
@@ -162,5 +142,14 @@ fun EventDetailSubText(text:String, bottomPadding:Int){
         modifier = Modifier.padding(bottom = bottomPadding.dp),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+fun HtmlText(html: String, modifier: Modifier = Modifier) {
+    AndroidView(
+        modifier = modifier,
+        factory = { context -> TextView(context) },
+        update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_COMPACT) }
     )
 }

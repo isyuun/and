@@ -25,7 +25,6 @@
 
 package kr.carepet.app.navi
 
-import android.content.Intent
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 

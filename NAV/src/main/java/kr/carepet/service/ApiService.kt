@@ -9,6 +9,7 @@ import kr.carepet.data.UmdListReq
 import kr.carepet.data.UmdListRes
 import kr.carepet.data.bbs.EventDetailRes
 import kr.carepet.data.bbs.EventListRes
+import kr.carepet.data.cmm.CmmRes
 import kr.carepet.data.cmm.NidUserInfoResponse
 import kr.carepet.data.cmm.WeatherReq
 import kr.carepet.data.cmm.WeatherRes
@@ -182,6 +183,8 @@ interface ApiService {
     // --------------------- 공통 코드 ----------------------- //
     @POST("api/v1/cmm/code-list")
     fun commonCodeList(@Body data: CommonCodeModel) : Call<CommonCodeResModel>
+    @POST("api/v1/cmm/code-list")
+    fun getCmmList(@Body data: CommonCodeModel) : Call<CmmRes>
     @POST("api/v1/cmm/pet-list")
     fun petList(@Body data: PetListModel) : Call<PetListResModel>
     @POST("api/v1/cmm/sgg-list")

@@ -1,6 +1,5 @@
 package kr.carepet.app.navi.screens.mainscreen
 
-import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -29,17 +28,11 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DatePickerColors
-import androidx.compose.material3.DatePickerDefaults
-import androidx.compose.material3.DatePickerFormatter
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -78,10 +71,6 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.data.user.BbsFaq
 import kr.carepet.data.user.BbsQnaBsc
-import java.time.DayOfWeek
-import java.time.Instant
-import java.util.Calendar
-import java.util.TimeZone
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable

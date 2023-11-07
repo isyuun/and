@@ -21,7 +21,6 @@ import com.patrykandpatrick.vico.core.component.shape.Shapes
 import com.patrykandpatrick.vico.core.component.shape.cornered.Corner
 import com.patrykandpatrick.vico.core.component.shape.cornered.MarkerCorneredShape
 import com.patrykandpatrick.vico.core.context.MeasureContext
-import com.patrykandpatrick.vico.core.dimensions.MutableDimensions
 import com.patrykandpatrick.vico.core.extension.copyColor
 import com.patrykandpatrick.vico.core.marker.Marker
 import kr.carepet.app.navi.ui.theme.design_login_text

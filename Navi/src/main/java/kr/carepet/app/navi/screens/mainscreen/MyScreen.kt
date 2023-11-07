@@ -110,7 +110,6 @@ import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
-import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
 import java.text.SimpleDateFormat

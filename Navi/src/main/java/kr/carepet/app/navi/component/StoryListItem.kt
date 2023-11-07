@@ -70,8 +70,8 @@ fun StoryListItem(data:StoryList, navController:NavHostController){
                 .crossfade(true)
                 .build(),
             contentDescription = "",
-            placeholder = painterResource(id = R.drawable.dog4),
-            error= painterResource(id = R.drawable.dog4),
+            placeholder = painterResource(id = R.drawable.profile_default),
+            error= painterResource(id = R.drawable.profile_default),
             modifier= Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.RefreshRes
 import kr.carepet.data.RefreshToken
+import kr.carepet.data.cmm.CmmRes
 import kr.carepet.data.daily.WeekData
 import kr.carepet.data.daily.WeekRecordReq
 import kr.carepet.data.daily.WeekRecordRes
@@ -69,6 +70,11 @@ class SharedViewModel:ViewModel(){
     private val _selectPetTemp = MutableStateFlow<CurrentPetData?>(null)
     val selectPetTemp: StateFlow<CurrentPetData?> = _selectPetTemp.asStateFlow()
     fun updateSelectPetTemp(newValue: CurrentPetData) { _selectPetTemp.value = newValue }
+
+    private val _selectPetMulti = MutableStateFlow<MutableList<CurrentPetData>>(mutableListOf())
+    val selectPetMulti: StateFlow<List<CurrentPetData>> = _selectPetMulti.asStateFlow()
+    fun addSelectPetMulti(newValue: CurrentPetData) { _selectPetMulti.value.add(newValue) }
+    fun subSelectPetMulti(newValue: CurrentPetData) { _selectPetMulti.value.remove(newValue) }
 
     fun parseBirthday(birthdayString: String): LocalDate? {
         val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
@@ -255,6 +261,8 @@ class SharedViewModel:ViewModel(){
             })
         }
     }
+
+
 
     val emptyCurrentPet = CurrentPetData(
         age = "0살",

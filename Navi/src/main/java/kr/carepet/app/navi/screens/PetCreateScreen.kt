@@ -4,7 +4,6 @@
 
 package kr.carepet.app.navi.screens
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -98,11 +97,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -132,7 +129,6 @@ import kr.carepet.data.SCD
 import kr.carepet.data.SggList
 import kr.carepet.data.UmdList
 import kr.carepet.data.pet.PetListData
-import kr.carepet.singleton.MySharedPreference
 import java.util.Calendar
 
 @Composable

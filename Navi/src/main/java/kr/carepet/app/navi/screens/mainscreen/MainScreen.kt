@@ -17,18 +17,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -54,8 +50,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
-import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -67,6 +61,7 @@ import kotlinx.coroutines.delay
 import kr.carepet.app.navi.BottomNav
 import kr.carepet.app.navi.MapActivity
 import kr.carepet.app.navi.R
+import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.LogoTopBar
 import kr.carepet.app.navi.ui.theme.design_bottomnav_text
@@ -79,7 +74,6 @@ import kr.carepet.app.navi.viewmodel.HomeViewModel
 import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
-import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.G
 
 
@@ -181,9 +175,14 @@ fun MainScreen(
                             }
 
                         "commu" ->
-
                             FloatingActionButton(
-                                onClick = {  },
+                                onClick = {
+                                    if (currentPet[0].ownrPetUnqNo=="") {
+                                        showDialog = true
+                                    }else{
+                                        navController.navigate(Screen.DailyPostScreen.route)
+                                    }
+                                },
                                 modifier = Modifier
                                     .padding(16.dp)
                                     .size(65.dp),
