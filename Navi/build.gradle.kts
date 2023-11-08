@@ -132,6 +132,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager:0.28.0") // Pager
     implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0") // Pager Indicators
     implementation("com.patrykandpatrick.vico:compose-m3:1.12.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
 
     //카카오 SDK
     implementation("com.kakao.sdk:v2-all:2.15.0")

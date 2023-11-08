@@ -2,6 +2,7 @@
 
 package kr.carepet.app.navi.screens.mainscreen
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
@@ -56,6 +57,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kr.carepet.app.navi.BottomNav
@@ -77,6 +80,7 @@ import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.singleton.G
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainScreen(
     navController: NavHostController,
@@ -116,6 +120,15 @@ fun MainScreen(
             sharedViewModel.updateInit(false)
         }
     }
+
+    val multiplePermissionsState = rememberMultiplePermissionsState(
+        listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+        )
+    )
 
     BackOnPressed()
     Scaffold(
@@ -251,6 +264,10 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
+
+        if (!multiplePermissionsState.allPermissionsGranted) {
+            multiplePermissionsState.launchMultiplePermissionRequest()
+        }
 
         Box(
             modifier = Modifier.fillMaxSize()

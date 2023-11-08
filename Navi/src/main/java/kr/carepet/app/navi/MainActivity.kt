@@ -1,8 +1,13 @@
 package kr.carepet.app.navi
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.EaseOut
@@ -14,12 +19,15 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kr.carepet.app.navi.screens.EasyRegScreen
 import kr.carepet.app.navi.screens.IdFindScreen
 import kr.carepet.app.navi.screens.IdPwSearchScreen
@@ -59,6 +67,7 @@ import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.SCDLocalData
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -73,6 +82,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MyApp(){
     val navController = rememberNavController()
@@ -81,6 +91,7 @@ fun MyApp(){
 }
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun AppNavigation(navController: NavHostController){
 

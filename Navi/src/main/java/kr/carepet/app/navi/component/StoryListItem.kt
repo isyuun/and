@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -40,12 +41,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
-import kr.carepet.app.navi.screens.mainscreen.StoryList
 import kr.carepet.app.navi.ui.theme.design_grad_end
 import kr.carepet.app.navi.ui.theme.design_white
+import kr.carepet.data.daily.Story
 
 @Composable
-fun StoryListItem(data:StoryList, navController:NavHostController){
+fun StoryListItem(data: Story, navController:NavHostController){
 
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 
@@ -54,8 +55,6 @@ fun StoryListItem(data:StoryList, navController:NavHostController){
         startY = sizeImage.height.toFloat()/5*3,
         endY = sizeImage.height.toFloat()
     )
-
-    val imageUri= ""
 
     Box(
         modifier = Modifier
@@ -66,14 +65,15 @@ fun StoryListItem(data:StoryList, navController:NavHostController){
     ){
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUri)
+                .data(data.storyFile)
                 .crossfade(true)
                 .build(),
             contentDescription = "",
             placeholder = painterResource(id = R.drawable.profile_default),
             error= painterResource(id = R.drawable.profile_default),
             modifier= Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            filterQuality = FilterQuality.Low
         )
 
         Box(modifier = Modifier
@@ -88,7 +88,7 @@ fun StoryListItem(data:StoryList, navController:NavHostController){
             .background(color = Color.Transparent)
         ){
             Text(
-                text = data.title,
+                text = data.schTtl,
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 18.sp,
                 letterSpacing = (-0.9).sp,
@@ -98,7 +98,7 @@ fun StoryListItem(data:StoryList, navController:NavHostController){
             )
 
             Text(
-                text = data.petName,
+                text = data.petNm,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,
@@ -114,7 +114,7 @@ fun StoryListItem(data:StoryList, navController:NavHostController){
                 Icon(painter = painterResource(id = R.drawable.icon_like), contentDescription = "", tint = Color.Unspecified)
 
                 Text(
-                    text = data.likeCount,
+                    text = data.rcmdtnCnt,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,
@@ -129,7 +129,7 @@ fun StoryListItem(data:StoryList, navController:NavHostController){
                 Icon(painter = painterResource(id = R.drawable.icon_comment), contentDescription = "", tint = Color.Unspecified)
 
                 Text(
-                    text = data.commentCount,
+                    text = data.cmntCnt,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,

@@ -140,18 +140,9 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
 @Composable
 fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
-    val dummyList = arrayListOf(
-        StoryList("","행복한 산책 했어요","핑키","37","22"),
-        StoryList("","꿀잠자는 저희 강아지...","강레오","28","3"),
-        StoryList("","행복한 산책 했어요","핑키","37","22"),
-        StoryList("","꿀잠자는 저희 강아지...","강레오","28","3"),
-        StoryList("","행복한 산책 했어요","핑키","37","22"),
-        StoryList("","꿀잠자는 저희 강아지...","강레오","28","3"),
-        StoryList("","행복한 산책 했어요","핑키","37","22"),
-        StoryList("","꿀잠자는 저희 강아지...","강레오","28","3")
 
-
-    )
+    val storyListRes by viewModel.storyRes.collectAsState()
+    val storyList = storyListRes?.data?.storyList
 
     Box(
         modifier = Modifier
@@ -205,7 +196,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(dummyList) { item ->
+                items(storyList?: emptyList()) { item ->
                     StoryListItem(data = item, navController = navController)
                 }
             }

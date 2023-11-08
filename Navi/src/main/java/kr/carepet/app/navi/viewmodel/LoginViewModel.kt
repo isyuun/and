@@ -1,9 +1,12 @@
 package kr.carepet.app.navi.viewmodel
 
+import android.content.ContentValues
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -83,6 +86,7 @@ class LoginViewModel() : ViewModel() {
     private val _marketingCheck = MutableStateFlow<Boolean>(false)
     val marketingCheck: StateFlow<Boolean> = _marketingCheck.asStateFlow()
     fun updateMarketingCheck(newValue: Boolean) { _marketingCheck.value = newValue }
+
 
 
     // 이메일 로그인

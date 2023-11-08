@@ -2,10 +2,15 @@
 
 package kr.carepet.app.navi.screens
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -69,8 +74,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -99,7 +112,7 @@ import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
 import kr.carepet.singleton.MySharedPreference
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedViewModel: SharedViewModel){
 
@@ -270,7 +283,9 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                     withDismissAction = false
                                 )
                             }
-                        } },
+                        }
+                              }
+                    ,
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .fillMaxWidth()
@@ -466,6 +481,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
 
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun LoginScreen(navController: NavController, viewModel: LoginViewModel,sharedViewModel: SharedViewModel) {
 
@@ -742,4 +758,3 @@ fun AgreeComponent(
             .background(design_textFieldOutLine))
     }
 }
-

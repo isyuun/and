@@ -1,11 +1,14 @@
 
 package kr.carepet.app.navi.screens.walkscreen
 
+import android.graphics.BitmapFactory
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -13,10 +16,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,25 +42,32 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -67,6 +83,10 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CircleImageTopBar
@@ -80,9 +100,13 @@ import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_textFieldOutLine
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.WalkViewModel
+import kr.carepet.data.daily.DailyDetailData
 import kr.carepet.data.daily.DailyLifePet
 import kr.carepet.util.Log
+import java.io.IOException
+import java.net.URL
 import kotlin.math.absoluteValue
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -100,6 +124,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
     val walkListItem by walkViewModel.walkListItem.collectAsState()
 
     var imageLoading by remember{ mutableStateOf(false) }
+    var showImage by remember{ mutableStateOf(false) }
 
     val pagerState = rememberPagerState( pageCount = {dailyDetail?.dailyLifeFileList?.size ?: 0 })
 
@@ -118,9 +143,18 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
         }
     }
 
+    BackHandler {
+        if (showImage){
+            showImage = false
+        }else{
+            navController.popBackStack()
+        }
+    }
+
     Scaffold(
         topBar = {BackTopBar(title = dailyDetail?.schTtl ?:"" , navController = navController )}
     ) { paddingValue ->
+
         Box(modifier = Modifier
             .fillMaxSize()
             .background(design_white)){
@@ -175,7 +209,9 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                                         .fillMaxWidth()
                                         .heightIn(max = 240.dp),
                                     state = pagerState,
-                                    beyondBoundsPageCount = 1
+                                    beyondBoundsPageCount = 1,
+                                    flingBehavior = PagerDefaults.flingBehavior(
+                                        state = pagerState, snapVelocityThreshold = 100.dp)
                                 ) { page ->
                                     val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
 
@@ -211,7 +247,9 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                                             contentDescription = "",
                                             //placeholder = painterResource(id = R.drawable.profile_default),
                                             //error= painterResource(id = R.drawable.profile_default),
-                                            modifier= Modifier.fillMaxSize(),
+                                            modifier= Modifier
+                                                .fillMaxSize()
+                                                .clickable { showImage = true },
                                             contentScale = ContentScale.Fit
                                         )
                                     }
@@ -397,6 +435,17 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
         }
     }
 
+    AnimatedVisibility(
+        visible =  showImage,
+        enter = scaleIn(transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.3f)).plus(fadeIn()),
+        exit = scaleOut(transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.3f)).plus(fadeOut())
+    ) {
+        FullScreenImage(
+            dailyDetail = dailyDetail!!,
+            page = pagerState.currentPage,
+            onDismiss = {newValue -> showImage = newValue})
+    }
+
 }
 
 
@@ -548,4 +597,91 @@ fun LoadingComposable(){
             .height(400.dp)
             .background(design_login_bg.copy(alpha))
     )
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FullScreenImage(
+    dailyDetail: DailyDetailData,
+    page : Int,
+    onDismiss: (Boolean) -> Unit
+){
+    var systemBarColor by remember{ mutableStateOf(Color.Black) }
+
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(color = systemBarColor)
+
+    var rotate by remember { mutableStateOf(false) }
+    var scale by remember { mutableFloatStateOf(1f) }
+    val rotation: Float by animateFloatAsState(if (rotate) 90f else 0f, label = "")
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
+        scale *= zoomChange
+        //rotation += rotationChange
+        offset = if (scale < 1f) {
+            Offset.Zero
+        } else {
+            offset + offsetChange
+        }
+    }
+
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = {
+                    systemBarColor = design_white
+                    onDismiss(false)
+                }
+            )
+        ,
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(
+                    "http://carepet.hopto.org/img/"+
+                            dailyDetail.dailyLifeFileList[page].filePathNm+
+                            dailyDetail.dailyLifeFileList[page].atchFileNm
+                )
+                .crossfade(true)
+                .build(),
+            contentDescription = "",
+            modifier= Modifier
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    rotationZ = rotation,
+                    translationX = if (rotate) -offset.y*scale else offset.x*scale,
+                    translationY = if (rotate) offset.x*scale else offset.y*scale
+                )
+                // add transformable to listen to multitouch transformation events
+                // after offset
+                .transformable(state = state)
+                .fillMaxSize(),
+            contentScale = ContentScale.Fit
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(bottom = 20.dp)
+                .clickable {
+                    rotate = !rotate
+                    offset = Offset.Zero
+                }
+                .align(Alignment.BottomCenter),
+            contentAlignment = Alignment.Center
+        ){
+            Text(
+                text = "사진 회전",
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                fontSize = 12.sp, color = design_white.copy(alpha = 0.5f),
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+        }
+
+    }
 }
