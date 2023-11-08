@@ -50,7 +50,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -66,8 +65,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -86,10 +83,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -102,7 +96,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -126,7 +119,6 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.widget.LocationButtonView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kr.carepet.DEBUG
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.R
 import kr.carepet.gps.app.GPSApplication
@@ -135,7 +127,11 @@ import kr.carepet.gpx.GPX_LATITUDE_ZERO
 import kr.carepet.gpx.GPX_LONGITUDE_ZERO
 import kr.carepet.gpx.TRACK_ZERO_NUM
 import kr.carepet.gpx.Track
+import kr.carepet.map._app.CircleImageUrl
+import kr.carepet.map._app.IconButton2
+import kr.carepet.map._app.ImageButton2
 import kr.carepet.map._app.getRounded
+import kr.carepet.map._app.navigationBarHeight
 import kr.carepet.map._app.toPx
 import kr.carepet.map._app.toText
 import kr.carepet.map.app.LoadingDialog
@@ -212,19 +208,6 @@ fun mark(pet: CurrentPetData, event: Track.EVENT, position: LatLng, mapView: Map
 }
 
 @Composable
-fun navigationBarHeight(): Dp {
-    val context = LocalContext.current
-    val density = context.resources.displayMetrics.density
-    val resourceId = context.resources.getIdentifier("navigation_bar_height", "dimen", "android")
-    val navigationBarHeight = if (resourceId > 0) {
-        (context.resources.getDimensionPixelSize(resourceId) / density).dp
-    } else {
-        0.dp
-    }
-    return navigationBarHeight
-}
-
-@Composable
 fun rememberMapViewWithLifecycle(
     context: Context,
     mapOptions: NaverMapOptions = NaverMapOptions()
@@ -270,99 +253,69 @@ fun rememberMapViewWithLifecycle(
     return mapView
 }
 
-@Composable
-fun IconButton(
-    text: String = "",
-    onClick: () -> Unit,
-    drawable: ImageVector,
-    description: String,
-    shape: Shape = RectangleShape,
-    color: Color = MaterialTheme.colorScheme.onBackground,
-    back: Color = MaterialTheme.colorScheme.background,
-    border: Color = MaterialTheme.colorScheme.tertiary,
-    size: Dp = 0.dp
-) {
-    val modifier = if (size > 0.dp) Modifier.size(size) else Modifier.fillMaxHeight()
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = text,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier
-                .background(Color.Transparent),
-        )
-        IconButton(
-            onClick = onClick,
-            modifier = modifier
-                .background(
-                    color = back,
-                    shape = shape,
-                )
-                .border(
-                    width = 0.1.dp,
-                    color = border,
-                    shape = shape,
-                ),
-        ) {
-            Icon(
-                modifier = Modifier
-                    .size(20.dp),
-                imageVector = drawable,
-                contentDescription = description,
-                tint = color
-            )
+fun NaverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Track>) {
+    val application = GPSApplication.instance
+    if (tracks?.isNotEmpty() == true) {
+        var lat1 = tracks.first().let { it.latitude }
+        var lon1 = tracks.first().let { it.longitude }
+        var lat2 = tracks.last().let { it.latitude }
+        var lon2 = tracks.last().let { it.longitude }
+        tracks.forEach {
+            val lat = it.latitude
+            val lon = it.longitude
+            if (lat < lat1) lat1 = lat
+            if (lon < lon1) lon1 = lon
+            if (lat > lat2) lat2 = lat
+            if (lon > lon2) lon2 = lon
+        }
+        val latLng1 = LatLng(lat1, lon1)
+        val latLng2 = LatLng(lat2, lon2)
+        val bounds = latLng1.let { latLng2.let { it1 -> LatLngBounds(it, it1) } }
+        val padding = 52.dp.toPx(context).toInt()
+        val update = CameraUpdate.fitBounds(bounds, padding)
+        naverMap.moveCamera(update)
+        application._distance?.let {
+            if (it < 200.0f) {
+                val center = bounds.center
+                val position = CameraPosition(center, GPX_CAMERA_ZOOM_ZERO)
+                val update2 = CameraUpdate.toCameraPosition(position)
+                naverMap.moveCamera(update2)
+            }
         }
     }
 }
 
-@Composable
-fun ImageButton(
-    text: String = "",
-    onClick: () -> Unit,
-    drawable: ImageVector,
-    description: String,
-    shape: Shape = RectangleShape,
-    color: Color = LocalContentColor.current,
-    back: Color = MaterialTheme.colorScheme.background,
-    border: Color = MaterialTheme.colorScheme.tertiary,
-    size: Dp = 0.dp
-) {
-    val modifier = if (size > 0.dp) Modifier.size(size) else Modifier.fillMaxHeight()
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = text,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier
-                .background(Color.Transparent),
-        )
-        IconButton(
-            onClick = onClick,
-            modifier = modifier
-                .background(
-                    color = back,
-                    shape = shape,
-                )
-                .border(
-                    width = 0.1.dp,
-                    color = border,
-                    shape = shape,
-                ),
-        ) {
-            Icon(
-                modifier = Modifier
-                    .size(20.dp),
-                imageVector = drawable,
-                contentDescription = description,
-                tint = color
-            )
+fun NaverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, finished: Boolean = false) {
+    val departure = context.resources.getString(R.string.departure)
+    val arrival = context.resources.getString(R.string.departure)
+    val markers = mutableListOf<Marker>()
+    val coords = mutableListOf<LatLng>()
+    markers.clear()
+    coords.clear()
+    tracks.forEach { track ->
+        marker(LatLng(track.latitude, track.longitude), track.event)?.let { markers.add(it) }
+        coords.add(LatLng(track.latitude, track.longitude))
+    }
+    if (coords.isNotEmpty()) {
+        val starter = marker(context = context, position = coords.first(), captionText = departure)
+        starter.map = naverMap
+        if (finished) {
+            val ender = marker(context = context, position = coords.first(), captionText = arrival)
+            ender.map = naverMap
         }
+        if (coords.size > 1) {
+            val path = PathOverlay()
+            path.coords = coords
+            path.color = 0xA0FFDBDB.toInt()
+            path.outlineColor = 0xA0FF5000.toInt()
+            path.width = 18
+            path.globalZIndex = 10
+            path.outlineWidth = 3
+            path.map = naverMap
+        }
+    }
+    markers.forEach {
+        it.map = naverMap
     }
 }
 
@@ -385,17 +338,10 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     Log.i(__CLASSNAME__, "${getMethodName()}[${start}][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
 
     val markers = remember { mutableListOf<Marker>() }
-    val coords = remember { mutableListOf<LatLng>() }
     if (start) {
         markers.clear()
-        coords.clear()
         tracks?.forEach { track ->
-            val lat = track.latitude
-            val lon = track.longitude
-            val pos = LatLng(lat, lon)
-            val mrk = marker(pos, track.event)
-            mrk?.let { markers.add(it) }
-            coords.add(pos)
+            marker(LatLng(track.latitude, track.longitude), track.event)?.let { markers.add(it) }
         }
     }
 
@@ -403,7 +349,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }
     source.isCompassEnabled = true
 
-    Log.w(__CLASSNAME__, "${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+    Log.w(__CLASSNAME__, "${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
 
     val mapOptions = remember {
         NaverMapOptions()
@@ -428,36 +374,22 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 
 
     var isLoading by remember { mutableStateOf(false) }
-    Log.wtf(__CLASSNAME__, "${getMethodName()}[isLoading:$isLoading][${coords.size}]")
-    if (coords.isNotEmpty()) {
+    Log.wtf(__CLASSNAME__, "${getMethodName()}[isLoading:$isLoading]")
+    if (tracks?.isNotEmpty() == true) {
         isLoading = false
     }
 
     var refresh by remember { mutableStateOf(false) }
-    LaunchedEffect(refresh, position, coords) {
+    LaunchedEffect(refresh, position) {
         scope.launch {
-            Log.w(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+            Log.w(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
             mapView.getMapAsync { naverMap ->
-                if (coords.isNotEmpty()) {
-                    isLoading = false
-                    val starter = marker(context = context, position = coords.first(), captionText = departure)
-                    starter.map = naverMap
-                    if (coords.size > 1) {
-                        val path = PathOverlay()
-                        path.coords = coords
-                        path.color = 0xA0FFDBDB.toInt()
-                        path.outlineColor = 0xA0FF5000.toInt()
-                        path.width = 18
-                        path.globalZIndex = 10
-                        path.outlineWidth = 3
-                        path.map = naverMap
-                        Log.wtf(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                    }
+                Log.wtf(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
+                if (tracks?.isNotEmpty() == true) isLoading = false
+                if (start) {
+                    tracks?.let { NaverMapPath(context = context, naverMap = naverMap, tracks = it) }
                 }
                 naverMap.locationOverlay.position = position
-                markers.forEach {
-                    it.map = naverMap
-                }
             }
         }
     }
@@ -478,10 +410,10 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             factory = {
                 mapView.apply {
                     getMapAsync { naverMap ->
-                        Log.wtf(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+                        Log.wtf(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
                         naverMap.apply {
                             uiSettings.isCompassEnabled = source.isCompassEnabled
-                            uiSettings.isZoomGesturesEnabled = !uiSettings.isZoomControlEnabled
+                            uiSettings.isZoomGesturesEnabled = true
                             locationSource = source
                             locationTrackingMode = LocationTrackingMode.Follow
                             cameraPosition = CameraPosition(cameraPosition.target, GPX_CAMERA_ZOOM_ZERO)
@@ -512,12 +444,12 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             .fillMaxSize()
             .padding(bottom = 20.dp)
     ) {
-        Log.i(__CLASSNAME__, "::NaverMapApp@Box${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+        Log.i(__CLASSNAME__, "::NaverMapApp@Box${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
         /** bottom */
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
-                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
                     showBottomSheet = false
                     application.resume()
                 },
@@ -606,7 +538,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         Button(
                             enabled = application.pets.isNotEmpty(),
                             onClick = {
-                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
                                         showBottomSheet = false
@@ -651,7 +583,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             R.string.walk_button_finish
                             Button(
                                 onClick = {
-                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                                         if (!sheetState.isVisible) {
                                             showBottomSheet = false
@@ -680,7 +612,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             R.string.walk_button_resume
                             Button(
                                 onClick = {
-                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                                         if (!sheetState.isVisible) {
                                             showBottomSheet = false
@@ -700,7 +632,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
         }
         /** right */
-        Log.w(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+        Log.w(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
         AnimatedVisibility(
             visible = true,
             modifier = Modifier.align(Alignment.BottomEnd),
@@ -715,10 +647,10 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 /** pee */
-                IconButton(
+                IconButton2(
                     onClick = {
-                        Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                        if (!start) return@IconButton
+                        Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
+                        if (!start) return@IconButton2
                         event = Track.EVENT.pee
                         if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
                         else showPetsSheet = true
@@ -730,10 +662,10 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     size = 40.dp
                 )
                 /** poo */
-                IconButton(
+                IconButton2(
                     onClick = {
-                        Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                        if (!start) return@IconButton
+                        Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
+                        if (!start) return@IconButton2
                         event = Track.EVENT.poo
                         if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
                         else showPetsSheet = true
@@ -745,10 +677,10 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     size = 40.dp
                 )
                 /** mrk */
-                IconButton(
+                IconButton2(
                     onClick = {
-                        Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                        if (!start) return@IconButton
+                        Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
+                        if (!start) return@IconButton2
                         event = Track.EVENT.mrk
                         if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
                         else showPetsSheet = true
@@ -772,20 +704,20 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             /** note */
-            IconButton(
+            IconButton2(
                 onClick = {
-                    Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                    if (!start) return@IconButton
+                    Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
+                    if (!start) return@IconButton2
                 },
                 drawable = ImageVector.vectorResource(id = R.drawable.icon_list),
                 description = stringResource(R.string.note),
                 size = 40.dp
             )
             /** camera */
-            IconButton(
+            IconButton2(
                 onClick = {
-                    Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                    if (!start) return@IconButton
+                    Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
+                    if (!start) return@IconButton2
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         context.startActivity(intent)
@@ -813,29 +745,14 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         /** walk */
         Button(
             onClick = {
-                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
+                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
                 if (pets.size == 1 && !start) {
                     application.start()
                     isLoading = true
                 } else {
                     showBottomSheet = !showBottomSheet
                     mapView.getMapAsync { naverMap ->
-                        if (tracks?.isNotEmpty() == true) {
-                            val latLng = tracks.last().let { LatLng(it.latitude, it.longitude) }
-                            latLng.let {
-                                val position = CameraPosition(it, GPX_CAMERA_ZOOM_ZERO)
-                                val update = CameraUpdate.toCameraPosition(position)
-                                naverMap.moveCamera(update)
-                            }
-                            val distance = application._distance
-                            if (distance != null && distance > 100) {
-                                val latLng1 = tracks.first().let { LatLng(it.latitude, it.longitude) }
-                                val latLng2 = tracks.last().let { LatLng(it.latitude, it.longitude) }
-                                val bounds = latLng1.let { latLng2.let { it1 -> LatLngBounds(it, it1) } }
-                                val padding = 48.dp.toPx(context).toInt()
-                                bounds.let { naverMap.moveCamera(CameraUpdate.fitBounds(it, padding)) }
-                            }
-                        }
+                        tracks?.let { NaverMapPreview(context = context, naverMap = naverMap, tracks = it) }
                     }
                 }
             },
@@ -923,11 +840,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(application.pets) { pet ->
-                        ImageButton(
+                        ImageButton2(
                             text = pet.petNm,
                             onClick = {
-                                Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[${start}][${tracks?.size}][${coords.size}][${markers.size}][${position.toText()}]")
-                                if (!start) return@ImageButton
+                                Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
+                                if (!start) return@ImageButton2
                                 showPetsSheet = false
                                 mark(pet, event, position, mapView)?.let { markers.add(it) }
                             },
@@ -1089,8 +1006,8 @@ fun WalkInfoNavi(start: Boolean) {
             while (true) {
                 delay(1000) // 1초마다 업데이트
                 if (start) count++ else count = 0
-                duration = if (DEBUG) "${application.duration}" else "${application.duration}"
-                distance = if (DEBUG) "${application.distance}" else "${application.distance}"
+                duration = if (application.pause) "${application.duration}" else "${application.__duration}"
+                distance = "${application.distance}"
             }
         }
     }
@@ -1174,7 +1091,7 @@ fun WalkInfoNavi(start: Boolean) {
             horizontalArrangement = Arrangement.spacedBy(0.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            CircleImageTopBar(size = 60, imageUri = pet.petRprsImgAddr)
+            CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
             Column(
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
@@ -1229,28 +1146,5 @@ fun WalkInfoNavi(start: Boolean) {
             //    }
             //)
         }
-    }
-}
-
-@Composable
-fun CircleImageTopBar(size: Int, imageUri: String?) {
-    Box(
-        modifier = Modifier
-            .size(size.dp)
-            .border(shape = CircleShape, border = BorderStroke(3.dp, color = MaterialTheme.colorScheme.background))
-            .shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
-            .clip(CircleShape)
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUri)
-                .crossfade(true)
-                .build(),
-            contentDescription = "",
-            placeholder = painterResource(id = R.drawable.profile_default),
-            error = painterResource(id = R.drawable.profile_default),
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
     }
 }

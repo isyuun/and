@@ -151,4 +151,7 @@ dependencies {
     // Skip this if you don't want to use integration libraries or configure Glide.
     implementation("com.google.dagger:hilt-android:2.47")
     //kapt("com.google.dagger:hilt-android-compiler:2.47")
+
+    //네이버 맵뷰
+    implementation("com.naver.maps:map-sdk:3.17.0")
 }

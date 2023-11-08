@@ -36,12 +36,42 @@ import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.naver.maps.geometry.LatLng
+import kr.carepet.gps.R
 
 /**
  * @Project     : carepet-android
@@ -141,4 +171,136 @@ fun Dp.toPx(context: Context): Float {
 
 fun TextUnit.toPx(context: Context): Float {
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this.value, context.resources.displayMetrics)
+}
+
+@Composable
+fun navigationBarHeight(): Dp {
+    val context = LocalContext.current
+    val density = context.resources.displayMetrics.density
+    val resourceId = context.resources.getIdentifier("navigation_bar_height", "dimen", "android")
+    val navigationBarHeight = if (resourceId > 0) {
+        (context.resources.getDimensionPixelSize(resourceId) / density).dp
+    } else {
+        0.dp
+    }
+    return navigationBarHeight
+}
+
+@Composable
+fun IconButton2(
+    text: String = "",
+    onClick: () -> Unit,
+    drawable: ImageVector,
+    description: String,
+    shape: Shape = RectangleShape,
+    color: Color = MaterialTheme.colorScheme.onBackground,
+    back: Color = MaterialTheme.colorScheme.background,
+    border: Color = MaterialTheme.colorScheme.tertiary,
+    size: Dp = 0.dp
+) {
+    val modifier = if (size > 0.dp) Modifier.size(size) else Modifier.fillMaxHeight()
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = text,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier
+                .background(Color.Transparent),
+        )
+        androidx.compose.material3.IconButton(
+            onClick = onClick,
+            modifier = modifier
+                .background(
+                    color = back,
+                    shape = shape,
+                )
+                .border(
+                    width = 0.1.dp,
+                    color = border,
+                    shape = shape,
+                ),
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(20.dp),
+                imageVector = drawable,
+                contentDescription = description,
+                tint = color
+            )
+        }
+    }
+}
+
+@Composable
+fun ImageButton2(
+    text: String = "",
+    onClick: () -> Unit,
+    drawable: ImageVector,
+    description: String,
+    shape: Shape = RectangleShape,
+    color: Color = LocalContentColor.current,
+    back: Color = MaterialTheme.colorScheme.background,
+    border: Color = MaterialTheme.colorScheme.tertiary,
+    size: Dp = 0.dp
+) {
+    val modifier = if (size > 0.dp) Modifier.size(size) else Modifier.fillMaxHeight()
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = text,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier
+                .background(Color.Transparent),
+        )
+        androidx.compose.material3.IconButton(
+            onClick = onClick,
+            modifier = modifier
+                .background(
+                    color = back,
+                    shape = shape,
+                )
+                .border(
+                    width = 0.1.dp,
+                    color = border,
+                    shape = shape,
+                ),
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(20.dp),
+                imageVector = drawable,
+                contentDescription = description,
+                tint = color
+            )
+        }
+    }
+}
+
+@Composable
+fun CircleImageUrl(size: Int, imageUri: String?) {
+    Box(
+        modifier = Modifier
+            .size(size.dp)
+            .border(shape = CircleShape, border = BorderStroke(3.dp, color = MaterialTheme.colorScheme.background))
+            .shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
+            .clip(CircleShape)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUri)
+                .crossfade(true)
+                .build(),
+            contentDescription = "",
+            placeholder = painterResource(id = R.drawable.profile_default),
+            error = painterResource(id = R.drawable.profile_default),
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
 }

@@ -176,6 +176,21 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
         this.write()
     }
 
+    val __duration: String
+        //get() = _GPXWriter.calculateDuration(_tracks)
+        get() {
+            if (_tracks.isEmpty()) {
+                return "00:00:00"
+            }
+            val startTime = _tracks.first()?.time ?: System.currentTimeMillis()
+            val endTime = System.currentTimeMillis()
+            val durationInMillis = endTime - startTime
+            val seconds = durationInMillis / 1000
+            val minutes = seconds / 60
+            val hours = minutes / 60
+            return String.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60)
+        }
+
     val _duration: Long
         get() {
             if (_tracks.isEmpty()) {
@@ -184,6 +199,21 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
             val startTime = _tracks.first()?.time ?: System.currentTimeMillis()
             val endTime = _tracks.last()?.time ?: System.currentTimeMillis()
             return endTime - startTime
+        }
+
+    val duration: String
+        //get() = _GPXWriter.calculateDuration(_tracks)
+        get() {
+            if (_tracks.isEmpty()) {
+                return "00:00:00"
+            }
+            val startTime = _tracks.first()?.time ?: System.currentTimeMillis()
+            val endTime = _tracks.last()?.time ?: System.currentTimeMillis()
+            val durationInMillis = endTime - startTime
+            val seconds = durationInMillis / 1000
+            val minutes = seconds / 60
+            val hours = minutes / 60
+            return String.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60)
         }
 
     val _distance: Float
@@ -201,21 +231,6 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
                 }
             }
             return totalDistance
-        }
-
-    val duration: String
-        //get() = _GPXWriter.calculateDuration(_tracks)
-        get() {
-            if (_tracks.isEmpty()) {
-                return "00:00:00"
-            }
-            val startTime = _tracks.first()?.time ?: System.currentTimeMillis()
-            val endTime = System.currentTimeMillis()
-            val durationInMillis = endTime - startTime
-            val seconds = durationInMillis / 1000
-            val minutes = seconds / 60
-            val hours = minutes / 60
-            return String.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60)
         }
 
     val distance: String

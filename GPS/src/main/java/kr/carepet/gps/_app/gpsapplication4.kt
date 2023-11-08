@@ -59,6 +59,8 @@ open class gpsapplication4 : gpsapplication3() {
         super.stop()
     }
 
+    val pause
+        get() = (this.service?.start == true && this.service?.pause == true)
     fun pause() {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
         this.service?.pause()
@@ -81,14 +83,17 @@ open class gpsapplication4 : gpsapplication3() {
     val tracks
         get() = this.service?.tracks
 
+    val __duration
+        get() = this.service?.__duration
+
     val _duration
         get() = this.service?._duration
 
-    val _distance
-        get() = this.service?._distance
-
     val duration
         get() = this.service?.duration
+
+    val _distance
+        get() = this.service?._distance
 
     val distance
         get() = this.service?.distance

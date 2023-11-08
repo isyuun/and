@@ -16,7 +16,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -79,11 +78,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -98,8 +97,15 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.naver.maps.geometry.LatLng
+import com.naver.maps.geometry.LatLngBounds
+import com.naver.maps.map.CameraPosition
+import com.naver.maps.map.CameraUpdate
+import com.naver.maps.map.overlay.Marker
+import com.naver.maps.map.overlay.PathOverlay
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.CircleImageTopBar
@@ -124,6 +130,12 @@ import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.Pet
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.app.GPSApplication
+import kr.carepet.gpx.GPX_CAMERA_ZOOM_ZERO
+import kr.carepet.map._app.toPx
+import kr.carepet.map.app.naver.NaverMapPath
+import kr.carepet.map.app.naver.NaverMapPreview
+import kr.carepet.map.app.naver.marker
+import kr.carepet.map.app.naver.rememberMapViewWithLifecycle
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
 
@@ -232,6 +244,12 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
             viewModel.updateSelectedImageList(listOf(dummyUri))
         }
 
+    val mapView = rememberMapViewWithLifecycle(context)
+    //val markers = remember { mutableListOf<Marker>() }
+    //val coords = remember { mutableListOf<LatLng>() }
+    //val departure = stringResource(id = kr.carepet.gps.R.string.departure)
+    //val arrival = stringResource(id = kr.carepet.gps.R.string.arrival)
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackState, Modifier) }
     ) { paddingValues ->
@@ -283,22 +301,33 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
+            var scale by remember { mutableStateOf(1f) }
+
             Box(
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(360.dp)
                     .background(color = design_icon_bg)
             ) {
-                application.preview?.let {
-                    Image(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                        bitmap = it.asImageBitmap(),
-                        contentDescription = "",
-                    )
-                }
+                AndroidView(
+                    factory = {
+                        mapView.apply {
+                            getMapAsync { naverMap ->
+                                naverMap.apply {
+                                    uiSettings.isZoomControlEnabled = false
+                                    uiSettings.isLogoClickEnabled = false
+                                }
+                                tracks?.let { NaverMapPath(context = context, naverMap = naverMap, tracks = it, finished = true) }
+                                tracks?.let { NaverMapPreview(context = context, naverMap =  naverMap, tracks = it) }
+                                naverMap.takeSnapshot(false) {
+                                    application.preview = it
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
@@ -361,12 +390,11 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     .heightIn(min = 40.dp)
                     .focusRequester(focusRequester)
                     .onFocusChanged { focusState ->
-                        if (focusState.isFocused){
+                        if (focusState.isFocused) {
                             expanded = focusState.isFocused
                             scope.launch { scrollState.animateScrollTo(scrollState.maxValue, tween(500)) }
                         }
-                    }
-                ,
+                    },
                 placeholder = {
                     Text(
                         text = "제목을 입력해주세요",
@@ -375,20 +403,20 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     )
                 },
                 trailingIcon = {
-                    if (expanded){
+                    if (expanded) {
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowUp,
                             contentDescription = "", tint = design_login_text,
                             modifier = Modifier.clickable { expanded = false }
                         )
-                    } else{
+                    } else {
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = "", tint = design_login_text,
                             modifier = Modifier.clickable { expanded = true }
                         )
                     }
-                               } ,
+                },
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedPlaceholderColor = design_placeHolder,
                     focusedPlaceholderColor = design_placeHolder,
@@ -415,8 +443,8 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                         .heightIn(max = 150.dp)
                         .background(color = design_white),
                     contentPadding = PaddingValues(vertical = 8.dp)
-                ){
-                    itemsIndexed(items){ index, item ->
+                ) {
+                    itemsIndexed(items) { index, item ->
                         Text(
                             text = item,
                             color = design_login_text.copy(alpha = 0.8f),
@@ -431,12 +459,14 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                                 }
                         )
 
-                        if (index < items.size-1){
-                            Spacer(modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 6.dp)
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(design_textFieldOutLine))
+                        if (index < items.size - 1) {
+                            Spacer(
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp, vertical = 6.dp)
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(design_textFieldOutLine)
+                            )
                         }
                     }
                 }

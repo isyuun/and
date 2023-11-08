@@ -56,7 +56,7 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
 
     override fun generateNotification(location: Location?): Notification {
         generateNotificationChannel(NotificationManager.IMPORTANCE_MAX)
-        val title = "${getString(R.string.walk_title_walking)} - ${duration}"
+        val title = "${getString(R.string.walk_title_walking)} - ${__duration}"
         val text = "${getString(R.string.app_name)}이 ${getString(R.string.walk_text_in_tracking)}"
         val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent(), PendingIntent.FLAG_MUTABLE)
         val ret = notificationCompatBuilder
@@ -100,7 +100,7 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
         }
     }
 
-    private var pause = false
+    internal var pause = false
     private var _pause: Track? = null
     private val _pauses = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
 
@@ -130,15 +130,19 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
     }
 
     override fun start() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][$start][$pause][$lastLocation]")
+        val loc = lastLocation?.let { Location(it) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::write[${(start && pause)}][start:$start][pause:$pause][${lastLocation == loc}][${tracks.size}]")
         super.start()
         pause = false
+        _pauses.clear()
     }
 
     override fun stop() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][$start][$pause][$lastLocation]")
+        val loc = lastLocation?.let { Location(it) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::write[${(start && pause)}][start:$start][pause:$pause][${lastLocation == loc}][${tracks.size}]")
         super.stop()
         pause = false
+        _pauses.clear()
     }
 
 }

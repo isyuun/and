@@ -21,7 +21,7 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
         timer = Timer()
         timer.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                val title = "${getString(R.string.walk_title_walking)} - ${duration}"
+                val title = "${getString(R.string.walk_title_walking)} - ${__duration}"
                 //Log.wtf(__CLASSNAME__, "${getMethodName()} $title")
                 notification = notificationCompatBuilder.setContentTitle(title).build()
                 notificationManager.notify(NOTIFICATION_ID, notification)
