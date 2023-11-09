@@ -82,7 +82,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -100,12 +99,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.naver.maps.geometry.LatLng
-import com.naver.maps.geometry.LatLngBounds
-import com.naver.maps.map.CameraPosition
-import com.naver.maps.map.CameraUpdate
-import com.naver.maps.map.overlay.Marker
-import com.naver.maps.map.overlay.PathOverlay
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.CircleImageTopBar
@@ -130,11 +123,8 @@ import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.Pet
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.app.GPSApplication
-import kr.carepet.gpx.GPX_CAMERA_ZOOM_ZERO
-import kr.carepet.map._app.toPx
 import kr.carepet.map.app.naver.NaverMapPath
 import kr.carepet.map.app.naver.NaverMapPreview
-import kr.carepet.map.app.naver.marker
 import kr.carepet.map.app.naver.rememberMapViewWithLifecycle
 import kr.carepet.singleton.G
 import kr.carepet.util.Log

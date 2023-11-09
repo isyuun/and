@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  *
- * Copyright (c) 2023. CarePat All right reserved.
+ * Copyright (c) 2023. PetTip All right reserved.
  * This software is the proprietary information of CarePet Co.,Ltd.
  *
  *  Revision History

@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  *
- * Copyright (c) 2023. CarePat All right reserved.
+ * Copyright (c) 2023. PetTip All right reserved.
  * This software is the proprietary information of CarePet Co.,Ltd.
  *
  *  Revision History
@@ -96,6 +96,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -127,13 +128,13 @@ import kr.carepet.gpx.GPX_LATITUDE_ZERO
 import kr.carepet.gpx.GPX_LONGITUDE_ZERO
 import kr.carepet.gpx.TRACK_ZERO_NUM
 import kr.carepet.gpx.Track
-import kr.carepet.map._app.CircleImageUrl
-import kr.carepet.map._app.IconButton2
-import kr.carepet.map._app.ImageButton2
-import kr.carepet.map._app.getRounded
-import kr.carepet.map._app.navigationBarHeight
-import kr.carepet.map._app.toPx
-import kr.carepet.map._app.toText
+import kr.carepet.map.CircleImageUrl
+import kr.carepet.map.IconButton2
+import kr.carepet.map.ImageButton2
+import kr.carepet.map.getRounded
+import kr.carepet.map.navigationBarHeight
+import kr.carepet.map.toPx
+import kr.carepet.map.toText
 import kr.carepet.map.app.LoadingDialog
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
@@ -163,6 +164,7 @@ fun marker(context: Context, position: LatLng?, captionText: String = ""): Marke
     marker.captionHaloColor = Color.Gray.toArgb()
     marker.captionTextSize = (3.8 * 0.85f).sp.toPx(context)
     marker.captionOffset = (-32 * 0.9f).dp.toPx(context).toInt()
+    marker.zIndex = 3
     return marker
 }
 
@@ -174,6 +176,7 @@ fun marker(context: Context, position: LatLng?, id: Int, back: Color = Color.Whi
     marker.width = (32 * 0.9f).dp.toPx(context).toInt()
     marker.height = (32 * 0.9f).dp.toPx(context).toInt()
     getRounded(context, id, back)?.let { marker.icon = OverlayImage.fromBitmap(it) }
+    marker.zIndex = 2
     return marker
 }
 
@@ -253,7 +256,7 @@ fun rememberMapViewWithLifecycle(
     return mapView
 }
 
-fun NaverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Track>) {
+fun NaverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, padding: Dp = 52.dp) {
     val application = GPSApplication.instance
     if (tracks?.isNotEmpty() == true) {
         var lat1 = tracks.first().let { it.latitude }
@@ -271,8 +274,7 @@ fun NaverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Tr
         val latLng1 = LatLng(lat1, lon1)
         val latLng2 = LatLng(lat2, lon2)
         val bounds = latLng1.let { latLng2.let { it1 -> LatLngBounds(it, it1) } }
-        val padding = 52.dp.toPx(context).toInt()
-        val update = CameraUpdate.fitBounds(bounds, padding)
+        val update = CameraUpdate.fitBounds(bounds, padding.toPx(context).toInt())
         naverMap.moveCamera(update)
         application._distance?.let {
             if (it < 200.0f) {
@@ -285,9 +287,9 @@ fun NaverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Tr
     }
 }
 
-fun NaverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, finished: Boolean = false) {
+fun NaverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, finished: Boolean) {
     val departure = context.resources.getString(R.string.departure)
-    val arrival = context.resources.getString(R.string.departure)
+    val arrival = context.resources.getString(R.string.arrival)
     val markers = mutableListOf<Marker>()
     val coords = mutableListOf<LatLng>()
     markers.clear()
@@ -300,7 +302,7 @@ fun NaverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track
         val starter = marker(context = context, position = coords.first(), captionText = departure)
         starter.map = naverMap
         if (finished) {
-            val ender = marker(context = context, position = coords.first(), captionText = arrival)
+            val ender = marker(context = context, position = coords.last(), captionText = arrival)
             ender.map = naverMap
         }
         if (coords.size > 1) {
@@ -387,9 +389,14 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 Log.wtf(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
                 if (tracks?.isNotEmpty() == true) isLoading = false
                 if (start) {
-                    tracks?.let { NaverMapPath(context = context, naverMap = naverMap, tracks = it) }
+                    tracks?.let { NaverMapPath(context = context, naverMap = naverMap, tracks = it, finished = false) }
                 }
                 naverMap.locationOverlay.position = position
+                if (start && tracks?.size == 1) {
+                    naverMap.apply {
+                        locationTrackingMode = LocationTrackingMode.Follow
+                    }
+                }
             }
         }
     }
@@ -452,6 +459,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[${start}][${tracks?.size}][${markers.size}][${position.toText()}]")
                     showBottomSheet = false
                     application.resume()
+                    mapView.getMapAsync { naverMap ->
+                        naverMap.apply {
+                            locationTrackingMode = LocationTrackingMode.Follow
+                        }
+                    }
                 },
                 sheetState = sheetState,
                 dragHandle = {},
@@ -487,18 +499,18 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Start,
                         ) {
-                            Checkbox(
-                                checked = checkedAll,
-                                onCheckedChange = {
-                                    checkedAll = it
-                                    if (checkedAll) application.add(pets) else application.remove()
-                                },
-                            )
-                            Text(
-                                text = stringResource(id = R.string.walk_check_select_all),
-                                fontSize = 14.sp,
-                                letterSpacing = (-0.7).sp
-                            )
+                            //Checkbox(
+                            //    checked = checkedAll,
+                            //    onCheckedChange = {
+                            //        checkedAll = it
+                            //        if (checkedAll) application.add(pets) else application.remove()
+                            //    },
+                            //)
+                            //Text(
+                            //    text = stringResource(id = R.string.walk_check_select_all),
+                            //    fontSize = 14.sp,
+                            //    letterSpacing = (-0.7).sp
+                            //)
                         }
                         LazyRow(modifier = Modifier.fillMaxWidth()) {
                             items(pets) { pet ->
@@ -752,7 +764,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 } else {
                     showBottomSheet = !showBottomSheet
                     mapView.getMapAsync { naverMap ->
-                        tracks?.let { NaverMapPreview(context = context, naverMap = naverMap, tracks = it) }
+                        tracks?.let { NaverMapPreview(context = context, naverMap = naverMap, tracks = it, padding = 104.dp) }
                     }
                 }
             },

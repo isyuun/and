@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  *
- * Copyright (c) 2023. CarePat All right reserved.
+ * Copyright (c) 2023. PetTip All right reserved.
  * This software is the proprietary information of CarePet Co.,Ltd.
  *
  *  Revision History
@@ -23,7 +23,7 @@
  *  isyuun@care-pet.kr             2023. 9. 20.   description...
  */
 
-package kr.carepet.map._app
+package kr.carepet.map
 
 import android.content.Context
 import android.content.res.Resources

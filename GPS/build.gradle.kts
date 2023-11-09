@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  *
- * Copyright (c) 2023. CarePat All right reserved.
+ * Copyright (c) 2023. PetTip All right reserved.
  * This software is the proprietary information of CarePet Co.,Ltd.
  *
  *  Revision History
@@ -25,14 +25,6 @@
 plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.kotlin.android)
-    //id("org.jetbrains.kotlin.jvm") version "1.9.0"
-    /** IY:플랫폼:샘플스:Define the samples to load */
-    ///**id("org.jetbrains.kotlin.kapt")*/
-    //id("com.google.devtools.ksp")
-    //id("com.google.dagger.hilt.android")
-    //id("dagger.hilt.android.plugin")
-    /** IY:플랫폼:샘플스:Define the samples to load */
-    ///**id("com.example.platform")*/
 }
 
 android {
@@ -70,44 +62,6 @@ android {
     //}
 }
 
-/**
-/** IY:플랫폼:샘플스:Define the samples to load */
-dependencies {
-id("com.dropbox.affectedmoduledetector") version "0.2.0"
-id("nl.littlerobots.version-catalog-update") version "0.7.0"
-id("com.github.ben-manes.versions") version "0.44.0"
-}
-versionCatalogUpdate {
-sortByKey.set(true)
-keep {
-keepUnusedVersions.set(true)
-}
-}
-
-affectedModuleDetector {
-baseDir = "${project.rootDir}"
-pathsAffectingAllModules = setOf(
-"gradle/libs.versions.toml",
-)
-excludedModules = setOf<String>()
-
-logFilename = "output.log"
-logFolder = "${rootProject.buildDir}/affectedModuleDetector"
-
-val baseRef = findProperty("affected_base_ref") as? String
-// If we have a base ref to diff against, extract the branch name and use it
-if (!baseRef.isNullOrEmpty()) {
-// Remove the prefix from the head.
-// TODO: need to support other types of git refs
-specifiedBranch = baseRef.replace("refs/heads/", "")
-compareFrom = "SpecifiedBranchCommit"
-} else {
-// Otherwise we use the previous commit. This is mostly used for commits to main.
-compareFrom = "PreviousCommit"
-}
-}
-/** IY:플랫폼:샘플스:Define the samples to load */
- */
 dependencies {
     implementation(project(mapOf("path" to ":_APP")))
     implementation(project(mapOf("path" to ":APP")))
@@ -141,30 +95,4 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.testManifest)
     /** 컴포즈.기본...JetPack.Compose */
-    /** IY:플랫폼:샘플스:Define the samples to load */
-    ///** 컴포즈.추가...JetPack.Compose */
-    //implementation(libs.compose.runtime.livedata)
-    //implementation(libs.compose.ui.ui)
-    //implementation(libs.compose.foundation.foundation)
-    //implementation(libs.compose.material3)
-    //implementation(libs.androidx.lifecycle.viewmodel.compose)
-    //implementation(libs.compose.runtime.runtime)
-    ///** 컴포즈.추가...JetPack.Compose */
-    /////*implementation(libs.hilt.android)*/
-    /////*kapt(libs.hilt.compiler)*/
-    //implementation("com.google.dagger:hilt-android:2.48")
-    //annotationProcessor("com.google.dagger:hilt-compiler:2.48")
-    //implementation(libs.androidx.preference.ktx)
-    //implementation(libs.casa.base)
-    //ksp(libs.casa.processor)
-    //implementation(libs.accompanist.permissions)
-    //implementation(libs.androidx.fragment)
-    //implementation(libs.coil.compose)
-    //implementation(libs.coil.video)
-    //implementation(libs.compose.ui.tooling.preview)
-    //implementation(libs.androidx.exifinterface)
-    //debugImplementation(libs.compose.ui.tooling)
-    //androidTestImplementation(libs.androidx.test.core)
-    //androidTestImplementation(libs.androidx.test.runner)
-    /** IY:플랫폼:샘플스:Define the samples to load */
 }
