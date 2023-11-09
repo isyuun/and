@@ -607,8 +607,11 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                 if (photoUpload) {
                                     val dailyUpload = viewModel.uploadDaily()
                                     if (dailyUpload) {
-                                        navController.popBackStack()
+                                        viewModel.updateStoryRes(null)
+                                        viewModel.updateStoryList(emptyList())
+                                        viewModel.updateStoryPage(1)
                                         viewModel.updateSelectedImageList(emptyList())
+                                        navController.popBackStack()
                                         isLoading = false
                                     } else {
                                         isLoading = false

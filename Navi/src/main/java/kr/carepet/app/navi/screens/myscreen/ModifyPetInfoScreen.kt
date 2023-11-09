@@ -41,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -198,6 +199,33 @@ fun ModifyPetInfoScreen(
         }
     }
 
+    DisposableEffect(Unit){
+        onDispose {
+            viewModel.updatePetName("")
+            viewModel.updatePetKind(
+                PetListData(
+                    petDogSzCd = "",
+                    petNm = "사이즈/품종 선택",
+                    petEnNm = "",
+                    petInfoUnqNo = 0,
+                    petTypCd = ""
+                )
+            )
+            viewModel.updatePetWght("")
+            viewModel.updatePetGender("남아")
+            viewModel.updatePetNtr("했어요")
+            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+            viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
+            viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
+            viewModel.updatePetBirth("")
+            viewModel.updateYear(PickerState())
+            viewModel.setImageUri(null,context)
+            viewModel.updateAddress("주소 선택")
+
+            init = true
+        }
+    }
+
     LaunchedEffect(key1 = delete){
         if (delete){
             isLoading = true
@@ -247,38 +275,38 @@ fun ModifyPetInfoScreen(
         }
     }
 
-    BackHandler {
-        navController.popBackStack()
-
-        scope.launch {
-            delay(700)
-
-
-            viewModel.updatePetName("")
-            viewModel.updatePetKind(
-                PetListData(
-                    petDogSzCd = "",
-                    petNm = "사이즈/품종 선택",
-                    petEnNm = "",
-                    petInfoUnqNo = 0,
-                    petTypCd = ""
-                )
-            )
-            viewModel.updatePetWght("")
-            viewModel.updatePetGender("남아")
-            viewModel.updatePetNtr("했어요")
-            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
-            viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
-            viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
-            viewModel.updatePetBirth("")
-            viewModel.updateYear(PickerState())
-            viewModel.setImageUri(null,context)
-            viewModel.updateAddress("주소 선택")
-
-            init = true
-        }
-
-    }
+    //BackHandler {
+    //    navController.popBackStack()
+    //
+    //    scope.launch {
+    //        delay(700)
+    //
+    //
+    //        viewModel.updatePetName("")
+    //        viewModel.updatePetKind(
+    //            PetListData(
+    //                petDogSzCd = "",
+    //                petNm = "사이즈/품종 선택",
+    //                petEnNm = "",
+    //                petInfoUnqNo = 0,
+    //                petTypCd = ""
+    //            )
+    //        )
+    //        viewModel.updatePetWght("")
+    //        viewModel.updatePetGender("남아")
+    //        viewModel.updatePetNtr("했어요")
+    //        viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+    //        viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
+    //        viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
+    //        viewModel.updatePetBirth("")
+    //        viewModel.updateYear(PickerState())
+    //        viewModel.setImageUri(null,context)
+    //        viewModel.updateAddress("주소 선택")
+    //
+    //        init = true
+    //    }
+    //
+    //}
 
     Scaffold (
         modifier = modifier.fillMaxSize(),

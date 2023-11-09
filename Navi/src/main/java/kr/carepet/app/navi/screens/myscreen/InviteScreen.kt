@@ -49,6 +49,8 @@ import kr.carepet.app.navi.ui.theme.design_sharp
 import kr.carepet.app.navi.ui.theme.design_skip
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SettingViewModel
+import kr.carepet.data.pet.PetDetailData
+import kr.carepet.singleton.G
 
 @Composable
 fun InviteScreen(navController: NavHostController, settingViewModel: SettingViewModel){
@@ -160,7 +162,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                 Spacer(modifier = Modifier.padding(top = 40.dp))
 
                 Button(
-                    onClick = { share(context, inviteCode = inviteCode) },
+                    onClick = { share(context, inviteCode = inviteCode, selectPet = selectPet) },
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
@@ -184,10 +186,16 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
     }
 }
 
-private fun share(context: Context, inviteCode:String){
+private fun share(context: Context, inviteCode:String, selectPet:List<PetDetailData>){
     val sendIntent: Intent = Intent().apply {
+        var petNameList:List<String> = selectPet.map { it.petNm }
+        val formattedString : String = petNameList.joinToString(separator = ", "){ "[${it}]" }
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, inviteCode)
+        val inviteString =
+            "${G.userNickName}님이 Pet Tip으로 초대했어요!" +
+                    "\n${formattedString} 관리에 동참하시겠어요?"+
+                    "\n초대코드등록란에 [${inviteCode}]를 입력해주세요. \n https://www.care-biz.co.kr/ "
+        putExtra(Intent.EXTRA_TEXT, inviteString)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         type = "text/plain"
     }

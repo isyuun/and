@@ -1,5 +1,8 @@
 package kr.carepet.app.navi.screens.myscreen
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -80,6 +83,12 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
     var showDialog by remember{ mutableStateOf(false) }
     var withDraw by remember { mutableStateOf(false) }
     val loginMethod = MySharedPreference.getLastLoginMethod()
+
+    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val fcmToken by settingViewModel.appKey.collectAsState()
+    LaunchedEffect(Unit){
+        settingViewModel.updateAppKey()
+    }
 
     LaunchedEffect(key1 = withDraw){
         if (withDraw){
@@ -267,7 +276,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
             Row {
                 Text(text = "비밀번호 변경", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier=Modifier
+                    modifier= Modifier
                         .padding(start = 20.dp)
                         .alignByBaseline(),
                     color = design_login_text)
@@ -277,7 +286,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     Text(text = "(간편가입시 비밀번호 변경이 불가능합니다)",
                         fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         letterSpacing = (-0.6).sp,
-                        modifier=Modifier
+                        modifier= Modifier
                             .padding(start = 8.dp)
                             .alignByBaseline(),
                         color = design_skip
@@ -431,6 +440,25 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                         color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp)
                 }
+            }
+
+            Button(
+                onClick = {
+                    val clipData = ClipData.newPlainText("Text", fcmToken)
+                    clipboardManager.setPrimaryClip(clipData)
+                },
+                modifier = Modifier
+                    .padding(start = 20.dp ,end = 20.dp, top = 30.dp)
+                    .fillMaxWidth()
+                    .height(48.dp)
+                ,
+                contentPadding = PaddingValues(0.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = design_sharp)
+            ) {
+                Text(text = "토큰복사",
+                    color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    letterSpacing = (-0.7).sp)
             }
         }//col
     }

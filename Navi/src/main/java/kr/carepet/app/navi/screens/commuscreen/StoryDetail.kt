@@ -68,7 +68,6 @@ import kr.carepet.app.navi.viewmodel.CommunityViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kotlin.math.absoluteValue
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel, navController:NavHostController){
 

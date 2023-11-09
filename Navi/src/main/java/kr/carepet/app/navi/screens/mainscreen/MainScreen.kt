@@ -5,8 +5,10 @@ package kr.carepet.app.navi.screens.mainscreen
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -34,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,6 +83,7 @@ import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.singleton.G
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainScreen(
@@ -120,15 +124,6 @@ fun MainScreen(
             sharedViewModel.updateInit(false)
         }
     }
-
-    val multiplePermissionsState = rememberMultiplePermissionsState(
-        listOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.POST_NOTIFICATIONS,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        )
-    )
 
     BackOnPressed()
     Scaffold(
@@ -264,11 +259,6 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
-
-        if (!multiplePermissionsState.allPermissionsGranted) {
-            multiplePermissionsState.launchMultiplePermissionRequest()
-        }
-
         Box(
             modifier = Modifier.fillMaxSize()
         ) {

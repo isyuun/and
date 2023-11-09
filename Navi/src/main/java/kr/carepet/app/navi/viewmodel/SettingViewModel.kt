@@ -1,11 +1,14 @@
 package kr.carepet.app.navi.viewmodel
 
+import android.content.ContentValues
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -196,6 +199,17 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     fun updateUserPwCheck(newValue: String) { _userPwCheck.value = newValue }
     // -----------------UserInfo Screen------------------------
 
+    private val _appKey = MutableStateFlow<String>("")
+    val appKey: StateFlow<String> = _appKey.asStateFlow() // state 노출
+    fun updateAppKey() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                android.util.Log.w(ContentValues.TAG, "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+            _appKey.value = task.result
+        })
+    }
 
     // ----------------- 게시판 ------------------------
     private val _faqData = MutableStateFlow<FAQData?>(null)

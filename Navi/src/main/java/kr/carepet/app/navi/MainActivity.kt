@@ -67,6 +67,7 @@ import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.SCDLocalData
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +83,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@OptIn(ExperimentalPermissionsApi::class)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MyApp(){
     val navController = rememberNavController()

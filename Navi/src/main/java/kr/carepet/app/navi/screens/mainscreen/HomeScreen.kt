@@ -4,6 +4,7 @@
 
 package kr.carepet.app.navi.screens.mainscreen
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
 import androidx.compose.animation.AnimatedVisibility
@@ -103,6 +104,8 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
@@ -142,7 +145,7 @@ import kotlin.math.absoluteValue
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -944,8 +947,8 @@ fun StoryItem(data: RTStoryData){
                 .crossfade(true)
                 .build(),
             contentDescription = "",
-            placeholder = painterResource(id = R.drawable.profile_default),
-            error= painterResource(id = R.drawable.profile_default),
+            placeholder = painterResource(id = R.drawable.img_blank),
+            error= painterResource(id = R.drawable.img_blank),
             modifier= Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )

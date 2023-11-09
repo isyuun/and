@@ -617,7 +617,7 @@ fun FullScreenImage(
     val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
         scale *= zoomChange
         //rotation += rotationChange
-        offset = if (scale < 1f) {
+        offset = if (scale <= 1f) {
             Offset.Zero
         } else {
             offset + offsetChange

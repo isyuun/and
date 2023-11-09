@@ -44,6 +44,7 @@ import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.ui.theme.design_grad_end
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.data.daily.Story
+import kr.carepet.util.Log
 
 @Composable
 fun StoryListItem(data: Story, navController:NavHostController){
@@ -61,7 +62,10 @@ fun StoryListItem(data: Story, navController:NavHostController){
             .size(width = 200.dp, height = 280.dp)
             .clip(shape = RoundedCornerShape(20.dp))
             .onGloballyPositioned { sizeImage = it.size }
-            .clickable { navController.navigate(Screen.StoryDetail.route) }
+            .clickable {
+
+                navController.navigate(Screen.StoryDetail.route)
+            }
     ){
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -69,8 +73,8 @@ fun StoryListItem(data: Story, navController:NavHostController){
                 .crossfade(true)
                 .build(),
             contentDescription = "",
-            placeholder = painterResource(id = R.drawable.profile_default),
-            error= painterResource(id = R.drawable.profile_default),
+            placeholder = painterResource(id = R.drawable.img_blank),
+            error= painterResource(id = R.drawable.img_blank),
             modifier= Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
             filterQuality = FilterQuality.Low

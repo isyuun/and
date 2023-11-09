@@ -2,6 +2,11 @@
 
 package kr.carepet.app.navi.screens.mainscreen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,7 +18,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,23 +30,29 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.DropdownMenu
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +64,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,9 +76,11 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
+import kr.carepet.app.navi.component.LoadingAnimation1
 import kr.carepet.app.navi.component.StoryListItem
 import kr.carepet.app.navi.ui.theme.design_B5B9BE
 import kr.carepet.app.navi.ui.theme.design_alpha60_black
@@ -74,6 +90,7 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.CommunityViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.bbs.BbsEvnt
+import kr.carepet.data.daily.Story
 import kr.carepet.util.Log
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -90,8 +107,13 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
 
     LaunchedEffect(init){
         if (init){
-            communityViewModel.getStoryList(1,"최신순", "전체")
-            communityViewModel.getEventList(1)
+            if (communityViewModel.storyRes.value == null){
+                communityViewModel.updateStoryListClear()
+                communityViewModel.getStoryList(1)
+            }
+            if (communityViewModel.eventList.value == null){
+                communityViewModel.getEventList(1)
+            }
             init = false
         }
     }
@@ -142,7 +164,53 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
 
 
     val storyListRes by viewModel.storyRes.collectAsState()
-    val storyList = storyListRes?.data?.storyList
+    val storyList by viewModel.storyList.collectAsState()
+    val paginate = storyListRes?.data?.paginate
+    val lazyGridState = rememberLazyGridState()
+    val page by viewModel.storyPage.collectAsState()
+    var isLoading by remember{ mutableStateOf(false) }
+    val orderType by viewModel.orderType.collectAsState()
+    val viewType by viewModel.viewType.collectAsState()
+
+    var oTDropDownShow by remember{ mutableStateOf(false) }
+    var vTDropDownShow by remember{ mutableStateOf(false) }
+
+    var typeChange by remember{ mutableStateOf(false) }
+
+    val oTItems = listOf("최신순", "인기순")
+    val vTItems = listOf("전체", "내 스토리")
+
+    LaunchedEffect(key1 = typeChange){
+        if (typeChange){
+            isLoading = true
+
+            viewModel.updateStoryListClear()
+            viewModel.updateStoryPage(1)
+            viewModel.getStoryList(1)
+
+            isLoading = false
+            typeChange = false
+        }
+    }
+
+    LaunchedEffect(key1 = lazyGridState.canScrollForward){
+        if (!lazyGridState.canScrollForward){
+            if (paginate?.existNextPage == true){
+                if (!isLoading){
+                    isLoading = true
+
+                    val result = viewModel.getStoryList(page + 1)
+                    isLoading = if (result){
+                        viewModel.updateStoryPage(page + 1)
+                        false
+                    }else{
+                        viewModel.updateStoryPage(page - 1)
+                        false
+                    }
+                }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -153,9 +221,12 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
             Row (
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
             ){
-                Row (verticalAlignment = Alignment.CenterVertically){
+
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { oTDropDownShow = true }
+                ){
                     Text(
-                        text = stringResource(R.string.commu_latest),
+                        text = orderType,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -168,11 +239,16 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                     )
                 }
 
+
+
                 Spacer(modifier = Modifier.padding(start = 20.dp))
 
-                Row (verticalAlignment = Alignment.CenterVertically){
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { vTDropDownShow = true }
+                ){
                     Text(
-                        text = stringResource(R.string.commu_all_story),
+                        text = viewType,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -186,18 +262,85 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                 }
             }
 
-
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp)
-                    .fillMaxSize(),
-                columns = GridCells.Fixed(2),
-                state = rememberLazyGridState(),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            DropdownMenu(
+                expanded = oTDropDownShow,
+                onDismissRequest = { oTDropDownShow = false },
+                offset = DpOffset(x = 10.dp, y = 5.dp)
             ) {
-                items(storyList?: emptyList()) { item ->
-                    StoryListItem(data = item, navController = navController)
+                oTItems.forEach { s ->
+                    DropdownMenuItem(
+                        onClick = {
+                            if(s != orderType){
+                                viewModel.updateOrderType(s)
+                                typeChange = true
+                            }
+                            oTDropDownShow = false
+                        },
+                        text = {
+                            Text(
+                                text = s,
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                color = design_login_text,
+                                fontSize = 14.sp,letterSpacing = (-0.7).sp
+                            )
+                        },
+                        contentPadding = PaddingValues(start = 10.dp)
+                    )
+                }
+            }
+
+            DropdownMenu(
+                expanded = vTDropDownShow,
+                onDismissRequest = { vTDropDownShow = false },
+                offset = DpOffset(x = 90.dp, y = 5.dp)
+            ) {
+                vTItems.forEach { s ->
+                    DropdownMenuItem(
+                        onClick = {
+                            if(s != viewType){
+                                viewModel.updateViewType(s)
+                                typeChange = true
+                            }
+                            vTDropDownShow = false
+                        },
+                        text = {
+                            Text(
+                                text = s,
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                color = design_login_text,
+                                fontSize = 14.sp,letterSpacing = (-0.7).sp
+                            )
+                        },
+                        contentPadding = PaddingValues(start = 10.dp)
+                    )
+                }
+            }
+
+            Crossfade(
+                targetState = storyList.isEmpty(),
+                label = "",
+            ) { storyList.isEmpty()
+                when(it){
+                    true ->
+                        Box(modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ){
+                            LoadingAnimation1()
+                        }
+                    false ->
+                        LazyVerticalGrid(
+                            modifier = Modifier
+                                .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+                                .fillMaxSize(),
+                            columns = GridCells.Fixed(2),
+                            state = lazyGridState,
+                            verticalArrangement = Arrangement.spacedBy(20.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(storyList?: emptyList()) { item ->
+                                StoryListItem(data = item, navController = navController)
+                            }
+                        }
                 }
             }
         }// col

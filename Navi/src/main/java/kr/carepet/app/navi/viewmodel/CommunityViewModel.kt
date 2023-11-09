@@ -25,12 +25,14 @@ import kr.carepet.data.daily.DailyCreateRes
 import kr.carepet.data.daily.Pet
 import kr.carepet.data.daily.PhotoData
 import kr.carepet.data.daily.PhotoRes
+import kr.carepet.data.daily.Story
 import kr.carepet.data.daily.StoryReq
 import kr.carepet.data.daily.StoryRes
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.user.BbsReq
 import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.RetrofitClientServer
+import kr.carepet.util.Log
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -46,6 +48,26 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
 
     private val _storyRes = MutableStateFlow<StoryRes?>(null)
     val storyRes: StateFlow<StoryRes?> = _storyRes.asStateFlow()
+    fun updateStoryRes(newValue: StoryRes?){
+        _storyRes.value = newValue
+    }
+
+    private val _storyList = MutableStateFlow<List<Story>>(emptyList())
+    val storyList: StateFlow<List<Story>> = _storyList.asStateFlow()
+    fun updateStoryList(newValue: List<Story>){
+        val currentList = _storyList.value.toMutableList()
+        currentList.addAll(newValue)
+        _storyList.value = currentList
+    }
+    fun updateStoryListClear(){
+        _storyList.value = emptyList()
+    }
+
+    private val _storyPage = MutableStateFlow<Int>(1)
+    val storyPage:StateFlow<Int> = _storyPage.asStateFlow()
+    fun updateStoryPage(newValue: Int){
+        _storyPage.value = newValue
+    }
 
     // ------------------------------------------------------------------
     private val _selectPetMulti = MutableStateFlow<MutableList<CurrentPetData>>(mutableListOf())
@@ -117,6 +139,8 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     private val _dm = MutableStateFlow<String>("")
     val dm: StateFlow<String> = _dm.asStateFlow()
 
+
+
     private val _comment = MutableStateFlow<String>("")
     val comment: StateFlow<String> = _comment.asStateFlow()
     fun updateComment(newValue: String) { _comment.value = newValue }
@@ -127,11 +151,23 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     private val _eventDetail = MutableStateFlow<EventDetailRes?>(null)
     val eventDetail: StateFlow<EventDetailRes?> = _eventDetail.asStateFlow()
 
-    suspend fun getStoryList(page: Int, orderType:String, viewType:String):Boolean{
+    private val _orderType = MutableStateFlow<String>("최신순")
+    val orderType: StateFlow<String> = _orderType.asStateFlow()
+    fun updateOrderType(newValue: String) {
+        _orderType.value = newValue
+    }
+
+    private val _viewType = MutableStateFlow<String>("전체")
+    val viewType: StateFlow<String> = _viewType.asStateFlow()
+    fun updateViewType(newValue: String) {
+        _viewType.value = newValue
+    }
+
+    suspend fun getStoryList(page: Int):Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val order = if (orderType == "최신순") "001" else "002"
-        val view = if (viewType == "전체") "001" else "002"
+        val order = if (_orderType.value == "최신순") "001" else "002"
+        val view = if (_viewType.value == "전체") "001" else "002"
 
         val data = StoryReq(orderType = order,page = page, pageSize = 10, recordSize = 20, viewType = view)
 
@@ -143,6 +179,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                         val body = response.body()
                         body?.let {
                             _storyRes.value = it
+                            updateStoryList(it.data.storyList)
                             continuation.resume(true)
                         }
                     }else{
