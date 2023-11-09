@@ -1,0 +1,8 @@
+Copyright (c) $originalComment.match("Copyright \(c\) (\d+)", 1, "-", "$today.year")$today.year. PetTip All right reserved.
+This software is the proprietary information of Care Pet.
+
+Revision History
+  Author                         Date          Description
+  --------------------------     ----------    ----------------------------------------
+  $username                         $today.year.$today.month.$today.day
+  ``
