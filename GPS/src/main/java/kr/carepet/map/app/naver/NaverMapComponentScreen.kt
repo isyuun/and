@@ -1,21 +1,6 @@
 /*
- *  Copyright 2011 The Android Open Source Project
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- *
  * Copyright (c) 2023. PetTip All right reserved.
- * This software is the proprietary information of CarePet Co.,Ltd.
+ * This software is the proprietary information of Care Pet.
  *
  *  Revision History
  *  Author                         Date          Description
@@ -131,11 +116,11 @@ import kr.carepet.gpx.Track
 import kr.carepet.map.CircleImageUrl
 import kr.carepet.map.IconButton2
 import kr.carepet.map.ImageButton2
+import kr.carepet.map.app.LoadingDialog
 import kr.carepet.map.getRounded
 import kr.carepet.map.navigationBarHeight
 import kr.carepet.map.toPx
 import kr.carepet.map.toText
-import kr.carepet.map.app.LoadingDialog
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -258,11 +243,11 @@ fun rememberMapViewWithLifecycle(
 
 fun NaverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, padding: Dp = 52.dp) {
     val application = GPSApplication.instance
-    if (tracks?.isNotEmpty() == true) {
-        var lat1 = tracks.first().let { it.latitude }
-        var lon1 = tracks.first().let { it.longitude }
-        var lat2 = tracks.last().let { it.latitude }
-        var lon2 = tracks.last().let { it.longitude }
+    if (tracks.isNotEmpty()) {
+        var lat1 = tracks.first().latitude
+        var lon1 = tracks.first().longitude
+        var lat2 = tracks.last().latitude
+        var lon2 = tracks.last().longitude
         tracks.forEach {
             val lat = it.latitude
             val lon = it.longitude
@@ -371,7 +356,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 
     val scope = rememberCoroutineScope()
 
-    val departure = stringResource(id = R.string.departure)
+    //val departure = stringResource(id = R.string.departure)
     val arrival = stringResource(id = R.string.arrival)
 
 
@@ -499,18 +484,18 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Start,
                         ) {
-                            //Checkbox(
-                            //    checked = checkedAll,
-                            //    onCheckedChange = {
-                            //        checkedAll = it
-                            //        if (checkedAll) application.add(pets) else application.remove()
-                            //    },
-                            //)
-                            //Text(
-                            //    text = stringResource(id = R.string.walk_check_select_all),
-                            //    fontSize = 14.sp,
-                            //    letterSpacing = (-0.7).sp
-                            //)
+                            Checkbox(
+                                checked = checkedAll,
+                                onCheckedChange = {
+                                    checkedAll = it
+                                    if (checkedAll) application.add(pets) else application.remove()
+                                },
+                            )
+                            Text(
+                                text = stringResource(id = R.string.walk_check_select_all),
+                                fontSize = 14.sp,
+                                letterSpacing = (-0.7).sp
+                            )
                         }
                         LazyRow(modifier = Modifier.fillMaxWidth()) {
                             items(pets) { pet ->
@@ -536,15 +521,15 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.End,
                         ) {
-                            Checkbox(
-                                checked = checkedSel,
-                                onCheckedChange = { checkedSel = it },
-                            )
-                            Text(
-                                text = stringResource(id = R.string.walk_check_select),
-                                fontSize = 14.sp,
-                                letterSpacing = (-0.7).sp
-                            )
+                            //Checkbox(
+                            //    checked = checkedSel,
+                            //    onCheckedChange = { checkedSel = it },
+                            //)
+                            //Text(
+                            //    text = stringResource(id = R.string.walk_check_select),
+                            //    fontSize = 14.sp,
+                            //    letterSpacing = (-0.7).sp
+                            //)
                         }
                         /** walk */
                         Button(

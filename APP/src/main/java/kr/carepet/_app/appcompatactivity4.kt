@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2023. PetTip All right reserved.
- * This software is the proprietary information of CarePet Co.,Ltd.
+ * This software is the proprietary information of Care Pet.
  *
  *  Revision History
  *  Author                         Date          Description

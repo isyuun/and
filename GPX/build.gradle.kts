@@ -1,21 +1,6 @@
 /*
- *  Copyright 2011 The Android Open Source Project
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- *
  * Copyright (c) 2023. PetTip All right reserved.
- * This software is the proprietary information of CarePet Co.,Ltd.
+ * This software is the proprietary information of Care Pet.
  *
  *  Revision History
  *  Author                         Date          Description
@@ -66,10 +51,6 @@ android {
 }
 
 dependencies {
-    //implementation("com.github.bumptech.glide:glide:4.15.1")    //https://github.com/BasicAirData/GPSLogger
-    //implementation("org.greenrobot:eventbus:3.3.1") //https://github.com/BasicAirData/GPSLogger
-    //annotationProcessor("org.greenrobot:eventbus-annotation-processor:3.3.1")   //https://github.com/BasicAirData/GPSLogger
-
     // JodaTime for Android
     // https://github.com/dlew/joda-time-android
     implementation("net.danlew:android.joda:2.12.5")        //https://github.com/ticofab/android-gpx-parser
