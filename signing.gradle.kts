@@ -1,31 +1,7 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-@file:Suppress("DSL_SCOPE_VIOLATION")
-
-buildscript {
-    dependencies {
-        classpath("com.google.gms:google-services:4.4.0")
-    }
-}
-
-// TODO: Remove once KTIJ-19369 is fixed
-plugins {
-    id("com.android.application") version "8.1.2" apply false
-    ///*alias(libs.plugins.com.android.application) apply false*/
-    id("com.android.library") version "8.1.2" apply false
-    /*alias(libs.plugins.com.android.library) apply false*/
-    id("org.jetbrains.kotlin.android") version "1.9.10" apply false
-    ///*alias(libs.plugins.kotlin.android) apply false*/
-    id("com.google.gms.google-services") version "4.3.15" apply false
-    ///*alias(libs.plugins.com.google.gms.google.services) apply false*/
-
-    id("com.google.devtools.ksp") version "1.9.10-1.0.13" apply false
-    id("com.google.dagger.hilt.android") version "2.48" apply false
-}
-
-//task clean(type: Delete) {
-//    delete rootProject.buildDir
-//}
-
+/**
+ * gradle kotlin-dsl move android {} into subproject {} in root project build.gradle.kts
+ * @see <a href="https://stackoverflow.com/questions/58255544/gradle-kotlin-dsl-move-android-into-subproject-in-root-project-build-gradl">gradle kotlin-dsl move android {} into subproject {} in root project build.gradle.kts</a>
+ */
 subprojects {
     afterEvaluate {}
     pluginManager.withPlugin("com.android.library") {

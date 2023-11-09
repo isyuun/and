@@ -11,34 +11,6 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        getByName("debug") {
-            storeFile = file("../.APK/kr.carepet.debug.jks")
-        }
-        create("release") {
-            storeFile = file("../.APK/kr.carepet.release.jks")
-            storePassword = "is230710!!"
-            keyAlias = "carepet"
-            keyPassword = "is230710!!"
-        }
-    }
-    buildTypes {
-        getByName("debug") {
-            signingConfig = signingConfigs.getByName("debug")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
-            isMinifyEnabled = true
-            //isDebuggable = true
-            //manifestPlaceholders["enableCrashlytics"] = "false"
-        }
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
-            isMinifyEnabled = true
-            //isDebuggable = false
-            //manifestPlaceholders["enableCrashlytics"] = "true"
-        }
-    }
-
     namespace = "kr.carepet.app.navi"
     compileSdk = 34
 
