@@ -123,8 +123,8 @@ import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.Pet
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.app.GPSApplication
-import kr.carepet.map.app.naver.NaverMapPath
-import kr.carepet.map.app.naver.NaverMapPreview
+import kr.carepet.map.app.naver.naverMapPath
+import kr.carepet.map.app.naver.naverMapPreview
 import kr.carepet.map.app.naver.rememberMapViewWithLifecycle
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
@@ -308,8 +308,8 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                                     uiSettings.isZoomControlEnabled = false
                                     uiSettings.isLogoClickEnabled = false
                                 }
-                                tracks?.let { NaverMapPath(context = context, naverMap = naverMap, tracks = it, finished = true) }
-                                tracks?.let { NaverMapPreview(context = context, naverMap =  naverMap, tracks = it) }
+                                tracks?.let { naverMapPath(context = context, naverMap = naverMap, tracks = it, finished = true) }
+                                tracks?.let { naverMapPreview(context = context, naverMap =  naverMap, tracks = it) }
                                 naverMap.takeSnapshot(false) {
                                     application.preview = it
                                 }
