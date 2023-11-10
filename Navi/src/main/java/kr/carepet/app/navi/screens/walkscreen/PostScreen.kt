@@ -304,12 +304,10 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     factory = {
                         mapView.apply {
                             getMapAsync { naverMap ->
-                                naverMap.apply {
-                                    uiSettings.isZoomControlEnabled = false
-                                    uiSettings.isLogoClickEnabled = false
-                                }
+                                naverMap.uiSettings.isZoomControlEnabled = false
+                                naverMap.uiSettings.isLogoClickEnabled = false
                                 tracks?.let { naverMapPath(context = context, naverMap = naverMap, tracks = it, finished = true) }
-                                tracks?.let { naverMapPreview(context = context, naverMap =  naverMap, tracks = it) }
+                                tracks?.let { naverMapPreview(context = context, naverMap = naverMap, tracks = it) }
                                 naverMap.takeSnapshot(false) {
                                     application.preview = it
                                 }

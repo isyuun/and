@@ -54,6 +54,9 @@ dependencies {
     implementation(project(mapOf("path" to ":GPX")))
     implementation(project(mapOf("path" to ":NAV")))
 
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.naver.maps:map-sdk:3.17.0")
+
     //기존 implementation
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
@@ -114,7 +117,4 @@ dependencies {
     // Skip this if you don't want to use integration libraries or configure Glide.
     implementation("com.google.dagger:hilt-android:2.47")
     //kapt("com.google.dagger:hilt-android-compiler:2.47")
-
-    //네이버 맵뷰
-    implementation("com.naver.maps:map-sdk:3.17.0")
 }
