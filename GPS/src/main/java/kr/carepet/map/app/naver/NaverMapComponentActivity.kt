@@ -17,19 +17,24 @@ package kr.carepet.map.app.naver
  * @author      : isyuun@care-pet.kr
  * @description :
  */
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.IBinder
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import com.naver.maps.map.util.FusedLocationSource
 import kr.carepet.gps._app.toText
+import kr.carepet.gps.app.GPSApplication
 import kr.carepet.gps.app.GPSComponentActivity
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
 open class NaverMapComponentActivity : GPSComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    val application = GPSApplication.instance
 
     private val fusedLocationSource: FusedLocationSource by lazy {
         FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
@@ -40,24 +45,43 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
         super.onCreate(savedInstanceState)
     }
 
+    //fun setContent(
+    //    parent: CompositionContext? = null,
+    //    content: @Composable () -> Unit
+    //) {
+    //    ComponentActivity.setContent(parent, content)
+    //}
+
     protected open fun setContent() {
         setContent { NaverMapApp() }
     }
 
     @Composable
     fun MapApp() {
-        //Log.d(__CLASSNAME__, "${getMethodName()}[$fusedLocationSource][${fusedLocationSource.lastLocation}]")
         NaverMapApp()
     }
 
     @Composable
     private fun NaverMapApp() {
-        //Log.d(__CLASSNAME__, "${getMethodName()}[$fusedLocationSource][${fusedLocationSource.lastLocation}]")
+        Log.v(__CLASSNAME__, "${getMethodName()}[application.service:${application.service}]")
+        application.service ?: return
         NaverMapApp(fusedLocationSource)
     }
 
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Log.d(__CLASSNAME__, "::NaverMapApp${getMethodName()}[$name][$service]")
+        super.onServiceConnected(name, service)
+        setContent()
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        Log.d(__CLASSNAME__, "::NaverMapApp${getMethodName()}[$name]")
+        super.onServiceDisconnected(name)
+        setContent()
+    }
+
     override fun onResume() {
-        Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}...")
+        Log.d(__CLASSNAME__, "::NaverMapApp${getMethodName()}...")
         super.onResume()
         setContent()
     }

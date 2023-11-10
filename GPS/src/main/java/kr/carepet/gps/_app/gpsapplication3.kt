@@ -29,11 +29,15 @@ open class gpsapplication3 : gpsapplication2() {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceConnected(name, service)
         this.service?.onServiceConnected(name, service)
+        if (this.activity is gpscomponentactivity3) (this.activity as gpscomponentactivity3).onServiceConnected(name, service)
+        if (this.activity is gpsappcompatactivity3) (this.activity as gpsappcompatactivity3).onServiceConnected(name, service)
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onServiceDisconnected(name)
         this.service?.onServiceDisconnected(name)
+        if (this.activity is gpscomponentactivity3) (this.activity as gpscomponentactivity3).onServiceDisconnected(name)
+        if (this.activity is gpsappcompatactivity3) (this.activity as gpsappcompatactivity3).onServiceDisconnected(name)
     }
 }

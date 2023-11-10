@@ -8,11 +8,11 @@ class MapRepository {
 
     private val petInfo = MutableLiveData<List<CurrentPetData>>()
 
-    fun getPetInfo() : LiveData<List<CurrentPetData>>{
+    fun getPetInfo(): LiveData<List<CurrentPetData>> {
         return petInfo
     }
 
-    fun updatePetInfo(newData : List<CurrentPetData>){
+    fun updatePetInfo(newData: List<CurrentPetData>) {
         petInfo.value = newData
     }
 }

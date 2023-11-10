@@ -46,6 +46,7 @@ open class gpsapplication4 : gpsapplication3() {
 
     val pause
         get() = (this.service?.start == true && this.service?.pause == true)
+
     fun pause() {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
         this.service?.pause()
@@ -160,10 +161,10 @@ open class gpsapplication4 : gpsapplication3() {
     fun orient(context: Context, uri: Uri) = this.service?.orient(context, uri)
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[${getActivity()?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
+        Log.v(__CLASSNAME__, "${getMethodName()}[${activity?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
         super.onServiceConnected(name, service)
-        this.service?.launchActivityIntent = getActivity()?.intent
-        Log.v(__CLASSNAME__, "${getMethodName()}[${getActivity()?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
+        this.service?.launchActivityIntent = activity?.intent
+        Log.v(__CLASSNAME__, "${getMethodName()}[${activity?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
     }
 
     var preview: Bitmap? = null

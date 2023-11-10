@@ -22,13 +22,10 @@ import android.app.Activity
 open class application : android.app.Application() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private var activity: Activity? = null
-
-    open fun getActivity(): Activity? {
-        return activity
-    }
-
-    open fun setActivity(activity: Activity?) {
-        this.activity = activity
-    }
+    private var _activity: Activity? = null
+    var activity
+        get() = this._activity
+        set(activity) {
+            this._activity = activity
+        }
 }

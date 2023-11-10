@@ -147,11 +147,12 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     open fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()}, $foregroundOnlyLocationService")
         // TODO: Step 1.0, Review Permissions: Checks and requests if needed.
-        if (foregroundPermissionApproved()) {
-            foregroundOnlyLocationService?.start() ?: Log.w(__CLASSNAME__, "${getMethodName()}Service Not Bound")
-        } else {
-            requestForegroundPermissions()
-        }
+        //if (foregroundPermissionApproved()) {
+        //    foregroundOnlyLocationService?.start() ?: Log.w(__CLASSNAME__, "${getMethodName()}Service Not Bound")
+        //} else {
+        //    requestForegroundPermissions()
+        //}
+        foregroundOnlyLocationService?.start() ?: Log.w(__CLASSNAME__, "${getMethodName()}Service Not Bound")
     }
 
     open fun stop() {
@@ -161,7 +162,6 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
 
     internal fun onStart() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
-        //super.onStart()
         updateButtonState(
             sharedPreferences.getBoolean(SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
         )

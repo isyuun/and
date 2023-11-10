@@ -232,9 +232,14 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         // ensure this Service can be promoted to a foreground service, i.e., the service needs to
         // be officially started (which we do here).
         val intent = Intent(applicationContext, this::class.java)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$applicationContext][${this::class.java}][$intent]")
-        //startService(intent)
-        ContextCompat.startForegroundService(applicationContext, intent)
+        try {
+            Log.wtf(__CLASSNAME__, "::startForegroundService${getMethodName()}[$applicationContext][${this::class.java}][$intent]")
+            startService(intent)
+            ContextCompat.startForegroundService(applicationContext, intent)
+        } catch (e: Exception) {
+            //TODO("Not yet implemented")
+            e.printStackTrace()
+        }
 
 
         try {

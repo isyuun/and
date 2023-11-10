@@ -13,27 +13,16 @@
 
 package kr.carepet.singleton
 
-import android.util.Log
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kr.carepet.data.RefreshRes
-import kr.carepet.data.RefreshToken
 import kr.carepet.service.ApiService
-import kr.carepet.service.OAuthAuthenticator
 import kr.carepet.service.RetryInterceptor
 import kr.carepet.service.TokenInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
-import java.time.Duration
-import java.util.Date
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.resume
 
 
 object RetrofitClientServer {

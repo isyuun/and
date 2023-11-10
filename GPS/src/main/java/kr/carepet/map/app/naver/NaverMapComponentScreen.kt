@@ -63,6 +63,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -113,6 +114,7 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.widget.LocationButtonView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kr.carepet.DEBUG
 import kr.carepet.__CLASSNAME__
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.R
@@ -380,613 +382,6 @@ fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun NaverMapApp(source: FusedLocationSource) {
-    Log.v(__CLASSNAME__, "${getMethodName()}[ST]")
-    val application = GPSApplication.instance
-    if (G.mapPetInfo.isEmpty()) {   //test
-        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎따", "", "", 0.0f)
-        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎따", "", "", 0.0f)
-        application.add(pet1)
-        application.add(pet1)
-        application.add(pet2)
-        G.mapPetInfo = application.pets
-    }
-    val pets = G.mapPetInfo
-    if (pets.size == 1) application.add(pets[0])
-    val context = LocalContext.current
-    val tracks = application.tracks
-    val start = application.start
-    Log.i(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
-
-    val markers = remember { mutableListOf<Marker>() }
-    if (start) {
-        markers.clear()
-        tracks?.forEach { track ->
-            marker(LatLng(track.latitude, track.longitude), track.event)?.let { markers.add(it) }
-        }
-    }
-
-    var position by remember { mutableStateOf(LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
-    source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }
-    source.isCompassEnabled = true
-
-    Log.w(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-
-    val mapOptions = remember {
-        NaverMapOptions()
-            .camera(CameraPosition(position, GPX_CAMERA_ZOOM_ZERO))
-            .logoClickEnabled(true)
-            .mapType(NaverMap.MapType.Basic)
-            .locationButtonEnabled(true)
-            .zoomControlEnabled(true)
-            .compassEnabled(true)
-            .zoomGesturesEnabled(true)
-            .indoorEnabled(true)
-    }
-    val mapView = rememberMapViewWithLifecycle(context, mapOptions)
-
-    val buttonText = if (start) stringResource(id = R.string.walk_button_end) else stringResource(R.string.walk_button_start)
-    val buttonColors = if (start) ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary) else ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
-
-    val scope = rememberCoroutineScope()
-
-    //val departure = stringResource(id = R.string.departure)
-    val arrival = stringResource(id = R.string.arrival)
-
-
-    var isLoading by remember { mutableStateOf(false) }
-    Log.wtf(__CLASSNAME__, "${getMethodName()}[isLoading:$isLoading]")
-    if (tracks?.isNotEmpty() == true) {
-        isLoading = false
-    }
-
-    var refresh by remember { mutableStateOf(false) }
-    LaunchedEffect(refresh, position) {
-        scope.launch {
-            Log.w(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-            mapView.getMapAsync { naverMap ->
-                Log.wtf(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                if (tracks?.isNotEmpty() == true) isLoading = false
-                if (start) {
-                    tracks?.let { naverMapPath(context = context, naverMap = naverMap, tracks = it, finished = false) }
-                }
-                naverMap.locationOverlay.position = position
-                if (start && tracks?.size == 1) {
-                    naverMap.apply {
-                        locationTrackingMode = LocationTrackingMode.Follow
-                    }
-                }
-            }
-        }
-    }
-
-    val activity = LocalContext.current as Activity
-
-    var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
-    var checkedAll by rememberSaveable { mutableStateOf(false) }
-    checkedAll = (application.pets == pets)
-    var checkedSel by rememberSaveable { mutableStateOf(false) }
-    var event by remember { mutableStateOf(Track.EVENT.nnn) }
-    var showPetsSheet by remember { mutableStateOf(false) }
-
-    val isSystemInDarkTheme = isSystemInDarkTheme()
-    val tint = if (isSystemInDarkTheme) {
-        Color.White // Customize the color for dark mode
-    } else {
-        Color.Black // Customize the color for light mode
-    }
-
-    /** map */
-    Box {
-        AndroidView(
-            factory = {
-                mapView.apply {
-                    getMapAsync { naverMap ->
-                        Log.wtf(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                        naverMap.apply {
-                            mapType = NaverMap.MapType.Navi
-                            isNightModeEnabled = isSystemInDarkTheme
-                            Log.i(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[isSystemInDarkTheme:$isSystemInDarkTheme][isNightModeEnabled:$isNightModeEnabled]")
-                            uiSettings.isCompassEnabled = source.isCompassEnabled
-                            uiSettings.isZoomGesturesEnabled = true
-                            locationSource = source
-                            locationTrackingMode = LocationTrackingMode.Follow
-                            cameraPosition = CameraPosition(cameraPosition.target, GPX_CAMERA_ZOOM_ZERO)
-                            locationOverlay.isVisible = true
-                            locationOverlay.circleRadius = 100
-                            /**locationOverlay.anchor = PointF(0.0f, 0.0f)*/
-                            locationOverlay.icon = OverlayImage.fromResource(R.drawable.currentlocation)
-                            locationOverlay.iconWidth = 100
-                            locationOverlay.iconHeight = 100
-                            ///**locationOverlay.subAnchor = PointF(-0.0f, 0.0f)*/
-                            //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.ic_location_overlay_start)
-                            //locationOverlay.subIconWidth = 80
-                            //locationOverlay.subIconHeight = 80
-                        }
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
-    }
-
-    /** top */
-    WalkInfoNavi(application.start)
-
-    val density = LocalDensity.current.density
-    val metrics = context.resources.displayMetrics
-    val width = metrics.widthPixels / density
-    val height = metrics.heightPixels / density
-
-    val horizontal = 24.dp
-    val vertical = 42.dp
-
-    val top = 120.dp
-    val bottom = 68.dp
-    val left = horizontal
-    val right = horizontal
-
-    val topMargin = top
-    val bottomMargin = (bottom + 0.dp)
-    val leftMargin = (left - 12.dp)
-    val rightMargin = (right - 10.dp)
-
-    val compass = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
-    compass?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-        this.topMargin = topMargin.toPx(context).toInt()
-        this.leftMargin = leftMargin.toPx(context).toInt()
-    }
-    val zoom = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
-    val rightInvert = (width - 70).dp
-    zoom?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-        this.rightMargin = rightInvert.toPx(context).toInt()
-    }
-    val locationButton = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
-    //val locationHeight = ((locationButton.height / density) + 10).dp
-    val locationHeight = (52 + 10).dp
-    locationButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-        this.bottomMargin = bottomMargin.toPx(context).toInt()
-        this.leftMargin = leftMargin.toPx(context).toInt()
-    }
-
-    Log.wtf(__CLASSNAME__, "::NaverMapApp::BOX${getMethodName()}[location.Height:${(locationButton.height / density)}][top:$top][bottom:$bottom][left:$left][right:$right][width:$width][height:$height]")
-    Log.wtf(__CLASSNAME__, "::NaverMapApp::BOX${getMethodName()}[location.Height:${(locationButton.height / density)}][topMargin:$topMargin][bottomMargin:$bottomMargin][leftMargin:$leftMargin][rightMargin:$rightMargin]")
-
-    /** LEFT/RIGHT/WALK */
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                horizontal = horizontal,
-                vertical = vertical,
-            )
-    ) {
-        /** BOTTOM */
-        /** LEFT */
-        Log.w(__CLASSNAME__, "::NaverMapApp@::LEFT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-        Column(
-            modifier = Modifier
-                .padding(bottom = bottom + locationHeight)
-                .align(Alignment.BottomStart),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            /** note */
-            IconButton2(
-                back = Color.White,
-                shape = RectangleShape,
-                onClick = {
-                    Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                    if (!start) return@IconButton2
-                },
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_list),
-                    contentDescription = stringResource(R.string.note),
-                    tint = Color.Black,
-                )
-            }
-            /** camera */
-            IconButton2(
-                back = Color.White,
-                shape = RectangleShape,
-                onClick = {
-                    Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                    if (!start) return@IconButton2
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        context.startActivity(intent)
-                    } else {
-                        val i = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        val pm: PackageManager = context.packageManager
-                        val info = pm.resolveActivity(i, 0)?.activityInfo
-                        val intent = Intent()
-                        intent.component = info?.let { ComponentName(it.packageName, it.name) }
-                        intent.action = Intent.ACTION_MAIN
-                        intent.addCategory(Intent.CATEGORY_LAUNCHER)
-                        context.startActivity(intent)
-                    }
-                },
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_camera_map),
-                    contentDescription = stringResource(R.string.photo),
-                    tint = Color.Black,
-                )
-            }
-        }
-        /** RIGHT */
-        Log.w(__CLASSNAME__, "::NaverMapApp@::RIGHT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-        Column(
-            modifier = Modifier
-                .padding(bottom = bottom)
-                .align(Alignment.BottomEnd),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            /** pee */
-            IconButton2(
-                back = Color.White,
-                onClick = {
-                    Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                    if (!start) return@IconButton2
-                    event = Track.EVENT.pee
-                    if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
-                    else showPetsSheet = true
-                },
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_pee),
-                    contentDescription = stringResource(R.string.pee),
-                    tint = Color(0xFFEEBF00),
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-            /** poo */
-            IconButton2(
-                back = Color.White,
-                onClick = {
-                    Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                    if (!start) return@IconButton2
-                    event = Track.EVENT.poo
-                    if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
-                    else showPetsSheet = true
-                },
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_poop),
-                    contentDescription = stringResource(R.string.poop),
-                    tint = Color(0xFF956A5C),
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-            /** mrk */
-            IconButton2(
-                back = Color.White,
-                onClick = {
-                    Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                    if (!start) return@IconButton2
-                    event = Track.EVENT.mrk
-                    if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
-                    else showPetsSheet = true
-                },
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_marking),
-                    contentDescription = stringResource(R.string.mark),
-                    tint = Color(0xFF4AB0F5),
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-        }
-        /** WALK */
-        Button(
-            onClick = {
-                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                if (pets.size == 1 && !start) {
-                    application.start()
-                    isLoading = true
-                } else {
-                    showBottomSheet = !showBottomSheet
-                    mapView.getMapAsync { naverMap ->
-                        tracks?.let { naverMapPreview(context = context, naverMap = naverMap, tracks = it, padding = 104.dp) }
-                    }
-                }
-            },
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(14.dp),
-            colors = buttonColors
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
-                    contentDescription = stringResource(id = R.string.walk_button_start),
-                    tint = Color.White,
-                )
-                Text(
-                    text = buttonText,
-                )
-            }
-        }
-    }
-
-    /** RIGHT */
-    AnimatedVisibility(
-        visible = showPetsSheet,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color(0xB0000000))
-                .clickable(enabled = showPetsSheet) {
-                    showPetsSheet = false
-                    refresh = !refresh
-                },
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(
-                        horizontal = horizontal,
-                        vertical = vertical + bottom,
-                    )
-                    .align(Alignment.BottomEnd),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                val item = when (event) {
-                    Track.EVENT.nnn -> stringResource(id = R.string.nnn)
-                    Track.EVENT.img -> stringResource(id = R.string.nnn)
-                    Track.EVENT.pee -> stringResource(id = R.string.pee)
-                    Track.EVENT.poo -> stringResource(id = R.string.poop)
-                    Track.EVENT.mrk -> stringResource(id = R.string.mark)
-                }
-                val text = String.format(stringResource(id = R.string.walk_title_marking), item)
-                Text(
-                    text = text,
-                    fontWeight = FontWeight.Bold,
-                    //color = MaterialTheme.colorScheme.onPrimary,
-                    color = Color.White,
-                )
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    items(application.pets) { pet ->
-                        IconButton2(
-                            text = pet.petNm,
-                            back = Color.White,
-                            onClick = {
-                                Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                                if (!start) return@IconButton2
-                                showPetsSheet = false
-                                mark(pet, event, position, mapView)?.let { markers.add(it) }
-                            },
-                        ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.walk_active),
-                                contentDescription = stringResource(R.string.mark),
-                                modifier = Modifier.size(20.dp),
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Log.i(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                showBottomSheet = false
-                application.resume()
-                mapView.getMapAsync { naverMap ->
-                    naverMap.apply {
-                        locationTrackingMode = LocationTrackingMode.Follow
-                    }
-                }
-            },
-            sheetState = sheetState,
-            dragHandle = {},
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(
-                        horizontal = horizontal,
-                        //vertical = vertical,
-                    )
-                    .padding(
-                        top = 24.dp,
-                        bottom = vertical,
-                    )
-                    .padding(bottom = navigationBarHeight())
-            ) {
-                if (!start) {
-                    Text(
-                        text = stringResource(id = R.string.walk_title_select),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    R.string.walk_check_select_all
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                checkedAll = !checkedAll
-                                if (checkedAll) application.add(pets) else application.remove()
-                            },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start,
-                    ) {
-                        Checkbox(
-                            checked = checkedAll,
-                            onCheckedChange = {
-                                checkedAll = it
-                                if (checkedAll) application.add(pets) else application.remove()
-                            },
-                        )
-                        Text(
-                            text = stringResource(id = R.string.walk_check_select_all),
-                            fontSize = 14.sp,
-                            letterSpacing = (-0.7).sp
-                        )
-                    }
-                    LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 10.dp)
-                    ) {
-                        items(pets) { pet ->
-                            Log.i(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[${application.contains(pet)}][${pet}]")
-                            Box {
-                                WalkPetButton(
-                                    pet = pet,
-                                    checked = application.contains(pet),
-                                    onCheckedChange = { checked ->
-                                        refresh = !refresh
-                                        if (checked) application.add(pet) else application.remove(pet)
-                                        Log.wtf(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[$checked][$refresh][${application.contains(pet)}][${application.pets}]")
-                                    }
-                                )
-                            }
-                        }
-                    }
-                    R.string.walk_check_select
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { checkedSel = !checkedSel },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End,
-                    ) {
-                        //Checkbox(
-                        //    checked = checkedSel,
-                        //    onCheckedChange = { checkedSel = it },
-                        //)
-                        //Text(
-                        //    text = stringResource(id = R.string.walk_check_select),
-                        //    fontSize = 14.sp,
-                        //    letterSpacing = (-0.7).sp
-                        //)
-                    }
-                    /** walk */
-                    Button(
-                        enabled = application.pets.isNotEmpty(),
-                        onClick = {
-                            Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    showBottomSheet = false
-                                }
-                            }
-                            application.start()
-                            isLoading = true
-                        },
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        contentPadding = PaddingValues(14.dp),
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
-                                contentDescription = stringResource(id = R.string.track),
-                                tint = Color.White,
-                            )
-                            Text(
-                                text = stringResource(id = R.string.walk_button_start),
-                            )
-                        }
-                    }
-                } else {
-                    application.pause()
-                    Text(
-                        text = stringResource(id = R.string.walk_title_end),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    WalkInfoSheet()
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        R.string.walk_button_finish
-                        Button(
-                            onClick = {
-                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        showBottomSheet = false
-                                    }
-                                }
-                                application.stop()
-                                if (start) {
-                                    mapView.getMapAsync { naverMap ->
-                                        val ender = marker(context = context, position = position, captionText = arrival)
-                                        ender.map = naverMap
-                                        naverMap.takeSnapshot(false) {
-                                            application.preview = it
-                                        }
-                                    }
-                                    G.toPost = true
-                                    activity.finish()
-                                }
-                            },
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(1.0f),
-                            contentPadding = PaddingValues(14.dp),
-                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
-                        ) {
-                            Text(text = stringResource(id = R.string.walk_button_finish))
-                        }
-                        R.string.walk_button_resume
-                        Button(
-                            onClick = {
-                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        showBottomSheet = false
-                                    }
-                                }
-                            },
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(1.0f),
-                            contentPadding = PaddingValues(14.dp),
-                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
-                        ) {
-                            Text(text = stringResource(id = R.string.walk_button_resume))
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    LoadingDialog(
-        loadingText = stringResource(id = R.string.walk_text_in_tracking),
-        loadingState = isLoading
-    )
-
-    Log.v(__CLASSNAME__, "${getMethodName()}[ED]")
-}
-
 @Composable
 fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     val petNm: String = pet.petNm
@@ -1213,6 +608,7 @@ fun WalkInfoNavi(start: Boolean) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
+            val text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_walking)
             Column(
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
@@ -1221,7 +617,7 @@ fun WalkInfoNavi(start: Boolean) {
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
-                    text = stringResource(id = R.string.walk_title_walking),
+                    text = text,
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,
                     fontWeight = FontWeight.Normal,
@@ -1268,4 +664,605 @@ fun WalkInfoNavi(start: Boolean) {
             //)
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun NaverMapApp(source: FusedLocationSource) {
+    Log.v(__CLASSNAME__, "${getMethodName()}[ST]")
+    val context = LocalContext.current
+    val application = GPSApplication.instance
+    val tracks = application.tracks
+    val start = application.start
+
+    if (G.mapPetInfo.isEmpty()) {   //test
+        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", 0.0f)
+        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", 0.0f)
+        application.add(pet1)
+        application.add(pet1)
+        application.add(pet2)
+        G.mapPetInfo = application.pets
+    }
+    val pets = G.mapPetInfo
+    if (pets.size == 1) application.add(pets[0])
+    Log.i(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
+
+    val markers by remember { mutableStateOf(mutableListOf<Marker>()) }
+    if (start) {
+        markers.clear()
+        tracks?.forEach { track ->
+            marker(LatLng(track.latitude, track.longitude), track.event)?.let { markers.add(it) }
+        }
+    }
+
+    var position by remember { mutableStateOf(LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
+    var zoom by remember { mutableDoubleStateOf(GPX_CAMERA_ZOOM_ZERO) }
+
+    source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }
+    source.isCompassEnabled = true
+
+    val mapOptions = remember {
+        NaverMapOptions()
+            .camera(CameraPosition(position, zoom))
+            .logoClickEnabled(true)
+            .mapType(NaverMap.MapType.Basic)
+            .locationButtonEnabled(true)
+            .zoomControlEnabled(true)
+            .compassEnabled(true)
+            .zoomGesturesEnabled(true)
+            .indoorEnabled(true)
+    }
+    val mapView = rememberMapViewWithLifecycle(context, mapOptions)
+
+
+    var loading by remember { mutableStateOf(false) }
+    Log.v(__CLASSNAME__, "::NaverMapApp@${getMethodName()}[${tracks?.size}][loading:$loading][${(tracks?.isNotEmpty())}]")
+    val scope = rememberCoroutineScope()
+    var refresh by remember { mutableStateOf(false) }
+    Log.w(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+    LaunchedEffect(refresh, position) {
+        scope.launch {
+            mapView.getMapAsync { naverMap ->
+                Log.v(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                if (tracks?.isNotEmpty() == true) loading = false
+                //loading = tracks?.isNotEmpty() != true
+                Log.wtf(__CLASSNAME__, "::NaverMapApp@${getMethodName()}[${tracks?.size}][loading:$loading][${(tracks?.isNotEmpty())}]")
+                if (start) {
+                    tracks?.let { naverMapPath(context = context, naverMap = naverMap, tracks = it, finished = false) }
+                }
+                naverMap.locationOverlay.position = position
+                if (start && tracks?.size == 1) {
+                    naverMap.locationTrackingMode = LocationTrackingMode.Follow
+                }
+            }
+        }
+    }
+
+    val buttonText = if (start) stringResource(id = R.string.walk_button_end) else stringResource(R.string.walk_button_start)
+    val buttonColors = if (start) ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary) else ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+
+    //val departure = stringResource(id = R.string.departure)
+    val arrival = stringResource(id = R.string.arrival)
+
+    val activity = LocalContext.current as Activity
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    var checkedAll by rememberSaveable { mutableStateOf(false) }
+    checkedAll = (application.pets == pets)
+    var checkedSel by rememberSaveable { mutableStateOf(false) }
+    var event by remember { mutableStateOf(Track.EVENT.nnn) }
+    var showPetsSheet by remember { mutableStateOf(false) }
+
+    val isSystemInDarkTheme = isSystemInDarkTheme()
+    //val tint = if (isSystemInDarkTheme) Color.White else Color.Black
+
+    /** map */
+    Box {
+        AndroidView(
+            factory = {
+                mapView.apply {
+                    getMapAsync { naverMap ->
+                        Log.wtf(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                        naverMap.apply {
+                            mapType = NaverMap.MapType.Navi
+                            isNightModeEnabled = isSystemInDarkTheme
+                            Log.i(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[isSystemInDarkTheme:$isSystemInDarkTheme][isNightModeEnabled:$isNightModeEnabled]")
+                            uiSettings.isCompassEnabled = source.isCompassEnabled
+                            uiSettings.isZoomGesturesEnabled = true
+                            locationSource = source
+                            locationTrackingMode = LocationTrackingMode.Follow
+                            cameraPosition = CameraPosition(cameraPosition.target, zoom)
+                            locationOverlay.isVisible = true
+                            locationOverlay.circleRadius = 100
+                            /**locationOverlay.anchor = PointF(0.0f, 0.0f)*/
+                            locationOverlay.icon = OverlayImage.fromResource(R.drawable.currentlocation)
+                            locationOverlay.iconWidth = 100
+                            locationOverlay.iconHeight = 100
+                            ///**locationOverlay.subAnchor = PointF(-0.0f, 0.0f)*/
+                            //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.ic_location_overlay_start)
+                            //locationOverlay.subIconWidth = 80
+                            //locationOverlay.subIconHeight = 80
+                        }
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxSize(),
+        )
+    }
+
+    /** top */
+    WalkInfoNavi(application.start)
+
+    val density = LocalDensity.current.density
+    val metrics = context.resources.displayMetrics
+    val width = metrics.widthPixels / density
+    val height = metrics.heightPixels / density
+
+    val horizontal = 24.dp
+    val vertical = 42.dp
+
+    val top = 120.dp
+    val bottom = 68.dp
+    val left = horizontal
+    val right = horizontal
+
+    val topMargin = top
+    val bottomMargin = (bottom + 0.dp)
+    val leftMargin = (left - 12.dp)
+    val rightMargin = (right - 10.dp)
+
+    val compass = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
+    compass?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        this.topMargin = topMargin.toPx(context).toInt()
+        this.leftMargin = leftMargin.toPx(context).toInt()
+    }
+    val zoomControl = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
+    val rightInvert = (width - 70).dp
+    zoomControl?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        this.rightMargin = rightInvert.toPx(context).toInt()
+    }
+    val locationButton = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
+    //val locationHeight = ((locationButton.height / density) + 10).dp
+    val locationHeight = (52 + 10).dp
+    locationButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        this.bottomMargin = bottomMargin.toPx(context).toInt()
+        this.leftMargin = leftMargin.toPx(context).toInt()
+    }
+
+    Log.wtf(__CLASSNAME__, "::NaverMapApp::BOX${getMethodName()}[location.Height:${(locationButton.height / density)}][top:$top][bottom:$bottom][left:$left][right:$right][width:$width][height:$height]")
+    Log.wtf(__CLASSNAME__, "::NaverMapApp::BOX${getMethodName()}[location.Height:${(locationButton.height / density)}][topMargin:$topMargin][bottomMargin:$bottomMargin][leftMargin:$leftMargin][rightMargin:$rightMargin]")
+
+    /** LEFT/RIGHT/WALK */
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(
+                horizontal = horizontal,
+                vertical = vertical,
+            )
+    ) {
+        /** BOTTOM */
+        /** LEFT */
+        Log.w(__CLASSNAME__, "::NaverMapApp@::LEFT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+        Column(
+            modifier = Modifier
+                .padding(bottom = bottom + locationHeight)
+                .align(Alignment.BottomStart),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            /** note */
+            IconButton2(
+                back = Color.White,
+                shape = RectangleShape,
+                onClick = {
+                    Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                    if (!start) return@IconButton2
+                },
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_list),
+                    contentDescription = stringResource(R.string.note),
+                    tint = Color.Black,
+                )
+            }
+            /** camera */
+            IconButton2(
+                back = Color.White,
+                shape = RectangleShape,
+                onClick = {
+                    Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                    if (!start) return@IconButton2
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        context.startActivity(intent)
+                    } else {
+                        val i = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        val pm: PackageManager = context.packageManager
+                        val info = pm.resolveActivity(i, 0)?.activityInfo
+                        val intent = Intent()
+                        intent.component = info?.let { ComponentName(it.packageName, it.name) }
+                        intent.action = Intent.ACTION_MAIN
+                        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+                        context.startActivity(intent)
+                    }
+                },
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_camera_map),
+                    contentDescription = stringResource(R.string.photo),
+                    tint = Color.Black,
+                )
+            }
+        }
+        /** RIGHT */
+        Log.w(__CLASSNAME__, "::NaverMapApp@::RIGHT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+        Column(
+            modifier = Modifier
+                .padding(bottom = bottom)
+                .align(Alignment.BottomEnd),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            /** pee */
+            IconButton2(
+                back = Color.White,
+                onClick = {
+                    Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                    if (!start) return@IconButton2
+                    event = Track.EVENT.pee
+                    if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
+                    else showPetsSheet = true
+                },
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_pee),
+                    contentDescription = stringResource(R.string.pee),
+                    tint = Color(0xFFEEBF00),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+            /** poo */
+            IconButton2(
+                back = Color.White,
+                onClick = {
+                    Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                    if (!start) return@IconButton2
+                    event = Track.EVENT.poo
+                    if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
+                    else showPetsSheet = true
+                },
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_poop),
+                    contentDescription = stringResource(R.string.poop),
+                    tint = Color(0xFF956A5C),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+            /** mrk */
+            IconButton2(
+                back = Color.White,
+                onClick = {
+                    Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                    if (!start) return@IconButton2
+                    event = Track.EVENT.mrk
+                    if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
+                    else showPetsSheet = true
+                },
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_marking),
+                    contentDescription = stringResource(R.string.mark),
+                    tint = Color(0xFF4AB0F5),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
+        /** WALK */
+        Button(
+            onClick = {
+                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                if (pets.size == 1 && !start) {
+                    application.start()
+                    loading = true
+                } else {
+                    showBottomSheet = !showBottomSheet
+                    mapView.getMapAsync { naverMap ->
+                        tracks?.let { naverMapPreview(context = context, naverMap = naverMap, tracks = it, padding = 104.dp) }
+                    }
+                }
+            },
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(14.dp),
+            colors = buttonColors
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
+                    contentDescription = stringResource(id = R.string.walk_button_start),
+                    tint = Color.White,
+                )
+                Text(
+                    text = buttonText,
+                )
+            }
+        }
+    }
+
+    /** RIGHT */
+    AnimatedVisibility(
+        visible = showPetsSheet,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color(0xB0000000))
+                .clickable(enabled = showPetsSheet) {
+                    showPetsSheet = false
+                    refresh = !refresh
+                },
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(
+                        horizontal = horizontal,
+                        vertical = vertical + bottom,
+                    )
+                    .align(Alignment.BottomEnd),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                val item = when (event) {
+                    Track.EVENT.nnn -> stringResource(id = R.string.nnn)
+                    Track.EVENT.img -> stringResource(id = R.string.nnn)
+                    Track.EVENT.pee -> stringResource(id = R.string.pee)
+                    Track.EVENT.poo -> stringResource(id = R.string.poop)
+                    Track.EVENT.mrk -> stringResource(id = R.string.mark)
+                }
+                val text = String.format(stringResource(id = R.string.walk_title_marking), item)
+                Text(
+                    text = text,
+                    fontWeight = FontWeight.Bold,
+                    //color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.White,
+                )
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    items(application.pets) { pet ->
+                        IconButton2(
+                            text = pet.petNm,
+                            back = Color.White,
+                            onClick = {
+                                Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                                if (!start) return@IconButton2
+                                showPetsSheet = false
+                                mark(pet, event, position, mapView)?.let { markers.add(it) }
+                            },
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.walk_active),
+                                contentDescription = stringResource(R.string.mark),
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Log.i(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                showBottomSheet = false
+                application.resume()
+                mapView.getMapAsync { naverMap ->
+                    naverMap.locationTrackingMode = LocationTrackingMode.Follow
+                    naverMap.cameraPosition = CameraPosition(position, zoom)
+                }
+            },
+            sheetState = sheetState,
+            dragHandle = {},
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(
+                        horizontal = horizontal,
+                        //vertical = vertical,
+                    )
+                    .padding(
+                        top = 24.dp,
+                        bottom = vertical,
+                    )
+                    .padding(bottom = navigationBarHeight())
+            ) {
+                if (!start) {
+                    Text(
+                        text = stringResource(id = R.string.walk_title_select),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    R.string.walk_check_select_all
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                checkedAll = !checkedAll
+                                if (checkedAll) application.add(pets) else application.remove()
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
+                        Checkbox(
+                            checked = checkedAll,
+                            onCheckedChange = {
+                                checkedAll = it
+                                if (checkedAll) application.add(pets) else application.remove()
+                            },
+                        )
+                        Text(
+                            text = stringResource(id = R.string.walk_check_select_all),
+                            fontSize = 14.sp,
+                            letterSpacing = (-0.7).sp
+                        )
+                    }
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 10.dp)
+                    ) {
+                        items(pets) { pet ->
+                            Log.i(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[${application.contains(pet)}][${pet}]")
+                            Box {
+                                WalkPetButton(
+                                    pet = pet,
+                                    checked = application.contains(pet),
+                                    onCheckedChange = { checked ->
+                                        refresh = !refresh
+                                        if (checked) application.add(pet) else application.remove(pet)
+                                        Log.wtf(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[$checked][$refresh][${application.contains(pet)}][${application.pets}]")
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    R.string.walk_check_select
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { checkedSel = !checkedSel },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End,
+                    ) {
+                        //Checkbox(
+                        //    checked = checkedSel,
+                        //    onCheckedChange = { checkedSel = it },
+                        //)
+                        //Text(
+                        //    text = stringResource(id = R.string.walk_check_select),
+                        //    fontSize = 14.sp,
+                        //    letterSpacing = (-0.7).sp
+                        //)
+                    }
+                    /** walk */
+                    Button(
+                        enabled = application.pets.isNotEmpty(),
+                        onClick = {
+                            Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                }
+                            }
+                            application.start()
+                            loading = true
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        contentPadding = PaddingValues(14.dp),
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.currentlocation),
+                                contentDescription = stringResource(id = R.string.track),
+                                tint = Color.White,
+                            )
+                            Text(
+                                text = stringResource(id = R.string.walk_button_start),
+                            )
+                        }
+                    }
+                } else {
+                    application.pause()
+                    mapView.getMapAsync { naverMap ->
+                        zoom = naverMap.cameraPosition.zoom
+                    }
+                    Text(
+                        text = stringResource(id = R.string.walk_title_end),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    WalkInfoSheet()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        R.string.walk_button_finish
+                        Button(
+                            onClick = {
+                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                    }
+                                }
+                                application.stop()
+                                if (start) {
+                                    mapView.getMapAsync { naverMap ->
+                                        val ender = marker(context = context, position = position, captionText = arrival)
+                                        ender.map = naverMap
+                                        naverMap.takeSnapshot(false) {
+                                            application.preview = it
+                                        }
+                                    }
+                                    G.toPost = true
+                                    activity.finish()
+                                }
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.weight(1.0f),
+                            contentPadding = PaddingValues(14.dp),
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
+                        ) {
+                            Text(text = stringResource(id = R.string.walk_button_finish))
+                        }
+                        R.string.walk_button_resume
+                        Button(
+                            onClick = {
+                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                    }
+                                }
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.weight(1.0f),
+                            contentPadding = PaddingValues(14.dp),
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                        ) {
+                            Text(text = stringResource(id = R.string.walk_button_resume))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    LoadingDialog(
+        loadingText = stringResource(id = R.string.walk_text_in_tracking),
+        loadingState = loading
+    )
+
+    Log.v(__CLASSNAME__, "${getMethodName()}[ED]")
 }

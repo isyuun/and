@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">Navi</string>
-
     <string name="signup_name">이름</string>
     <string name="signup_cate">견종</string>
     <string name="signup_birth">출생</string>
@@ -59,5 +57,5 @@
         referred to as GeeksforGeeks. We also offer paid Courses managed by Sanchhaya Classes Pvt. Ltd.</string>
     <string name="comment">댓글</string>
     <string name="userid">UserId</string>
-    <string name="posting_comment">댓글쓰기...</string>
+    <string name="posting_comment">댓글쓰기…</string>
 </resources>

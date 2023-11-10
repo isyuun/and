@@ -34,18 +34,13 @@ const val GPX_INTERVAL_UPDATE_MIllIS = 1L
 const val GPX_INTERVAL_UPDATE_METERS = 10.0f
 const val GPX_LATITUDE_ZERO = 37.546855      //37.5
 const val GPX_LONGITUDE_ZERO = 127.065330    //127.0
-
-//const val GPX_LATITUDE_ZERO = 37.5      //37.5
-//const val GPX_LONGITUDE_ZERO = 127.0    //127.0
 const val GPX_CAMERA_ZOOM_ZERO = 17.0
 
 open class _GPXWriter {
     companion object {
         @JvmStatic
         fun calculateDuration(tracks: List<Track>): String {
-            if (tracks.isEmpty()) {
-                return "N/A"
-            }
+            if (tracks.isEmpty()) return "N/A"
 
             val startTime = tracks.first().time
             val endTime = tracks.last().time
@@ -58,9 +53,7 @@ open class _GPXWriter {
 
         @JvmStatic
         fun calculateTotalDistance(tracks: List<Track>): String {
-            if (tracks.isEmpty()) {
-                return "N/A"
-            }
+            if (tracks.isEmpty()) return "N/A"
 
             var totalDistance = 0.0
             for (i in 1 until tracks.size) {
@@ -74,9 +67,7 @@ open class _GPXWriter {
 
         @JvmStatic
         fun calculateMaxAltitudeGap(tracks: List<Track>): String {
-            if (tracks.isEmpty()) {
-                return "N/A"
-            }
+            if (tracks.isEmpty()) return "N/A"
 
             var maxAltitudeGap = 0.0
             for (i in 1 until tracks.size) {
@@ -92,9 +83,7 @@ open class _GPXWriter {
 
         @JvmStatic
         fun calculateMaxSpeed(tracks: List<Track>): String {
-            if (tracks.isEmpty()) {
-                return "N/A"
-            }
+            if (tracks.isEmpty()) return "N/A"
 
             var maxSpeed = 0.0f
             for (location in tracks) {
@@ -107,9 +96,7 @@ open class _GPXWriter {
 
         @JvmStatic
         fun calculateAvgSpeed(tracks: List<Track>): String {
-            if (tracks.isEmpty()) {
-                return "N/A"
-            }
+            if (tracks.isEmpty()) return "N/A"
 
             var totalSpeed = 0.0f
             for (location in tracks) {

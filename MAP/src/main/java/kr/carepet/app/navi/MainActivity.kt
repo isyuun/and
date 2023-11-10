@@ -13,10 +13,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.start}]")
         super.onCreate(savedInstanceState)
-        if (!application.start) {
-            val intent = Intent(this, MapActivity::class.java)
-            startActivity(intent)
-        }
     }
 
     override fun onStart() {
@@ -27,6 +23,10 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.start}]")
         super.onResume()
+        if (!application.start) {
+            val intent = Intent(this, MapActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {

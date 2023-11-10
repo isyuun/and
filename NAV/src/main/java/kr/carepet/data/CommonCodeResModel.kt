@@ -33,7 +33,7 @@ data class CcData(
 )
 
 
-class CommonCodeModel (
+class CommonCodeModel(
     @SerializedName("cmmCdData")
-    var cmmCdData:String
+    var cmmCdData: String
 )

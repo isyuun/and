@@ -1,10 +1,6 @@
 package kr.carepet.service
 
-import android.provider.Settings.Global
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kr.carepet.data.RefreshToken
 import kr.carepet.singleton.G
 import okhttp3.Authenticator
@@ -22,19 +18,19 @@ class OAuthAuthenticator(private val apiService: ApiService) : Authenticator {
                 // Update the access token in your storage.
                 updateAccessToken(newAccessToken)
                 // Retry the request with the new access token.
-                Log.d("AUTH","999")
+                Log.d("AUTH", "999")
                 return response.request.newBuilder()
                     .header("Authorization", "Bearer $newAccessToken")
                     .build()
             }
         }
 
-        Log.d("AUTH","null")
+        Log.d("AUTH", "null")
         // If the request can't be retried, return null to indicate failure.
         return null
     }
 
-    private fun refreshAccessToken():  String? {
+    private fun refreshAccessToken(): String? {
         // Use your API service to send a request to refresh the access token.
         val refreshToken = getRefreshToken() // Retrieve the refresh token from local storage.
         val response = apiService.sendRefreshToken(refreshToken).execute()

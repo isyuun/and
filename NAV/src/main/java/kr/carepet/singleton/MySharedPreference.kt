@@ -2,7 +2,6 @@ package kr.carepet.singleton
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.net.Uri
 import android.util.Log
 import java.time.LocalDate
 
@@ -16,7 +15,7 @@ object MySharedPreference {
     private lateinit var sharedPreferences: SharedPreferences
 
     fun init(context: Context) {
-        sharedPreferences = context.getSharedPreferences(MySharedPreference.DATA, Context.MODE_PRIVATE)
+        sharedPreferences = context.getSharedPreferences(DATA, Context.MODE_PRIVATE)
     }
 
     fun getTodayData(): Boolean {

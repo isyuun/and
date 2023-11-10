@@ -16,5 +16,5 @@ data class MyPetListRes(
 
 data class MyPetListReq(
     @SerializedName("userId")
-    var userId:String
+    var userId: String
 )

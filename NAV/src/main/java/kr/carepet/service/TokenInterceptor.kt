@@ -7,11 +7,7 @@ import kr.carepet.singleton.G
 import kr.carepet.singleton.MySharedPreference
 import okhttp3.Interceptor
 import okhttp3.Response
-import okhttp3.internal.commonNewBuilder
-import okhttp3.internal.stripBody
-import org.json.JSONObject
 import java.io.IOException
-import kotlin.reflect.typeOf
 
 class TokenInterceptor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -37,8 +33,8 @@ class TokenInterceptor() : Interceptor {
 
         val responseBodyString = response.body
 
-        if (response.code == 401){
-            Log.d("LOG","if 실행")
+        if (response.code == 401) {
+            Log.d("LOG", "if 실행")
             val gson = Gson()
             val tokenResponse = gson.fromJson(responseBodyString.string(), RefreshRes::class.java)
 
@@ -47,7 +43,7 @@ class TokenInterceptor() : Interceptor {
             MySharedPreference.setAccessToken(tokenResponse.data.accessToken)
             MySharedPreference.setRefreshToken(tokenResponse.data.refreshToken)
 
-            if (G.accessToken != null){
+            if (G.accessToken != null) {
                 val retryRequestBuilder = originalRequest.newBuilder()
                 retryRequestBuilder.header("Authorization", G.accessToken)
                 retryRequestBuilder.header("Refresh", G.refreshToken)

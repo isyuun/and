@@ -12,12 +12,12 @@
 package kr.carepet.data.user
 
 data class UserDataModel(
-    var appKey:String,
-    var appOs:String,
-    var appTypNm:String? = "",
-    var ncknm:String,
-    var snsLogin:String? = "",
-    var userID:String,
-    var userName:String,
-    var userPW:String
+    var appKey: String,
+    var appOs: String,
+    var appTypNm: String? = "",
+    var ncknm: String,
+    var snsLogin: String? = "",
+    var userID: String,
+    var userName: String,
+    var userPW: String
 )

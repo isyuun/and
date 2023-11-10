@@ -30,7 +30,7 @@ open class appcompatactivity : androidx.appcompat.app.AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        application.setActivity(this)
+        application.activity = (this)
     }
 
     override fun onPause() {
@@ -44,6 +44,6 @@ open class appcompatactivity : androidx.appcompat.app.AppCompatActivity() {
     }
 
     private fun clearReferences() {
-        if (this == application.getActivity()) application.setActivity(null)
+        if (this == application.activity) application.activity = (null)
     }
 }
