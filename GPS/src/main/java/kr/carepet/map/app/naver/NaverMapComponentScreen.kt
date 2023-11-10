@@ -105,6 +105,7 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.widget.LocationButtonView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kr.carepet.__CLASSNAME__
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.R
 import kr.carepet.gps.app.GPSApplication
@@ -133,7 +134,6 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 fun marker(context: Context, position: LatLng?, captionText: String = ""): Marker {
     val marker = Marker()
@@ -497,7 +497,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 letterSpacing = (-0.7).sp
                             )
                         }
-                        LazyRow(modifier = Modifier.fillMaxWidth()) {
+                        LazyRow(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 10.dp)) {
                             items(pets) { pet ->
                                 Log.i(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[${application.contains(pet)}][${pet}]")
                                 Box {

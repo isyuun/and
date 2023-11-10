@@ -19,5 +19,6 @@ package kr.carepet
  * @description : kr.carepet
  * @see kr.carepet.config
  */
+val __CLASSNAME__ = Exception().stackTrace[0].fileName
 val DEBUG = kr.carepet.BuildConfig.DEBUG
 //val DEBUG = false
