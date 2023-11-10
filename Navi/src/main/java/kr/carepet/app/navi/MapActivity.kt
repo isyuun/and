@@ -10,6 +10,8 @@
 
 package kr.carepet.app.navi
 
+import androidx.activity.compose.setContent
+import kr.carepet.app.navi.ui.theme.AppTheme
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -25,11 +27,11 @@ class MapActivity : kr.carepet.map.app.MapActivity() {
 
     override fun setContent() {
         Log.v(__CLASSNAME__, "${getMethodName()}...")
-        super.setContent()
-        //setContent {
-        //    AppTheme {
-        //        MapApp()
-        //    }
-        //}
+        //super.setContent()
+        setContent {
+            AppTheme {
+                MapApp()
+            }
+        }
     }
 }

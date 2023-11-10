@@ -30,25 +30,25 @@ subprojects {
     afterEvaluate {}
     pluginManager.withPlugin("com.android.library") {
         project.extensions.getByType<com.android.build.gradle.BaseExtension>().apply {
-            defaultConfig {
-                //ext.BUILD_DATE = { return new Date().format("yyyy/MM/dd HH:mm:ss") }
-                //ext.BUILD_TIME = { return System.currentTimeMillis() + "L" }
-                //buildConfigField("String", "BUILD_DATE", "\"" + new Date().format("yyyy/MM/dd HH:mm:ss") + "\"")
-                //buildConfigField("long", "BUILD_TIME", System.currentTimeMillis() + "L")
-                //consumerProguardFiles "consumer-rules.pro"
-            }
-            buildTypes {
-                getByName("debug") {
-                    //isMinifyEnabled = true
-                    ////isDebuggable = true
-                    ////manifestPlaceholders["enableCrashlytics"] = "false"
-                }
-                getByName("release") {
-                    //isMinifyEnabled = true
-                    ////isDebuggable = false
-                    ////manifestPlaceholders["enableCrashlytics"] = "true"
-                }
-            }
+            //defaultConfig {
+            //    //ext.BUILD_DATE = { return new Date().format("yyyy/MM/dd HH:mm:ss") }
+            //    //ext.BUILD_TIME = { return System.currentTimeMillis() + "L" }
+            //    //buildConfigField("String", "BUILD_DATE", "\"" + new Date().format("yyyy/MM/dd HH:mm:ss") + "\"")
+            //    //buildConfigField("long", "BUILD_TIME", System.currentTimeMillis() + "L")
+            //    //consumerProguardFiles "consumer-rules.pro"
+            //}
+            //buildTypes {
+            //    getByName("debug") {
+            //        //isMinifyEnabled = true
+            //        ////isDebuggable = true
+            //        ////manifestPlaceholders["enableCrashlytics"] = "false"
+            //    }
+            //    getByName("release") {
+            //        //isMinifyEnabled = true
+            //        ////isDebuggable = false
+            //        ////manifestPlaceholders["enableCrashlytics"] = "true"
+            //    }
+            //}
         }
     }
     pluginManager.withPlugin("com.android.application") {
@@ -74,7 +74,7 @@ subprojects {
                 getByName("debug") {
                     signingConfig = signingConfigs.getByName("debug")
                     proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
-                    isMinifyEnabled = true
+                    //isMinifyEnabled = true
                     //isDebuggable = true
                     //manifestPlaceholders["enableCrashlytics"] = "false"
                 }
