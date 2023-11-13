@@ -1,12 +1,10 @@
 package kr.carepet.app.navi
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseIn
@@ -15,19 +13,22 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kr.carepet.app.navi.screens.EasyRegScreen
 import kr.carepet.app.navi.screens.IdFindScreen
 import kr.carepet.app.navi.screens.IdPwSearchScreen
@@ -71,30 +72,36 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val data = intent.extras;
         setContent {
             AppTheme {
                 Surface {
-                    MyApp()
+                    MyApp(data)
                 }
             }
         }
     }
-}
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        val intent = intent
+        intent.data = null
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun MyApp(){
+fun MyApp(data: Bundle?) {
     val navController = rememberNavController()
 
-    AppNavigation(navController = navController)
+    AppNavigation(navController = navController, data = data)
 }
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun AppNavigation(navController: NavHostController){
+fun AppNavigation(navController: NavHostController, data: Bundle?){
 
     val scdLocalData = remember { SCDLocalData() }
 
@@ -106,6 +113,7 @@ fun AppNavigation(navController: NavHostController){
     val communityViewModel = remember{CommunityViewModel(sharedViewModel)}
     val settingViewModel = remember{SettingViewModel(sharedViewModel)}
 
+    sharedViewModel.updatePushData(data)
 
     NavHost(
         navController = navController,
@@ -113,9 +121,34 @@ fun AppNavigation(navController: NavHostController){
         enterTransition = { fadeIn(tween(700)) },
         exitTransition = { fadeOut(tween(700)) }
     ){
+        composable(
+            route = "detail",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "http://pettip.kr/{seqNo}"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
+            arguments = listOf(
+                navArgument("schUnqNo"){
+                    type = NavType.IntType
+                    defaultValue = 1
+                }
+            )
+        ){entry ->
+            val id = entry.arguments?.getInt("schUnqNo")
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                Text(text = id.toString())
+            }
+        }
+
         composable("intro"){
 
-            IntroScreen(navController = navController, viewModel = sharedViewModel, loginViewModel = viewModel)
+            IntroScreen(navController = navController, viewModel = sharedViewModel)
         }
         composable("login"){
             LoginScreen(navController = navController, viewModel, sharedViewModel)
@@ -165,7 +198,6 @@ fun AppNavigation(navController: NavHostController){
         }
 
         composable("postScreen"){
-            val context = LocalContext.current
             PostScreen(walkViewModel, navController)
         }
 
@@ -173,7 +205,29 @@ fun AppNavigation(navController: NavHostController){
             EasyRegScreen(navController = navController, viewModel = viewModel, userCreateViewModel = userCreateViewModel)
         }
 
-        composable("storyDetail"){
+        composable(
+            route = "storyDetail",
+                enterTransition = {
+            fadeIn(
+                animationSpec = tween(
+                    300, easing = LinearEasing
+                )
+            ) + slideIntoContainer(
+                animationSpec = tween(300, easing = EaseIn),
+                towards = AnimatedContentTransitionScope.SlideDirection.Start
+            )
+        },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
+                    )
+                ) + slideOutOfContainer(
+                    animationSpec = tween(300, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.End
+                )
+            }
+        ){
             StoryDetail(viewModel = communityViewModel, sharedViewModel = sharedViewModel, navController = navController)
         }
         composable("eventDetail"){

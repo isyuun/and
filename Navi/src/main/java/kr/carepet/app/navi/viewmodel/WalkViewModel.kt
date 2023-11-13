@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
+import android.os.Bundle
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -51,6 +53,11 @@ import kotlin.coroutines.resume
 
 
 class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() {
+
+    val pushData:Bundle? = sharedViewModel.pushData.value
+    fun clearPushData(){
+        sharedViewModel.updatePushData(null)
+    }
 
     val weekRecord: StateFlow<WeekData?> = sharedViewModel.weekRecord
     fun updatePetInfo(newData: List<PetDetailData>) {

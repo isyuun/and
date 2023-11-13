@@ -6,6 +6,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
@@ -66,6 +67,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kr.carepet.app.navi.BottomNav
 import kr.carepet.app.navi.MapActivity
+import kr.carepet.app.navi.MyFirebaseMessagingService
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
@@ -81,6 +83,8 @@ import kr.carepet.app.navi.viewmodel.SettingViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.singleton.G
+import kr.carepet.singleton.MySharedPreference
+import kr.carepet.util.Log
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -106,6 +110,8 @@ fun MainScreen(
 
     val init by sharedViewModel.init.collectAsState()
 
+    val pushData by sharedViewModel.pushData.collectAsState()
+
     val selectedPet by sharedViewModel.selectPet.collectAsState()
     val currentPet by sharedViewModel.currentPetInfo.collectAsState()
 
@@ -124,6 +130,28 @@ fun MainScreen(
             sharedViewModel.updateInit(false)
         }
     }
+
+    //LaunchedEffect(Unit){
+    //    val page = MySharedPreference.getFcmDataPage()
+    //    val schUnqNo = MySharedPreference.getFcmDataSchUnqNo()
+    //    if (page!="" && schUnqNo!=""){
+    //        clearPushDataFromIntent()
+    //        when(page){
+    //            "story" -> {
+    //
+    //                navController.navigate(Screen.StoryDetail.route)
+    //            }
+    //            "walk" ->{
+    //                val result = schUnqNo?.toInt()?.let { walkViewModel.getDailyDetail(it) }
+    //                if (result == true){
+    //                    navController.navigate(Screen.WalkDetailContent.route)
+    //                }else{
+    //                    sharedViewModel.updatePushData(null)
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 
     BackOnPressed()
     Scaffold(
@@ -436,4 +464,9 @@ fun BackOnPressed() {
         }
         backPressedTime = System.currentTimeMillis()
     }
+}
+
+private fun clearPushDataFromIntent() {
+    val intent = Intent()
+    intent.data = null // Replace with your actual intent
 }

@@ -1,5 +1,6 @@
 package kr.carepet.app.navi.viewmodel
 
+import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,10 @@ import kotlin.coroutines.resume
 
 
 class SharedViewModel:ViewModel(){
+
+    private val _pushData = MutableStateFlow<Bundle?>(null)
+    val pushData:StateFlow<Bundle?> = _pushData.asStateFlow()
+    fun updatePushData(newValue: Bundle?){ _pushData.value = newValue}
 
     private val _nickName = MutableStateFlow<String>("")
     val nickName:StateFlow<String> = _nickName.asStateFlow()

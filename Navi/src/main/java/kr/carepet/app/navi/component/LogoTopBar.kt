@@ -29,6 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,6 +62,8 @@ fun LogoTopBar(
     backBtnOnChange:(Boolean) -> Unit,
     walkViewModel: WalkViewModel
 ) {
+
+    val petList by walkViewModel.petInfo.collectAsState()
 
     TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
@@ -96,7 +100,7 @@ fun LogoTopBar(
                             .clip(shape = CircleShape)
                             .clickable {
                                 walkViewModel.updateToMonthCalendar(false)
-                                 }
+                            }
                             .align(Alignment.CenterStart),
                         contentAlignment = Alignment.Center
                     ){
@@ -112,7 +116,10 @@ fun LogoTopBar(
                         .align(Alignment.CenterEnd)
                         .fillMaxHeight()
                         .wrapContentWidth()
-                        .clickable { openBottomSheet(true) },
+                        .clickable(
+                            enabled = petList.isNotEmpty(),
+                            onClick = { openBottomSheet(true) }
+                        ) ,
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Spacer(modifier = Modifier.padding(start = 16.dp))

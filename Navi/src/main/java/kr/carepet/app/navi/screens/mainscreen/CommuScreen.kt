@@ -31,10 +31,13 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.DropdownMenu
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -80,6 +83,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
+import kr.carepet.app.navi.component.CustomIndicator
 import kr.carepet.app.navi.component.LoadingAnimation1
 import kr.carepet.app.navi.component.StoryListItem
 import kr.carepet.app.navi.ui.theme.design_B5B9BE
@@ -103,7 +107,7 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
     val coroutineScope = rememberCoroutineScope()
     var tabVisible by remember { mutableFloatStateOf(1f) }
 
-    var init by remember{ mutableStateOf(true) }
+    var init by rememberSaveable{ mutableStateOf(true) }
 
     LaunchedEffect(init){
         if (init){
@@ -159,18 +163,25 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
 
     val storyListRes by viewModel.storyRes.collectAsState()
     val storyList by viewModel.storyList.collectAsState()
-    val paginate = storyListRes?.data?.paginate
     val lazyGridState = rememberLazyGridState()
     val page by viewModel.storyPage.collectAsState()
     var isLoading by remember{ mutableStateOf(false) }
     val orderType by viewModel.orderType.collectAsState()
     val viewType by viewModel.viewType.collectAsState()
+
+    var refreshing by remember{ mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = refreshing,
+        onRefresh = {
+            refreshing = true
+        })
 
     var oTDropDownShow by remember{ mutableStateOf(false) }
     var vTDropDownShow by remember{ mutableStateOf(false) }
@@ -193,9 +204,22 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
         }
     }
 
+    LaunchedEffect(key1 = refreshing){
+        if (refreshing){
+
+            viewModel.updateStoryListClear()
+            viewModel.updateStoryPage(1)
+            viewModel.getStoryList(1)
+
+            delay(300)
+            refreshing = false
+        }
+    }
+
     LaunchedEffect(key1 = lazyGridState.canScrollForward){
-        if (!lazyGridState.canScrollForward){
-            if (paginate?.existNextPage == true){
+        Log.d("LOG", lazyGridState.canScrollForward.toString())
+        if (!lazyGridState.canScrollForward && !refreshing){
+            if (storyListRes?.data?.paginate?.existNextPage == true){
                 if (!isLoading){
                     isLoading = true
 
@@ -218,103 +242,106 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
             .background(color = design_white)
     ){
         Column {
-            Row (
-                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
-            ){
-
-                Row(verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { oTDropDownShow = true }
-                ){
-                    Text(
-                        text = orderType,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 14.sp,
-                        letterSpacing = (-0.7).sp,
-                        color = design_login_text
-                    )
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = "",
-                        tint = design_login_text
-                    )
-                }
-
-
-
-                Spacer(modifier = Modifier.padding(start = 20.dp))
-
+            Box{
                 Row (
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { vTDropDownShow = true }
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
                 ){
-                    Text(
-                        text = viewType,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 14.sp,
-                        letterSpacing = (-0.7).sp,
-                        color = design_login_text
-                    )
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = "",
-                        tint = design_login_text
-                    )
+
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { oTDropDownShow = true }
+                    ){
+                        Text(
+                            text = orderType,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp,
+                            letterSpacing = (-0.7).sp,
+                            color = design_login_text
+                        )
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = "",
+                            tint = design_login_text
+                        )
+                    }
+
+
+
+                    Spacer(modifier = Modifier.padding(start = 20.dp))
+
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { vTDropDownShow = true }
+                    ){
+                        Text(
+                            text = viewType,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp,
+                            letterSpacing = (-0.7).sp,
+                            color = design_login_text
+                        )
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = "",
+                            tint = design_login_text
+                        )
+                    }
+                }
+
+                DropdownMenu(
+                    expanded = oTDropDownShow,
+                    onDismissRequest = { oTDropDownShow = false },
+                    offset = DpOffset(x = 10.dp, y = 5.dp)
+                ) {
+                    oTItems.forEach { s ->
+                        DropdownMenuItem(
+                            onClick = {
+                                if(s != orderType){
+                                    viewModel.updateOrderType(s)
+                                    typeChange = true
+                                }
+                                oTDropDownShow = false
+                            },
+                            text = {
+                                Text(
+                                    text = s,
+                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                    color = design_login_text,
+                                    fontSize = 14.sp,letterSpacing = (-0.7).sp
+                                )
+                            },
+                            contentPadding = PaddingValues(start = 10.dp)
+                        )
+                    }
+                }
+
+                DropdownMenu(
+                    expanded = vTDropDownShow,
+                    onDismissRequest = { vTDropDownShow = false },
+                    offset = DpOffset(x = 90.dp, y = 5.dp)
+                ) {
+                    vTItems.forEach { s ->
+                        DropdownMenuItem(
+                            onClick = {
+                                if(s != viewType){
+                                    viewModel.updateViewType(s)
+                                    typeChange = true
+                                }
+                                vTDropDownShow = false
+                            },
+                            text = {
+                                Text(
+                                    text = s,
+                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                    color = design_login_text,
+                                    fontSize = 14.sp,letterSpacing = (-0.7).sp
+                                )
+                            },
+                            contentPadding = PaddingValues(start = 10.dp)
+                        )
+                    }
                 }
             }
 
-            DropdownMenu(
-                expanded = oTDropDownShow,
-                onDismissRequest = { oTDropDownShow = false },
-                offset = DpOffset(x = 10.dp, y = 5.dp)
-            ) {
-                oTItems.forEach { s ->
-                    DropdownMenuItem(
-                        onClick = {
-                            if(s != orderType){
-                                viewModel.updateOrderType(s)
-                                typeChange = true
-                            }
-                            oTDropDownShow = false
-                        },
-                        text = {
-                            Text(
-                                text = s,
-                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                color = design_login_text,
-                                fontSize = 14.sp,letterSpacing = (-0.7).sp
-                            )
-                        },
-                        contentPadding = PaddingValues(start = 10.dp)
-                    )
-                }
-            }
-
-            DropdownMenu(
-                expanded = vTDropDownShow,
-                onDismissRequest = { vTDropDownShow = false },
-                offset = DpOffset(x = 90.dp, y = 5.dp)
-            ) {
-                vTItems.forEach { s ->
-                    DropdownMenuItem(
-                        onClick = {
-                            if(s != viewType){
-                                viewModel.updateViewType(s)
-                                typeChange = true
-                            }
-                            vTDropDownShow = false
-                        },
-                        text = {
-                            Text(
-                                text = s,
-                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                color = design_login_text,
-                                fontSize = 14.sp,letterSpacing = (-0.7).sp
-                            )
-                        },
-                        contentPadding = PaddingValues(start = 10.dp)
-                    )
-                }
-            }
 
             Crossfade(
                 targetState = storyList.isEmpty(),
@@ -331,6 +358,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                         LazyVerticalGrid(
                             modifier = Modifier
                                 .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+                                .pullRefresh(pullRefreshState)
                                 .fillMaxSize(),
                             columns = GridCells.Fixed(2),
                             state = lazyGridState,
@@ -338,11 +366,17 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(storyList?: emptyList()) { item ->
-                                StoryListItem(data = item, navController = navController)
+                                StoryListItem(data = item, navController = navController, viewModel = viewModel)
                             }
                         }
                 }
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+                    CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+                }
             }
+
+
         }// col
     }
 }

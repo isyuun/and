@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<channels xmlns:android="http://schemas.android.com/apk/res/android">
+    <channel
+        id="default_channel_id"
+        name="Default Channel"
+        importance="default"
+        />
+    <!-- 다른 채널들 추가 가능 -->
+</channels>

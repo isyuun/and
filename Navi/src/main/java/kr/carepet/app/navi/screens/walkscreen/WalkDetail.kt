@@ -1,7 +1,6 @@
 
 package kr.carepet.app.navi.screens.walkscreen
 
-import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -48,7 +47,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -84,9 +82,6 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CircleImageTopBar
@@ -102,26 +97,36 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.DailyDetailData
 import kr.carepet.data.daily.DailyLifePet
+import kr.carepet.singleton.MySharedPreference
 import kr.carepet.util.Log
-import java.io.IOException
-import java.net.URL
 import kotlin.math.absoluteValue
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostController){
+fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostController){
 
     DisposableEffect(Unit){
         onDispose {
             walkViewModel.updateDailyDetail(null)
-            walkViewModel.updateWalkListItem(null)
         }
     }
 
+    LaunchedEffect(Unit){
+        MySharedPreference.setFcmDataPage("")
+        MySharedPreference.setFcmDataSchUnqNo("")
+    }
+
+    //LaunchedEffect(Unit){
+    //    if (walkViewModel.pushData?.getString("schUnqNo") != null){
+    //        walkViewModel.pushData.getString("schUnqNo")?.toInt()?.let { walkViewModel.getDailyDetail(it) }
+    //        walkViewModel.clearPushData()
+    //    }
+    //}
+
     val isLoading by walkViewModel.isLoading.collectAsState()
     val dailyDetail by walkViewModel.dailyDetail.collectAsState()
-    val walkListItem by walkViewModel.walkListItem.collectAsState()
+
 
     var imageLoading by remember{ mutableStateOf(false) }
     var showImage by remember{ mutableStateOf(false) }
@@ -173,7 +178,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                 ){
                     Icon(painter = painterResource(id = R.drawable.icon_calendar), contentDescription = "", tint = Color.Unspecified)
                     Text(
-                        text = walkListItem?.walkDptreDt ?: "",
+                        text = dailyDetail?.walkDptreDt ?: "",
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -182,97 +187,98 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                     )
                 }
 
+                if(dailyDetail?.dailyLifeFileList != null){
+                    Crossfade(
+                        targetState = isLoading,
+                        label = "",
+                        animationSpec = tween(700),
+                        modifier = Modifier.animateContentSize()
+                    ) { isLoading ->
+                        when(isLoading){
+                            true ->
+                                Box (modifier = Modifier
+                                    .padding(top = 20.dp)
+                                    .fillMaxWidth()
+                                    .height(258.dp),
+                                    contentAlignment = Alignment.Center
+                                ){
+                                    LoadingAnimation1(circleColor = design_intro_bg)
+                                }
+                            false ->
+                                Column {
+                                    Spacer(modifier = Modifier.padding(top= 20.dp))
 
-                Crossfade(
-                    targetState = isLoading,
-                    label = "",
-                    animationSpec = tween(700),
-                    modifier = Modifier.animateContentSize()
-                ) { isLoading ->
-                    when(isLoading){
-                        true ->
-                            Box (modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                                .height(258.dp),
-                                contentAlignment = Alignment.Center
-                            ){
-                                LoadingAnimation1(circleColor = design_intro_bg)
-                            }
-                        false ->
-                            Column {
-                                Spacer(modifier = Modifier.padding(top= 20.dp))
+                                    HorizontalPager(
+                                        modifier = Modifier
+                                            .padding(horizontal = 10.dp)
+                                            .fillMaxWidth()
+                                            .heightIn(max = 240.dp),
+                                        state = pagerState,
+                                        beyondBoundsPageCount = 1,
+                                        flingBehavior = PagerDefaults.flingBehavior(
+                                            state = pagerState, snapVelocityThreshold = 100.dp)
+                                    ) { page ->
+                                        val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
 
-                                HorizontalPager(
-                                    modifier = Modifier
-                                        .padding(horizontal = 10.dp)
-                                        .fillMaxWidth()
-                                        .heightIn(max = 240.dp),
-                                    state = pagerState,
-                                    beyondBoundsPageCount = 1,
-                                    flingBehavior = PagerDefaults.flingBehavior(
-                                        state = pagerState, snapVelocityThreshold = 100.dp)
-                                ) { page ->
-                                    val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
+                                        // 선택된 아이템의 Z-index를 높게 설정
+                                        val zIndexModifier = if (isSelected) Modifier.zIndex(1f) else Modifier
 
-                                    // 선택된 아이템의 Z-index를 높게 설정
-                                    val zIndexModifier = if (isSelected) Modifier.zIndex(1f) else Modifier
+                                        Box(Modifier
+                                            .then(zIndexModifier)
+                                            .graphicsLayer {
+                                                val pageOffset = pagerState.calculateCurrentOffsetForPage(page)
+                                                // translate the contents by the size of the page, to prevent the pages from sliding in from left or right and stays in the center
+                                                //translationX = pageOffset * size.width/4
+                                                // apply an alpha to fade the current page in and the old page out
+                                                alpha = 1 - pageOffset.absoluteValue / 3 * 2
+                                                scaleX = 1 - pageOffset.absoluteValue / 3
+                                                scaleY = 1 - pageOffset.absoluteValue / 3
+                                            }
+                                            .fillMaxSize()
+                                            , contentAlignment = Alignment.Center) {
 
-                                    Box(Modifier
-                                        .then(zIndexModifier)
-                                        .graphicsLayer {
-                                            val pageOffset = pagerState.calculateCurrentOffsetForPage(page)
-                                            // translate the contents by the size of the page, to prevent the pages from sliding in from left or right and stays in the center
-                                            //translationX = pageOffset * size.width/4
-                                            // apply an alpha to fade the current page in and the old page out
-                                            alpha = 1 - pageOffset.absoluteValue / 3 * 2
-                                            scaleX = 1 - pageOffset.absoluteValue / 3
-                                            scaleY = 1 - pageOffset.absoluteValue / 3
+                                            AsyncImage(
+                                                onLoading = { imageLoading = true },
+                                                onError = {Log.d("LOG", "onError")},
+                                                onSuccess = { imageLoading = false},
+                                                model = ImageRequest.Builder(LocalContext.current)
+                                                    .data(
+                                                        "http://carepet.hopto.org/img/"+
+                                                                dailyDetail!!.dailyLifeFileList[page].filePathNm+
+                                                                dailyDetail!!.dailyLifeFileList[page].atchFileNm
+                                                    )
+                                                    .crossfade(true)
+                                                    .build(),
+                                                contentDescription = "",
+                                                //placeholder = painterResource(id = R.drawable.profile_default),
+                                                //error= painterResource(id = R.drawable.profile_default),
+                                                modifier= Modifier
+                                                    .fillMaxSize()
+                                                    .clickable { showImage = true },
+                                                contentScale = ContentScale.Fit
+                                            )
                                         }
-                                        .fillMaxSize()
-                                        , contentAlignment = Alignment.Center) {
+                                    }
 
-                                        AsyncImage(
-                                            onLoading = { imageLoading = true },
-                                            onError = {Log.d("LOG", "onError")},
-                                            onSuccess = { imageLoading = false},
-                                            model = ImageRequest.Builder(LocalContext.current)
-                                                .data(
-                                                    "http://carepet.hopto.org/img/"+
-                                                            dailyDetail!!.dailyLifeFileList[page].filePathNm+
-                                                            dailyDetail!!.dailyLifeFileList[page].atchFileNm
-                                                )
-                                                .crossfade(true)
-                                                .build(),
-                                            contentDescription = "",
-                                            //placeholder = painterResource(id = R.drawable.profile_default),
-                                            //error= painterResource(id = R.drawable.profile_default),
-                                            modifier= Modifier
-                                                .fillMaxSize()
-                                                .clickable { showImage = true },
-                                            contentScale = ContentScale.Fit
-                                        )
+                                    Row(
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp),
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        repeat(dailyDetail?.dailyLifeFileList?.size ?: 0 ) { iteration ->
+                                            val color = if (pagerState.currentPage == iteration) design_intro_bg else design_DDDDDD
+                                            Box(
+                                                modifier = Modifier
+                                                    .padding(horizontal = 4.dp)
+                                                    .clip(CircleShape)
+                                                    .background(color)
+                                                    .size(10.dp)
+                                            )
+                                        }
                                     }
                                 }
-
-                                Row(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp),
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    repeat(dailyDetail?.dailyLifeFileList?.size ?: 0 ) { iteration ->
-                                        val color = if (pagerState.currentPage == iteration) design_intro_bg else design_DDDDDD
-                                        Box(
-                                            modifier = Modifier
-                                                .padding(horizontal = 4.dp)
-                                                .clip(CircleShape)
-                                                .background(color)
-                                                .size(10.dp)
-                                        )
-                                    }
-                                }
-                            }
+                        }
                     }
                 }
 
@@ -297,7 +303,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                         )
 
                         Text(
-                            text = walkListItem?.runNcknm ?: "",
+                            text = dailyDetail?.runNcknm ?: "",
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = 0.sp,
@@ -325,7 +331,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                         )
 
                         Text(
-                            text = walkListItem?.runTime ?: "",
+                            text = dailyDetail?.runTime ?: "",
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = 0.sp,
@@ -355,7 +361,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController:NavHostControl
                         )
 
                         Text(
-                            text = walkListItem?.runDstnc.toString()+"m",
+                            text = dailyDetail?.runDstnc.toString()+"m",
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = 0.sp,
@@ -655,8 +661,8 @@ fun FullScreenImage(
                     scaleX = scale,
                     scaleY = scale,
                     rotationZ = rotation,
-                    translationX = if (rotate) -offset.y*scale else offset.x*scale,
-                    translationY = if (rotate) offset.x*scale else offset.y*scale
+                    translationX = if (rotate) -offset.y * scale else offset.x * scale,
+                    translationY = if (rotate) offset.x * scale else offset.y * scale
                 )
                 // add transformable to listen to multitouch transformation events
                 // after offset

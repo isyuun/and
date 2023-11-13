@@ -36,7 +36,7 @@ data class DailyDetailData(
     @SerializedName("nrcmdtnCnt")
     var nrcmdtnCnt: Int, // 0
     @SerializedName("rcmdtnCnt")
-    var rcmdtnCnt: Int, // 0
+    var rcmdtnCnt: Int?, // 0
     @SerializedName("rcmdtnYn")
     var rcmdtnYn: String, // Y
     @SerializedName("rgtrIpAddr")
@@ -62,7 +62,17 @@ data class DailyDetailData(
     @SerializedName("walkDptreDt")
     var walkDptreDt: String, // 2023-10-20 13:35:46
     @SerializedName("walkEndDt")
-    var walkEndDt: String // 2023-10-20 13:35:46
+    var walkEndDt: String, // 2023-10-20 13:35:46
+    @SerializedName("runTime")
+    var runTime: String,
+    @SerializedName("runDstnc")
+    var runDstnc: Int,
+    @SerializedName("runClr")
+    var runClr: Int,
+    @SerializedName("runNcknm")
+    var runNcknm: String
+
+
 )
 
 data class DailyLifeFile(
