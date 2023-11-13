@@ -115,7 +115,6 @@ import com.naver.maps.map.widget.LocationButtonView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.DEBUG
-import kr.carepet.__CLASSNAME__
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.R
 import kr.carepet.gps.app.GPSApplication
@@ -139,6 +138,8 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
+
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 @Composable
 fun CircleImageUrl(size: Int, imageUri: String?) {
