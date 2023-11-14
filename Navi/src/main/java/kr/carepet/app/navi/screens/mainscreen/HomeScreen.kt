@@ -1128,12 +1128,16 @@ fun BottomSheetContent(
                     .height(48.dp),
                 shape = RoundedCornerShape(100.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_white),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = design_white,
+                    disabledContainerColor = design_white
+                ),
                 border = BorderStroke(1.dp, design_btn_border),
                 onClick = {
                     onDisMiss(false)
                     navController.navigate("petProfileScreen/${index.toString()}")
-                }
+                },
+                enabled = petList[0].petInfoUnqNo!=0
             ) {
                 Text(
                     text = stringResource(R.string.manage_pet),

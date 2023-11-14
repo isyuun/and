@@ -98,14 +98,26 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // Since android Oreo notification channel is needed.
+        //// Since android Oreo notification channel is needed.
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        //    val channel = NotificationChannel(
+        //        channelId,
+        //        "Channel human readable title",
+        //        NotificationManager.IMPORTANCE_DEFAULT,
+        //    )
+        //    notificationManager.createNotificationChannel(channel)
+        //}
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Channel human readable title",
-                NotificationManager.IMPORTANCE_DEFAULT,
-            )
-            notificationManager.createNotificationChannel(channel)
+            // Create the NotificationChannel.
+            val name = getString(R.string.default_notification_channel_id)
+            val descriptionText = "default channel"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val mChannel = NotificationChannel(channelId, name, importance)
+            mChannel.description = descriptionText
+            // Register the channel with the system. You can't change the importance
+            // or other notification behaviors after this.
+            notificationManager.createNotificationChannel(mChannel)
         }
 
         val notificationId = 0

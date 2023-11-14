@@ -217,7 +217,7 @@ fun MainScreen(
                                 onClick = {
                                     if (currentPet.isNotEmpty()) {
                                         if (currentPet[0].ownrPetUnqNo=="") {
-                                            showDialog = true
+
                                         }else{
                                             navController.navigate(Screen.DailyPostScreen.route)
                                         }
