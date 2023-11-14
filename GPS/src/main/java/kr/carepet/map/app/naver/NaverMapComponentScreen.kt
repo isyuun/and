@@ -218,15 +218,15 @@ fun marker(context: Context, position: LatLng?, captionText: String = ""): Marke
     if (position != null) {
         marker.position = position
     }
-    marker.width = (24 * 1.2f).dp.toPx(context).toInt()
-    marker.height = (32 * 1.2f).dp.toPx(context).toInt()
+    marker.width = (24 * 1.5f).dp.toPx(context).toInt()
+    marker.height = (32 * 1.5f).dp.toPx(context).toInt()
     //marker.icon = MarkerIcons.BLUE
     marker.icon = OverlayImage.fromResource(R.drawable.marker_start)
     marker.captionText = captionText
     marker.captionColor = Color.White.toArgb()
     marker.captionHaloColor = Color.Gray.toArgb()
     marker.captionTextSize = (3.8 * 0.85f).sp.toPx(context)
-    marker.captionOffset = (-32 * 0.9f).dp.toPx(context).toInt()
+    marker.captionOffset = (-32 * 1.2f).dp.toPx(context).toInt()
     marker.zIndex = 3
     return marker
 }
