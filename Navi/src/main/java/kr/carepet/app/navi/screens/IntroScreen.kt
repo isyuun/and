@@ -1,5 +1,6 @@
 package kr.carepet.app.navi.screens
 
+import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,7 @@ import kr.carepet.singleton.MySharedPreference
 private const val SplashWaitTime:Long = 2000
 
 @Composable
-fun IntroScreen(modifier: Modifier = Modifier, navController: NavHostController, viewModel: SharedViewModel, loginViewModel: LoginViewModel){
+fun IntroScreen(modifier: Modifier = Modifier, navController: NavHostController, viewModel: SharedViewModel){
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(color = design_intro_bg)
@@ -59,7 +60,7 @@ fun IntroScreen(modifier: Modifier = Modifier, navController: NavHostController,
             modifier= modifier
                 .offset(0.dp,(-80).dp), tint = Color.Unspecified)
         
-        Icon(painter = painterResource(id = R.drawable.logo_splash), contentDescription = "",
+        Icon(painter = painterResource(id = R.drawable.logo_splash_en), contentDescription = "",
             modifier=modifier.offset(0.dp, (-40).dp), tint = Color.Unspecified)
         
     }

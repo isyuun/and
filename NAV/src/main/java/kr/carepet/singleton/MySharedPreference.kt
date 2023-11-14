@@ -49,6 +49,22 @@ object MySharedPreference {
         return sharedPreferences.getString("AccessToken", "").toString()
     }
 
+    fun setFcmDataPage(page: String) {
+        sharedPreferences.edit().putString("page", page).apply()
+    }
+
+    fun getFcmDataPage(): String {
+        return sharedPreferences.getString("page", "").toString()
+    }
+
+    fun setFcmDataSchUnqNo(schUnqNo: String) {
+        sharedPreferences.edit().putString("schUnqNo", schUnqNo).apply()
+    }
+
+    fun getFcmDataSchUnqNo(): String {
+        return sharedPreferences.getString("schUnqNo", "").toString()
+    }
+
     fun setRefreshToken(refreshToken: String) {
         sharedPreferences.edit().putString("RefreshToken", refreshToken).apply()
     }

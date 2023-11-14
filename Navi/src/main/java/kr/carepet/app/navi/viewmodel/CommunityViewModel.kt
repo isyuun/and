@@ -22,6 +22,7 @@ import kr.carepet.data.cmm.CmmRes
 import kr.carepet.data.cmm.CommonData
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
+import kr.carepet.data.daily.DailyDetailRes
 import kr.carepet.data.daily.Pet
 import kr.carepet.data.daily.PhotoData
 import kr.carepet.data.daily.PhotoRes
@@ -69,6 +70,11 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _storyPage.value = newValue
     }
 
+    private val _storyDetail = MutableStateFlow<DailyDetailRes?>(null)
+    val storyDetail:StateFlow<DailyDetailRes?> = _storyDetail.asStateFlow()
+    fun updateStoryDetail(newValue: DailyDetailRes?){
+        _storyDetail.value = newValue
+    }
     // ------------------------------------------------------------------
     private val _selectPetMulti = MutableStateFlow<MutableList<CurrentPetData>>(mutableListOf())
     val selectPetMulti: StateFlow<MutableList<CurrentPetData>> = _selectPetMulti.asStateFlow()
@@ -190,10 +196,47 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 override fun onFailure(call: Call<StoryRes>, t: Throwable) {
                     continuation.resume(false)
                 }
+            })
+        }
+    }
+
+    suspend fun getStoryDetail(schUnqNo: Int): Boolean {
+        val apiService = RetrofitClientServer.instance
+
+        val data = kr.carepet.data.daily.DailyDetailReq(schUnqNo = schUnqNo, cmntYn = "N")
+
+        val call = apiService.getDailyDetail(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<DailyDetailRes> {
+                override fun onResponse(
+                    call: Call<DailyDetailRes>,
+                    response: Response<DailyDetailRes>
+                ) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        body?.let {
+                            if (body.statusCode == 200) {
+                                _storyDetail.value = it
+                                continuation.resume(true)
+                            } else {
+
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<DailyDetailRes>, t: Throwable) {
+
+                    continuation.resume(false)
+                }
 
             })
         }
     }
+
     suspend fun getEventList(page:Int):Boolean{
         val apiService = RetrofitClientServer.instance
 

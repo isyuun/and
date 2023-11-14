@@ -80,6 +80,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
@@ -103,6 +104,7 @@ import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -932,8 +934,6 @@ fun StoryItem(data: RTStoryData){
         endY = sizeImage.height.toFloat()
     )
 
-    val imageUri= ""
-
     Box(
         modifier = Modifier
             .size(width = 200.dp, height = 280.dp)
@@ -941,15 +941,15 @@ fun StoryItem(data: RTStoryData){
             .onGloballyPositioned { sizeImage = it.size }
             .clickable { }
     ){
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(data.storyFile)
-                .crossfade(true)
-                .build(),
+        val painter = rememberAsyncImagePainter(
+            model = data.storyFile?:R.drawable.img_blank,
+            filterQuality = FilterQuality.Low,
+        )
+
+        Image(
+            painter = painter,
+            modifier = Modifier.fillMaxSize(),
             contentDescription = "",
-            placeholder = painterResource(id = R.drawable.img_blank),
-            error= painterResource(id = R.drawable.img_blank),
-            modifier= Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
 
@@ -1128,12 +1128,16 @@ fun BottomSheetContent(
                     .height(48.dp),
                 shape = RoundedCornerShape(100.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_white),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = design_white,
+                    disabledContainerColor = design_white
+                ),
                 border = BorderStroke(1.dp, design_btn_border),
                 onClick = {
                     onDisMiss(false)
                     navController.navigate("petProfileScreen/${index.toString()}")
-                }
+                },
+                enabled = petList[0].petInfoUnqNo!=0
             ) {
                 Text(
                     text = stringResource(R.string.manage_pet),

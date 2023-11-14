@@ -1,5 +1,6 @@
 package kr.carepet.app.navi.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,18 +40,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
 import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.ui.theme.design_grad_end
 import kr.carepet.app.navi.ui.theme.design_white
+import kr.carepet.app.navi.viewmodel.CommunityViewModel
 import kr.carepet.data.daily.Story
-import kr.carepet.util.Log
 
 @Composable
-fun StoryListItem(data: Story, navController:NavHostController){
+fun StoryListItem(data: Story, navController:NavHostController, viewModel:CommunityViewModel){
 
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
+    val scope = rememberCoroutineScope()
 
     val gradient = Brush.verticalGradient(
         colors = listOf(Color.Transparent, design_grad_end),
@@ -63,21 +68,23 @@ fun StoryListItem(data: Story, navController:NavHostController){
             .clip(shape = RoundedCornerShape(20.dp))
             .onGloballyPositioned { sizeImage = it.size }
             .clickable {
+                scope.launch {
 
-                navController.navigate(Screen.StoryDetail.route)
+                    navController.navigate(Screen.StoryDetail.route)
+                    viewModel.getStoryDetail(data.schUnqNo)
+                }
             }
     ){
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(data.storyFile)
-                .crossfade(true)
-                .build(),
+        val painter = rememberAsyncImagePainter(
+            model = data.storyFile?:R.drawable.img_blank,
+            filterQuality = FilterQuality.Low,
+        )
+
+        Image(
+            painter = painter,
+            modifier = Modifier.fillMaxSize(),
             contentDescription = "",
-            placeholder = painterResource(id = R.drawable.img_blank),
-            error= painterResource(id = R.drawable.img_blank),
-            modifier= Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            filterQuality = FilterQuality.Low
+            contentScale = ContentScale.Crop
         )
 
         Box(modifier = Modifier

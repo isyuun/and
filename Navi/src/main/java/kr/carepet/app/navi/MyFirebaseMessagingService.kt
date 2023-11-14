@@ -7,38 +7,38 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kr.carepet.singleton.MySharedPreference
 import kr.carepet.util.Log
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     // [START receive_message]
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // TODO(developer): Handle FCM messages here.
-        Log.d(TAG, "From: ${remoteMessage.from}")
 
-        remoteMessage.notification?.body?.let { sendNotification(it) }
+        Log.d(TAG, "From: ${remoteMessage.from}")
 
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
-            Log.d(TAG, "Message data payload: ${remoteMessage.data}")
-
             // Check if data needs to be processed by long running job
-            handleNow()
+            handleNow(remoteMessage)
         }
 
         // Check if message contains a notification payload.
         remoteMessage.notification?.let {
-            Log.d(TAG, "Message Notification Body: ${it.body}")
+            it.body?.let { sendNotification(remoteMessage) }
         }
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
     }
     // [END receive_message]
+
 
     private fun needsToBeScheduled() = true
 
@@ -53,8 +53,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         sendRegistrationToServer(token)
     }
-    private fun handleNow() {
-        Log.d(TAG, "Short lived task is done.")
+    private fun handleNow(remoteMessage: RemoteMessage) {
+        val page = remoteMessage.data["page"]
+        val schUnqNo = remoteMessage.data["schUnqNo"]
+        MySharedPreference.setFcmDataPage(page?:"")
+        MySharedPreference.setFcmDataSchUnqNo(schUnqNo?:"")
+        Log.d(TAG, "handleNow")
     }
 
     private fun sendRegistrationToServer(token: String?) {
@@ -63,37 +67,57 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     @SuppressLint("ServiceCast")
-    private fun sendNotification(messageBody: String) {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val requestCode = 0
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            requestCode,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE,
+    private fun sendNotification(remoteMessage: RemoteMessage) {
+
+        val deepLinkIntent = Intent(this, MainActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            data = Uri.parse("http://pettip.kr/${remoteMessage.data["schUnqNo"]}")
+        }
+
+        // Create a TaskStackBuilder to handle the back stack
+        val stackBuilder = TaskStackBuilder.create(this)
+
+        // Add the deep link intent to the stack
+        stackBuilder.addNextIntentWithParentStack(deepLinkIntent)
+
+        // Get a PendingIntent containing the entire back stack
+        val pendingIntent = stackBuilder.getPendingIntent(
+            0,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val channelId = "fcm_default_channel"
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("Pet Tip")
-            .setContentText(messageBody)
+            .setSmallIcon(R.drawable.icon_sole)
+            .setContentTitle(remoteMessage.notification?.title ?: "Pet Tip")
+            .setContentText(remoteMessage.notification?.body ?: "새로운 알림이 왔어요!")
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(pendingIntent) // Set the PendingIntent
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // Since android Oreo notification channel is needed.
+        //// Since android Oreo notification channel is needed.
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        //    val channel = NotificationChannel(
+        //        channelId,
+        //        "Channel human readable title",
+        //        NotificationManager.IMPORTANCE_DEFAULT,
+        //    )
+        //    notificationManager.createNotificationChannel(channel)
+        //}
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Channel human readable title",
-                NotificationManager.IMPORTANCE_DEFAULT,
-            )
-            notificationManager.createNotificationChannel(channel)
+            // Create the NotificationChannel.
+            val name = getString(R.string.default_notification_channel_id)
+            val descriptionText = "default channel"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val mChannel = NotificationChannel(channelId, name, importance)
+            mChannel.description = descriptionText
+            // Register the channel with the system. You can't change the importance
+            // or other notification behaviors after this.
+            notificationManager.createNotificationChannel(mChannel)
         }
 
         val notificationId = 0
