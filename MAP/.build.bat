@@ -13,4 +13,4 @@ REM start /d ".\" .build.debug.bat
 cmd /c .build.debug.bat
 REM [Å¬¸®´×ºôµå]
 REM cmd /c .build.clean.bat
-REM pause
+pause
