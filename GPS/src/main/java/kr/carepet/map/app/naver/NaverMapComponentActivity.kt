@@ -88,7 +88,7 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        Log.wtf(__CLASSNAME__, "::NaverMapApp${getMethodName()}${location?.toText()}, $location, $context, $intent")
+        Log.wtf(__CLASSNAME__, "::NaverMapApp${getMethodName()}[loading:...]${location?.toText()}, $location, $context, $intent")
         setContent()
     }
 }
