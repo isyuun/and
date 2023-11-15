@@ -39,7 +39,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -810,39 +809,48 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val horizontal = 24.dp
     val vertical = 42.dp
 
-    val top = 120.dp
+    val top = 220.dp
     val bottom = 68.dp
     val left = horizontal
     val right = horizontal
 
     val topMargin = top
     val bottomMargin = (bottom + 0.dp)
-    val leftMargin = (left - 12.dp)
-    val rightMargin = (right - 10.dp)
+    val leftMargin = (left - 9.dp)
+    val rightMargin = (right - 9.dp)
 
     val zoomControl = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
+    val compass = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
+    val locationButton = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
+
+    val lHeight = (locationButton.height / density)
+
+    Log.v(__CLASSNAME__, "::NaverMapApp::BOX${getMethodName()}[location.Height:$lHeight][top:$top][bottom:$bottom][left:$left][right:$right][width:$width][height:$height]")
+    Log.v(__CLASSNAME__, "::NaverMapApp::BOX${getMethodName()}[location.Height:$lHeight][topMargin:$topMargin][bottomMargin:$bottomMargin][leftMargin:$leftMargin][rightMargin:$rightMargin]")
+
     val rightInvert = (width - 70).dp
     zoomControl?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
         this.topMargin = (height / -3.5).dp.toPx(context).toInt()
         this.rightMargin = rightInvert.toPx(context).toInt()
-        Log.wtf(__CLASSNAME__, "::NaverMapApp::ZOOM${getMethodName()}[topMargin:${this.topMargin}][bottom:${this.bottomMargin}][left:${this.leftMargin}][right:${this.rightMargin}]")
+        Log.wtf(__CLASSNAME__, "::NaverMapApp::ZOOM${getMethodName()}[topMargin:${this.topMargin}][bottomMargin:${this.bottomMargin}][leftMargin:${this.leftMargin}][rightMargin:${this.rightMargin}]")
     }
-    val compass = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
+    val coords = intArrayOf(0, 0)
+    zoomControl.getLocationOnScreen(coords)
+    val zTop = coords[1]
+    val zBottom: Int = coords[1] + zoomControl.height
+    Log.wtf(__CLASSNAME__, "::NaverMapApp::ZOOM${getMethodName()}[coords:$coords][zTop:$zTop][bottom:$zBottom]")
     compass?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
         this.topMargin = topMargin.toPx(context).toInt()
+        //this.topMargin = zBottom
         this.leftMargin = leftMargin.toPx(context).toInt()
-        Log.wtf(__CLASSNAME__, "::NaverMapApp::COMP${getMethodName()}[topMargin:${this.topMargin}][bottom:${this.bottomMargin}][left:${this.leftMargin}][right:${this.rightMargin}]")
+        Log.wtf(__CLASSNAME__, "::NaverMapApp::COMP${getMethodName()}[topMargin:${this.topMargin}][bottomMargin:${this.bottomMargin}][leftMargin:${this.leftMargin}][rightMargin:${this.rightMargin}]")
     }
-    val locationButton = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
     //val locationHeight = ((locationButton.height / density) + 10).dp
     val locationHeight = (52 + 10).dp
     locationButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
         this.bottomMargin = bottomMargin.toPx(context).toInt()
         this.leftMargin = leftMargin.toPx(context).toInt()
     }
-
-    //Log.wtf(__CLASSNAME__, "::NaverMapApp::BOX${getMethodName()}[location.Height:${(locationButton.height / density)}][top:$top][bottom:$bottom][left:$left][right:$right][width:$width][height:$height]")
-    //Log.wtf(__CLASSNAME__, "::NaverMapApp::BOX${getMethodName()}[location.Height:${(locationButton.height / density)}][topMargin:$topMargin][bottomMargin:$bottomMargin][leftMargin:$leftMargin][rightMargin:$rightMargin]")
 
     /** LEFT/RIGHT/WALK */
     Box(
@@ -853,7 +861,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 vertical = vertical,
             )
     ) {
-        /** BOTTOM */
         /** LEFT */
         Log.w(__CLASSNAME__, "::NaverMapApp@::LEFT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
         Column(
@@ -1072,6 +1079,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         }
     }
 
+    /** BOTTOM */
     Log.i(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
     if (showBottomSheet) {
         ModalBottomSheet(
