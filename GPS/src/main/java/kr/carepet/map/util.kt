@@ -20,6 +20,7 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.util.DisplayMetrics
 import android.util.TypedValue
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -142,4 +143,16 @@ fun navigationBarHeight(): Dp {
         0.dp
     }
     return navigationBarHeight
+}
+
+fun getDeviceDensityString(context: Context): String? {
+    when (context.resources.displayMetrics.densityDpi) {
+        DisplayMetrics.DENSITY_LOW -> return "ldpi"
+        DisplayMetrics.DENSITY_MEDIUM -> return "mdpi"
+        DisplayMetrics.DENSITY_TV, DisplayMetrics.DENSITY_HIGH -> return "hdpi"
+        DisplayMetrics.DENSITY_260, DisplayMetrics.DENSITY_280, DisplayMetrics.DENSITY_300, DisplayMetrics.DENSITY_XHIGH -> return "xhdpi"
+        DisplayMetrics.DENSITY_340, DisplayMetrics.DENSITY_360, DisplayMetrics.DENSITY_400, DisplayMetrics.DENSITY_420, DisplayMetrics.DENSITY_440, DisplayMetrics.DENSITY_XXHIGH -> return "xxhdpi"
+        DisplayMetrics.DENSITY_560, DisplayMetrics.DENSITY_XXXHIGH -> return "xxxhdpi"
+    }
+    return ""
 }
