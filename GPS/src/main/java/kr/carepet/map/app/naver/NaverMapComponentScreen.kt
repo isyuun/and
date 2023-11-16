@@ -81,6 +81,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -123,6 +125,7 @@ import kr.carepet.gpx.GPX_LATITUDE_ZERO
 import kr.carepet.gpx.GPX_LONGITUDE_ZERO
 import kr.carepet.gpx.Track
 import kr.carepet.map.app.LoadingDialog
+import kr.carepet.map.getDeviceDensityString
 import kr.carepet.map.getRounded
 import kr.carepet.map.navigationBarHeight
 import kr.carepet.map.toPx
@@ -217,15 +220,15 @@ fun marker(context: Context, position: LatLng?, captionText: String = ""): Marke
     if (position != null) {
         marker.position = position
     }
-    marker.width = (24 * 1.2f).dp.toPx(context).toInt()
-    marker.height = (32 * 1.2f).dp.toPx(context).toInt()
+    marker.width = (24 * 1.5f).dp.toPx(context).toInt()
+    marker.height = (32 * 1.5f).dp.toPx(context).toInt()
     //marker.icon = MarkerIcons.BLUE
     marker.icon = OverlayImage.fromResource(R.drawable.marker_start)
     marker.captionText = captionText
     marker.captionColor = Color.White.toArgb()
     marker.captionHaloColor = Color.Gray.toArgb()
     marker.captionTextSize = (3.8 * 0.85f).sp.toPx(context)
-    marker.captionOffset = (-32 * 0.9f).dp.toPx(context).toInt()
+    marker.captionOffset = (-32 * 1.2f).dp.toPx(context).toInt()
     marker.zIndex = 3
     return marker
 }
@@ -510,14 +513,16 @@ fun WalkInfoSheet() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WalkInfoNavi(start: Boolean) {
-    Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
+fun WalkInfoNavi(onPositioned: (LayoutCoordinates) -> Unit) {
     val application = GPSApplication.instance
-    var pet by remember { mutableStateOf(CurrentPetData("", "", "", "", "", "", 0.0f, 0)) }
+    val start = application.start
+    Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
+    var pet by remember { mutableStateOf(CurrentPetData("", "", "", "", "", "", 0.0f)) }
     if (application.pets.isNotEmpty()) pet = application.pets[0]
     var count by remember { mutableIntStateOf(0) }
     var duration by remember { mutableStateOf("00:00:00") }
     var distance by remember { mutableStateOf("0.00 km") }
+    /** 1초마다 업데이트*/
     if (start) {
         LaunchedEffect(Unit) {
             while (true) {
@@ -528,6 +533,7 @@ fun WalkInfoNavi(start: Boolean) {
             }
         }
     }
+
     R.string.walk_title_tip
     AnimatedVisibility(
         visible = !start,
@@ -536,7 +542,6 @@ fun WalkInfoNavi(start: Boolean) {
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
@@ -547,8 +552,13 @@ fun WalkInfoNavi(start: Boolean) {
                     shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
                 )
                 .padding(horizontal = 24.dp)
-                .padding(vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(vertical = 26.dp)
+                .fillMaxWidth()
+                .onGloballyPositioned { onPositioned(it) },
+            verticalArrangement = Arrangement.spacedBy(
+                space = 8.dp,
+                alignment = Alignment.CenterVertically,
+            ),
             horizontalAlignment = Alignment.Start,
         ) {
             Row(
@@ -593,7 +603,6 @@ fun WalkInfoNavi(start: Boolean) {
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
@@ -604,8 +613,13 @@ fun WalkInfoNavi(start: Boolean) {
                     shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
                 )
                 .padding(horizontal = 24.dp)
-                .padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(0.dp),
+                .padding(vertical = 16.dp)
+                .fillMaxWidth()
+                .onGloballyPositioned { onPositioned(it) },
+            horizontalArrangement = Arrangement.spacedBy(
+                space = 0.dp,
+                alignment = Alignment.CenterHorizontally
+            ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
@@ -614,7 +628,10 @@ fun WalkInfoNavi(start: Boolean) {
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .padding(vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                //verticalArrangement = Arrangement.spacedBy(
+                //    space = 10.dp,
+                //    //alignment = Alignment.CenterVertically,
+                //),
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
@@ -670,15 +687,16 @@ fun WalkInfoNavi(start: Boolean) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NaverMapApp(source: FusedLocationSource) {
-    Log.v(__CLASSNAME__, "${getMethodName()}[ST]")
+    var loading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val application = GPSApplication.instance
     val tracks = application.tracks
     val start = application.start
+    Log.v(__CLASSNAME__, "${getMethodName()}[ST][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
 
     if (G.mapPetInfo.isEmpty()) {   //test
-        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", 0.0f, 0)
-        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", 0.0f, 0)
+        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", 0.0f)
+        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", 0.0f)
         application.add(pet1)
         application.add(pet1)
         application.add(pet2)
@@ -715,9 +733,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
     val mapView = rememberMapViewWithLifecycle(context, mapOptions)
 
-
-    var loading by remember { mutableStateOf(false) }
-    Log.v(__CLASSNAME__, "::NaverMapApp@${getMethodName()}[${tracks?.size}][loading:$loading][${(tracks?.isNotEmpty())}]")
     val scope = rememberCoroutineScope()
     var refresh by remember { mutableStateOf(false) }
     Log.w(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
@@ -725,9 +740,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         scope.launch {
             mapView.getMapAsync { naverMap ->
                 Log.v(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                if (tracks?.isNotEmpty() == true) loading = false
-                //loading = tracks?.isNotEmpty() != true
-                Log.wtf(__CLASSNAME__, "::NaverMapApp@${getMethodName()}[${tracks?.size}][loading:$loading][${(tracks?.isNotEmpty())}]")
                 if (start) {
                     tracks?.let { naverMapPath(context = context, naverMap = naverMap, tracks = it, finished = false) }
                 }
@@ -793,62 +805,74 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
 
     /** top */
-    WalkInfoNavi(application.start)
+    val lc = remember { mutableStateOf<LayoutCoordinates?>(null) }
+    WalkInfoNavi { lc.value = it }
 
-    val density = LocalDensity.current.density
+    val d = LocalDensity.current.density
+    val p = context.resources.displayMetrics.densityDpi
+    val i = getDeviceDensityString(context)
+
     val metrics = context.resources.displayMetrics
-    val width = metrics.widthPixels / density
-    val height = metrics.heightPixels / density
 
-    val horizontal = 24.dp
-    val vertical = 42.dp
+    val width = (metrics.widthPixels / d).dp
+    val height = (metrics.heightPixels / d).dp
 
-    val top = 120.dp
-    val bottom = 68.dp
-    val left = horizontal
-    val right = horizontal
+    val h = 24.dp
+    val v = 42.dp
 
-    val topMargin = top
-    val bottomMargin = (bottom + 0.dp)
-    val leftMargin = (left - 12.dp)
-    val rightMargin = (right - 10.dp)
+    val l = (h - 9.dp)
+    val t = 220.dp
+    val r = (h - 9.dp)
+    val b = 68.dp
 
-    val compass = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
-    compass?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-        this.topMargin = topMargin.toPx(context).toInt()
-        this.leftMargin = leftMargin.toPx(context).toInt()
-    }
-    val zoomControl = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
-    val rightInvert = (width - 70).dp
-    zoomControl?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+    Log.v(__CLASSNAME__, "::NaverMapApp.BOXX${getMethodName()}[density:$d-$p.dpi-$i][width:$width(${metrics.widthPixels}.px)][height:$height(${metrics.heightPixels}.px)][l:$l][t:$t][r:$r][b$b]")
+    val zc = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
+    Log.v(__CLASSNAME__, "::NaverMapApp.ZOOM${getMethodName()}[zc.width:${zc.width}][zc.height:${zc.height}][l:${zc.left}][t:${zc.top}][r:${zc.right}][b:${zc.bottom}]")
+    val cc = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
+    Log.v(__CLASSNAME__, "::NaverMapApp.COMP${getMethodName()}[cc.width:${cc.width}][cc.height:${cc.height}][t:${cc.top}][b:${cc.bottom}][l:${cc.left}][r:${cc.right}]")
+    val lb = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
+    Log.v(__CLASSNAME__, "::NaverMapApp.LOCA${getMethodName()}[lb.width:${lb.width}][lb.height:${lb.height}][t:${lb.top}][b:${lb.bottom}][l:${lb.left}][r:${lb.right}]")
+
+    val rightInvert = (width - 70.dp)
+    zc?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        this.topMargin = (height / (-4.0).dp).dp.toPx(context).toInt()
+        //this.topMargin = 0;       //test
         this.rightMargin = rightInvert.toPx(context).toInt()
+        Log.wtf(__CLASSNAME__, "::NaverMapApp.ZOOM${getMethodName()}[topMargin:${this.topMargin}][bottomMargin:${this.bottomMargin}][leftMargin:${this.leftMargin}][rightMargin:${this.rightMargin}]")
     }
-    val locationButton = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
+    val coords = intArrayOf(0, 0)
+    zc.getLocationOnScreen(coords)
+    val zTop = coords[1]
+    val zBottom: Int = coords[1] + zc.height
+    Log.wtf(__CLASSNAME__, "::NaverMapApp.ZOOM${getMethodName()}[coords:${coords.size}][zTop:$zTop][zBottom:$zBottom]")
+    cc?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        this.topMargin = t.toPx(context).toInt()
+        //this.topMargin = zBottom
+        this.leftMargin = l.toPx(context).toInt()
+        Log.wtf(__CLASSNAME__, "::NaverMapApp.COMP${getMethodName()}[topMargin:${this.topMargin}][bottomMargin:${this.bottomMargin}][leftMargin:${this.leftMargin}][rightMargin:${this.rightMargin}]")
+    }
     //val locationHeight = ((locationButton.height / density) + 10).dp
     val locationHeight = (52 + 10).dp
-    locationButton?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-        this.bottomMargin = bottomMargin.toPx(context).toInt()
-        this.leftMargin = leftMargin.toPx(context).toInt()
+    lb?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        this.bottomMargin = b.toPx(context).toInt()
+        this.leftMargin = l.toPx(context).toInt()
+        Log.wtf(__CLASSNAME__, "::NaverMapApp.LOCA${getMethodName()}[topMargin:${this.topMargin}][bottomMargin:${this.bottomMargin}][leftMargin:${this.leftMargin}][rightMargin:${this.rightMargin}]")
     }
-
-    Log.wtf(__CLASSNAME__, "::NaverMapApp::BOX${getMethodName()}[location.Height:${(locationButton.height / density)}][top:$top][bottom:$bottom][left:$left][right:$right][width:$width][height:$height]")
-    Log.wtf(__CLASSNAME__, "::NaverMapApp::BOX${getMethodName()}[location.Height:${(locationButton.height / density)}][topMargin:$topMargin][bottomMargin:$bottomMargin][leftMargin:$leftMargin][rightMargin:$rightMargin]")
 
     /** LEFT/RIGHT/WALK */
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                horizontal = horizontal,
-                vertical = vertical,
+                horizontal = h,
+                vertical = v,
             )
     ) {
-        /** BOTTOM */
         /** LEFT */
         Log.w(__CLASSNAME__, "::NaverMapApp@::LEFT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
         Column(
             modifier = Modifier
-                .padding(bottom = bottom + locationHeight)
+                .padding(bottom = b + locationHeight)
                 .align(Alignment.BottomStart),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -900,7 +924,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         Log.w(__CLASSNAME__, "::NaverMapApp@::RIGHT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
         Column(
             modifier = Modifier
-                .padding(bottom = bottom)
+                .padding(bottom = b)
                 .align(Alignment.BottomEnd),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -1014,8 +1038,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             Column(
                 modifier = Modifier
                     .padding(
-                        horizontal = horizontal,
-                        vertical = vertical + bottom,
+                        horizontal = h,
+                        vertical = v + b,
                     )
                     .align(Alignment.BottomEnd),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -1062,6 +1086,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         }
     }
 
+    /** BOTTOM */
     Log.i(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -1082,12 +1107,12 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(
-                        horizontal = horizontal,
+                        horizontal = h,
                         //vertical = vertical,
                     )
                     .padding(
                         top = 24.dp,
-                        bottom = vertical,
+                        bottom = v,
                     )
                     .padding(bottom = navigationBarHeight())
             ) {
@@ -1260,10 +1285,13 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         }
     }
 
+    Log.i(__CLASSNAME__, "::NaverMapApp@${getMethodName()}[start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
+    if (tracks?.isNotEmpty() == true) loading = false
+    Log.w(__CLASSNAME__, "::NaverMapApp@${getMethodName()}[start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
     LoadingDialog(
         loadingText = stringResource(id = R.string.walk_text_in_tracking),
         loadingState = loading
     )
 
-    Log.v(__CLASSNAME__, "${getMethodName()}[ED]")
+    Log.v(__CLASSNAME__, "${getMethodName()}[ED][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
 }
