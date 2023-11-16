@@ -53,6 +53,10 @@ class TokenInterceptor() : Interceptor {
             }
         }
 
+        if (response.code == 403){
+            G.dupleLogin = true
+        }
+
         return response
     }
 

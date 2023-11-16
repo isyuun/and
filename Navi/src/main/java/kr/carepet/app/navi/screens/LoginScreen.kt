@@ -179,6 +179,10 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
         }
     }
 
+    LaunchedEffect(Unit){
+        viewModel.updateAppKey()
+    }
+
     Scaffold (
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ){ paddingValues ->
@@ -284,6 +288,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                     Log.d("NAV","nav진입")
                                     popUpTo(0)
                                 }
+
                             }else{
                                 isLoading = false
                                 focusManager.clearFocus()
@@ -362,11 +367,9 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                 Button(onClick = {
                     scope.launch {
                         val kakaoLoginResult = viewModel.kakaoLogin(context)
-                        // naver Login 성공
                         if (kakaoLoginResult){
 
                             val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "KAKAO")
-                            // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
                             if (loginResult){
                                 sharedViewModel.updateInit(true)
                                 navController.navigate(Screen.MainScreen.route){
@@ -402,7 +405,6 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                 Button(onClick = {
                     scope.launch {
                         val naverLoginResult = viewModel.naverLogin(context)
-                        // naver Login 성공
                         if (naverLoginResult){
 
                             val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "NAVER")

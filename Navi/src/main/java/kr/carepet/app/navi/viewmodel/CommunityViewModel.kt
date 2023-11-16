@@ -20,6 +20,12 @@ import kr.carepet.data.bbs.EventListRes
 import kr.carepet.data.cmm.CdDetail
 import kr.carepet.data.cmm.CmmRes
 import kr.carepet.data.cmm.CommonData
+import kr.carepet.data.cmm.commonRes
+import kr.carepet.data.daily.Cmnt
+import kr.carepet.data.daily.CmntCreateReq
+import kr.carepet.data.daily.CmntCreateRes
+import kr.carepet.data.daily.CmntDeleteReq
+import kr.carepet.data.daily.CmntUpdateReq
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
 import kr.carepet.data.daily.DailyDetailRes
@@ -46,6 +52,8 @@ import kotlin.coroutines.resume
 
 @GlideModule
 class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(){
+
+    val selectedPet = sharedViewModel.selectPet
 
     private val _storyRes = MutableStateFlow<StoryRes?>(null)
     val storyRes: StateFlow<StoryRes?> = _storyRes.asStateFlow()
@@ -75,6 +83,25 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     fun updateStoryDetail(newValue: DailyDetailRes?){
         _storyDetail.value = newValue
     }
+
+    private val _cmntList = MutableStateFlow<List<Cmnt>?>(null)
+    val cmntList:StateFlow<List<Cmnt>?> = _cmntList.asStateFlow()
+    fun updateCmntList(newValue: List<Cmnt>?){
+        _cmntList.value = newValue
+    }
+
+    private val _commentRes = MutableStateFlow<CmntCreateRes?>(null)
+    val commentRes:StateFlow<CmntCreateRes?> = _commentRes.asStateFlow()
+
+    private val _storyLoading = MutableStateFlow<Boolean>(false)
+    val storyLoading:StateFlow<Boolean> = _storyLoading.asStateFlow()
+
+    private val _replyCmnt = MutableStateFlow<Cmnt?>(null)
+    val replyCmnt:StateFlow<Cmnt?> = _replyCmnt.asStateFlow()
+    fun updateReplyCmnt(newValue: Cmnt?){
+        _replyCmnt.value = newValue
+    }
+
     // ------------------------------------------------------------------
     private val _selectPetMulti = MutableStateFlow<MutableList<CurrentPetData>>(mutableListOf())
     val selectPetMulti: StateFlow<MutableList<CurrentPetData>> = _selectPetMulti.asStateFlow()
@@ -151,6 +178,10 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     val comment: StateFlow<String> = _comment.asStateFlow()
     fun updateComment(newValue: String) { _comment.value = newValue }
 
+    private val _updateComment = MutableStateFlow<String>("")
+    val updateComment: StateFlow<String> = _updateComment.asStateFlow()
+    fun updateUpdateComment(newValue: String) { _updateComment.value = newValue }
+
     private val _eventList = MutableStateFlow<EventListRes?>(null)
     val eventList: StateFlow<EventListRes?> = _eventList.asStateFlow()
 
@@ -203,8 +234,9 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun getStoryDetail(schUnqNo: Int): Boolean {
         val apiService = RetrofitClientServer.instance
 
-        val data = kr.carepet.data.daily.DailyDetailReq(schUnqNo = schUnqNo, cmntYn = "N")
+        val data = kr.carepet.data.daily.DailyDetailReq(schUnqNo = schUnqNo, cmntYn = "Y")
 
+        _storyLoading.value = true
         val call = apiService.getDailyDetail(data)
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<DailyDetailRes> {
@@ -217,13 +249,18 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                         body?.let {
                             if (body.statusCode == 200) {
                                 _storyDetail.value = it
+                                _cmntList.value = body.data.cmntList
+                                _storyLoading.value = false
                                 continuation.resume(true)
                             } else {
 
+                                _storyLoading.value = false
                                 continuation.resume(false)
                             }
                         }
                     }else{
+
+                        _storyLoading.value = false
                         continuation.resume(false)
                     }
                 }
@@ -382,6 +419,141 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
                 override fun onFailure(call: Call<DailyCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun uploadComment():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = CmntCreateReq(
+            schUnqNo = _storyDetail.value?.data?.schUnqNo ?: 0,
+            cmntCn = _comment.value,
+            petRelUnqNo = selectedPet.value?.petRelUnqNo?:0,
+            upCmntNo = 0
+        )
+
+        val call = apiService.cmntCreate(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<CmntCreateRes>{
+                override fun onResponse(call: Call<CmntCreateRes>, response: Response<CmntCreateRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _cmntList.value = it.data
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<CmntCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun uploadComment(cmntCn: String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = CmntCreateReq(
+            schUnqNo = _storyDetail.value?.data?.schUnqNo ?: 0,
+            cmntCn = cmntCn,
+            petRelUnqNo = selectedPet.value?.petRelUnqNo?:0,
+            upCmntNo = _replyCmnt.value?.cmntNo ?: 0
+        )
+
+        val call = apiService.cmntCreate(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<CmntCreateRes>{
+                override fun onResponse(call: Call<CmntCreateRes>, response: Response<CmntCreateRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _cmntList.value = it.data
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<CmntCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun deleteComment(cmntNo: Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = CmntDeleteReq(cmntNo)
+
+        val call = apiService.cmntDelete(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<CmntCreateRes>{
+                override fun onResponse(call: Call<CmntCreateRes>, response: Response<CmntCreateRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let { it ->
+                            if (it.statusCode == 200){
+                                _cmntList.value = it.data
+                                continuation.resume(true)
+                            }else{
+
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<CmntCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun updateComment(cmntCn:String, cmntNo:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = CmntUpdateReq(
+            cmntCn = cmntCn,
+            cmntNo = cmntNo
+        )
+
+        val call = apiService.cmntUpdate(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<CmntCreateRes>{
+                override fun onResponse(call: Call<CmntCreateRes>, response: Response<CmntCreateRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let { it ->
+                            if (it.statusCode == 200){
+                                _cmntList.value = it.data
+                                continuation.resume(true)
+                            }else{
+
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<CmntCreateRes>, t: Throwable) {
                     continuation.resume(false)
                 }
 

@@ -513,7 +513,7 @@ fun WalkInfoSheet() {
 fun WalkInfoNavi(start: Boolean) {
     Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
     val application = GPSApplication.instance
-    var pet by remember { mutableStateOf(CurrentPetData("", "", "", "", "", "", 0.0f)) }
+    var pet by remember { mutableStateOf(CurrentPetData("", "", "", "", "", "", 0.0f, 0)) }
     if (application.pets.isNotEmpty()) pet = application.pets[0]
     var count by remember { mutableIntStateOf(0) }
     var duration by remember { mutableStateOf("00:00:00") }
@@ -677,8 +677,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val start = application.start
 
     if (G.mapPetInfo.isEmpty()) {   //test
-        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", 0.0f)
-        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", 0.0f)
+        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", 0.0f, 0)
+        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", 0.0f, 0)
         application.add(pet1)
         application.add(pet1)
         application.add(pet2)

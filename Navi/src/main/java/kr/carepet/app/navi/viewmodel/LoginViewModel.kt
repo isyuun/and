@@ -2,6 +2,7 @@ package kr.carepet.app.navi.viewmodel
 
 import android.content.ContentValues
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
@@ -20,7 +21,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kr.carepet.data.cmm.commonRes
 import kr.carepet.data.user.LoginResModel
+import kr.carepet.data.user.TrmnlMngReq
 import kr.carepet.singleton.G
 import kr.carepet.singleton.MySharedPreference
 import kr.carepet.singleton.RetrofitClientServer
@@ -87,7 +90,44 @@ class LoginViewModel() : ViewModel() {
     val marketingCheck: StateFlow<Boolean> = _marketingCheck.asStateFlow()
     fun updateMarketingCheck(newValue: Boolean) { _marketingCheck.value = newValue }
 
+    private val _appKey = MutableStateFlow<String>("")
+    fun updateAppKey() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
 
+                return@OnCompleteListener
+            }
+            _appKey.value = task.result
+        })
+    }
+
+    private val _registedAppKey = MutableStateFlow<String>("")
+
+
+    private fun trmnlMng(){
+        if ( _appKey.value != _registedAppKey.value || _registedAppKey.value == ""  ){
+            val apiService = RetrofitClientServer.instance
+
+            val data = TrmnlMngReq(
+                appKey = _appKey.value,
+                appOs = "001",
+                appTypNm = Build.MODEL.toString()
+            )
+
+            val call = apiService.trmnlMng(data)
+            call.enqueue(object :Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    Log.d("TRM","등록성공")
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    Log.d("TRM","등록실패")
+                }
+
+            })
+        }
+
+    }
 
     // 이메일 로그인
     suspend fun onLoginButtonClick(userId: String, userPw: String, loginMethod: String): Boolean {
@@ -95,7 +135,9 @@ class LoginViewModel() : ViewModel() {
             // 서버로 전송
             val apiService = RetrofitClientServer.instance
 
-            val loginData = kr.carepet.data.user.LoginData(userId, userPw)
+            val appTypNm = Build.MODEL.toString()
+
+            val loginData = kr.carepet.data.user.LoginData(appTypNm, userId, userPw)
 
             val call = apiService.sendLoginToServer(loginData)
             return suspendCancellableCoroutine { continuation ->
@@ -111,6 +153,8 @@ class LoginViewModel() : ViewModel() {
                                 if (it.statusCode == 200) { // status code 200 검증
                                     // 200이면 login 처리, access/refresh token G 및 shared 에 저장
 
+                                    _registedAppKey.value = it.data.appKeyVl ?: ""
+                                    trmnlMng()
                                     G.accessToken = it.data.accessToken
                                     G.refreshToken = it.data.refreshToken
                                     G.userId = it.data.userId

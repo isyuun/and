@@ -28,5 +28,7 @@ data class CurrentPetData(
     @SerializedName("sexTypNm")
     var sexTypNm: String?, // 남아
     @SerializedName("wghtVl")
-    var wghtVl: Float // 5.2
+    var wghtVl: Float, // 5.2
+    @SerializedName("petRelUnqNo")
+    var petRelUnqNo: Int // 펫 관계번호
 )

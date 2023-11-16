@@ -276,7 +276,8 @@ class SharedViewModel:ViewModel(){
         petKindNm = "",
         petRprsImgAddr = "",
         sexTypNm = "모름",
-        wghtVl =0.0f
+        wghtVl =0.0f,
+        petRelUnqNo = 0
     )
 
     val emptyPet = PetDetailData(

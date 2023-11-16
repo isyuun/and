@@ -3,6 +3,7 @@ package kr.carepet.app.navi.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -55,6 +58,7 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
 
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
     val scope = rememberCoroutineScope()
+    var lastClickTime by remember { mutableStateOf(System.currentTimeMillis()) }
 
     val gradient = Brush.verticalGradient(
         colors = listOf(Color.Transparent, design_grad_end),
@@ -67,12 +71,20 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
             .size(width = 200.dp, height = 280.dp)
             .clip(shape = RoundedCornerShape(20.dp))
             .onGloballyPositioned { sizeImage = it.size }
-            .clickable {
-                scope.launch {
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(bounded = false)
+            ) {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastClickTime >= 500) {
+                    lastClickTime = currentTime
+                    scope.launch {
 
-                    navController.navigate(Screen.StoryDetail.route)
-                    viewModel.getStoryDetail(data.schUnqNo)
+                        navController.navigate(Screen.StoryDetail.route)
+                        viewModel.getStoryDetail(data.schUnqNo)
+                    }
                 }
+
             }
     ){
         val painter = rememberAsyncImagePainter(
