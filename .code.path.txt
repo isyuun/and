@@ -1,0 +1,3 @@
+%PROGRAMFILES%\Android\Android Studio\jbr\bin
+%LOCALAPPDATA%\Android\Sdk\platform-tools
+%USERPROFILE%\.flutter\bin

@@ -17,8 +17,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.MediaStore
+import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.RelativeLayout
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -280,9 +282,7 @@ fun rememberMapViewWithLifecycle(
     context: Context,
     mapOptions: NaverMapOptions = NaverMapOptions()
 ): MapView {
-    val mapView = remember {
-        MapView(context, mapOptions)
-    }
+    val mapView = remember { MapView(context, mapOptions) }
 
     val lifecycleObserver = rememberUpdatedState(mapView)
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -513,7 +513,9 @@ fun WalkInfoSheet() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WalkInfoNavi(onPositioned: (LayoutCoordinates) -> Unit) {
+fun WalkInfoNavi(
+    onPositioned: (LayoutCoordinates) -> Unit
+) {
     val application = GPSApplication.instance
     val start = application.start
     Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
@@ -534,152 +536,160 @@ fun WalkInfoNavi(onPositioned: (LayoutCoordinates) -> Unit) {
         }
     }
 
-    R.string.walk_title_tip
-    AnimatedVisibility(
-        visible = !start,
-        enter = expandVertically(),
-        exit = shrinkVertically(),
-    ) {
-        Column(
-            modifier = Modifier
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                )
-                .border(
-                    width = 0.1.dp,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                )
-                .padding(horizontal = 24.dp)
-                .padding(vertical = 26.dp)
-                .fillMaxWidth()
-                .onGloballyPositioned { onPositioned(it) },
-            verticalArrangement = Arrangement.spacedBy(
-                space = 8.dp,
-                alignment = Alignment.CenterVertically,
-            ),
-            horizontalAlignment = Alignment.Start,
+    Box(modifier = Modifier
+        //.fillMaxWidth()
+        .onGloballyPositioned {
+            try {
+                onPositioned(it)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }) {
+        R.string.walk_title_tip
+        AnimatedVisibility(
+            visible = !start,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
         ) {
-            Row(
+            Column(
                 modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                    )
+                    .border(
+                        width = 0.1.dp,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                    )
+                    .padding(horizontal = 24.dp)
+                    .padding(vertical = 26.dp)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
+                verticalArrangement = Arrangement.spacedBy(
+                    space = 8.dp,
+                    alignment = Alignment.CenterVertically,
+                ),
+                horizontalAlignment = Alignment.Start,
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_bulb),
-                    contentDescription = "",
-                    tint = Color.Unspecified,
-                )
-                Text(
-                    text = stringResource(id = R.string.walk_title_tip),
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.6).sp,
+                Row(
                     modifier = Modifier
-                        .padding(start = 4.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_bulb),
+                        contentDescription = "",
+                        tint = Color.Unspecified,
+                    )
+                    Text(
+                        text = stringResource(id = R.string.walk_title_tip),
+                        fontSize = 12.sp,
+                        letterSpacing = (-0.6).sp,
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .basicMarquee(),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 1,
+                    )
+                }
+                Text(
+                    modifier = Modifier
+                        .padding(start = 24.dp)
                         .basicMarquee(),
+                    text = stringResource(id = R.string.walk_title_tips),
+                    fontSize = 14.sp,
+                    letterSpacing = (-0.7).sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                 )
             }
-            Text(
-                modifier = Modifier
-                    .padding(start = 24.dp)
-                    .basicMarquee(),
-                text = stringResource(id = R.string.walk_title_tips),
-                fontSize = 14.sp,
-                letterSpacing = (-0.7).sp,
-                color = MaterialTheme.colorScheme.onBackground,
-                maxLines = 1,
-            )
         }
-    }
-    R.string.walk_title_walking
-    AnimatedVisibility(
-        visible = start,
-        enter = expandVertically(),
-        exit = shrinkVertically(),
-    ) {
-        Row(
-            modifier = Modifier
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                )
-                .border(
-                    width = 0.1.dp,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                )
-                .padding(horizontal = 24.dp)
-                .padding(vertical = 16.dp)
-                .fillMaxWidth()
-                .onGloballyPositioned { onPositioned(it) },
-            horizontalArrangement = Arrangement.spacedBy(
-                space = 0.dp,
-                alignment = Alignment.CenterHorizontally
-            ),
-            verticalAlignment = Alignment.CenterVertically,
+        R.string.walk_title_walking
+        AnimatedVisibility(
+            visible = start,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
         ) {
-            CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
-            val text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_walking)
-            Column(
+            Row(
                 modifier = Modifier
-                    .padding(horizontal = 12.dp)
-                    .padding(vertical = 8.dp),
-                //verticalArrangement = Arrangement.spacedBy(
-                //    space = 10.dp,
-                //    //alignment = Alignment.CenterVertically,
-                //),
-                horizontalAlignment = Alignment.Start,
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                    )
+                    .border(
+                        width = 0.1.dp,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                    )
+                    .padding(horizontal = 24.dp)
+                    .padding(vertical = 16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(
+                    space = 0.dp,
+                    alignment = Alignment.CenterHorizontally
+                ),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = text,
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.6).sp,
-                    fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
+                val text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_walking)
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .padding(vertical = 8.dp),
+                    //verticalArrangement = Arrangement.spacedBy(
+                    //    space = 10.dp,
+                    //    //alignment = Alignment.CenterVertically,
+                    //),
+                    horizontalAlignment = Alignment.Start,
                 ) {
                     Text(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        text = duration,
-                        fontSize = 22.sp,
-                        letterSpacing = (-0.0).sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Start,
-                        //style = TextStyle(background = Color.Yellow),
+                        text = text,
+                        fontSize = 12.sp,
+                        letterSpacing = (-0.6).sp,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.onBackground,
                     )
-                    Text(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        text = distance,
-                        fontSize = 22.sp,
-                        letterSpacing = (-0.0).sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Start,
-                        //style = TextStyle(background = Color.Yellow),
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .weight(1.0f),
+                            text = duration,
+                            fontSize = 22.sp,
+                            letterSpacing = (-0.0).sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Start,
+                            //style = TextStyle(background = Color.Yellow),
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                        Text(
+                            modifier = Modifier
+                                .weight(1.0f),
+                            text = distance,
+                            fontSize = 22.sp,
+                            letterSpacing = (-0.0).sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Start,
+                            //style = TextStyle(background = Color.Yellow),
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                    }
                 }
+                //Text(
+                //    text = "반려동물 변경",
+                //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                //    fontSize = 14.sp,
+                //    letterSpacing = (-0.6).sp,
+                //    textDecoration = TextDecoration.Underline,
+                //    color = design_skip,
+                //    modifier = Modifier.clickable {
+                //        viewModel.updateSheetChange("change")
+                //        scope.launch { bottomSheetState.show() }
+                //    }
+                //)
             }
-            //Text(
-            //    text = "반려동물 변경",
-            //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-            //    fontSize = 14.sp,
-            //    letterSpacing = (-0.6).sp,
-            //    textDecoration = TextDecoration.Underline,
-            //    color = design_skip,
-            //    modifier = Modifier.clickable {
-            //        viewModel.updateSheetChange("change")
-            //        scope.launch { bottomSheetState.show() }
-            //    }
-            //)
         }
     }
 }
@@ -706,7 +716,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     if (pets.size == 1) application.add(pets[0])
     Log.i(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
 
-    val markers by remember { mutableStateOf(mutableListOf<Marker>()) }
+    val markers = mutableListOf<Marker>()
     if (start) {
         markers.clear()
         tracks?.forEach { track ->
@@ -804,59 +814,55 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         )
     }
 
-    /** top */
-    val lc = remember { mutableStateOf<LayoutCoordinates?>(null) }
-    WalkInfoNavi { lc.value = it }
-
     val d = LocalDensity.current.density
     val p = context.resources.displayMetrics.densityDpi
     val i = getDeviceDensityString(context)
 
-    val metrics = context.resources.displayMetrics
+    val m = context.resources.displayMetrics
 
-    val width = (metrics.widthPixels / d).dp
-    val height = (metrics.heightPixels / d).dp
+    val width = (m.widthPixels / d).dp
+    val height = (m.heightPixels / d).dp
 
-    val h = 24.dp
-    val v = 42.dp
+    val s = 16.dp
 
-    val l = (h - 9.dp)
-    val t = 220.dp
-    val r = (h - 9.dp)
+    val horizontal = 24.dp
+    val vertical = 42.dp
+
+    val l = (horizontal - 13.dp)
+    var t: Dp
+    val r = (horizontal - 13.dp)
     val b = 68.dp
 
-    Log.v(__CLASSNAME__, "::NaverMapApp.BOXX${getMethodName()}[density:$d-$p.dpi-$i][width:$width(${metrics.widthPixels}.px)][height:$height(${metrics.heightPixels}.px)][l:$l][t:$t][r:$r][b$b]")
-    val zc = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
-    Log.v(__CLASSNAME__, "::NaverMapApp.ZOOM${getMethodName()}[zc.width:${zc.width}][zc.height:${zc.height}][l:${zc.left}][t:${zc.top}][r:${zc.right}][b:${zc.bottom}]")
-    val cc = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
-    Log.v(__CLASSNAME__, "::NaverMapApp.COMP${getMethodName()}[cc.width:${cc.width}][cc.height:${cc.height}][t:${cc.top}][b:${cc.bottom}][l:${cc.left}][r:${cc.right}]")
-    val lb = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
-    Log.v(__CLASSNAME__, "::NaverMapApp.LOCA${getMethodName()}[lb.width:${lb.width}][lb.height:${lb.height}][t:${lb.top}][b:${lb.bottom}][l:${lb.left}][r:${lb.right}]")
 
-    val rightInvert = (width - 70.dp)
-    zc?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-        this.topMargin = (height / (-4.0).dp).dp.toPx(context).toInt()
-        //this.topMargin = 0;       //test
-        this.rightMargin = rightInvert.toPx(context).toInt()
-        Log.wtf(__CLASSNAME__, "::NaverMapApp.ZOOM${getMethodName()}[topMargin:${this.topMargin}][bottomMargin:${this.bottomMargin}][leftMargin:${this.leftMargin}][rightMargin:${this.rightMargin}]")
-    }
-    val coords = intArrayOf(0, 0)
-    zc.getLocationOnScreen(coords)
-    val zTop = coords[1]
-    val zBottom: Int = coords[1] + zc.height
-    Log.wtf(__CLASSNAME__, "::NaverMapApp.ZOOM${getMethodName()}[coords:${coords.size}][zTop:$zTop][zBottom:$zBottom]")
-    cc?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-        this.topMargin = t.toPx(context).toInt()
-        //this.topMargin = zBottom
-        this.leftMargin = l.toPx(context).toInt()
-        Log.wtf(__CLASSNAME__, "::NaverMapApp.COMP${getMethodName()}[topMargin:${this.topMargin}][bottomMargin:${this.bottomMargin}][leftMargin:${this.leftMargin}][rightMargin:${this.rightMargin}]")
-    }
-    //val locationHeight = ((locationButton.height / density) + 10).dp
-    val locationHeight = (52 + 10).dp
-    lb?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-        this.bottomMargin = b.toPx(context).toInt()
-        this.leftMargin = l.toPx(context).toInt()
-        Log.wtf(__CLASSNAME__, "::NaverMapApp.LOCA${getMethodName()}[topMargin:${this.topMargin}][bottomMargin:${this.bottomMargin}][leftMargin:${this.leftMargin}][rightMargin:${this.rightMargin}]")
+    /** top */
+    val zc = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
+    val co = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
+    val lb = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
+    var lh by remember { mutableStateOf(0.dp) }
+
+    WalkInfoNavi {
+        t = (it.size.height.div(d)).dp
+        Log.wtf(__CLASSNAME__, "::NaverMapApp.COOR${getMethodName()}[${it.isAttached}][${it.size.width}][${it.size.height}][t:$t]")
+        Log.v(__CLASSNAME__, "::NaverMapApp.BOXX${getMethodName()}[density:$d-$p.dpi-$i][w:$width(${m.widthPixels}.px)][h:$height(${m.heightPixels}.px)][l:$l][t:$t][r:$r][b$b]")
+        Log.v(__CLASSNAME__, "::NaverMapApp.ZOOM${getMethodName()}[zc.w:${zc.width}][zc.h:${zc.height}][l:${zc.left}][t:${zc.top}][r:${zc.right}][b:${zc.bottom}]")
+        Log.v(__CLASSNAME__, "::NaverMapApp.COMP${getMethodName()}[cc.w:${co.width}][cc.h:${co.height}][t:${co.top}][b:${co.bottom}][l:${co.left}][r:${co.right}]")
+        Log.v(__CLASSNAME__, "::NaverMapApp.LOCA${getMethodName()}[lb.w:${lb.width}][lb.h:${lb.height}][t:${lb.top}][b:${lb.bottom}][l:${lb.left}][r:${lb.right}]")
+
+        zc?.updateLayoutParams<FrameLayout.LayoutParams> {
+            this.gravity = Gravity.TOP or Gravity.START
+            this.topMargin = (t + s).toPx(context).toInt()
+            this.leftMargin = horizontal.toPx(context).toInt()
+        }
+        co?.updateLayoutParams<RelativeLayout.LayoutParams> {
+            val g = 89.dp
+            this.topMargin = (t + s + g).toPx(context).toInt()
+            this.leftMargin = l.toPx(context).toInt()
+        }
+        lb?.updateLayoutParams<RelativeLayout.LayoutParams> {
+            this.bottomMargin = b.toPx(context).toInt()
+            this.leftMargin = l.toPx(context).toInt()
+        }
+        lh = if (lb.height > 0) (lb.height / d).dp else 52.dp
     }
 
     /** LEFT/RIGHT/WALK */
@@ -864,17 +870,17 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                horizontal = h,
-                vertical = v,
+                horizontal = horizontal,
+                vertical = vertical,
             )
     ) {
         /** LEFT */
         Log.w(__CLASSNAME__, "::NaverMapApp@::LEFT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
         Column(
             modifier = Modifier
-                .padding(bottom = b + locationHeight)
+                .padding(bottom = (b + s + lh))
                 .align(Alignment.BottomStart),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(s)
         ) {
             /** note */
             IconButton2(
@@ -902,9 +908,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         context.startActivity(intent)
                     } else {
-                        val i = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        val ri = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         val pm: PackageManager = context.packageManager
-                        val info = pm.resolveActivity(i, 0)?.activityInfo
+                        val info = pm.resolveActivity(ri, 0)?.activityInfo
                         val intent = Intent()
                         intent.component = info?.let { ComponentName(it.packageName, it.name) }
                         intent.action = Intent.ACTION_MAIN
@@ -926,7 +932,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             modifier = Modifier
                 .padding(bottom = b)
                 .align(Alignment.BottomEnd),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(s)
         ) {
             /** pee */
             IconButton2(
@@ -1038,11 +1044,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             Column(
                 modifier = Modifier
                     .padding(
-                        horizontal = h,
-                        vertical = v + b,
+                        horizontal = horizontal,
+                        vertical = vertical + b,
                     )
                     .align(Alignment.BottomEnd),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(s),
                 horizontalAlignment = Alignment.End
             ) {
                 val item = when (event) {
@@ -1060,7 +1066,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     color = Color.White,
                 )
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(s),
                     horizontalAlignment = Alignment.End
                 ) {
                     items(application.pets) { pet ->
@@ -1107,12 +1113,12 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(
-                        horizontal = h,
+                        horizontal = horizontal,
                         //vertical = vertical,
                     )
                     .padding(
                         top = 24.dp,
-                        bottom = v,
+                        bottom = vertical,
                     )
                     .padding(bottom = navigationBarHeight())
             ) {
