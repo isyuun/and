@@ -10,7 +10,6 @@
 
 package kr.carepet.gps._app
 
-import android.Manifest
 import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
@@ -21,8 +20,8 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
-import androidx.annotation.RequiresPermission
 import kr.carepet.gps.app.CameraContentObserver
+import kr.carepet.gps.app.GPSApplication
 import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
 import kr.carepet.gpx.Track
 import kr.carepet.util.Log
@@ -52,7 +51,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
     private lateinit var cameraContentObserver: CameraContentObserver
     private val handler: Handler = Handler(Looper.getMainLooper())
 
-    @RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
+    //@RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
     override fun onCreate() {
         super.onCreate()
 
@@ -215,6 +214,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
             val orient = orient(this, uri)
             Log.wtf(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][orient:$orient][rotate:$rotate][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
             img(uri)
+            GPSApplication.instance.onChange(selfChange, uri)
         }
     }
 
