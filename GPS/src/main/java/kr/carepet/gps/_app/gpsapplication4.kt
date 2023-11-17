@@ -171,7 +171,7 @@ open class gpsapplication4 : gpsapplication3() {
 
     internal fun onChange(selfChange: Boolean, uri: Uri) {
         Log.i(__CLASSNAME__, "${getMethodName()}[${(this.activity is gpscomponentactivity4)}][${(this.activity is gpsappcompatactivity4)}][selfChange:$selfChange][uri:$uri]")
-        if (this.activity is gpscomponentactivity4) (activity as gpscomponentactivity4).onChange(selfChange, uri)
-        if (this.activity is gpsappcompatactivity4) (activity as gpsappcompatactivity4).onChange(selfChange, uri)
+        if (this.activity is gpscomponentactivity4) (this.activity as gpscomponentactivity4).onChange(selfChange, uri)
+        if (this.activity is gpsappcompatactivity4) (this.activity as gpsappcompatactivity4).onChange(selfChange, uri)
     }
 }
