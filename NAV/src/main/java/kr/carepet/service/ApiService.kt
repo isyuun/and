@@ -17,13 +17,16 @@ import kr.carepet.data.cmm.commonRes
 import kr.carepet.data.daily.CmntCreateReq
 import kr.carepet.data.daily.CmntCreateRes
 import kr.carepet.data.daily.CmntDeleteReq
+import kr.carepet.data.daily.CmntRcmdtnReq
 import kr.carepet.data.daily.CmntUpdateReq
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
+import kr.carepet.data.daily.DailyDetailData
 import kr.carepet.data.daily.DailyDetailReq
 import kr.carepet.data.daily.DailyDetailRes
 import kr.carepet.data.daily.DailyMonthReq
 import kr.carepet.data.daily.DailyMonthRes
+import kr.carepet.data.daily.DailyRcmdtn
 import kr.carepet.data.daily.PhotoRes
 import kr.carepet.data.daily.RTStoryListRes
 import kr.carepet.data.daily.StoryReq
@@ -121,6 +124,9 @@ interface ApiService {
     @POST("api/v1/daily-life/create")
     fun uploadDaily(@Body data: DailyCreateReq): Call<DailyCreateRes>
 
+    @POST("api/v1/daily-life/rcmdtn")
+    fun rcmdtnDaily(@Body data: DailyRcmdtn): Call<DailyDetailRes>
+
     @POST("api/v1/daily-life/list")
     fun getWalkList(@Body data: WalkListReq): Call<WalkListRes>
 
@@ -148,6 +154,9 @@ interface ApiService {
 
     @POST("api/v1/daily-life/cmnt/update")
     fun cmntUpdate(@Body data: CmntUpdateReq): Call<CmntCreateRes>
+
+    @POST("api/v1/daily-life/cmnt/rcmdtn")
+    fun cmntRcmdtn(@Body data: CmntRcmdtnReq): Call<CmntCreateRes>
     // --------------------- 일상생활 ----------------------- //
 
     // --------------------- 마이펫 ----------------------- //

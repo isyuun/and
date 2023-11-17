@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
@@ -99,7 +101,7 @@ fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(imageVector = Icons.Default.KeyboardArrowLeft,
+                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = "", tint = design_white,
                     modifier = Modifier.clickable { currentMonth = addOneMonth(currentMonth, -1) })
 
@@ -109,7 +111,7 @@ fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel
                     letterSpacing = (-1.0).sp, color = design_white
                 )
 
-                Icon(imageVector = Icons.Default.KeyboardArrowRight,
+                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "", tint = design_white,
                     modifier = Modifier.clickable { currentMonth = addOneMonth(currentMonth, 1) })
             }

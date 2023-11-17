@@ -25,10 +25,13 @@ import kr.carepet.data.daily.Cmnt
 import kr.carepet.data.daily.CmntCreateReq
 import kr.carepet.data.daily.CmntCreateRes
 import kr.carepet.data.daily.CmntDeleteReq
+import kr.carepet.data.daily.CmntRcmdtnReq
 import kr.carepet.data.daily.CmntUpdateReq
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
+import kr.carepet.data.daily.DailyDetailData
 import kr.carepet.data.daily.DailyDetailRes
+import kr.carepet.data.daily.DailyRcmdtn
 import kr.carepet.data.daily.Pet
 import kr.carepet.data.daily.PhotoData
 import kr.carepet.data.daily.PhotoRes
@@ -554,6 +557,72 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
                 override fun onFailure(call: Call<CmntCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun rcmdtnComment(cmntNo:Int ,rcmdtnSeCd:String, schUnqNo:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = CmntRcmdtnReq(
+            cmntNo = cmntNo,
+            rcmdtnSeCd = rcmdtnSeCd,
+            schUnqNo = schUnqNo
+        )
+
+        val call = apiService.cmntRcmdtn(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<CmntCreateRes>{
+                override fun onResponse(call: Call<CmntCreateRes>, response: Response<CmntCreateRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let { it ->
+                            if (it.statusCode == 200){
+                                _cmntList.value = it.data
+                                continuation.resume(true)
+                            }else{
+
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<CmntCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun rcmdtnDaily(rcmdtnSeCd:String, schUnqNo:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = DailyRcmdtn(rcmdtnSeCd, schUnqNo)
+
+        val call = apiService.rcmdtnDaily(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<DailyDetailRes>{
+                override fun onResponse(call: Call<DailyDetailRes>, response: Response<DailyDetailRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _storyDetail.value = it
+
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<DailyDetailRes>, t: Throwable) {
                     continuation.resume(false)
                 }
 

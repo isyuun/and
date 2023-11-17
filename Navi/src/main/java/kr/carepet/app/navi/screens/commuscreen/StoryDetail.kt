@@ -46,6 +46,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
@@ -161,6 +162,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     val pagerState = rememberPagerState( pageCount = {story?.dailyLifeFileList?.size ?: 0 })
     var showImage by remember{ mutableStateOf(false) }
     var isLoading by remember{ mutableStateOf(false) }
+    var rcmdtnLoading by remember{ mutableStateOf(false) }
     var cmntExpanded by remember{ mutableStateOf(true) }
     var onReply by remember{ mutableStateOf(false) }
     var replyText by remember{ mutableStateOf("") }
@@ -171,6 +173,8 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     BackHandler {
         if (showImage){
             showImage = false
+        }else if (onReply){
+            onReply = false
         }else{
             navController.popBackStack()
         }
@@ -189,6 +193,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
             delay(300)
             focusRequester.requestFocus()
         } else{
+            delay(300)
             viewModel.updateReplyCmnt(null)
             replyText = ""
         }
@@ -448,6 +453,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                             onReply = false
                                             isLoading = false
                                         } else {
+                                            isLoading = false
                                             Toast
                                                 .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
                                                 .show()
@@ -458,6 +464,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                             viewModel.updateComment("")
                                             isLoading = false
                                         } else {
+                                            isLoading = false
                                             Toast
                                                 .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
                                                 .show()
@@ -490,10 +497,28 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                         .size(40.dp)
                         .background(color = design_white, shape = RoundedCornerShape(12.dp))
                         .clip(shape = RoundedCornerShape(12.dp))
-                        .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp)),
+                        .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
+                        .clickable (
+                            enabled = story?.myRcmdtn == null && !rcmdtnLoading
+                        ){
+                            viewModel.viewModelScope.launch {
+                                rcmdtnLoading = true
+                                val result = viewModel.rcmdtnDaily(rcmdtnSeCd = "001", schUnqNo = story?.schUnqNo ?: 0)
+                                if (result) {
+                                    rcmdtnLoading = true
+                                } else {
+                                    rcmdtnLoading = true
+                                    Toast
+                                        .makeText(context, "좋아요 실패", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                            }
+                        }
+                    ,
                     contentAlignment = Alignment.Center
                 ){
-                    Icon(painter = painterResource(id = R.drawable.icon_like),
+                    Icon(painter = painterResource(
+                        id = if (story?.myRcmdtn == "001") R.drawable.icon_like else R.drawable.icon_like_default),
                         contentDescription = "", tint = Color.Unspecified)
                 }
 
@@ -503,10 +528,28 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                         .size(40.dp)
                         .background(color = design_white, shape = RoundedCornerShape(12.dp))
                         .clip(shape = RoundedCornerShape(12.dp))
-                        .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp)),
+                        .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
+                        .clickable (
+                            enabled = story?.myRcmdtn == null && !rcmdtnLoading
+                        ){
+                            viewModel.viewModelScope.launch {
+                                rcmdtnLoading = true
+                                val result = viewModel.rcmdtnDaily(rcmdtnSeCd = "002", schUnqNo = story?.schUnqNo ?: 0)
+                                if (result) {
+                                    rcmdtnLoading = true
+                                } else {
+                                    rcmdtnLoading = true
+                                    Toast
+                                        .makeText(context, "싫어요 실패", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                            }
+                        }
+                    ,
                     contentAlignment = Alignment.Center
                 ){
-                    Icon(painter = painterResource(id = R.drawable.icon_dislike),
+                    Icon(painter = painterResource(
+                        id = if (story?.myRcmdtn == "002") R.drawable.icon_dislike else R.drawable.icon_dislike_default),
                         contentDescription = "", tint = Color.Unspecified)
                 }
             }
@@ -580,7 +623,9 @@ fun StoryDetailTopContent(story: DailyDetailData?) {
             horizontalArrangement = Arrangement.SpaceBetween
         ){
             Row (verticalAlignment = Alignment.CenterVertically){
-                Icon(painter = painterResource(id = R.drawable.icon_like), contentDescription = "", tint = Color.Unspecified)
+                Icon(painter = painterResource(
+                    id = if (story?.myRcmdtn == "001") R.drawable.icon_like else R.drawable.icon_like_default),
+                    contentDescription = "", tint = Color.Unspecified)
 
                 Text(
                     text = story?.rcmdtnCnt?.toString() ?: "0",
@@ -850,6 +895,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
 
     var updateComment by remember{ mutableStateOf(comment.cmntCn) }
     var updateLoading by remember { mutableStateOf(false) }
+    var rcmdtnLoading by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -1003,7 +1049,16 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                             unfocusedContainerColor = design_white,
                             focusedContainerColor = design_white,
                             unfocusedLeadingIconColor = design_placeHolder,
-                            focusedLeadingIconColor = design_login_text)
+                            focusedLeadingIconColor = design_login_text),
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "", tint = design_skip,
+                                modifier = Modifier
+                                    .size(14.dp)
+                                    .clickable { updateComment = "" }
+                            )
+                        }
                     )
 
                     Box(
@@ -1025,6 +1080,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                                 .makeText(context, "댓글이 수정되었습니다", Toast.LENGTH_SHORT)
                                                 .show()
                                         } else {
+                                            updateLoading = false
                                             Toast
                                                 .makeText(context, "댓글 수정에 실패했습니다", Toast.LENGTH_SHORT)
                                                 .show()
@@ -1117,21 +1173,48 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                 exit = fadeOut() + slideOutVertically(targetOffsetY = {it/2})
                             ) {
                                 Row (verticalAlignment = Alignment.CenterVertically){
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.icon_like_default),
-                                        contentDescription = "", tint = Color.Unspecified,
-                                        modifier = Modifier
-                                            .padding(start = 12.dp)
-                                            .clickable(
-                                                onClick = { },
-                                                indication = rememberRipple(
-                                                    bounded = true,
-                                                    radius = 8.dp,
-                                                    color = design_sharp
-                                                ),
-                                                interactionSource = remember { MutableInteractionSource() }
-                                            )
-                                    )
+                                    Row (verticalAlignment = Alignment.CenterVertically){
+                                        Icon(
+                                            painter = painterResource(id = if (comment.myCmntRcmdtn == "001" ) R.drawable.icon_like else R.drawable.icon_like_default),
+                                            contentDescription = "", tint = Color.Unspecified,
+                                            modifier = Modifier
+                                                .padding(start = 12.dp)
+                                                .clickable(
+                                                    enabled = comment.myCmntRcmdtn == null && !rcmdtnLoading,
+                                                    onClick = {
+                                                        viewModel.viewModelScope.launch {
+                                                            rcmdtnLoading = true
+                                                            val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo, rcmdtnSeCd = "001", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
+                                                            if (result) {
+                                                                rcmdtnLoading = true
+                                                            } else {
+                                                                rcmdtnLoading = true
+                                                                Toast
+                                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                                    .show()
+                                                            }
+                                                        }
+                                                    },
+                                                    indication = rememberRipple(
+                                                        bounded = true,
+                                                        radius = 8.dp,
+                                                        color = design_sharp
+                                                    ),
+                                                    interactionSource = remember { MutableInteractionSource() }
+                                                )
+                                        )
+
+                                        Text(text = "${comment.rcmdtnCnt}",
+                                            style = TextStyle(
+                                                color = design_skip,
+                                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                                fontSize = 12.sp,
+                                                letterSpacing = (-0.6).sp),
+                                            textAlign = TextAlign.Center,
+                                            lineHeight = 12.sp,
+                                            modifier = Modifier.padding(start = 4.dp)
+                                        )
+                                    }
 
                                     Icon(
                                         painter = painterResource(id = R.drawable.icon_comment_line),
@@ -1166,9 +1249,12 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                             color = design_skip,
+                                            textDecoration = if (comment.delYn == "Y" || comment.bldYn == "Y") TextDecoration.LineThrough else TextDecoration.None,
                                             modifier = Modifier
                                                 .padding(start = 12.dp)
-                                                .clickable {
+                                                .clickable(
+                                                    enabled = comment.delYn == "N" && comment.bldYn == "N"
+                                                ) {
                                                     focusManager.clearFocus()
                                                     openBottomSheet = true
                                                 }
@@ -1178,28 +1264,60 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                             color = design_skip,
+                                            textDecoration = if (comment.delYn == "Y" || comment.bldYn == "Y") TextDecoration.LineThrough else TextDecoration.None,
                                             modifier = Modifier
                                                 .padding(start = 12.dp)
-                                                .clickable { deleteDialog = true }
+                                                .clickable(
+                                                    enabled = comment.delYn == "N" && comment.bldYn == "N"
+                                                ) { deleteDialog = true }
                                         )
                                     }
                                 }else{
                                     Row (verticalAlignment = Alignment.CenterVertically){
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.icon_dislike_default),
-                                            contentDescription = "", tint = Color.Unspecified,
-                                            modifier = Modifier
-                                                .padding(start = 12.dp)
-                                                .clickable(
-                                                    onClick = { },
-                                                    indication = rememberRipple(
-                                                        bounded = true,
-                                                        radius = 8.dp,
-                                                        color = design_login_text
-                                                    ),
-                                                    interactionSource = remember { MutableInteractionSource() }
-                                                )
-                                        )
+                                        Row (
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ){
+                                            Icon(
+                                                painter = painterResource(id = if (comment.myCmntRcmdtn == "002" ) R.drawable.icon_dislike else R.drawable.icon_dislike_default),
+                                                contentDescription = "", tint = Color.Unspecified,
+                                                modifier = Modifier
+                                                    .padding(start = 12.dp)
+                                                    .clickable(
+                                                        enabled = comment.myCmntRcmdtn == null && !rcmdtnLoading,
+                                                        onClick = {
+                                                            viewModel.viewModelScope.launch {
+                                                                rcmdtnLoading = true
+                                                                val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo, rcmdtnSeCd = "002", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
+                                                                if (result) {
+                                                                    rcmdtnLoading = true
+                                                                } else {
+                                                                    rcmdtnLoading = true
+                                                                    Toast
+                                                                        .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                                        .show()
+                                                                }
+                                                            }
+                                                        },
+                                                        indication = rememberRipple(
+                                                            bounded = true,
+                                                            radius = 8.dp,
+                                                            color = design_login_text
+                                                        ),
+                                                        interactionSource = remember { MutableInteractionSource() }
+                                                    )
+                                            )
+
+                                            Text(text = "${comment.nrcmdtnCnt}",
+                                                style = TextStyle(
+                                                    color = design_skip,
+                                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                                    fontSize = 12.sp,
+                                                    letterSpacing = (-0.6).sp),
+                                                textAlign = TextAlign.Center,
+                                                lineHeight = 12.sp,
+                                                modifier = Modifier.padding(start = 4.dp)
+                                            )
+                                        }
 
                                         Icon(
                                             painter = painterResource(id = R.drawable.icon_report),
@@ -1255,7 +1373,9 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                         fontSize = 12.sp,
                         letterSpacing = (-0.6).sp),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 4.dp).clickable { step2Expand = !step2Expand }
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .clickable { step2Expand = !step2Expand }
                     )
                 }
             }
@@ -1296,6 +1416,7 @@ fun CommentListItem2(
     val context = LocalContext.current
     var updateComment by remember{ mutableStateOf(comment.cmntCn) }
     var updateLoading by remember { mutableStateOf(false) }
+    var rcmdtnLoading by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(key1 = commentDelete){
@@ -1556,12 +1677,26 @@ fun CommentListItem2(
                         ) {
                             Row (verticalAlignment = Alignment.CenterVertically){
                                 Icon(
-                                    painter = painterResource(id = R.drawable.icon_like_default),
+                                    painter = painterResource(id = if (comment.myCmntRcmdtn == "001" ) R.drawable.icon_like else R.drawable.icon_like_default),
                                     contentDescription = "", tint = Color.Unspecified,
                                     modifier = Modifier
                                         .padding(start = 12.dp)
                                         .clickable(
-                                            onClick = { },
+                                            enabled = comment.myCmntRcmdtn == null && !rcmdtnLoading,
+                                            onClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    rcmdtnLoading = true
+                                                    val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo, rcmdtnSeCd = "001", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
+                                                    if (result) {
+                                                        rcmdtnLoading = true
+                                                    } else {
+                                                        rcmdtnLoading = true
+                                                        Toast
+                                                            .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                            .show()
+                                                    }
+                                                }
+                                            },
                                             indication = rememberRipple(
                                                 bounded = true,
                                                 radius = 8.dp,
@@ -1569,6 +1704,16 @@ fun CommentListItem2(
                                             ),
                                             interactionSource = remember { MutableInteractionSource() }
                                         )
+                                )
+                                Text(text = "${comment.nrcmdtnCnt}",
+                                    style = TextStyle(
+                                        color = design_skip,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 12.sp,
+                                        letterSpacing = (-0.6).sp),
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = 12.sp,
+                                    modifier = Modifier.padding(start = 4.dp)
                                 )
                             }
                         }
@@ -1604,21 +1749,49 @@ fun CommentListItem2(
                                 }
                             }else{
                                 Row (verticalAlignment = Alignment.CenterVertically){
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.icon_dislike_default),
-                                        contentDescription = "", tint = Color.Unspecified,
-                                        modifier = Modifier
-                                            .padding(start = 12.dp)
-                                            .clickable(
-                                                onClick = { },
-                                                indication = rememberRipple(
-                                                    bounded = true,
-                                                    radius = 8.dp,
-                                                    color = design_login_text
-                                                ),
-                                                interactionSource = remember { MutableInteractionSource() }
-                                            )
-                                    )
+                                    Row (
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ){
+                                        Icon(
+                                            painter = painterResource(id = if (comment.myCmntRcmdtn == "002" ) R.drawable.icon_dislike else R.drawable.icon_dislike_default),
+                                            contentDescription = "", tint = Color.Unspecified,
+                                            modifier = Modifier
+                                                .padding(start = 12.dp)
+                                                .clickable(
+                                                    enabled = comment.myCmntRcmdtn == null && !rcmdtnLoading,
+                                                    onClick = {
+                                                        viewModel.viewModelScope.launch {
+                                                            rcmdtnLoading = true
+                                                            val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo, rcmdtnSeCd = "002", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
+                                                            if (result) {
+                                                                rcmdtnLoading = true
+                                                            } else {
+                                                                rcmdtnLoading = true
+                                                                Toast
+                                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                                    .show()
+                                                            }
+                                                        }
+                                                    },
+                                                    indication = rememberRipple(
+                                                        bounded = true,
+                                                        radius = 8.dp,
+                                                        color = design_login_text
+                                                    ),
+                                                    interactionSource = remember { MutableInteractionSource() }
+                                                )
+                                        )
+                                        Text(text = "${comment.nrcmdtnCnt}",
+                                            style = TextStyle(
+                                                color = design_skip,
+                                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                                fontSize = 12.sp,
+                                                letterSpacing = (-0.6).sp),
+                                            textAlign = TextAlign.Center,
+                                            lineHeight = 12.sp,
+                                            modifier = Modifier.padding(start = 4.dp)
+                                        )
+                                    }
 
                                     Icon(
                                         painter = painterResource(id = R.drawable.icon_report),

@@ -28,7 +28,7 @@ data class DailyDetailData(
     @SerializedName("dailyLifePetList")
     var dailyLifePetList: List<DailyLifePet>,
     @SerializedName("dailyLifeSchHashTagList")
-    var dailyLifeSchHashTagList: List<DailyLifeSchHashTag>,
+    var dailyLifeSchHashTagList: List<DailyLifeSchHashTag>?,
     @SerializedName("dailyLifeSchSeList")
     var dailyLifeSchSeList: List<DailyLifeSchSe>,
     @SerializedName("delYn")
@@ -36,9 +36,11 @@ data class DailyDetailData(
     @SerializedName("nrcmdtnCnt")
     var nrcmdtnCnt: Int, // 0
     @SerializedName("rcmdtnCnt")
-    var rcmdtnCnt: Int?, // 0
+    var rcmdtnCnt: Int, // 0
     @SerializedName("rcmdtnYn")
     var rcmdtnYn: String, // Y
+    @SerializedName("myRcmdtn")
+    var myRcmdtn: String?,
     @SerializedName("rgtrIpAddr")
     var rgtrIpAddr: Any?, // null
     @SerializedName("rlsDt")
@@ -153,6 +155,8 @@ data class DailyDetailReq(
 data class Cmnt(
     @SerializedName("bldYn")
     var bldYn: String, // N
+    @SerializedName("delYn")
+    var delYn: String, // N
     @SerializedName("cmntCn")
     var cmntCn: String, // 댓글 테스트
     @SerializedName("cmntNo")
@@ -178,5 +182,7 @@ data class Cmnt(
     @SerializedName("upCmntNo")
     var upCmntNo: Int, // 0
     @SerializedName("userId")
-    var userId: String // 16a5e09c-884e-4f96-a7ab-aebd8756549a
+    var userId: String, // 16a5e09c-884e-4f96-a7ab-aebd8756549a
+    @SerializedName("myCmntRcmdtn")
+    var myCmntRcmdtn: String? //
 )
