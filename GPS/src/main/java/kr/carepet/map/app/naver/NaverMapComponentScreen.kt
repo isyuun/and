@@ -902,15 +902,17 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         context.startActivity(intent)
+                        Log.i(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent]")
                     } else {
                         val ri = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         val pm: PackageManager = context.packageManager
-                        val info = pm.resolveActivity(ri, 0)?.activityInfo
+                        val ai = pm.resolveActivity(ri, 0)?.activityInfo
                         val intent = Intent()
-                        intent.component = info?.let { ComponentName(it.packageName, it.name) }
+                        intent.component = ai?.let { ComponentName(it.packageName, it.name) }
                         intent.action = Intent.ACTION_MAIN
                         intent.addCategory(Intent.CATEGORY_LAUNCHER)
                         context.startActivity(intent)
+                        Log.i(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent][pm:$pm][ai:$ai]")
                     }
                 },
             ) {

@@ -31,7 +31,7 @@ import java.util.Collections
  * @description :
  */
 
-open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
+open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     /** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-tracks-in-metre">Calculate distance between two tracks in metre</a> */
