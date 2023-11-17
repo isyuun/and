@@ -18,4 +18,5 @@ object G {
 
     // true면 PostScreen으로 이동
     var toPost by mutableStateOf(false)
+    var dupleLogin by mutableStateOf(false)
 }

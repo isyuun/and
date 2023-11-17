@@ -10,15 +10,23 @@ import kr.carepet.data.UmdListRes
 import kr.carepet.data.bbs.EventDetailRes
 import kr.carepet.data.bbs.EventListRes
 import kr.carepet.data.cmm.CmmRes
+import kr.carepet.data.cmm.CommonData
 import kr.carepet.data.cmm.WeatherReq
 import kr.carepet.data.cmm.WeatherRes
 import kr.carepet.data.cmm.commonRes
+import kr.carepet.data.daily.CmntCreateReq
+import kr.carepet.data.daily.CmntCreateRes
+import kr.carepet.data.daily.CmntDeleteReq
+import kr.carepet.data.daily.CmntRcmdtnReq
+import kr.carepet.data.daily.CmntUpdateReq
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
+import kr.carepet.data.daily.DailyDetailData
 import kr.carepet.data.daily.DailyDetailReq
 import kr.carepet.data.daily.DailyDetailRes
 import kr.carepet.data.daily.DailyMonthReq
 import kr.carepet.data.daily.DailyMonthRes
+import kr.carepet.data.daily.DailyRcmdtn
 import kr.carepet.data.daily.PhotoRes
 import kr.carepet.data.daily.RTStoryListRes
 import kr.carepet.data.daily.StoryReq
@@ -53,6 +61,7 @@ import kr.carepet.data.user.QnaRes
 import kr.carepet.data.user.RelCloseReq
 import kr.carepet.data.user.ResetNickNameReq
 import kr.carepet.data.user.ResetPwReq
+import kr.carepet.data.user.TrmnlMngReq
 import kr.carepet.data.user.UserDataModel
 import kr.carepet.data.user.UserDataResponse
 import okhttp3.MultipartBody
@@ -106,12 +115,17 @@ interface ApiService {
     @POST("/api/v1/member/withdraw")
     fun withdraw(): Call<commonRes>
 
+    @POST("/api/v1/member/trmnlMng")
+    fun trmnlMng(@Body data:TrmnlMngReq): Call<commonRes>
     // --------------------- 회원 ----------------------- //
 
     // --------------------- 일상생활 ----------------------- //
 
     @POST("api/v1/daily-life/create")
     fun uploadDaily(@Body data: DailyCreateReq): Call<DailyCreateRes>
+
+    @POST("api/v1/daily-life/rcmdtn")
+    fun rcmdtnDaily(@Body data: DailyRcmdtn): Call<DailyDetailRes>
 
     @POST("api/v1/daily-life/list")
     fun getWalkList(@Body data: WalkListReq): Call<WalkListRes>
@@ -131,6 +145,18 @@ interface ApiService {
 
     @POST("api/v1/daily-life/week/recode")
     fun getWeekRecord(@Body data: WeekRecordReq): Call<WeekRecordRes>
+
+    @POST("api/v1/daily-life/cmnt/create")
+    fun cmntCreate(@Body data: CmntCreateReq): Call<CmntCreateRes>
+
+    @POST("api/v1/daily-life/cmnt/delete")
+    fun cmntDelete(@Body data: CmntDeleteReq): Call<CmntCreateRes>
+
+    @POST("api/v1/daily-life/cmnt/update")
+    fun cmntUpdate(@Body data: CmntUpdateReq): Call<CmntCreateRes>
+
+    @POST("api/v1/daily-life/cmnt/rcmdtn")
+    fun cmntRcmdtn(@Body data: CmntRcmdtnReq): Call<CmntCreateRes>
     // --------------------- 일상생활 ----------------------- //
 
     // --------------------- 마이펫 ----------------------- //

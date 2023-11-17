@@ -1075,8 +1075,19 @@ fun CustomDialogDelete(
                     color = design_white
                 )
             } },
-        title = { Text(text = title) },
-        text = { Text(text = text, color = design_skip) },
+        title = {
+            Text(
+                text = title,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                color = design_login_text
+            ) },
+        text = {
+            Text(
+                text = text,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                color = design_skip
+            )
+               },
         dismissButton = {
             Button(
                 onClick = {

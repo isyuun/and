@@ -34,10 +34,13 @@ data class Data(
     @SerializedName("nckNm")
     var nckNm: String, //
     @SerializedName("email")
-    var email: String //
+    var email: String, //
+    @SerializedName("appKeyVl")
+    var appKeyVl: String?,
 )
 
 data class LoginData(
+    var appTypNm : String,
     var userID: String,
     var userPW: String
 )

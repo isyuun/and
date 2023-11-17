@@ -64,7 +64,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         sharedViewModel.updatePetInfo(newData)
     }
 
-    suspend fun callGetWeekRecord(ownrPetUnqNo: String, searchDay: String) {
+    suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String) {
         sharedViewModel.getWeekRecord(ownrPetUnqNo, searchDay)
     }
 

@@ -18,6 +18,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -146,6 +148,7 @@ fun WalkScreen(
     }
 
     var selectPetPre:String? by rememberSaveable { mutableStateOf(null) }
+
 
     LaunchedEffect(key1 = selectPet){
         if (selectPet?.ownrPetUnqNo != selectPetPre){
@@ -261,6 +264,8 @@ fun WalkListContent(walkViewModel: WalkViewModel, navController: NavHostControll
 @Composable
 fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navController: NavHostController) {
 
+    var lastClickTime by remember { mutableStateOf(System.currentTimeMillis()) }
+
     Column (
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -313,12 +318,18 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                 modifier = Modifier
                     .size(30.dp)
                     .clip(shape = CircleShape)
-                    .clickable {
-                        walkViewModel.viewModelScope.launch {
-                            //walkViewModel.updateWalkListItem(walk)
-                            walkViewModel.getDailyDetail(walk.schUnqNo)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rememberRipple(bounded = false)
+                    ) {
+                        val currentTime = System.currentTimeMillis()
+                        if (currentTime - lastClickTime >= 300) {
+                            lastClickTime = currentTime
+                            walkViewModel.viewModelScope.launch {
+                                walkViewModel.getDailyDetail(walk.schUnqNo)
+                            }
+                            navController.navigate(Screen.WalkDetailContent.route)
                         }
-                        navController.navigate(Screen.WalkDetailContent.route)
                     },
                 contentAlignment = Alignment.Center
             ){
@@ -928,7 +939,6 @@ fun WalkBottomSheet(title:String, btnText:String, viewModel: WalkViewModel, bott
 
     val petList by viewModel.petInfo.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    Log.d("LOG","왜 안나옴"+petList.toString())
 
     var isCheck by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()

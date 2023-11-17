@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
@@ -53,6 +55,8 @@ import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.MonthDay
+import kr.carepet.data.pet.CurrentPetData
+import kr.carepet.util.Log
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -97,7 +101,7 @@ fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(imageVector = Icons.Default.KeyboardArrowLeft,
+                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = "", tint = design_white,
                     modifier = Modifier.clickable { currentMonth = addOneMonth(currentMonth, -1) })
 
@@ -107,7 +111,7 @@ fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel
                     letterSpacing = (-1.0).sp, color = design_white
                 )
 
-                Icon(imageVector = Icons.Default.KeyboardArrowRight,
+                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "", tint = design_white,
                     modifier = Modifier.clickable { currentMonth = addOneMonth(currentMonth, 1) })
             }
@@ -132,7 +136,7 @@ fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel
                 Text(text = "토", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
             }
 
-            CalendarMonthItem(walkViewModel = walkViewModel)
+            CalendarMonthItem(walkViewModel = walkViewModel, selectPet = selectPet)
 
 
         }// column
@@ -254,7 +258,7 @@ fun RunCountData(walkViewModel: WalkViewModel){
 }
 
 @Composable
-fun CalendarMonthItem(walkViewModel: WalkViewModel){
+fun CalendarMonthItem(walkViewModel: WalkViewModel, selectPet: CurrentPetData?){
 
     val days by walkViewModel.dailyMonth.collectAsState()
 
@@ -267,13 +271,13 @@ fun CalendarMonthItem(walkViewModel: WalkViewModel){
         contentPadding = PaddingValues(top = 16.dp)
     ) {
         items(days?.dayList.orEmpty()){ day ->
-            CalendarDay(day = day)
+            CalendarDay(day = day, viewModel = walkViewModel, selectPet = selectPet)
         }
     }
 }
 
 @Composable
-fun CalendarDay(day: MonthDay){
+fun CalendarDay(day: MonthDay, viewModel: WalkViewModel, selectPet: CurrentPetData?){
 
     val formChangeDay = extractDayFromDate(day.date)
 
@@ -287,7 +291,13 @@ fun CalendarDay(day: MonthDay){
                 } else{
                     painterResource(id = R.drawable.attendance_active)
                 },
-                contentDescription = "", tint = Color.Unspecified)
+                contentDescription = "", tint = Color.Unspecified,
+                modifier = Modifier.clickable {
+                    viewModel.viewModelScope.launch {
+                        selectPet?.ownrPetUnqNo?.let { viewModel.getWeekRecord(ownrPetUnqNo = it, searchDay = day.date) }
+                    }
+                }
+            )
 
             Spacer(modifier = Modifier.padding(top = 5.dp))
 

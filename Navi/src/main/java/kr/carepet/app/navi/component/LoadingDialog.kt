@@ -90,7 +90,7 @@ fun LoadingDialog(
 @Composable
 fun LoadingAnimation1(
     circleColor: Color = Color.Magenta,
-    animationDelay: Int = 1000
+    animationDelay: Int = 1000,
 ) {
 
     // circle's scale state

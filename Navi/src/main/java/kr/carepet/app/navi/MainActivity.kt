@@ -3,24 +3,46 @@ package kr.carepet.app.navi
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -29,6 +51,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import kotlinx.coroutines.delay
+import kr.carepet.app.navi.component.LoadingAnimation1
+import kr.carepet.app.navi.component.LoadingDialog
 import kr.carepet.app.navi.screens.EasyRegScreen
 import kr.carepet.app.navi.screens.IdFindScreen
 import kr.carepet.app.navi.screens.IdPwSearchScreen
@@ -58,6 +83,9 @@ import kr.carepet.app.navi.screens.myscreen.UserInfoScreen
 import kr.carepet.app.navi.screens.walkscreen.PostScreen
 import kr.carepet.app.navi.screens.walkscreen.WalkDetailContent
 import kr.carepet.app.navi.ui.theme.AppTheme
+import kr.carepet.app.navi.ui.theme.design_intro_bg
+import kr.carepet.app.navi.ui.theme.design_login_text
+import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.CommunityViewModel
 import kr.carepet.app.navi.viewmodel.HomeViewModel
 import kr.carepet.app.navi.viewmodel.LoginViewModel
@@ -66,6 +94,8 @@ import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.app.navi.viewmodel.UserCreateViewModel
 import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.SCDLocalData
+import kr.carepet.singleton.G
+import kr.carepet.util.Log
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -113,6 +143,22 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
     val communityViewModel = remember{CommunityViewModel(sharedViewModel)}
     val settingViewModel = remember{SettingViewModel(sharedViewModel)}
 
+    var count by remember { mutableIntStateOf(3) }
+
+    LaunchedEffect(key1 = G.dupleLogin){
+        if (G.dupleLogin){
+            while (count > 0) {
+                delay(1000) // 1초 딜레이
+                count--
+            }
+            // 카운트다운이 끝나면 콜백 실행
+            navController.navigate(Screen.Login.route){
+                popUpTo(0)
+            }
+            G.dupleLogin = false
+            count = 3
+        }
+    }
     sharedViewModel.updatePushData(data)
 
     NavHost(
@@ -297,6 +343,25 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
         composable("dailyPostScreen"){
             DailyPostScreen(viewModel = communityViewModel, sharedViewModel = sharedViewModel, navController = navController)
         }
+    }
+
+    if (G.dupleLogin){
+        AlertDialog(
+            onDismissRequest = { },
+            buttons = { },
+            title = {
+                Text(
+                    text = "다른 기기에서 로그인",
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold))
+                ) },
+            text = {
+                Text(
+                    text = "잠시 후 로그아웃 됩니다...${count}",
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular))
+                )},
+            backgroundColor = design_white,
+            contentColor = design_login_text
+        )
     }
 }
 

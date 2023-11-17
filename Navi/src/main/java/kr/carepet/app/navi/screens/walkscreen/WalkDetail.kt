@@ -361,7 +361,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                         )
 
                         Text(
-                            text = dailyDetail?.runDstnc.toString()+"m",
+                            text = (dailyDetail?.runDstnc ?: 0).toString() + "m",
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = 0.sp,

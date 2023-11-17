@@ -51,7 +51,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
 
-        sendRegistrationToServer(token)
+        MySharedPreference.setFcmToken(token)
     }
     private fun handleNow(remoteMessage: RemoteMessage) {
         val page = remoteMessage.data["page"]

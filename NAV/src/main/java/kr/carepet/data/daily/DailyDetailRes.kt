@@ -20,7 +20,7 @@ data class DailyDetailData(
     @SerializedName("cmntCnt")
     var cmntCnt: Int, // 0
     @SerializedName("cmntList")
-    var cmntList: Any?, // null
+    var cmntList: List<Cmnt>?, // null
     @SerializedName("cmntUseYn")
     var cmntUseYn: String, // Y
     @SerializedName("dailyLifeFileList")
@@ -28,7 +28,7 @@ data class DailyDetailData(
     @SerializedName("dailyLifePetList")
     var dailyLifePetList: List<DailyLifePet>,
     @SerializedName("dailyLifeSchHashTagList")
-    var dailyLifeSchHashTagList: List<DailyLifeSchHashTag>,
+    var dailyLifeSchHashTagList: List<DailyLifeSchHashTag>?,
     @SerializedName("dailyLifeSchSeList")
     var dailyLifeSchSeList: List<DailyLifeSchSe>,
     @SerializedName("delYn")
@@ -36,9 +36,11 @@ data class DailyDetailData(
     @SerializedName("nrcmdtnCnt")
     var nrcmdtnCnt: Int, // 0
     @SerializedName("rcmdtnCnt")
-    var rcmdtnCnt: Int?, // 0
+    var rcmdtnCnt: Int, // 0
     @SerializedName("rcmdtnYn")
     var rcmdtnYn: String, // Y
+    @SerializedName("myRcmdtn")
+    var myRcmdtn: String?,
     @SerializedName("rgtrIpAddr")
     var rgtrIpAddr: Any?, // null
     @SerializedName("rlsDt")
@@ -148,4 +150,39 @@ data class DailyDetailReq(
     var cmntYn: String, // Y
     @SerializedName("schUnqNo")
     var schUnqNo: Int // 3
+)
+
+data class Cmnt(
+    @SerializedName("bldYn")
+    var bldYn: String, // N
+    @SerializedName("delYn")
+    var delYn: String, // N
+    @SerializedName("cmntCn")
+    var cmntCn: String, // 댓글 테스트
+    @SerializedName("cmntNo")
+    var cmntNo: Int, // 10
+    @SerializedName("lastStrgDt")
+    var lastStrgDt: String, // 23.11.14 03:22
+    @SerializedName("nrcmdtnCnt")
+    var nrcmdtnCnt: Int, // 0
+    @SerializedName("petImg")
+    var petImg: String, // /mypet/20231103/74d93117e6cb4950b2b6cb44706ada6e.JPG
+    @SerializedName("petNm")
+    var petNm: String, // 수정
+    @SerializedName("petRelUnqNo")
+    var petRelUnqNo: Int, // 157
+    @SerializedName("rcmdtnCnt")
+    var rcmdtnCnt: Int, // 0
+    @SerializedName("schUnqNo")
+    var schUnqNo: Int, // 214
+    @SerializedName("stdgUmdNm")
+    var stdgUmdNm: Any?, // null
+    @SerializedName("stepLevel")
+    var stepLevel: Int, // 1
+    @SerializedName("upCmntNo")
+    var upCmntNo: Int, // 0
+    @SerializedName("userId")
+    var userId: String, // 16a5e09c-884e-4f96-a7ab-aebd8756549a
+    @SerializedName("myCmntRcmdtn")
+    var myCmntRcmdtn: String? //
 )
