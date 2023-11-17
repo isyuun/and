@@ -12,6 +12,7 @@
 package kr.carepet.gps._app
 
 import android.net.Uri
+import kr.carepet.gps.app.ICameraContentObserver
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -23,9 +24,9 @@ import kr.carepet.util.getMethodName
  * @description : kr.carepet.gps._app
  * @see kr.carepet.gps._app.gpsappcompatactivity4
  */
-open class gpsappcompatactivity4 : gpsappcompatactivity3() {
+open class gpsappcompatactivity4 : gpsappcompatactivity3(), ICameraContentObserver {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-    internal fun onChange(selfChange: Boolean, uri: Uri) {
+    override fun onCameraChange(selfChange: Boolean, uri: Uri) {
         Log.w(__CLASSNAME__, "${getMethodName()}[selfChange:$selfChange][uri:$uri]")
     }
 }

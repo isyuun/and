@@ -16,6 +16,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.IBinder
 import kr.carepet.data.pet.CurrentPetData
+import kr.carepet.gps.app.ICameraContentObserver
 import kr.carepet.gpx.TRACK_ZERO_NO
 import kr.carepet.gpx.Track
 import kr.carepet.util.Log
@@ -28,7 +29,7 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class gpsapplication4 : gpsapplication3() {
+open class gpsapplication4 : gpsapplication3(), ICameraContentObserver {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
     override fun start() {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
@@ -169,9 +170,8 @@ open class gpsapplication4 : gpsapplication3() {
 
     var preview: Bitmap? = null
 
-    internal fun onChange(selfChange: Boolean, uri: Uri) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${(this.activity is gpscomponentactivity4)}][${(this.activity is gpsappcompatactivity4)}][selfChange:$selfChange][uri:$uri]")
-        if (this.activity is gpscomponentactivity4) (this.activity as gpscomponentactivity4).onChange(selfChange, uri)
-        if (this.activity is gpsappcompatactivity4) (this.activity as gpsappcompatactivity4).onChange(selfChange, uri)
+    override fun onCameraChange(selfChange: Boolean, uri: Uri) {
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ICameraContentObserver)}][selfChange:$selfChange][uri:$uri]")
+        if (this.activity is ICameraContentObserver) (this.activity as ICameraContentObserver).onCameraChange(selfChange, uri)
     }
 }
