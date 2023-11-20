@@ -172,7 +172,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
                 ExifInterface.ORIENTATION_ROTATE_90 -> rotate = ROTATE.ROTATE_90
                 ExifInterface.ORIENTATION_NORMAL -> rotate = ROTATE.ROTATE_0
             }
-            Log.i(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file.absolutePath}]")
+            Log.i(__CLASSNAME__, "${getMethodName()}::onCameraChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file.absolutePath}]")
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
@@ -199,7 +199,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
                 }
                 it.close()
             }
-            Log.w(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file.absolutePath}]")
+            Log.w(__CLASSNAME__, "${getMethodName()}::onCameraChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file.absolutePath}]")
         } catch (e: Exception) {
             e.printStackTrace()
         }
