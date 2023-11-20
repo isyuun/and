@@ -30,34 +30,29 @@ subprojects {
     afterEvaluate {}
     pluginManager.withPlugin("com.android.library") {
         project.extensions.getByType<com.android.build.gradle.BaseExtension>().apply {
-            //defaultConfig {
-            //    //ext.BUILD_DATE = { return new Date().format("yyyy/MM/dd HH:mm:ss") }
-            //    //ext.BUILD_TIME = { return System.currentTimeMillis() + "L" }
-            //    //buildConfigField("String", "BUILD_DATE", "\"" + new Date().format("yyyy/MM/dd HH:mm:ss") + "\"")
-            //    //buildConfigField("long", "BUILD_TIME", System.currentTimeMillis() + "L")
-            //    //consumerProguardFiles "consumer-rules.pro"
-            //}
-            //buildTypes {
-            //    getByName("debug") {
-            //        //isMinifyEnabled = true
-            //        ////isDebuggable = true
-            //        ////manifestPlaceholders["enableCrashlytics"] = "false"
-            //    }
-            //    getByName("release") {
-            //        //isMinifyEnabled = true
-            //        ////isDebuggable = false
-            //        ////manifestPlaceholders["enableCrashlytics"] = "true"
-            //    }
-            //}
+            defaultConfig {
+                //buildConfigField("String", "BUILD_DATE", "\"${new Date().format("yyyy/MM/dd HH:mm:ss")}\"")
+                //buildConfigField("long", "BUILD_TIME", "${System.currentTimeMillis()}L")
+            }
+            buildTypes {
+                //getByName("debug") {
+                //    //isMinifyEnabled = true
+                //    ////isDebuggable = true
+                //    ////manifestPlaceholders["enableCrashlytics"] = "false"
+                //}
+                //getByName("release") {
+                //    //isMinifyEnabled = true
+                //    ////isDebuggable = false
+                //    ////manifestPlaceholders["enableCrashlytics"] = "true"
+                //}
+            }
         }
     }
     pluginManager.withPlugin("com.android.application") {
         project.extensions.getByType<com.android.build.gradle.BaseExtension>().apply {
             defaultConfig {
-                //ext.BUILD_DATE = { Date().format("yyyy/MM/dd HH:mm:ss") }
-                //ext.BUILD_TIME = { System.currentTimeMillis() + "L" }
-                //buildConfigField("String", "BUILD_DATE", "\"" + new Date().format("yyyy/MM/dd HH:mm:ss") + "\"")
-                //buildConfigField("long", "BUILD_TIME", System.currentTimeMillis() + "L")
+                //buildConfigField("String", "BUILD_DATE", "\"${Date(System.currentTimeMillis()).format("yyyy/MM/dd HH:mm:ss")}\"")
+                //buildConfigField("long", "BUILD_TIME",  "${System.currentTimeMillis()}L")
             }
             signingConfigs {
                 getByName("debug") {

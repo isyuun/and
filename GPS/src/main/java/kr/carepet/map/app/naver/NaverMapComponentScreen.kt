@@ -40,6 +40,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -119,7 +120,9 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.widget.LocationButtonView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kr.carepet.BuildConfig
 import kr.carepet.DEBUG
+import kr.carepet.RELEASE
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.gps.R
 import kr.carepet.gps.app.GPSApplication
@@ -136,6 +139,8 @@ import kr.carepet.map.toText
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
+import java.util.Date
+
 
 /**
  * @Project     : carepet-android
@@ -1305,6 +1310,24 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         loadingText = stringResource(id = R.string.walk_text_in_tracking),
         loadingState = loading
     )
-
     Log.v(__CLASSNAME__, "${getMethodName()}[ED][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
+    /** VERSION */
+    if (!RELEASE) {
+        Box(modifier = Modifier.fillMaxHeight()) {
+            var version: String
+            val build_time = Date(BuildConfig.BUILD_TIME)
+            Log.i(__CLASSNAME__, "${getMethodName()}[BUILD_TIME:$build_time]")
+            version = "[BUILD_TIME:$build_time]"
+            Text(
+                text = "${stringResource(id = R.string.app_version)}:$version",
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .fillMaxWidth(),
+                color = Color.Red,
+                fontSize = 8.sp,
+                textAlign = TextAlign.End,
+                maxLines = 1,
+            )
+        }
+    }
 }
