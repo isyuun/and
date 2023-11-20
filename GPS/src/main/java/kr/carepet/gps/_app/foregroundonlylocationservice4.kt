@@ -14,12 +14,12 @@ import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.ServiceConnection
-import android.media.ExifInterface
 import android.net.Uri
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
+import androidx.exifinterface.media.ExifInterface
 import kr.carepet.gps.app.CameraContentObserver
 import kr.carepet.gps.app.GPSApplication
 import kr.carepet.gps.app.ICameraContentObserver
@@ -156,6 +156,9 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
         ROTATE_270,
     }
 
+    /**
+     * 카메라 이미지 회전방향: ExifInterface사용
+     */
     internal fun rotate(context: Context, uri: Uri): ROTATE {
         val path = path(uri)
         val file = File(path)
@@ -179,6 +182,9 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
         return rotate
     }
 
+    /**
+     * 카메라 이미지 회전방향: 컨텐츠리졸버(DB)사용
+     */
     internal fun orient(context: Context, uri: Uri): ROTATE {
         val path = path(uri)
         val file = File(path)

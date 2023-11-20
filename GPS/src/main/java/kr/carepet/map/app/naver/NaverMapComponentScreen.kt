@@ -172,11 +172,11 @@ fun CircleImageUrl(size: Int, imageUri: String?) {
 
 @Composable
 fun IconButton2(
+    modifier: Modifier = Modifier,
     text: String = "",
     back: Color = MaterialTheme.colorScheme.background,
     shape: Shape = CircleShape,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -515,7 +515,7 @@ fun WalkInfoSheet() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WalkInfoNavi(
-    onPositioned: (LayoutCoordinates) -> Unit
+    onGloballyPositioned: (LayoutCoordinates) -> Unit
 ) {
     val application = GPSApplication.instance
     val start = application.start
@@ -550,16 +550,14 @@ fun WalkInfoNavi(
         }
     }
     Box(modifier = Modifier
-        //.fillMaxWidth()
         .onGloballyPositioned {
             try {
-                onPositioned(it)
+                onGloballyPositioned(it)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }) {
-        val config = LocalConfiguration.current
-        if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
             R.string.walk_title_tip
             AnimatedVisibility(
                 visible = !start,
@@ -598,14 +596,14 @@ fun WalkInfoNavi(
                             tint = Color.Unspecified,
                         )
                         Text(
-                            text = stringResource(id = R.string.walk_title_tip),
-                            fontSize = 12.sp,
-                            letterSpacing = (-0.6).sp,
                             modifier = Modifier
                                 .padding(start = 4.0.dp)
                                 .basicMarquee(),
-                            color = MaterialTheme.colorScheme.onBackground,
+                            text = stringResource(id = R.string.walk_title_tip),
+                            fontSize = 16.sp,
+                            letterSpacing = (-0.6).sp,
                             maxLines = 1,
+                            //style = TextStyle(background = Color.Yellow),     //test
                         )
                     }
                     Text(
@@ -615,8 +613,8 @@ fun WalkInfoNavi(
                         text = stringResource(id = R.string.walk_title_tips),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
-                        color = MaterialTheme.colorScheme.onBackground,
                         maxLines = 1,
+                        //style = TextStyle(background = Color.Yellow),     //test
                     )
                 }
             }
@@ -647,23 +645,19 @@ fun WalkInfoNavi(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
-                    val text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_walking)
                     Column(
                         modifier = Modifier
                             .padding(horizontal = 12.0.dp)
                             .padding(vertical = 8.0.dp),
-                        //verticalArrangement = Arrangement.spacedBy(
-                        //    space = 10.0.dp,
-                        //    //alignment = Alignment.CenterVertically,
-                        //),
                         horizontalAlignment = Alignment.Start,
                     ) {
                         Text(
-                            text = text,
-                            fontSize = 12.sp,
+                            text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_walking),
+                            fontSize = 16.sp,
                             letterSpacing = (-0.6).sp,
                             fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onBackground,
+                            maxLines = 1,
+                            //style = TextStyle(background = Color.Yellow),     //test
                         )
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(20.0.dp)
@@ -676,8 +670,8 @@ fun WalkInfoNavi(
                                 letterSpacing = (-0.0).sp,
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Start,
-                                //style = TextStyle(background = Color.Yellow),
-                                color = MaterialTheme.colorScheme.onBackground,
+                                maxLines = 1,
+                                //style = TextStyle(background = Color.Yellow),     //test
                             )
                             Text(
                                 modifier = Modifier
@@ -687,8 +681,8 @@ fun WalkInfoNavi(
                                 letterSpacing = (-0.0).sp,
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Start,
-                                //style = TextStyle(background = Color.Yellow),
-                                color = MaterialTheme.colorScheme.onBackground,
+                                maxLines = 1,
+                                //style = TextStyle(background = Color.Yellow),     //test
                             )
                         }
                     }
@@ -842,7 +836,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val b = 68.0.dp
 
 
-    /** top */
+    /** TOP */
     val zc = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
     val co = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
     val lb = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)

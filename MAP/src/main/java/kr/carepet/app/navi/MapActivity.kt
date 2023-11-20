@@ -10,8 +10,8 @@
 
 package kr.carepet.app.navi
 
-/**import kr.carepet.util.__CLASSNAME__*/
 import androidx.activity.compose.setContent
+import androidx.compose.material3.Surface
 import kr.carepet.app.navi.ui.theme.AppTheme
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
@@ -35,7 +35,9 @@ open class MapActivity : kr.carepet.map.app.MapActivity() {
         //super.setContent()
         setContent {
             AppTheme(dynamicColor = true) {
-                MapApp()
+                Surface {
+                    MapApp()
+                }
             }
         }
     }
