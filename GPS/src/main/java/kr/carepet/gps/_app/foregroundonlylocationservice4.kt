@@ -10,7 +10,6 @@
 
 package kr.carepet.gps._app
 
-import android.Manifest
 import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
@@ -21,8 +20,9 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
-import androidx.annotation.RequiresPermission
 import kr.carepet.gps.app.CameraContentObserver
+import kr.carepet.gps.app.GPSApplication
+import kr.carepet.gps.app.ICameraContentObserver
 import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
 import kr.carepet.gpx.Track
 import kr.carepet.util.Log
@@ -38,7 +38,7 @@ import java.util.Collections
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), ServiceConnection {
+open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), ServiceConnection, ICameraContentObserver {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -52,7 +52,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
     private lateinit var cameraContentObserver: CameraContentObserver
     private val handler: Handler = Handler(Looper.getMainLooper())
 
-    @RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
+    //@RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
     override fun onCreate() {
         super.onCreate()
 
@@ -128,6 +128,10 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
     }
 
 
+    private val _imgs = Collections.synchronizedList(ArrayList<Uri>()) // The list of Tracks
+    internal val images
+        get() = _imgs
+
     override fun start() {
         super.start()
         _imgs.clear()
@@ -202,7 +206,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
         return rotate
     }
 
-    fun onChange(selfChange: Boolean, uri: Uri) {
+    override fun onCameraChange(selfChange: Boolean, uri: Uri) {
         val path = path(uri)
         val time = time(uri) ?: return
         //Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
@@ -215,10 +219,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
             val orient = orient(this, uri)
             Log.wtf(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][orient:$orient][rotate:$rotate][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
             img(uri)
+            GPSApplication.instance.onCameraChange(selfChange, uri)
         }
     }
-
-    private val _imgs = Collections.synchronizedList(ArrayList<Uri>()) // The list of Tracks
-    internal val images
-        get() = _imgs
 }

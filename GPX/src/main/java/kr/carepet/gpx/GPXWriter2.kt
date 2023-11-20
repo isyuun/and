@@ -72,7 +72,8 @@ class GPXWriter2 : _GPXWriter() {
                 val poo = track.poo
                 val mrk = track.mrk
                 val img = track.img
-                val uri = track.uri
+                //val uri = track.uri
+                val uri = ""
                 var event = Track.EVENT.nnn
                 if (pee > TRACK_ZERO_PEE) event = Track.EVENT.pee
                 if (poo > TRACK_ZERO_POO) event = Track.EVENT.poo

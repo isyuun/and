@@ -14,6 +14,7 @@ package kr.carepet.gps._app
 import android.content.Intent
 import android.location.Location
 import com.google.android.gms.location.LocationResult
+import kr.carepet.RELEASE
 import kr.carepet.gpx.GPXWriter2
 import kr.carepet.gpx.GPX_INTERVAL_UPDATE_METERS
 import kr.carepet.gpx.GPX_SIMPLE_TICK_FORMAT
@@ -31,7 +32,7 @@ import java.util.Collections
  * @description :
  */
 
-open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
+open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     /** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-tracks-in-metre">Calculate distance between two tracks in metre</a> */
@@ -85,8 +86,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice() {
 
 
     private fun path(): String {
-        //val ret = "${filesDir.path}/.GPX"
-        val ret = getExternalFilesDirs(".GPX")[0].path
+        val ret = if (RELEASE) "${filesDir.path}/.GPX" else getExternalFilesDirs(".GPX")[0].path
         Log.w(__CLASSNAME__, "${getMethodName()}$ret")
         return ret
     }

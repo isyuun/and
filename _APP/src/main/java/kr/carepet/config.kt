@@ -20,5 +20,6 @@ package kr.carepet
  * @see kr.carepet.config
  */
 //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-val DEBUG = kr.carepet.BuildConfig.DEBUG
+val DEBUG = BuildConfig.DEBUG
 //val DEBUG = false
+val RELEASE = true and !BuildConfig.DEBUG

@@ -520,7 +520,20 @@ fun WalkInfoNavi(
     val application = GPSApplication.instance
     val start = application.start
     Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
-    var pet by remember { mutableStateOf(CurrentPetData("", "", "", "", "", "", 0.0f)) }
+    var pet by remember {
+        mutableStateOf(
+            CurrentPetData(
+                age = "",
+                ownrPetUnqNo = "",
+                petKindNm = "",
+                petNm = "",
+                petRprsImgAddr = "",
+                sexTypNm = "",
+                wghtVl = 0.0f,
+                petRelUnqNo = 0
+            )
+        )
+    }
     if (application.pets.isNotEmpty()) pet = application.pets[0]
     var count by remember { mutableIntStateOf(0) }
     var duration by remember { mutableStateOf("00:00:00") }
@@ -708,8 +721,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     Log.v(__CLASSNAME__, "${getMethodName()}[ST][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
 
     if (G.mapPetInfo.isEmpty()) {   //test
-        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", 0.0f)
-        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", 0.0f)
+        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", -0.1f, -1)
+        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", -0.1f, -1)
         application.add(pet1)
         application.add(pet1)
         application.add(pet2)
@@ -902,15 +915,17 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         context.startActivity(intent)
+                        Log.i(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent]")
                     } else {
                         val ri = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         val pm: PackageManager = context.packageManager
-                        val info = pm.resolveActivity(ri, 0)?.activityInfo
+                        val ai = pm.resolveActivity(ri, 0)?.activityInfo
                         val intent = Intent()
-                        intent.component = info?.let { ComponentName(it.packageName, it.name) }
+                        intent.component = ai?.let { ComponentName(it.packageName, it.name) }
                         intent.action = Intent.ACTION_MAIN
                         intent.addCategory(Intent.CATEGORY_LAUNCHER)
                         context.startActivity(intent)
+                        Log.i(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent][pm:$pm][ai:$ai]")
                     }
                 },
             ) {

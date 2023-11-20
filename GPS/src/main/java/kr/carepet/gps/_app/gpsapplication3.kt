@@ -11,7 +11,9 @@
 package kr.carepet.gps._app
 
 import android.content.ComponentName
+import android.content.ServiceConnection
 import android.os.IBinder
+import kr.carepet.gps.app.ICameraContentObserver
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -26,18 +28,16 @@ open class gpsapplication3 : gpsapplication2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        Log.w(__CLASSNAME__, "${getMethodName()}...")
+        Log.w(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ServiceConnection)}]")
         super.onServiceConnected(name, service)
         this.service?.onServiceConnected(name, service)
-        if (this.activity is gpscomponentactivity3) (this.activity as gpscomponentactivity3).onServiceConnected(name, service)
-        if (this.activity is gpsappcompatactivity3) (this.activity as gpsappcompatactivity3).onServiceConnected(name, service)
+        if (this.activity is ServiceConnection) (this.activity as ServiceConnection).onServiceConnected(name, service)
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        Log.w(__CLASSNAME__, "${getMethodName()}...")
+        Log.w(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ServiceConnection)}]")
         super.onServiceDisconnected(name)
         this.service?.onServiceDisconnected(name)
-        if (this.activity is gpscomponentactivity3) (this.activity as gpscomponentactivity3).onServiceDisconnected(name)
-        if (this.activity is gpsappcompatactivity3) (this.activity as gpsappcompatactivity3).onServiceDisconnected(name)
+        if (this.activity is ServiceConnection) (this.activity as ServiceConnection).onServiceDisconnected(name)
     }
 }

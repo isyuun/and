@@ -15,7 +15,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
-import kr.carepet.gps._app.gpsappcompatactivity3
+import kr.carepet.gps._app.gpsappcompatactivity4
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
@@ -26,7 +26,7 @@ import kr.carepet.util.getMethodName
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-open class GPSAppCompatActivity : gpsappcompatactivity3() {
+open class GPSAppCompatActivity : gpsappcompatactivity4() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private val requestPermission = registerForActivityResult(
