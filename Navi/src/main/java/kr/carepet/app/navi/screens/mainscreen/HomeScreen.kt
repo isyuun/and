@@ -24,6 +24,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +57,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.TextField
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -134,6 +136,7 @@ import kr.carepet.app.navi.ui.theme.design_weather_1
 import kr.carepet.app.navi.ui.theme.design_white
 import kr.carepet.app.navi.viewmodel.HomeViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
+import kr.carepet.app.navi.viewmodel.WalkViewModel
 import kr.carepet.data.daily.RTStoryData
 import kr.carepet.data.pet.PetDetailData
 import kr.carepet.singleton.G
@@ -256,7 +259,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
-            StoryContent(viewModel = viewModel, navController)
+            StoryContent(viewModel = viewModel, sharedViewModel,bottomNavController)
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
@@ -272,7 +275,7 @@ fun HomeScreen(
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = design_btn_border),
                     onClick = {
-                        sharedViewModel.updateMoreStoryClick(true)
+                        //sharedViewModel.updateMoreStoryClick(true)
                         bottomNavController.navigate("commu") {
                             bottomNavController.graph.startDestinationRoute?.let {
                                 popUpTo(it) { saveState = true }
@@ -870,7 +873,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
 }
 
 @Composable
-fun StoryContent(viewModel: HomeViewModel, navController: NavHostController){
+fun StoryContent(viewModel: HomeViewModel, sharedViewModel: SharedViewModel, bottomNavController: NavHostController){
 
     LaunchedEffect(Unit){
         viewModel.getRTStoryList()
@@ -916,7 +919,7 @@ fun StoryContent(viewModel: HomeViewModel, navController: NavHostController){
             ) {
                 if (storyList!=null){
                     items(storyList?.data ?: emptyList()){ item ->
-                        StoryItem(data = item)
+                        StoryItem(data = item, bottomNavController = bottomNavController, sharedViewModel = sharedViewModel)
                     }
                 }
             }
@@ -925,7 +928,7 @@ fun StoryContent(viewModel: HomeViewModel, navController: NavHostController){
 }
 
 @Composable
-fun StoryItem(data: RTStoryData){
+fun StoryItem(data: RTStoryData, bottomNavController: NavHostController, sharedViewModel: SharedViewModel){
 
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 
@@ -940,7 +943,16 @@ fun StoryItem(data: RTStoryData){
             .size(width = 200.dp, height = 280.dp)
             .clip(shape = RoundedCornerShape(20.dp))
             .onGloballyPositioned { sizeImage = it.size }
-            .clickable { }
+            .clickable {
+                sharedViewModel.updateMoreStoryClick(data.schUnqNo)
+                bottomNavController.navigate("commu") {
+                    bottomNavController.graph.startDestinationRoute?.let {
+                        popUpTo(it) { saveState = true }
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
     ){
         val painter = rememberAsyncImagePainter(
             model = data.storyFile?:R.drawable.img_blank,

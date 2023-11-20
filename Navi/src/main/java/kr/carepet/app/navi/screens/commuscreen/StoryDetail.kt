@@ -101,6 +101,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.patrykandpatrick.vico.compose.legend.horizontalLegend
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -109,6 +110,7 @@ import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CircleImageTopBar
 import kr.carepet.app.navi.component.LoadingAnimation1
 import kr.carepet.app.navi.component.LoadingAnimation3
+import kr.carepet.app.navi.component.LoadingDialog
 import kr.carepet.app.navi.screens.mainscreen.calculateCurrentOffsetForPage
 import kr.carepet.app.navi.screens.mainscreen.metersToKilometers
 import kr.carepet.app.navi.screens.myscreen.CustomDialogDelete
@@ -127,6 +129,7 @@ import kr.carepet.app.navi.viewmodel.CommunityViewModel
 import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.daily.Cmnt
 import kr.carepet.data.daily.DailyDetailData
+import kr.carepet.data.daily.DailyUpdateReq
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
 import java.text.SimpleDateFormat
@@ -183,10 +186,6 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     val upCmntNo0:List<Cmnt> = cmntList?.filter { cmnt ->
         cmnt.upCmntNo == 0 } ?: emptyList()
 
-    LaunchedEffect(Unit){
-        sharedViewModel.updatePushData(null)
-    }
-
     LaunchedEffect(key1 = onReply){
         if (onReply){
             focusManager.clearFocus()
@@ -196,6 +195,26 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
             delay(300)
             viewModel.updateReplyCmnt(null)
             replyText = ""
+        }
+    }
+
+    LaunchedEffect(key1 = storyLoading){
+        if (!storyLoading && story?.userId==G.userId){
+            val dailyUpdateReq = DailyUpdateReq(
+                cmntUseYn = story.cmntUseYn,
+                dailyLifeFileList = story.dailyLifeFileList,
+                dailyLifePetList = story.dailyLifePetList,
+                dailyLifeSchHashTagList = story.dailyLifeSchHashTagList,
+                dailyLifeSchSeList = story.dailyLifeSchSeList,
+                delYn = story.delYn,
+                rcmdtnYn = story.rcmdtnYn,
+                rlsYn = story.rlsYn,
+                schCn = story.schCn,
+                schTtl = story.schTtl,
+                schUnqNo = story.schUnqNo
+            )
+
+            viewModel.updateStoryUpdate(dailyUpdateReq)
         }
     }
 
@@ -219,7 +238,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
         ){
             Spacer(modifier = Modifier.padding(top = 20.dp))
             
-            StoryDetailTopContent(story)
+            StoryDetailTopContent(story,viewModel,navController)
 
             Spacer(
                 modifier = Modifier
@@ -498,9 +517,9 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                         .background(color = design_white, shape = RoundedCornerShape(12.dp))
                         .clip(shape = RoundedCornerShape(12.dp))
                         .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
-                        .clickable (
+                        .clickable(
                             enabled = story?.myRcmdtn == null && !rcmdtnLoading
-                        ){
+                        ) {
                             viewModel.viewModelScope.launch {
                                 rcmdtnLoading = true
                                 val result = viewModel.rcmdtnDaily(rcmdtnSeCd = "001", schUnqNo = story?.schUnqNo ?: 0)
@@ -529,9 +548,9 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                         .background(color = design_white, shape = RoundedCornerShape(12.dp))
                         .clip(shape = RoundedCornerShape(12.dp))
                         .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
-                        .clickable (
+                        .clickable(
                             enabled = story?.myRcmdtn == null && !rcmdtnLoading
-                        ){
+                        ) {
                             viewModel.viewModelScope.launch {
                                 rcmdtnLoading = true
                                 val result = viewModel.rcmdtnDaily(rcmdtnSeCd = "002", schUnqNo = story?.schUnqNo ?: 0)
@@ -569,7 +588,57 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
 }
 
 @Composable
-fun StoryDetailTopContent(story: DailyDetailData?) {
+fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel, navcontroller:NavHostController) {
+
+    var deleteDialog by remember { mutableStateOf(false) }
+    var storyDelete by remember { mutableStateOf(false) }
+    var loading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    if (deleteDialog){
+        CustomDialogDelete(
+            onDismiss = { newValue -> deleteDialog = newValue },
+            confirm = "삭제하기",
+            dismiss = "취소",
+            title = "게시글 삭제하기",
+            text = "정말 삭제하시겠어요?",
+            valueChange = { newValue -> storyDelete = newValue}
+        )
+    }
+
+    if (loading){
+        LoadingDialog(
+            loadingText = "삭제중..",
+            loadingState = loading
+        )
+    }
+
+    LaunchedEffect(key1 = storyDelete){
+        if (storyDelete){
+            loading = true
+            val result = viewModel.updateDaily(delYn = "Y")
+            if (!result){
+                loading = false
+                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+            }else{
+
+                viewModel.updateStoryListClear()
+                viewModel.updateStoryPage(1)
+                val getList = viewModel.getStoryList(1)
+                if (getList){
+                    loading = false
+                    navcontroller.popBackStack()
+                }else{
+                    loading = false
+                    navcontroller.popBackStack()
+                }
+
+
+            }
+        }
+        storyDelete = false
+    }
+
     Column (
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -665,22 +734,66 @@ fun StoryDetailTopContent(story: DailyDetailData?) {
                 )
             }
 
-            Row (verticalAlignment = Alignment.CenterVertically){
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_report),
-                    contentDescription = "", tint = Color.Unspecified,
-                    modifier = Modifier.padding(start = 12.dp))
+            if (story?.userId == G.userId){
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_daily),
+                        contentDescription = "", tint = design_skip,
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .size(14.dp))
 
-                Text(
-                    text = "신고하기",
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.6).sp,
-                    color = design_skip,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
+                    Text(
+                        text = "수정하기",
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 12.sp,
+                        letterSpacing = (-0.6).sp,
+                        color = design_skip,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+
+
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "", tint = design_skip,
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .size(14.dp))
+
+                    Text(
+                        text = "삭제하기",
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 12.sp,
+                        letterSpacing = (-0.6).sp,
+                        color = design_skip,
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .clickable {
+                                deleteDialog = true
+                            }
+                    )
+
+
+                }
+            }else{
+                Row (verticalAlignment = Alignment.CenterVertically){
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_report),
+                        contentDescription = "", tint = Color.Unspecified,
+                        modifier = Modifier.padding(start = 12.dp))
+
+                    Text(
+                        text = "신고하기",
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 12.sp,
+                        letterSpacing = (-0.6).sp,
+                        color = design_skip,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
             }
-
         }
     }
 }
@@ -742,8 +855,8 @@ fun PagerImage(story: DailyDetailData?, showImage: (Boolean) -> Unit, pagerState
                                 model = ImageRequest.Builder(LocalContext.current)
                                     .data(
                                         story?.atchPath+
-                                                story!!.dailyLifeFileList[page].filePathNm+
-                                                story!!.dailyLifeFileList[page].atchFileNm
+                                                story!!.dailyLifeFileList?.get(page)?.filePathNm +
+                                                (story!!.dailyLifeFileList?.get(page)?.atchFileNm )
                                     )
                                     .crossfade(true)
                                     .build(),
@@ -1705,7 +1818,7 @@ fun CommentListItem2(
                                             interactionSource = remember { MutableInteractionSource() }
                                         )
                                 )
-                                Text(text = "${comment.nrcmdtnCnt}",
+                                Text(text = "${comment.rcmdtnCnt}",
                                     style = TextStyle(
                                         color = design_skip,
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),

@@ -32,6 +32,7 @@ import kr.carepet.data.daily.DailyCreateRes
 import kr.carepet.data.daily.DailyDetailData
 import kr.carepet.data.daily.DailyDetailRes
 import kr.carepet.data.daily.DailyRcmdtn
+import kr.carepet.data.daily.DailyUpdateReq
 import kr.carepet.data.daily.Pet
 import kr.carepet.data.daily.PhotoData
 import kr.carepet.data.daily.PhotoRes
@@ -55,6 +56,11 @@ import kotlin.coroutines.resume
 
 @GlideModule
 class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(){
+
+    var moreStoryClick = sharedViewModel.moreStoryClick
+    fun updateMoreStoryClick(newValue : Int?){
+        sharedViewModel.updateMoreStoryClick(newValue)
+    }
 
     val selectedPet = sharedViewModel.selectPet
 
@@ -87,6 +93,12 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _storyDetail.value = newValue
     }
 
+    private val _storyUpdate = MutableStateFlow<DailyUpdateReq?>(null)
+    val storyUpdate:StateFlow<DailyUpdateReq?> = _storyUpdate.asStateFlow()
+    fun updateStoryUpdate(newValue: DailyUpdateReq?){
+        _storyUpdate.value = newValue
+    }
+
     private val _cmntList = MutableStateFlow<List<Cmnt>?>(null)
     val cmntList:StateFlow<List<Cmnt>?> = _cmntList.asStateFlow()
     fun updateCmntList(newValue: List<Cmnt>?){
@@ -110,11 +122,13 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     val selectPetMulti: StateFlow<MutableList<CurrentPetData>> = _selectPetMulti.asStateFlow()
     fun addSelectPetMulti(newValue: CurrentPetData) { _selectPetMulti.value.add(newValue) }
     fun subSelectPetMulti(newValue: CurrentPetData) { _selectPetMulti.value.remove(newValue) }
+    fun clearSelectPetMulti() { _selectPetMulti.value.clear() }
 
     private val _selectCategory = MutableStateFlow<MutableList<CdDetail>>(mutableListOf())
     val selectCategory: StateFlow<MutableList<CdDetail>> = _selectCategory.asStateFlow()
     fun addSelectCategory(newValue: CdDetail) { _selectCategory.value.add(newValue) }
     fun subSelectCategory(newValue: CdDetail) { _selectCategory.value.remove(newValue) }
+    fun clearSelectCategory() { _selectCategory.value.clear() }
 
     private val _walkMemo = MutableStateFlow<String>("")
     val walkMemo: StateFlow<String> = _walkMemo.asStateFlow()
@@ -254,6 +268,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                                 _storyDetail.value = it
                                 _cmntList.value = body.data.cmntList
                                 _storyLoading.value = false
+
                                 continuation.resume(true)
                             } else {
 
@@ -614,6 +629,37 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                         val body = response.body()
                         body?.let {
                             _storyDetail.value = it
+
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<DailyDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun updateDaily(delYn:String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = _storyUpdate.value?.copy(
+            delYn = delYn
+        )
+        Log.d("LOG",data.toString())
+        val call = data?.let { apiService.updateDaily(it) }
+
+        return suspendCancellableCoroutine { continuation ->
+            call?.enqueue(object : Callback<DailyDetailRes>{
+                override fun onResponse(call: Call<DailyDetailRes>, response: Response<DailyDetailRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
 
                             continuation.resume(true)
                         }

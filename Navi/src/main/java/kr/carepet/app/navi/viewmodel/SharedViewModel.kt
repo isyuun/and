@@ -44,9 +44,9 @@ class SharedViewModel:ViewModel(){
     val init:StateFlow<Boolean> = _init.asStateFlow()
     fun updateInit(newValue: Boolean){ _init.value = newValue }
 
-    private val _moreStoryClick = MutableStateFlow<Boolean>(false)
-    val moreStoryClick:StateFlow<Boolean> = _moreStoryClick.asStateFlow()
-    fun updateMoreStoryClick(newValue: Boolean){
+    private val _moreStoryClick = MutableStateFlow<Int?>(null)
+    val moreStoryClick:StateFlow<Int?> = _moreStoryClick.asStateFlow()
+    fun updateMoreStoryClick(newValue: Int?){
         _moreStoryClick.value = newValue
     }
 
@@ -310,7 +310,7 @@ class SharedViewModel:ViewModel(){
     )
 
     fun clear(){
-        _moreStoryClick.value =false
+        _moreStoryClick.value = null
         _weekRecord.value = null
         _init.value = true
         _petInfo.value = arrayListOf(emptyPet)

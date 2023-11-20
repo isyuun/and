@@ -159,6 +159,8 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
     DisposableEffect(Unit) {
         onDispose {
             viewModel.clearSelectedImages()
+            viewModel.clearSelectPetMulti()
+            viewModel.clearSelectCategory()
             viewModel.updateWalkTitle("")
             viewModel.updateWalkMemo("")
             viewModel.updatePostStory(false)

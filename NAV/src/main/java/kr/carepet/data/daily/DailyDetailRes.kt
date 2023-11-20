@@ -24,13 +24,13 @@ data class DailyDetailData(
     @SerializedName("cmntUseYn")
     var cmntUseYn: String, // Y
     @SerializedName("dailyLifeFileList")
-    var dailyLifeFileList: List<DailyLifeFile>,
+    var dailyLifeFileList: List<DailyLifeFile>?,
     @SerializedName("dailyLifePetList")
-    var dailyLifePetList: List<DailyLifePet>,
+    var dailyLifePetList: List<DailyLifePet>?,
     @SerializedName("dailyLifeSchHashTagList")
     var dailyLifeSchHashTagList: List<DailyLifeSchHashTag>?,
     @SerializedName("dailyLifeSchSeList")
-    var dailyLifeSchSeList: List<DailyLifeSchSe>,
+    var dailyLifeSchSeList: List<DailyLifeSchSe>?,
     @SerializedName("delYn")
     var delYn: String, // N
     @SerializedName("nrcmdtnCnt")
@@ -73,8 +73,6 @@ data class DailyDetailData(
     var runClr: Int,
     @SerializedName("runNcknm")
     var runNcknm: String
-
-
 )
 
 data class DailyLifeFile(
@@ -95,7 +93,7 @@ data class DailyLifeFile(
     @SerializedName("orgnlAtchFileNm")
     var orgnlAtchFileNm: String, // image_file_name.jpg
     @SerializedName("rowState")
-    var rowState: Any?, // null
+    var rowState: String?, // null
     @SerializedName("schUnqNo")
     var schUnqNo: Int // 53
 )
@@ -114,7 +112,7 @@ data class DailyLifePet(
     @SerializedName("relmIndctNmtm")
     var relmIndctNmtm: Int, // 0
     @SerializedName("rowState")
-    var rowState: Any?, // null
+    var rowState: String?, // null
     @SerializedName("schUnqNo")
     var schUnqNo: Int, // 53
     @SerializedName("stdgUmdNm")
@@ -129,7 +127,7 @@ data class DailyLifeSchHashTag(
     @SerializedName("hashTagNo")
     var hashTagNo: String, // 21
     @SerializedName("rowState")
-    var rowState: Any?, // null
+    var rowState: String?, // null
     @SerializedName("schUnqNo")
     var schUnqNo: Int // 53
 )
@@ -140,7 +138,7 @@ data class DailyLifeSchSe(
     @SerializedName("cdNm")
     var cdNm: String, // 산책
     @SerializedName("rowState")
-    var rowState: Any?, // null
+    var rowState: String?, // null
     @SerializedName("schUnqNo")
     var schUnqNo: Int // 53
 )
@@ -176,7 +174,7 @@ data class Cmnt(
     @SerializedName("schUnqNo")
     var schUnqNo: Int, // 214
     @SerializedName("stdgUmdNm")
-    var stdgUmdNm: Any?, // null
+    var stdgUmdNm: String?, // null
     @SerializedName("stepLevel")
     var stepLevel: Int, // 1
     @SerializedName("upCmntNo")

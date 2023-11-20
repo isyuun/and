@@ -244,8 +244,8 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                                 model = ImageRequest.Builder(LocalContext.current)
                                                     .data(
                                                         "http://carepet.hopto.org/img/"+
-                                                                dailyDetail!!.dailyLifeFileList[page].filePathNm+
-                                                                dailyDetail!!.dailyLifeFileList[page].atchFileNm
+                                                                (dailyDetail!!.dailyLifeFileList?.get(page)?.filePathNm ?: "") +
+                                                                (dailyDetail!!.dailyLifeFileList?.get(page)?.atchFileNm ?: "")
                                                     )
                                                     .crossfade(true)
                                                     .build(),
@@ -630,6 +630,10 @@ fun FullScreenImage(
         }
     }
 
+    BackHandler {
+        systemBarColor = design_white
+        onDismiss(false)
+    }
 
     Box(
         modifier = Modifier
@@ -650,8 +654,8 @@ fun FullScreenImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
                     "http://carepet.hopto.org/img/"+
-                            dailyDetail.dailyLifeFileList[page].filePathNm+
-                            dailyDetail.dailyLifeFileList[page].atchFileNm
+                            (dailyDetail.dailyLifeFileList?.get(page)?.filePathNm ?: "") +
+                            (dailyDetail.dailyLifeFileList?.get(page)?.atchFileNm ?: "")
                 )
                 .crossfade(true)
                 .build(),

@@ -938,30 +938,31 @@ class PickerState {
     var selectedItem by mutableStateOf("")
 }
 
-fun integrityCheck(viewModel: UserCreateViewModel, context: Context):Boolean{
-    if (viewModel.petKind.value.petNm=="사이즈/품종 선택"){
+fun integrityCheck(viewModel: UserCreateViewModel, context: Context): Boolean {
+    if (viewModel.petKind.value.petNm == "사이즈/품종 선택") {
         Toast.makeText(context, "펫 종류를 선택해주세요", Toast.LENGTH_SHORT).show()
         return false
-    }else if(viewModel.address.value=="주소 선택"){
+    } else if (viewModel.address.value == "주소 선택") {
         Toast.makeText(context, "주소를 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
-    }else if(viewModel.petName.value==""){
+    } else if (viewModel.petName.value == "") {
         Toast.makeText(context, "이름을 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
-    }else if ( !viewModel.petBirthUnknown.value && viewModel.petBirth.value.length<8 ){
+    } else if (!viewModel.petBirthUnknown.value && viewModel.petBirth.value.length < 8) {
         Toast.makeText(context, "생일을 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
-    }else if (!isDateInPastOrToday(viewModel.petBirth.value) || !isDateValid(viewModel.petBirth.value)){
+    } else if (!viewModel.petBirthUnknown.value &&
+        (!isDateInPastOrToday(viewModel.petBirth.value) || !isDateValid(viewModel.petBirth.value))
+    ) {
         Toast.makeText(context, "올바른 날짜가 아닙니다", Toast.LENGTH_SHORT).show()
         return false
-    }else if(viewModel.petWght.value==""){
+    } else if (viewModel.petWght.value == "") {
         Toast.makeText(context, "몸무게를 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
-    }else if(!isValidFloat(viewModel.petWght.value)){
+    } else if (!isValidFloat(viewModel.petWght.value)) {
         Toast.makeText(context, "올바른 몸무게를 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
-    }
-    else{
+    } else {
         return true
     }
 }

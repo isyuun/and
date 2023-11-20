@@ -236,6 +236,14 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
         }
     }
 
+    LaunchedEffect(key1 = viewModel.moreStoryClick){
+        if (viewModel.moreStoryClick.value != null){
+            navController.navigate(Screen.StoryDetail.route)
+            viewModel.getStoryDetail(viewModel.moreStoryClick.value!!)
+            viewModel.updateMoreStoryClick(null)
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -244,7 +252,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
         Column {
             Box{
                 Row (
-                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp)
                 ){
 
                     Row(verticalAlignment = Alignment.CenterVertically,
@@ -342,7 +350,6 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                 }
             }
 
-
             Crossfade(
                 targetState = storyList.isEmpty(),
                 label = "",
@@ -357,7 +364,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                     false ->
                         LazyVerticalGrid(
                             modifier = Modifier
-                                .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+                                .padding(top = 10.dp, start = 20.dp, end = 20.dp)
                                 .pullRefresh(pullRefreshState)
                                 .fillMaxSize(),
                             columns = GridCells.Fixed(2),
