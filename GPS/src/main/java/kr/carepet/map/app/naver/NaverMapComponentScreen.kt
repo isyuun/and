@@ -1329,14 +1329,12 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     version = !version
                 })
                 .align(Alignment.BottomEnd)
-                .height(vertical)
-                .fillMaxWidth(),
+                //.fillMaxWidth()
+                .height(vertical),
         ) {
             Text(
                 text = "${stringResource(id = R.string.app_version)}:$vs",
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .fillMaxWidth(),
+                modifier = Modifier.align(Alignment.BottomEnd),
                 fontSize = 6.sp,
                 color = if (version) Color.Red else Color.Transparent,
                 textAlign = TextAlign.Right,
