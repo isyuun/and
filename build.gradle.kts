@@ -3,7 +3,7 @@
 
 buildscript {
     dependencies {
-        classpath("com.google.gms:google-services:4.4.0")
+        classpath(libs.google.services)
     }
 }
 
@@ -22,37 +22,23 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.48" apply false
 }
 
-//task clean(type: Delete) {
-//    delete rootProject.buildDir
-//}
-
+/**
+ * gradle kotlin-dsl move android {} into subproject {} in root project build.gradle.kts
+ * @see <a href="https://stackoverflow.com/questions/58255544/gradle-kotlin-dsl-move-android-into-subproject-in-root-project-build-gradl">gradle kotlin-dsl move android {} into subproject {} in root project build.gradle.kts</a>
+ */
 subprojects {
     afterEvaluate {}
     pluginManager.withPlugin("com.android.library") {
         project.extensions.getByType<com.android.build.gradle.BaseExtension>().apply {
             defaultConfig {
-                //buildConfigField("String", "BUILD_DATE", "\"${new Date().format("yyyy/MM/dd HH:mm:ss")}\"")
-                //buildConfigField("long", "BUILD_TIME", "${System.currentTimeMillis()}L")
-            }
-            buildTypes {
-                //getByName("debug") {
-                //    //isMinifyEnabled = true
-                //    ////isDebuggable = true
-                //    ////manifestPlaceholders["enableCrashlytics"] = "false"
-                //}
-                //getByName("release") {
-                //    //isMinifyEnabled = true
-                //    ////isDebuggable = false
-                //    ////manifestPlaceholders["enableCrashlytics"] = "true"
-                //}
+                resValue("string", "build_time", "${System.currentTimeMillis()}")
             }
         }
     }
     pluginManager.withPlugin("com.android.application") {
         project.extensions.getByType<com.android.build.gradle.BaseExtension>().apply {
             defaultConfig {
-                //buildConfigField("String", "BUILD_DATE", "\"${Date(System.currentTimeMillis()).format("yyyy/MM/dd HH:mm:ss")}\"")
-                //buildConfigField("long", "BUILD_TIME",  "${System.currentTimeMillis()}L")
+                resValue("string", "build_time", "${System.currentTimeMillis()}")
             }
             signingConfigs {
                 getByName("debug") {

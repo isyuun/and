@@ -20,6 +20,10 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.media.AudioManager
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import androidx.compose.runtime.Composable
@@ -39,6 +43,28 @@ import com.naver.maps.geometry.LatLng
  * @author      : isyuun@care-pet.kr
  * @description :
  */
+private val handler: Handler = Handler(Looper.getMainLooper())
+
+fun post(d: Long = 0, r: Runnable) {
+    handler.postDelayed(r, d)
+}
+
+fun remove(r: Runnable) {
+    handler.removeCallbacks(r)
+}
+
+fun send(d: Long = 0, m: Message) {
+    handler.sendMessageDelayed(m, d)
+}
+
+fun handle(m: Message) {
+    handler.handleMessage(m)
+}
+
+fun dispatch(m: Message) {
+    handler.dispatchMessage(m)
+}
+
 fun LatLng?.toText(): String {
     return if (this != null) {
         "($latitude, $longitude)"
@@ -155,4 +181,15 @@ fun getDeviceDensityString(context: Context): String? {
         DisplayMetrics.DENSITY_560, DisplayMetrics.DENSITY_XXXHIGH -> return "xxxhdpi"
     }
     return ""
+}
+
+/**
+ * How to play the platform CLICK sound in Jetpack Compose Button click
+ * @see <a href="https://stackoverflow.com/questions/66080018/how-to-play-the-platform-click-sound-in-jetpack-compose-button-click">How to play the platform CLICK sound in Jetpack Compose Button click</a>
+ */
+fun withClick(context: Context, onClick: () -> Unit): () -> Unit {
+    return {
+        post { (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK) }
+        onClick()
+    }
 }

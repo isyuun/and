@@ -24,16 +24,16 @@ import android.os.Message
 open class service2 : service() {
     private val handler: Handler = Handler(Looper.getMainLooper())
 
-    fun post(d: Long? = 0, r: Runnable) {
-        handler.postDelayed(r, d!!)
+    fun post(d: Long = 0, r: Runnable) {
+        handler.postDelayed(r, d)
     }
 
     fun remove(r: Runnable) {
         handler.removeCallbacks(r)
     }
 
-    fun send(d: Long? = 0, m: Message) {
-        handler.sendMessageDelayed(m, d!!)
+    fun send(d: Long = 0, m: Message) {
+        handler.sendMessageDelayed(m, d)
     }
 
     fun handle(m: Message) {

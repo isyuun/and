@@ -44,12 +44,13 @@ androidxWindowManager = "1.2.0"
 androidxWork = "2.9.0-rc01"
 animation = "1.5.4"
 coil = "2.4.0"
-firebaseBom = "32.5.0"
+firebaseBom = "32.6.0"
 firebaseCrashlyticsPlugin = "2.9.9"
 firebasePerfPlugin = "1.4.2"
 gmsPlugin = "4.3.14"
 googleOss = "17.0.1"
 googleOssPlugin = "0.10.6"
+googleServices = "4.4.0"
 hilt = "2.48"
 hiltExt = "1.1.0"
 jacoco = "0.8.7"
@@ -108,6 +109,7 @@ constraintlayout = "2.1.4"
 [libraries]
 androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
 accompanist-testharness = { group = "com.google.accompanist", name = "accompanist-testharness", version.ref = "accompanist" }
@@ -300,7 +302,7 @@ mdc = "com.google.android.material:material:1.10.0"
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version = "1.2.1" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version = "2.7.5" }
-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version = "22.2.0" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version = "22.3.0" }
 
 [plugins]
 #org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }

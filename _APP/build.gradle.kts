@@ -22,9 +22,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-
-        //buildConfigField("String", "BUILD_DATE", "\"${Date(System.currentTimeMillis()).format("yyyy/MM/dd HH:mm:ss")}\"")
-        buildConfigField("long", "BUILD_TIME",  "${System.currentTimeMillis()}L")
     }
 
     buildTypes {

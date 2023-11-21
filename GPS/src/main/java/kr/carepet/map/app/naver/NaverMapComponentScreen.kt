@@ -40,9 +40,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -120,7 +120,6 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.widget.LocationButtonView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kr.carepet.BuildConfig
 import kr.carepet.DEBUG
 import kr.carepet.RELEASE
 import kr.carepet.data.pet.CurrentPetData
@@ -136,10 +135,13 @@ import kr.carepet.map.getRounded
 import kr.carepet.map.navigationBarHeight
 import kr.carepet.map.toPx
 import kr.carepet.map.toText
+import kr.carepet.map.withClick
 import kr.carepet.singleton.G
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 
 /**
@@ -674,7 +676,7 @@ fun WalkInfoNavi(
                                 fontSize = 22.sp,
                                 letterSpacing = (-0.0).sp,
                                 fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Start,
+                                textAlign = TextAlign.Left,
                                 maxLines = 1,
                                 //style = TextStyle(background = Color.Yellow),     //test
                             )
@@ -685,7 +687,7 @@ fun WalkInfoNavi(
                                 fontSize = 22.sp,
                                 letterSpacing = (-0.0).sp,
                                 fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Start,
+                                textAlign = TextAlign.Left,
                                 maxLines = 1,
                                 //style = TextStyle(background = Color.Yellow),     //test
                             )
@@ -1312,21 +1314,32 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     )
     Log.v(__CLASSNAME__, "${getMethodName()}[ED][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
     /** VERSION */
-    if (!RELEASE) {
-        Box(modifier = Modifier.fillMaxHeight()) {
-            var version: String
-            val build_time = Date(BuildConfig.BUILD_TIME)
-            Log.i(__CLASSNAME__, "${getMethodName()}[BUILD_TIME:$build_time]")
-            version = "[BUILD_TIME:$build_time]"
+    //if (RELEASE) return
+    val df = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.KOREA)
+    val bt = df.format(Date(stringResource(id = R.string.build_time).toLong()))
+    val pi = context.packageManager.getPackageInfo(context.packageName, 0)
+    val vs = "[${pi.versionName}(${if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode else pi.versionCode})][${if (RELEASE) "REL" else "DEB"}][$bt]"
+    var version by remember { mutableStateOf(false) }
+    Log.i(__CLASSNAME__, "${getMethodName()}[$version][$vs]")
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .clickable(onClick = withClick(context) {
+                    Log.wtf(__CLASSNAME__, "::withClick${getMethodName()}[$context][$version]")
+                    version = !version
+                })
+                .align(Alignment.BottomEnd)
+                .height(vertical)
+                .fillMaxWidth(),
+        ) {
             Text(
-                text = "${stringResource(id = R.string.app_version)}:$version",
+                text = "${stringResource(id = R.string.app_version)}:$vs",
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .fillMaxWidth(),
-                color = Color.Red,
-                fontSize = 8.sp,
-                textAlign = TextAlign.End,
-                maxLines = 1,
+                fontSize = 6.sp,
+                color = if (version) Color.Red else Color.Transparent,
+                textAlign = TextAlign.Right,
             )
         }
     }
