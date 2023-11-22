@@ -3,15 +3,15 @@
 
 buildscript {
     dependencies {
-        classpath("com.google.gms:google-services:4.4.0")
+        classpath(libs.google.services)
     }
 }
 
 // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    id("com.android.application") version "8.1.3" apply false
+    id("com.android.application") version "8.1.4" apply false
     ///*alias(libs.plugins.com.android.application) apply false*/
-    id("com.android.library") version "8.1.3" apply false
+    id("com.android.library") version "8.1.4" apply false
     /*alias(libs.plugins.com.android.library) apply false*/
     id("org.jetbrains.kotlin.android") version "1.9.10" apply false
     ///*alias(libs.plugins.kotlin.android) apply false*/
@@ -22,42 +22,23 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.48" apply false
 }
 
-//task clean(type: Delete) {
-//    delete rootProject.buildDir
-//}
-
+/**
+ * gradle kotlin-dsl move android {} into subproject {} in root project build.gradle.kts
+ * @see <a href="https://stackoverflow.com/questions/58255544/gradle-kotlin-dsl-move-android-into-subproject-in-root-project-build-gradl">gradle kotlin-dsl move android {} into subproject {} in root project build.gradle.kts</a>
+ */
 subprojects {
     afterEvaluate {}
     pluginManager.withPlugin("com.android.library") {
         project.extensions.getByType<com.android.build.gradle.BaseExtension>().apply {
-            //defaultConfig {
-            //    //ext.BUILD_DATE = { return new Date().format("yyyy/MM/dd HH:mm:ss") }
-            //    //ext.BUILD_TIME = { return System.currentTimeMillis() + "L" }
-            //    //buildConfigField("String", "BUILD_DATE", "\"" + new Date().format("yyyy/MM/dd HH:mm:ss") + "\"")
-            //    //buildConfigField("long", "BUILD_TIME", System.currentTimeMillis() + "L")
-            //    //consumerProguardFiles "consumer-rules.pro"
-            //}
-            //buildTypes {
-            //    getByName("debug") {
-            //        //isMinifyEnabled = true
-            //        ////isDebuggable = true
-            //        ////manifestPlaceholders["enableCrashlytics"] = "false"
-            //    }
-            //    getByName("release") {
-            //        //isMinifyEnabled = true
-            //        ////isDebuggable = false
-            //        ////manifestPlaceholders["enableCrashlytics"] = "true"
-            //    }
-            //}
+            defaultConfig {
+                resValue("string", "build_time", "${System.currentTimeMillis()}")
+            }
         }
     }
     pluginManager.withPlugin("com.android.application") {
         project.extensions.getByType<com.android.build.gradle.BaseExtension>().apply {
             defaultConfig {
-                //ext.BUILD_DATE = { Date().format("yyyy/MM/dd HH:mm:ss") }
-                //ext.BUILD_TIME = { System.currentTimeMillis() + "L" }
-                //buildConfigField("String", "BUILD_DATE", "\"" + new Date().format("yyyy/MM/dd HH:mm:ss") + "\"")
-                //buildConfigField("long", "BUILD_TIME", System.currentTimeMillis() + "L")
+                resValue("string", "build_time", "${System.currentTimeMillis()}")
             }
             signingConfigs {
                 getByName("debug") {

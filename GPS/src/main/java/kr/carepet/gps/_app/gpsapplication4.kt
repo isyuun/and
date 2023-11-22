@@ -70,6 +70,9 @@ open class gpsapplication4 : gpsapplication3(), ICameraContentObserver {
     val tracks
         get() = this.service?.tracks
 
+    val lastLocation
+        get() = this.service?.lastLocation
+
     val __duration
         get() = this.service?.__duration
 

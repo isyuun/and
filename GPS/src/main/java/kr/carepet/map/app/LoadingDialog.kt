@@ -72,6 +72,7 @@ fun LoadingDialog(
                 Text(
                     text = loadingText,
                     fontSize = 16.sp,
+                    color = Color.Black,
                 )
             }
         }
