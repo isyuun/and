@@ -607,7 +607,7 @@ fun WalkInfoNavi(
                             modifier = Modifier
                                 .padding(start = 4.0.dp)
                                 .basicMarquee(),
-                            text = stringResource(id = R.string.walk_title_tip),
+                            text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_tip),
                             fontSize = 16.sp,
                             letterSpacing = (-0.6).sp,
                             maxLines = 1,
