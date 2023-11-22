@@ -79,7 +79,7 @@ data class DailyLifeFile(
     @SerializedName("atchFileNm")
     var atchFileNm: String, // 958984f26b154024a9f2bbf78be1235d.JPG
     @SerializedName("atchFileSn")
-    var atchFileSn: String, // 44
+    var atchFileSn: String?, // 44
     @SerializedName("atchFileSz")
     var atchFileSz: Int, // 2859770
     @SerializedName("fileExtnNm")
@@ -95,12 +95,12 @@ data class DailyLifeFile(
     @SerializedName("rowState")
     var rowState: String?, // null
     @SerializedName("schUnqNo")
-    var schUnqNo: Int // 53
+    var schUnqNo: Int? // 53
 )
 
 data class DailyLifePet(
     @SerializedName("age")
-    var age: String, // 15년2일
+    var age: String?, // 15년2일
     @SerializedName("bwlMvmNmtm")
     var bwlMvmNmtm: Int, // 1
     @SerializedName("ownrPetUnqNo")
@@ -108,7 +108,7 @@ data class DailyLifePet(
     @SerializedName("petNm")
     var petNm: String, // 첫째
     @SerializedName("petImg")
-    var petImg: String,
+    var petImg: String?,
     @SerializedName("relmIndctNmtm")
     var relmIndctNmtm: Int, // 0
     @SerializedName("rowState")
@@ -116,7 +116,7 @@ data class DailyLifePet(
     @SerializedName("schUnqNo")
     var schUnqNo: Int, // 53
     @SerializedName("stdgUmdNm")
-    var stdgUmdNm: Any?, // null
+    var stdgUmdNm: String?, // null
     @SerializedName("urineNmtm")
     var urineNmtm: Int // 1
 )

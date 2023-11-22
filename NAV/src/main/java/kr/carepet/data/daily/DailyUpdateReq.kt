@@ -7,9 +7,9 @@ data class DailyUpdateReq(
     @SerializedName("cmntUseYn")
     var cmntUseYn: String, // Y
     @SerializedName("dailyLifeFileList")
-    var dailyLifeFileList: List<DailyLifeFile>?,
+    var dailyLifeFileList: List<Any?>?,
     @SerializedName("dailyLifePetList")
-    var dailyLifePetList: List<DailyLifePet>?,
+    var dailyLifePetList: List<Any>,
     @SerializedName("dailyLifeSchHashTagList")
     var dailyLifeSchHashTagList: List<DailyLifeSchHashTag>?,
     @SerializedName("dailyLifeSchSeList")
@@ -28,3 +28,38 @@ data class DailyUpdateReq(
     var schUnqNo: Int // 43
 )
 
+sealed class DailyLifeUpdatePet {
+    data class PetWithDetails(
+        val ownrPetUnqNo: String,
+        val petNm: String,
+        val stdgUmdNm: String,
+        val age: String,
+        val schUnqNo: Int,
+        val bwlMvmNmtm: Int,
+        val urineNmtm: Int,
+        val relmIndctNmtm: Int,
+        val rowState: String? // 또는 다른 타입으로 변경 가능
+    ) : DailyLifeUpdatePet()
+
+    data class SimplePet(
+        val ownrPetUnqNo: String,
+        val petNm: String,
+        val rowState: String
+    ) : DailyLifeUpdatePet()
+
+    companion object {
+        fun fromDailyLifePet(pet: DailyLifePet): DailyLifeUpdatePet {
+            return PetWithDetails(
+                ownrPetUnqNo = pet.ownrPetUnqNo,
+                petNm = pet.petNm,
+                stdgUmdNm = pet.stdgUmdNm ?: "",
+                age = pet.age?: "",
+                schUnqNo = pet.schUnqNo,
+                bwlMvmNmtm = pet.bwlMvmNmtm,
+                urineNmtm = pet.urineNmtm,
+                relmIndctNmtm = pet.relmIndctNmtm,
+                rowState = pet.rowState
+            )
+        }
+    }
+}

@@ -2,7 +2,6 @@ package kr.carepet.app.navi.viewmodel
 
 import android.content.Context
 import android.net.Uri
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,7 +19,6 @@ import kr.carepet.data.bbs.EventListRes
 import kr.carepet.data.cmm.CdDetail
 import kr.carepet.data.cmm.CmmRes
 import kr.carepet.data.cmm.CommonData
-import kr.carepet.data.cmm.commonRes
 import kr.carepet.data.daily.Cmnt
 import kr.carepet.data.daily.CmntCreateReq
 import kr.carepet.data.daily.CmntCreateRes
@@ -29,8 +27,12 @@ import kr.carepet.data.daily.CmntRcmdtnReq
 import kr.carepet.data.daily.CmntUpdateReq
 import kr.carepet.data.daily.DailyCreateReq
 import kr.carepet.data.daily.DailyCreateRes
-import kr.carepet.data.daily.DailyDetailData
 import kr.carepet.data.daily.DailyDetailRes
+import kr.carepet.data.daily.DailyLifeFile
+import kr.carepet.data.daily.DailyLifePet
+import kr.carepet.data.daily.DailyLifeSchHashTag
+import kr.carepet.data.daily.DailyLifeSchSe
+import kr.carepet.data.daily.DailyLifeUpdatePet
 import kr.carepet.data.daily.DailyRcmdtn
 import kr.carepet.data.daily.DailyUpdateReq
 import kr.carepet.data.daily.Pet
@@ -41,7 +43,6 @@ import kr.carepet.data.daily.StoryReq
 import kr.carepet.data.daily.StoryRes
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.user.BbsReq
-import kr.carepet.gps.app.GPSApplication
 import kr.carepet.singleton.RetrofitClientServer
 import kr.carepet.util.Log
 import okhttp3.MediaType.Companion.toMediaType
@@ -50,7 +51,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.File
 import kotlin.coroutines.resume
 
 
@@ -216,6 +216,150 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     fun updateViewType(newValue: String) {
         _viewType.value = newValue
     }
+
+    // ---------------------------Modify------------------------------
+
+    // 이미 등록된 펫 리스트
+    private val _uploadedPetMulti = MutableStateFlow<MutableList<DailyLifePet>>(mutableListOf())
+    val uploadedPetMulti: StateFlow<MutableList<DailyLifePet>> = _uploadedPetMulti.asStateFlow()
+    fun addUploadedPetMulti(newValue: DailyLifePet) {
+        _uploadedPetMulti.value = _uploadedPetMulti.value.map { pet ->
+            if (pet.ownrPetUnqNo == newValue.ownrPetUnqNo) {
+                pet.copy(rowState = null)
+            } else {
+                pet
+            }
+        }.toMutableList()
+    }
+    fun subUploadedPetMulti(newValue: DailyLifePet) {
+        _uploadedPetMulti.value = _uploadedPetMulti.value.map { pet ->
+            if (pet.ownrPetUnqNo == newValue.ownrPetUnqNo) {
+                pet.copy(rowState = "D")
+            } else {
+                pet
+            }
+        }.toMutableList()
+    }
+    fun clearUploadedPetMulti() { _uploadedPetMulti.value.clear() }
+    fun initUploadedPetMulti(newValue: List<DailyLifePet>){
+        _uploadedPetMulti.value.addAll(newValue)
+    }
+
+    // 새로 추가한 펫
+    private val _newSelectPet = MutableStateFlow<MutableList<DailyLifeUpdatePet.SimplePet>>(mutableListOf())
+    val newSelectPet: StateFlow<MutableList<DailyLifeUpdatePet.SimplePet>> = _newSelectPet.asStateFlow()
+    fun addNewSelectPet(newValue: DailyLifeUpdatePet.SimplePet) {
+        _newSelectPet.value.add(newValue)
+    }
+    fun subNewSelectPet(newValue: DailyLifeUpdatePet.SimplePet) {
+        _newSelectPet.value.remove(newValue)
+    }
+    fun clearNewSelectPet() { _newSelectPet.value.clear() }
+
+    private val _uploadSchTtl = MutableStateFlow<String?>(null)
+    val uploadSchTtl = _uploadSchTtl.asStateFlow()
+    fun updateUploadSchTtl(newValue: String){
+        _uploadSchTtl.value = newValue
+    }
+
+    // 이미 등록된 사진 리스트
+    private val _uploadedFileList = MutableStateFlow<List<DailyLifeFile>?>(null)
+    val uploadedFileList:StateFlow<List<DailyLifeFile>?> = _uploadedFileList.asStateFlow()
+    fun updateUploadedFileList(newValue: List<DailyLifeFile>?){
+        _uploadedFileList.value = newValue
+    }
+    fun subUploadedFileList(newValue:Uri){
+        val fileName = getLastSegmentAfterSlash(newValue.toString())
+        _uploadedFileList.value = (_uploadedFileList.value?.map { file ->
+            if (file.atchFileNm == fileName) {
+                file.copy(rowState = "D")
+            } else {
+                file
+            }
+        } ?: emptyList()) as MutableList<DailyLifeFile>?
+    }
+
+    // 새로 등록된 사진 리스트
+    private val _newFileList = MutableStateFlow<List<DailyLifeFile>?>(null)
+    val newFileList:StateFlow<List<DailyLifeFile>?> = _newFileList.asStateFlow()
+    fun clearNewFileList(){_newFileList.value = null}
+
+
+    fun getLastSegmentAfterSlash(inputString: String): String {
+        val segments = inputString.split('/')
+        return segments.last()
+    }
+
+    private val _uploadSchCn = MutableStateFlow<String?>(null)
+    val uploadSchCn = _uploadSchCn.asStateFlow()
+    fun updateUploadSchCn(newValue: String){
+        _uploadSchCn.value = newValue
+    }
+
+    private val _uploadSchSeList = MutableStateFlow<MutableList<DailyLifeSchSe>>(mutableListOf())
+    val uploadSchSeList = _uploadSchSeList.asStateFlow()
+    fun addUploadSchSeList(newValue: DailyLifeSchSe){
+        val isAlreadyUploadedSch = _storyDetail.value?.data?.dailyLifeSchSeList?.any{ it.cdId == newValue.cdId}
+        if (isAlreadyUploadedSch == true){
+            _uploadSchSeList.value = _uploadSchSeList.value.map { sch ->
+                if (sch.cdId == newValue.cdId) {
+                    sch.copy(rowState = null)
+                } else {
+                    sch
+                }
+            }.toMutableList()
+        }else{
+            _uploadSchSeList.value.add(newValue.copy(rowState = "C"))
+        }
+        Log.d("LOG",_uploadSchSeList.value.toString())
+    }
+    fun subUploadSchSeList(newValue: DailyLifeSchSe){
+        val isAlreadyUploadedSch = _storyDetail.value?.data?.dailyLifeSchSeList?.any { it.cdId == newValue.cdId }
+
+        if (isAlreadyUploadedSch == true) {
+            _uploadSchSeList.value = _uploadSchSeList.value.map { sch ->
+                if (sch.cdId == newValue.cdId) {
+                    sch.copy(rowState = "D")
+                } else {
+                    sch
+                }
+            }.toMutableList()
+        }else{
+            _uploadSchSeList.value.remove(newValue.copy(rowState = "C"))
+        }
+        Log.d("LOG",_uploadSchSeList.value.toString())
+    }
+    fun initUploadSchSeList(newValue: List<DailyLifeSchSe>){
+        _uploadSchSeList.value.addAll(newValue)
+    }
+    fun clearUploadSchSeList(){ _uploadSchSeList.value.clear()}
+
+    private val _uploadHashTag = MutableStateFlow<List<DailyLifeSchHashTag>>(emptyList())
+    val uploadHashTag: StateFlow<List<DailyLifeSchHashTag>> = _uploadHashTag.asStateFlow()
+    fun updateUploadHashTag(newValue: List<String>) {
+
+        val currentHashTagList = _storyDetail.value?.data?.dailyLifeSchHashTagList ?: emptyList()
+
+        _uploadHashTag.value = currentHashTagList.map { currentHashTag ->
+            if (newValue.contains(currentHashTag.hashTagNm)) {
+                currentHashTag.copy(rowState = null)
+            } else {
+                currentHashTag.copy(rowState = "D")
+            }
+        } + newValue.filter { newHashTag ->
+            !currentHashTagList.any { it.hashTagNm == newHashTag }
+        }.map {
+            DailyLifeSchHashTag(hashTagNm = it, hashTagNo = "", rowState = "C", schUnqNo = _storyDetail.value?.data?.schUnqNo?:0)
+        }
+    }
+    fun clearUploadHashTag(){_uploadHashTag.value = emptyList() }
+
+    private val _uploadPostStory = MutableStateFlow<Boolean>(false)
+    val uploadPostStory: StateFlow<Boolean> = _uploadPostStory.asStateFlow()
+    fun updateUploadPostStory(newValue: Boolean) {
+        _uploadPostStory.value = newValue
+    }
+    // ---------------------------Modify------------------------------
 
     suspend fun getStoryList(page: Int):Boolean{
         val apiService = RetrofitClientServer.instance
@@ -648,10 +792,20 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun updateDaily(delYn:String):Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val data = _storyUpdate.value?.copy(
-            delYn = delYn
+        val data = DailyUpdateReq(
+            cmntUseYn = _storyDetail.value?.data?.cmntUseYn?:"Y",
+            dailyLifeFileList = _storyDetail.value?.data?.dailyLifeFileList,
+            dailyLifePetList = _storyDetail.value?.data?.dailyLifePetList?: emptyList(),
+            dailyLifeSchHashTagList = _storyDetail.value?.data?.dailyLifeSchHashTagList,
+            dailyLifeSchSeList = _storyDetail.value?.data?.dailyLifeSchSeList,
+            delYn = delYn,
+            rcmdtnYn = _storyDetail.value?.data?.rcmdtnYn?:"Y",
+            rlsYn = _storyDetail.value?.data?.rlsYn?:"Y",
+            schCn = _storyDetail.value?.data?.schCn?:"",
+            schTtl = _storyDetail.value?.data?.schTtl?:"",
+            schUnqNo = _storyDetail.value?.data?.schUnqNo ?: 0,
         )
-        Log.d("LOG",data.toString())
+
         val call = data?.let { apiService.updateDaily(it) }
 
         return suspendCancellableCoroutine { continuation ->
@@ -661,6 +815,49 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                         val body = response.body()
                         body?.let {
 
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<DailyDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun updateDaily():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        concatUploadedFileList(_newFileList.value?: emptyList())
+
+        val data = DailyUpdateReq(
+            cmntUseYn = "Y",
+            dailyLifeFileList = _uploadedFileList.value,
+            dailyLifePetList = _uploadedPetMulti.value+_newSelectPet.value,
+            dailyLifeSchHashTagList = _uploadHashTag.value,
+            dailyLifeSchSeList = _uploadSchSeList.value,
+            delYn = "N",
+            rcmdtnYn = "Y",
+            rlsYn = if (_uploadPostStory.value) "Y" else "N",
+            schCn = _uploadSchCn.value?:"",
+            schTtl = _uploadSchTtl.value?:"",
+            schUnqNo = _storyDetail.value?.data?.schUnqNo ?: 0,
+        )
+
+        val call = data.let { apiService.updateDaily(it) }
+
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<DailyDetailRes>{
+                override fun onResponse(call: Call<DailyDetailRes>, response: Response<DailyDetailRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _storyDetail.value = it
                             continuation.resume(true)
                         }
                     }else{
@@ -715,6 +912,76 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
             })
+        }
+    }
+
+    suspend fun fileUploadModify(context: Context): Boolean {
+        val apiService = RetrofitClientServer.instance
+
+        val parts = ArrayList<MultipartBody.Part>()
+
+        val maxImages = 5
+
+        val localUriList = state.listOfSelectedImages.filter { uri ->
+            uri.scheme != "http" && uri.scheme != "https"
+        }
+
+        for (i in 0 until Integer.min(maxImages, localUriList.size - 1)) {
+            val fileUri = localUriList[i]
+
+            val resizedFile = resizeImage(context, fileUri , i)
+
+            resizedFile?.let {
+                val requestBody = it.asRequestBody("image/*".toMediaType())
+                val part = MultipartBody.Part.createFormData("files", "image$i.jpg", requestBody)
+                parts.add(part)
+            }
+        }
+
+        val call = apiService.uploadPhoto(parts)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<PhotoRes> {
+                override fun onResponse(call: Call<PhotoRes>, response: Response<PhotoRes>) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        body?.let {
+                            val dailyLifeFiles = body.data.map { photoData ->
+                                DailyLifeFile(
+                                    atchFileNm = photoData.atchFileNm,
+                                    atchFileSz = photoData.atchFileSz,
+                                    atchFileSn = null,
+                                    fileExtnNm = photoData.fileExtnNm,
+                                    filePathNm = photoData.filePathNm,
+                                    flmPstnLat = photoData.flmPstnLat,
+                                    flmPstnLot = photoData.flmPstnLot,
+                                    orgnlAtchFileNm = photoData.orgnlAtchFileNm,
+                                    rowState = "C",
+                                    schUnqNo = null
+                                )
+                            }
+                            _newFileList.value = dailyLifeFiles
+                            continuation.resume(true)
+                        }
+                    } else {
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<PhotoRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    fun concatUploadedFileList(newFiles: List<DailyLifeFile>) {
+        _uploadedFileList.value?.let { currentList ->
+            val combinedList = mutableListOf<DailyLifeFile>().apply {
+                addAll(currentList)
+                addAll(newFiles)
+            }
+            _uploadedFileList.value = combinedList
         }
     }
 }

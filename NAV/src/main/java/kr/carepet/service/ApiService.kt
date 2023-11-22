@@ -30,6 +30,7 @@ import kr.carepet.data.daily.DailyRcmdtn
 import kr.carepet.data.daily.DailyUpdateReq
 import kr.carepet.data.daily.PhotoRes
 import kr.carepet.data.daily.RTStoryListRes
+import kr.carepet.data.daily.RlsDailyReq
 import kr.carepet.data.daily.StoryReq
 import kr.carepet.data.daily.StoryRes
 import kr.carepet.data.daily.WalkListReq
@@ -130,6 +131,9 @@ interface ApiService {
 
     @POST("api/v1/daily-life/update")
     fun updateDaily(@Body data: DailyUpdateReq): Call<DailyDetailRes>
+
+    @POST("api/v1/daily-life/rls/update")
+    fun rlsDaily(@Body data: RlsDailyReq): Call<DailyDetailRes>
 
     @POST("api/v1/daily-life/list")
     fun getWalkList(@Body data: WalkListReq): Call<WalkListRes>
