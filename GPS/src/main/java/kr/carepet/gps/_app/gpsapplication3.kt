@@ -13,7 +13,6 @@ package kr.carepet.gps._app
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
-import kr.carepet.gps.app.ICameraContentObserver
 import kr.carepet.util.Log
 import kr.carepet.util.getMethodName
 
