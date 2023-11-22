@@ -1,5 +1,6 @@
 package kr.carepet.app.navi.screens.commuscreen
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -13,7 +14,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -51,7 +54,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -70,7 +72,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -80,7 +81,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -106,6 +106,7 @@ import com.patrykandpatrick.vico.compose.legend.horizontalLegend
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.carepet.app.navi.R
+import kr.carepet.app.navi.Screen
 import kr.carepet.app.navi.component.BackTopBar
 import kr.carepet.app.navi.component.CircleImageTopBar
 import kr.carepet.app.navi.component.LoadingAnimation1
@@ -168,17 +169,21 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     var rcmdtnLoading by remember{ mutableStateOf(false) }
     var cmntExpanded by remember{ mutableStateOf(true) }
     var onReply by remember{ mutableStateOf(false) }
+    var isModify by remember{ mutableStateOf(false) }
     var replyText by remember{ mutableStateOf("") }
     val context = LocalContext.current
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     BackHandler {
-        if (showImage){
+        if (isModify){
+            isModify = false
+        }else if (showImage){
             showImage = false
         }else if (onReply){
-            onReply = false
-        }else{
+            onReply =false
+        }
+        else{
             navController.popBackStack()
         }
     }
@@ -195,26 +200,6 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
             delay(300)
             viewModel.updateReplyCmnt(null)
             replyText = ""
-        }
-    }
-
-    LaunchedEffect(key1 = storyLoading){
-        if (!storyLoading && story?.userId==G.userId){
-            val dailyUpdateReq = DailyUpdateReq(
-                cmntUseYn = story.cmntUseYn,
-                dailyLifeFileList = story.dailyLifeFileList,
-                dailyLifePetList = story.dailyLifePetList,
-                dailyLifeSchHashTagList = story.dailyLifeSchHashTagList,
-                dailyLifeSchSeList = story.dailyLifeSchSeList,
-                delYn = story.delYn,
-                rcmdtnYn = story.rcmdtnYn,
-                rlsYn = story.rlsYn,
-                schCn = story.schCn,
-                schTtl = story.schTtl,
-                schUnqNo = story.schUnqNo
-            )
-
-            viewModel.updateStoryUpdate(dailyUpdateReq)
         }
     }
 
@@ -238,7 +223,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
         ){
             Spacer(modifier = Modifier.padding(top = 20.dp))
             
-            StoryDetailTopContent(story,viewModel,navController)
+            StoryDetailTopContent(story,viewModel,navController, modifyChange = {newValue -> isModify = newValue})
 
             Spacer(
                 modifier = Modifier
@@ -265,7 +250,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                 .animateContentSize() // 이 부분을 추가하여 크기 변화를 자연스럽게 만듭니다.
                         ) {
                             if (story?.dailyLifeFileList != null){
-                                PagerImage(story, showImage = {newValue -> showImage = newValue}, pagerState, viewModel)
+                                PagerImage(showImage = {newValue -> showImage = newValue}, pagerState, viewModel)
                             }
 
                             AnimatedVisibility(
@@ -574,6 +559,14 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
             }
         }// col
     }
+    AnimatedVisibility(
+        visible = isModify,
+        enter = slideInHorizontally(initialOffsetX = {it/2})+ fadeIn(),
+        exit = slideOutHorizontally(targetOffsetX = {it/2})+ fadeOut()
+    ) {
+        DailyModifyScreen(viewModel = viewModel, sharedViewModel = sharedViewModel, navController = navController, onBack = {newValue -> isModify = newValue})
+    }
+
 
     AnimatedVisibility(
         visible = showImage,
@@ -588,7 +581,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
 }
 
 @Composable
-fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel, navcontroller:NavHostController) {
+fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel, navcontroller:NavHostController,modifyChange:(Boolean) ->Unit) {
 
     var deleteDialog by remember { mutableStateOf(false) }
     var storyDelete by remember { mutableStateOf(false) }
@@ -616,8 +609,10 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
     LaunchedEffect(key1 = storyDelete){
         if (storyDelete){
             loading = true
+            Log.d("LOG","delete 진입")
             val result = viewModel.updateDaily(delYn = "Y")
             if (!result){
+                Log.d("LOG","결과 진입")
                 loading = false
                 Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
             }else{
@@ -738,44 +733,52 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                 Row (
                     verticalAlignment = Alignment.CenterVertically
                 ){
-                    Icon(
-                        painter = painterResource(id = R.drawable.icon_daily),
-                        contentDescription = "", tint = design_skip,
-                        modifier = Modifier
-                            .padding(start = 12.dp)
-                            .size(14.dp))
+                    Row (
+                        modifier = Modifier.clickable {
+                                                      modifyChange(true)
+                        },
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_daily),
+                            contentDescription = "", tint = design_skip,
+                            modifier = Modifier
+                                .padding(start = 12.dp)
+                                .size(14.dp))
 
-                    Text(
-                        text = "수정하기",
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 12.sp,
-                        letterSpacing = (-0.6).sp,
-                        color = design_skip,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
+                        Text(
+                            text = "수정하기",
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 12.sp,
+                            letterSpacing = (-0.6).sp,
+                            color = design_skip,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
 
+                    Row (
+                        modifier = Modifier.clickable {
+                            deleteDialog = true
+                        },
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "", tint = design_skip,
+                            modifier = Modifier
+                                .padding(start = 12.dp)
+                                .size(14.dp))
 
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "", tint = design_skip,
-                        modifier = Modifier
-                            .padding(start = 12.dp)
-                            .size(14.dp))
-
-                    Text(
-                        text = "삭제하기",
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 12.sp,
-                        letterSpacing = (-0.6).sp,
-                        color = design_skip,
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .clickable {
-                                deleteDialog = true
-                            }
-                    )
-
-
+                        Text(
+                            text = "삭제하기",
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 12.sp,
+                            letterSpacing = (-0.6).sp,
+                            color = design_skip,
+                            modifier = Modifier
+                                .padding(start = 4.dp)
+                        )
+                    }
                 }
             }else{
                 Row (verticalAlignment = Alignment.CenterVertically){
@@ -800,8 +803,9 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PagerImage(story: DailyDetailData?, showImage: (Boolean) -> Unit, pagerState: PagerState, viewModel: CommunityViewModel) {
+fun PagerImage(showImage: (Boolean) -> Unit, pagerState: PagerState, viewModel: CommunityViewModel) {
 
+    val story by viewModel.storyDetail.collectAsState()
     val isLoading by viewModel.storyLoading.collectAsState()
 
     Crossfade(
@@ -854,9 +858,9 @@ fun PagerImage(story: DailyDetailData?, showImage: (Boolean) -> Unit, pagerState
                             AsyncImage(
                                 model = ImageRequest.Builder(LocalContext.current)
                                     .data(
-                                        story?.atchPath+
-                                                story!!.dailyLifeFileList?.get(page)?.filePathNm +
-                                                (story!!.dailyLifeFileList?.get(page)?.atchFileNm )
+                                        story?.data?.atchPath+
+                                                story?.data?.dailyLifeFileList?.get(page)?.filePathNm +
+                                                (story?.data?.dailyLifeFileList?.get(page)?.atchFileNm )
                                     )
                                     .crossfade(true)
                                     .build(),
@@ -878,7 +882,7 @@ fun PagerImage(story: DailyDetailData?, showImage: (Boolean) -> Unit, pagerState
                             .padding(top = 8.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        repeat(story?.dailyLifeFileList?.size ?: 0 ) { iteration ->
+                        repeat(story?.data?.dailyLifeFileList?.size ?: 0 ) { iteration ->
                             val color = if (pagerState.currentPage == iteration) design_intro_bg else design_DDDDDD
                             Box(
                                 modifier = Modifier
@@ -1299,9 +1303,9 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                                             rcmdtnLoading = true
                                                             val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo, rcmdtnSeCd = "001", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
                                                             if (result) {
-                                                                rcmdtnLoading = true
+                                                                rcmdtnLoading = false
                                                             } else {
-                                                                rcmdtnLoading = true
+                                                                rcmdtnLoading = false
                                                                 Toast
                                                                     .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
                                                                     .show()
@@ -1477,7 +1481,8 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_login_text
+                    color = design_login_text,
+                    modifier = Modifier.padding(end = 10.dp)
                 )
 
                 if (step2CmntList.isNotEmpty()){

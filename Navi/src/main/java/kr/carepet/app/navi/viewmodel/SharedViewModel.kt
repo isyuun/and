@@ -32,6 +32,10 @@ import kotlin.coroutines.resume
 
 class SharedViewModel:ViewModel(){
 
+    private val _profilePet = MutableStateFlow<PetDetailData?>(null)
+    val profilePet:StateFlow<PetDetailData?> = _profilePet.asStateFlow()
+    fun updateProfilePet(newValue: PetDetailData?){ _profilePet.value = newValue}
+
     private val _pushData = MutableStateFlow<Bundle?>(null)
     val pushData:StateFlow<Bundle?> = _pushData.asStateFlow()
     fun updatePushData(newValue: Bundle?){ _pushData.value = newValue}

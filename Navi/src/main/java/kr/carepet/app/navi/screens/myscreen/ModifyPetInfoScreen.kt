@@ -105,6 +105,7 @@ import kr.carepet.data.SCD
 import kr.carepet.data.SggList
 import kr.carepet.data.UmdList
 import kr.carepet.data.pet.PetListData
+import kr.carepet.util.Log
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -167,7 +168,7 @@ fun ModifyPetInfoScreen(
     var delete by remember{ mutableStateOf(false) }
     var isLoading by remember{ mutableStateOf(false) }
 
-    LaunchedEffect(key1 = init){
+    LaunchedEffect(Unit){
         if (init){
             viewModel.updatePetName(selectPet.petNm)
             viewModel.updatePetDorC("강아지")
@@ -199,32 +200,33 @@ fun ModifyPetInfoScreen(
         }
     }
 
-    DisposableEffect(Unit){
-        onDispose {
-            viewModel.updatePetName("")
-            viewModel.updatePetKind(
-                PetListData(
-                    petDogSzCd = "",
-                    petNm = "사이즈/품종 선택",
-                    petEnNm = "",
-                    petInfoUnqNo = 0,
-                    petTypCd = ""
-                )
-            )
-            viewModel.updatePetWght("")
-            viewModel.updatePetGender("남아")
-            viewModel.updatePetNtr("했어요")
-            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
-            viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
-            viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
-            viewModel.updatePetBirth("")
-            viewModel.updateYear(PickerState())
-            viewModel.setImageUri(null,context)
-            viewModel.updateAddress("주소 선택")
-
-            init = true
-        }
-    }
+    //DisposableEffect(Unit){
+    //
+    //    onDispose {
+    //        if (init){
+    //            viewModel.updatePetName("")
+    //            viewModel.updatePetKind(
+    //                PetListData(
+    //                    petDogSzCd = "",
+    //                    petNm = "사이즈/품종 선택",
+    //                    petEnNm = "",
+    //                    petInfoUnqNo = 0,
+    //                    petTypCd = ""
+    //                )
+    //            )
+    //            viewModel.updatePetWght("")
+    //            viewModel.updatePetGender("남아")
+    //            viewModel.updatePetNtr("했어요")
+    //            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+    //            viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
+    //            viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
+    //            viewModel.updatePetBirth("")
+    //            viewModel.updateYear(PickerState())
+    //            viewModel.setImageUri(null,context)
+    //            viewModel.updateAddress("주소 선택")
+    //        }
+    //    }
+    //}
 
     LaunchedEffect(key1 = delete){
         if (delete){
@@ -275,38 +277,34 @@ fun ModifyPetInfoScreen(
         }
     }
 
-    //BackHandler {
-    //    navController.popBackStack()
-    //
-    //    scope.launch {
-    //        delay(700)
-    //
-    //
-    //        viewModel.updatePetName("")
-    //        viewModel.updatePetKind(
-    //            PetListData(
-    //                petDogSzCd = "",
-    //                petNm = "사이즈/품종 선택",
-    //                petEnNm = "",
-    //                petInfoUnqNo = 0,
-    //                petTypCd = ""
-    //            )
-    //        )
-    //        viewModel.updatePetWght("")
-    //        viewModel.updatePetGender("남아")
-    //        viewModel.updatePetNtr("했어요")
-    //        viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
-    //        viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
-    //        viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
-    //        viewModel.updatePetBirth("")
-    //        viewModel.updateYear(PickerState())
-    //        viewModel.setImageUri(null,context)
-    //        viewModel.updateAddress("주소 선택")
-    //
-    //        init = true
-    //    }
-    //
-    //}
+    BackHandler {
+        scope.launch {
+            navController.popBackStack()
+
+            viewModel.updatePetName("")
+            viewModel.updatePetKind(
+                PetListData(
+                    petDogSzCd = "",
+                    petNm = "사이즈/품종 선택",
+                    petEnNm = "",
+                    petInfoUnqNo = 0,
+                    petTypCd = ""
+                )
+            )
+            viewModel.updatePetWght("")
+            viewModel.updatePetGender("남아")
+            viewModel.updatePetNtr("했어요")
+            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+            viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
+            viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
+            viewModel.updatePetBirth("")
+            viewModel.updateYear(PickerState())
+            viewModel.setImageUri(null,context)
+            viewModel.updateAddress("주소 선택")
+
+            init = true
+        }
+    }
 
     Scaffold (
         modifier = modifier.fillMaxSize(),
@@ -992,6 +990,8 @@ private fun pixelsToDp(pixels: Int) = with(LocalDensity.current) { pixels.toDp()
 @Composable
 fun BackTopBarInModify(title: String, navController: NavHostController, backVisible:Boolean=true,viewModel: UserCreateViewModel,initChange:(Boolean)->Unit){
 
+    val context = LocalContext.current
+
     TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
         modifier = Modifier.height(60.dp),
@@ -1027,6 +1027,13 @@ fun BackTopBarInModify(title: String, navController: NavHostController, backVisi
                                 viewModel.updatePetWght("")
                                 viewModel.updatePetGender("남아")
                                 viewModel.updatePetNtr("했어요")
+                                viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+                                viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
+                                viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
+                                viewModel.updatePetBirth("")
+                                viewModel.updateYear(PickerState())
+                                viewModel.setImageUri(null,context)
+                                viewModel.updateAddress("주소 선택")
 
                                 initChange(true)
                             }
