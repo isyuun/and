@@ -1096,6 +1096,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             Icon(
                                 imageVector = ImageVector.vectorResource(id = R.drawable.walk_active),
                                 contentDescription = stringResource(R.string.mark),
+                                tint = Color.Black,
                                 modifier = Modifier.size(20.0.dp),
                             )
                         }
