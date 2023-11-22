@@ -717,8 +717,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var loading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val application = GPSApplication.instance
-    val tracks = application.tracks
     val start = application.start
+    val tracks = application.tracks
     Log.v(__CLASSNAME__, "${getMethodName()}[ST][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
 
     if (G.mapPetInfo.isEmpty()) {   //test
@@ -741,7 +741,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         }
     }
 
-    var position by remember { mutableStateOf(LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
+    val location = application.lastLocation ?: source.lastLocation
+    var position by remember { mutableStateOf(if (location != null) LatLng(location.latitude, location.longitude) else LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
     var zoom by remember { mutableDoubleStateOf(GPX_CAMERA_ZOOM_ZERO) }
 
     source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }

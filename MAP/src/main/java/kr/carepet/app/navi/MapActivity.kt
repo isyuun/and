@@ -26,10 +26,6 @@ import kr.carepet.util.getMethodName
 open class MapActivity : kr.carepet.map.app.MapActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    //private val fusedLocationSource: FusedLocationSource by lazy {
-    //    FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
-    //}
-
     override fun setContent() {
         Log.v(__CLASSNAME__, "${getMethodName()}...")
         //super.setContent()

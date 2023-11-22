@@ -40,10 +40,10 @@ open class gpsappcompatactivity : AppCompatActivity(), IForegroundOnlyBroadcastR
         return application.location4Intent(intent)
     }
 
-    protected var location: Location? = null
+    protected var lastLocation: Location? = null
     override fun onReceive(context: Context, intent: Intent) {
-        location = location4Intent(intent)
-        Log.i(__CLASSNAME__, "${getMethodName()}${location?.toText()}, $location, $context, $intent")
+        lastLocation = location4Intent(intent)
+        Log.i(__CLASSNAME__, "${getMethodName()}${lastLocation?.toText()}, $lastLocation, $context, $intent")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
