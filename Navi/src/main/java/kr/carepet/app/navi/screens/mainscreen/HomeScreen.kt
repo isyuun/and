@@ -105,6 +105,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -389,8 +390,10 @@ fun ProfileContent(
         if (weatherRefresh){
             val getLocation = viewModel.getLocation(context)
             if (getLocation){
-                viewModel.getWeather()
-                viewModel.updateWeatherRefresh(false)
+                viewModel.viewModelScope.let {
+                    viewModel.getWeather()
+                    viewModel.updateWeatherRefresh(false)
+                }
             }
         }
     }
