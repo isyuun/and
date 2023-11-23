@@ -14,11 +14,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kr.carepet.data.CommonCodeModel
+import kr.carepet.data.bbs.BbsCmnt
+import kr.carepet.data.bbs.BbsCmntCreateRes
+import kr.carepet.data.bbs.BbsCmntRcmdtnReq
+import kr.carepet.data.bbs.BbsCmntUpdateReq
+import kr.carepet.data.bbs.BbsCmtCreateReq
 import kr.carepet.data.bbs.EventDetailRes
 import kr.carepet.data.bbs.EventListRes
 import kr.carepet.data.cmm.CdDetail
 import kr.carepet.data.cmm.CmmRes
 import kr.carepet.data.cmm.CommonData
+import kr.carepet.data.daily.BbsCmntDeleteReq
 import kr.carepet.data.daily.Cmnt
 import kr.carepet.data.daily.CmntCreateReq
 import kr.carepet.data.daily.CmntCreateRes
@@ -43,6 +49,7 @@ import kr.carepet.data.daily.StoryReq
 import kr.carepet.data.daily.StoryRes
 import kr.carepet.data.pet.CurrentPetData
 import kr.carepet.data.user.BbsReq
+import kr.carepet.singleton.G
 import kr.carepet.singleton.RetrofitClientServer
 import kr.carepet.util.Log
 import okhttp3.MediaType.Companion.toMediaType
@@ -201,9 +208,28 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
 
     private val _eventList = MutableStateFlow<EventListRes?>(null)
     val eventList: StateFlow<EventListRes?> = _eventList.asStateFlow()
+    fun updateEventListClear(){_eventList.value = null}
 
     private val _eventDetail = MutableStateFlow<EventDetailRes?>(null)
     val eventDetail: StateFlow<EventDetailRes?> = _eventDetail.asStateFlow()
+
+    private val _eventCmntList = MutableStateFlow<List<BbsCmnt>?>(null)
+    val eventCmntList:StateFlow<List<BbsCmnt>?> = _eventCmntList.asStateFlow()
+    fun updateEventCmntList(newValue: List<BbsCmnt>?){
+        _eventCmntList.value = newValue
+    }
+
+    private val _eventReplyCmnt = MutableStateFlow<BbsCmnt?>(null)
+    val eventReplyCmnt:StateFlow<BbsCmnt?> = _eventReplyCmnt.asStateFlow()
+    fun updateEventReplyCmnt(newValue: BbsCmnt?){
+        _eventReplyCmnt.value = newValue
+    }
+
+    private val _bbsComment = MutableStateFlow<String>("")
+    val bbsComment: StateFlow<String> = _bbsComment.asStateFlow()
+    fun updateBbsComment(newValue: String) { _bbsComment.value = newValue }
+
+
 
     private val _orderType = MutableStateFlow<String>("최신순")
     val orderType: StateFlow<String> = _orderType.asStateFlow()
@@ -478,6 +504,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                         val body = response.body()
                         body?.let {
                             _eventDetail.value = it
+                            _eventCmntList.value = it.data.bbsCmnts
                             continuation.resume(true)
                         }
                     }else{
@@ -866,6 +893,176 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
                 override fun onFailure(call: Call<DailyDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun bbsDeleteComment(cmntNo: Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsCmntDeleteReq(cmntNo)
+
+        val call = apiService.bbsCmntDelete(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<BbsCmntCreateRes>{
+                override fun onResponse(call: Call<BbsCmntCreateRes>, response: Response<BbsCmntCreateRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let { it ->
+                            if (it.statusCode == 200){
+                                _eventCmntList.value = it.data
+                                continuation.resume(true)
+                            }else{
+
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<BbsCmntCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun bbsCmntCreate(cmntCn: String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsCmtCreateReq(
+            cmntCn = cmntCn,
+            petRelUnqNo = selectedPet.value?.petRelUnqNo?:0,
+            pstSn = _eventDetail.value?.data?.pstSn?:0,
+            upCmntNo = _eventReplyCmnt.value?.pstCmntNo ?: 0,
+            userId = G.userId,
+        )
+
+        val call = apiService.bbsCmntCreate(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<BbsCmntCreateRes>{
+                override fun onResponse(call: Call<BbsCmntCreateRes>, response: Response<BbsCmntCreateRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _eventCmntList.value = it.data
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<BbsCmntCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun bbsCmntCreate():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsCmtCreateReq(
+            cmntCn = _bbsComment.value,
+            petRelUnqNo = selectedPet.value?.petRelUnqNo?:0,
+            pstSn = _eventDetail.value?.data?.pstSn?:0,
+            upCmntNo = 0,
+            userId = G.userId,
+        )
+
+        val call = apiService.bbsCmntCreate(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<BbsCmntCreateRes>{
+                override fun onResponse(call: Call<BbsCmntCreateRes>, response: Response<BbsCmntCreateRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _eventCmntList.value = it.data
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<BbsCmntCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun bbsUpdateComment(cmntCn: String, pstCmntNo:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsCmntUpdateReq(cmntCn = cmntCn, pstCmntNo = pstCmntNo)
+
+        val call = apiService.bbsCmntUpdate(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<BbsCmntCreateRes>{
+                override fun onResponse(call: Call<BbsCmntCreateRes>, response: Response<BbsCmntCreateRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let { it ->
+                            if (it.statusCode == 200){
+                                _eventCmntList.value = it.data
+                                continuation.resume(true)
+                            }else{
+
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<BbsCmntCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+    suspend fun bbsRcmdtnComment(pstCmntNo:Int ,rcmdtnSeCd:String, pstSn:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsCmntRcmdtnReq(
+            pstCmntNo = pstCmntNo,
+            pstSn = pstSn,
+            rcmdtnSeCd = rcmdtnSeCd
+        )
+
+        val call = apiService.bbsCmntRcmdtn(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<BbsCmntCreateRes>{
+                override fun onResponse(call: Call<BbsCmntCreateRes>, response: Response<BbsCmntCreateRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let { it ->
+                            if (it.statusCode == 200){
+                                _eventCmntList.value = it.data
+                                continuation.resume(true)
+                            }else{
+
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<BbsCmntCreateRes>, t: Throwable) {
                     continuation.resume(false)
                 }
 

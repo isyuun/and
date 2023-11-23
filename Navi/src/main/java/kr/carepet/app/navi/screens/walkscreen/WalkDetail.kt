@@ -383,7 +383,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 300.dp),
+                            .heightIn(max = 500.dp),
                         state = rememberLazyListState(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ){

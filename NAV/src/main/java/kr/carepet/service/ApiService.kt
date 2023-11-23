@@ -7,6 +7,10 @@ import kr.carepet.data.RefreshToken
 import kr.carepet.data.SggListRes
 import kr.carepet.data.UmdListReq
 import kr.carepet.data.UmdListRes
+import kr.carepet.data.bbs.BbsCmntCreateRes
+import kr.carepet.data.bbs.BbsCmntRcmdtnReq
+import kr.carepet.data.bbs.BbsCmntUpdateReq
+import kr.carepet.data.bbs.BbsCmtCreateReq
 import kr.carepet.data.bbs.EventDetailRes
 import kr.carepet.data.bbs.EventListRes
 import kr.carepet.data.cmm.CmmRes
@@ -14,6 +18,7 @@ import kr.carepet.data.cmm.CommonData
 import kr.carepet.data.cmm.WeatherReq
 import kr.carepet.data.cmm.WeatherRes
 import kr.carepet.data.cmm.commonRes
+import kr.carepet.data.daily.BbsCmntDeleteReq
 import kr.carepet.data.daily.CmntCreateReq
 import kr.carepet.data.daily.CmntCreateRes
 import kr.carepet.data.daily.CmntDeleteReq
@@ -89,6 +94,17 @@ interface ApiService {
     @POST("api/v1/bbs/event/dtl/list")
     fun getEventDetail(@Body data: Int): Call<EventDetailRes>
 
+    @POST("api/v1/bbs/cmnt/delete")
+    fun bbsCmntDelete(@Body data: BbsCmntDeleteReq): Call<BbsCmntCreateRes>
+
+    @POST("api/v1/bbs/cmnt/create")
+    fun bbsCmntCreate(@Body data: BbsCmtCreateReq): Call<BbsCmntCreateRes>
+
+    @POST("api/v1/bbs/cmnt/rcmdtn")
+    fun bbsCmntRcmdtn(@Body data: BbsCmntRcmdtnReq): Call<BbsCmntCreateRes>
+
+    @POST("api/v1/bbs/cmnt/update")
+    fun bbsCmntUpdate(@Body data: BbsCmntUpdateReq): Call<BbsCmntCreateRes>
     // --------------------- 게시판 ----------------------- //
 
 
@@ -165,6 +181,7 @@ interface ApiService {
 
     @POST("api/v1/daily-life/cmnt/rcmdtn")
     fun cmntRcmdtn(@Body data: CmntRcmdtnReq): Call<CmntCreateRes>
+
     // --------------------- 일상생활 ----------------------- //
 
     // --------------------- 마이펫 ----------------------- //

@@ -96,6 +96,7 @@ import kr.carepet.app.navi.viewmodel.SharedViewModel
 import kr.carepet.data.bbs.BbsEvnt
 import kr.carepet.data.daily.Story
 import kr.carepet.util.Log
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -116,6 +117,7 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
                 communityViewModel.getStoryList(1)
             }
             if (communityViewModel.eventList.value == null){
+                communityViewModel.updateEventListClear()
                 communityViewModel.getEventList(1)
             }
             init = false
@@ -388,30 +390,79 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
     val eventList by viewModel.eventList.collectAsState()
+
+    var refreshing by remember{ mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = refreshing,
+        onRefresh = {
+            refreshing = true
+        })
+
+    LaunchedEffect(key1 = refreshing) {
+        if (refreshing) {
+
+            viewModel.updateEventListClear()
+            viewModel.updateStoryPage(1)
+            viewModel.getEventList(1)
+
+            delay(300)
+            refreshing = false
+        }
+    }
+
 
     Box (
         Modifier
             .fillMaxSize()
             .background(color = design_white)
     ){
-        LazyColumn(
-            state = rememberLazyListState(),
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(40.dp)
-            ){
-            if (eventList?.data?.bbsEvntList != null){
-                items(eventList?.data?.bbsEvntList ?: emptyList()){ item ->
-                    EventItem(eventItemData = item, navController, viewModel)
-                }
+
+        Crossfade(
+            targetState = eventList?.data?.bbsEvntList?.isEmpty(),
+            label = "",
+        ) { eventList?.data?.bbsEvntList?.isEmpty()
+            when(it){
+                true ->
+                    Box(modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        LoadingAnimation1()
+                    }
+                false ->
+                    LazyColumn(
+                        state = rememberLazyListState(),
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .pullRefresh(pullRefreshState)
+                            .fillMaxWidth(),
+                        contentPadding = PaddingValues(vertical = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(40.dp)
+                    ){
+                        if (eventList?.data?.bbsEvntList != null){
+                            items(eventList?.data?.bbsEvntList ?: emptyList()){ item ->
+                                EventItem(eventItemData = item, navController, viewModel)
+                            }
+                        }
+                    }
+
+                else ->
+                    Box(modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        LoadingAnimation1()
+                    }
+            }
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+                CustomIndicator(state = pullRefreshState, refreshing = refreshing)
             }
         }
+
     }
 }
 
@@ -465,9 +516,6 @@ fun EventItem(eventItemData: BbsEvnt, navController: NavHostController, viewMode
                 .onGloballyPositioned { sizeImage = it.size }
         ){
             AsyncImage(
-                onLoading = {  },
-                onError = { Log.d("LOG", "onError")},
-                onSuccess = { Log.d("LOG", "onSuccess")},
                 model = ImageRequest.Builder(LocalContext.current)
                     .data( eventItemData.rprsImgUrl )
                     .crossfade(true)
@@ -623,24 +671,18 @@ val CommunityTabItems = listOf(
             ) })
 )
 
-fun compareTimes(inputTime: String?) : Boolean {
-
-    if (inputTime == "" || inputTime == null){
+fun compareTimes(inputDate: String?): Boolean {
+    if (inputDate == "" || inputDate == null) {
         return false
-    }else{
-        // 현재 시간 가져오기
-        val currentTime = LocalDateTime.now()
-        // 입력된 문자열을 LocalDateTime으로 파싱
-        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val parsedTime = LocalDateTime.parse(inputTime, inputFormatter)
+    } else {
+        // 현재 날짜 가져오기
+        val currentDate = LocalDate.now()
+        // 입력된 문자열을 LocalDate로 파싱
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val parsedDate = LocalDate.parse(inputDate, inputFormatter)
 
-        // 현재 시간과 비교
-        return if (currentTime.isBefore(parsedTime)) {
-            false
-        } else if (currentTime.isEqual(parsedTime)) {
-            true
-        } else {
-            true
-        }
+        // 현재 날짜와 비교
+        return !currentDate.isBefore(parsedDate)
     }
 }
+
