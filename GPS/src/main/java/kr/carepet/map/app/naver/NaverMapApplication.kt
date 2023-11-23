@@ -25,6 +25,6 @@ const val NAVERMAP_PERMISSION_REQUEST_CODE = 100
 open class NaverMapApplication : GPSApplication() {
     override fun onCreate() {
         super.onCreate()
-        NaverMapSdk.getInstance(this).client = NaverMapSdk.NaverCloudPlatformClient("j535dgyex9")
+        NaverMapSdk.getInstance(this).client = NaverMapSdk.NaverCloudPlatformClient("4wgixyse4n")
     }
 }
