@@ -34,7 +34,7 @@ open class appcompatactivity : androidx.appcompat.app.AppCompatActivity() {
     }
 
     override fun onPause() {
-        clearReferences()
+        //clearReferences()
         super.onPause()
     }
 

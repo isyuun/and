@@ -49,84 +49,28 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
         Log.i(__CLASSNAME__, "${getMethodName()}...")
     }
 
-    private lateinit var cameraContentObserver: CameraContentObserver
+    private lateinit var observer: CameraContentObserver
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     //@RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
     override fun onCreate() {
         super.onCreate()
 
-        cameraContentObserver = CameraContentObserver(this, handler)
+        observer = CameraContentObserver(this, handler, contentResolver)
         val contentResolver: ContentResolver = contentResolver
         val cameraImageUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         contentResolver.registerContentObserver(
             cameraImageUri,
             true,
-            cameraContentObserver
+            observer
         )
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
-        contentResolver.unregisterContentObserver(cameraContentObserver)
+        contentResolver.unregisterContentObserver(observer)
     }
-
-    private fun path(uri: Uri): String {
-        var path = ""
-        try {
-            val projection = arrayOf(MediaStore.Images.Media.DATA)
-            val cursor = contentResolver.query(uri, projection, null, null, null)
-            cursor?.use {
-                if (it.moveToFirst()) {
-                    val columnIndex = it.getColumnIndex(projection[0])
-                    path = it.getString(columnIndex)
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return path
-    }
-
-    private fun time(uri: Uri): Long? {
-        var time: Long? = null
-        try {
-            val projection = arrayOf(MediaStore.Images.Media.DATE_ADDED)
-            val cursor = contentResolver.query(uri, projection, null, null, null)
-            cursor?.use {
-                if (it.moveToFirst()) {
-                    val columnIndex = it.getColumnIndex(projection[0])
-                    time = it.getLong(columnIndex)
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return time
-    }
-
-    private fun camera(uri: Uri): Boolean {
-        val projection = arrayOf(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
-
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndex(projection[0])
-                val bucketName = it.getString(columnIndex)
-                return bucketName.contains("DCIM/Camera") || mime(uri)
-            }
-        }
-
-        return false
-    }
-
-    private fun mime(imageUri: Uri): Boolean {
-        val mimeType = contentResolver.getType(imageUri)
-        return mimeType?.startsWith("image/") == true
-    }
-
 
     private val _imgs = Collections.synchronizedList(ArrayList<Uri>()) // The list of Tracks
     internal val images
@@ -148,6 +92,61 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
         write()
     }
 
+    //private fun path(uri: Uri): String {
+    //    var path = ""
+    //    try {
+    //        val projection = arrayOf(MediaStore.Images.Media.DATA)
+    //        val cursor = contentResolver.query(uri, projection, null, null, null)
+    //        cursor?.use {
+    //            if (it.moveToFirst()) {
+    //                val columnIndex = it.getColumnIndex(projection[0])
+    //                path = it.getString(columnIndex)
+    //            }
+    //        }
+    //    } catch (e: Exception) {
+    //        e.printStackTrace()
+    //    }
+    //    return path
+    //}
+    //
+    //private fun time(uri: Uri): Long? {
+    //    var time: Long? = null
+    //    try {
+    //        val projection = arrayOf(MediaStore.Images.Media.DATE_ADDED)
+    //        val cursor = contentResolver.query(uri, projection, null, null, null)
+    //        cursor?.use {
+    //            if (it.moveToFirst()) {
+    //                val columnIndex = it.getColumnIndex(projection[0])
+    //                time = it.getLong(columnIndex)
+    //            }
+    //        }
+    //    } catch (e: Exception) {
+    //        e.printStackTrace()
+    //    }
+    //    return time
+    //}
+    //
+    //private fun camera(uri: Uri): Boolean {
+    //    val projection = arrayOf(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+    //
+    //    val cursor = contentResolver.query(uri, projection, null, null, null)
+    //
+    //    cursor?.use {
+    //        if (it.moveToFirst()) {
+    //            val columnIndex = it.getColumnIndex(projection[0])
+    //            val bucketName = it.getString(columnIndex)
+    //            return bucketName.contains("DCIM/Camera") || mime(uri)
+    //        }
+    //    }
+    //
+    //    return false
+    //}
+    //
+    //private fun mime(imageUri: Uri): Boolean {
+    //    val mimeType = contentResolver.getType(imageUri)
+    //    return mimeType?.startsWith("image/") == true
+    //}
+
     enum class ROTATE {
         ROTATE_NG,
         ROTATE_0,
@@ -160,7 +159,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
      * 카메라 이미지 회전방향: ExifInterface사용
      */
     internal fun rotate(context: Context, uri: Uri): ROTATE {
-        val path = path(uri)
+        val path = observer.path(uri)
         val file = File(path)
         var rotate = ROTATE.ROTATE_NG
         val orientation: Int
@@ -186,7 +185,7 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
      * 카메라 이미지 회전방향: 컨텐츠리졸버(DB)사용
      */
     internal fun orient(context: Context, uri: Uri): ROTATE {
-        val path = path(uri)
+        val path = observer.path(uri)
         val file = File(path)
         var rotate = ROTATE.ROTATE_NG
         var orientation: Int = -1
@@ -213,13 +212,13 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
     }
 
     override fun onCameraChange(selfChange: Boolean, uri: Uri) {
-        val path = path(uri)
-        val time = time(uri) ?: return
+        val path = observer.path(uri)
+        val time = observer.time(uri) ?: return
         //Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
         val file = File(path)
         val name = file.name
         val exists = file.exists()
-        val camera = exists && camera(uri) && !_imgs.contains(uri) && !name.startsWith(".")
+        val camera = exists && observer.camera(uri) && !_imgs.contains(uri) && !name.startsWith(".")
         if (camera) {
             val rotate = rotate(this, uri)
             val orient = orient(this, uri)

@@ -27,6 +27,6 @@ import kr.carepet.util.getMethodName
 open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentObserver {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
     override fun onCameraChange(selfChange: Boolean, uri: Uri) {
-        Log.w(__CLASSNAME__, "${getMethodName()}[selfChange:$selfChange][uri:$uri]")
+        Log.v(__CLASSNAME__, "${getMethodName()}[selfChange:$selfChange]")
     }
 }
