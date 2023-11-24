@@ -6,6 +6,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -32,6 +35,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -49,6 +53,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
@@ -65,6 +70,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -581,7 +587,20 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
     var deleteDialog by remember { mutableStateOf(false) }
     var storyDelete by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
+    var rlsUpdateLoading by remember{ mutableStateOf(false) }
     val context = LocalContext.current
+
+    var animatedValue by remember { mutableFloatStateOf(0f) }
+    var booleanValue by remember{ mutableStateOf(false) }
+
+    val targetValue = if (booleanValue) 59f else 7f
+    animatedValue = animateFloatAsState(
+        targetValue = targetValue,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "").value
 
     if (deleteDialog){
         CustomDialogDelete(
@@ -599,6 +618,12 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
             loadingText = "삭제중..",
             loadingState = loading
         )
+    }
+
+    LaunchedEffect(key1 = story){
+        if (story != null){
+            booleanValue = story.rlsYn != "Y"
+        }
     }
 
     LaunchedEffect(key1 = storyDelete){
@@ -709,19 +734,92 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                     modifier = Modifier.padding(start = 4.dp)
                 )
 
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_view),
-                    contentDescription = "", tint = Color.Unspecified,
-                    modifier = Modifier.padding(start = 12.dp))
+                AnimatedVisibility(
+                    visible = G.userId == story?.userId
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically){
+                        Box {
+                            Row (
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .padding(start = 12.dp)
+                                    .clip(shape = RoundedCornerShape(2.dp))
+                                    .clickable(
+                                        enabled = !rlsUpdateLoading && booleanValue
+                                    ) {
+                                        rlsUpdateLoading = true
+                                        viewModel.viewModelScope.launch {
+                                            val result = viewModel.updateDailyRls("Y")
+                                            if (result) {
+                                                rlsUpdateLoading = false
+                                            } else {
+                                                rlsUpdateLoading = false
+                                                Toast
+                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                    .show()
+                                            }
+                                        }
+                                    }
 
-                Text(
-                    text = "218",
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.6).sp,
-                    color = design_skip,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
+                            ){
+                                Icon(
+                                    painter = painterResource(id = R.drawable.icon_view),
+                                    contentDescription = "", tint = Color.Unspecified,
+                                    modifier = Modifier
+                                        .size(14.dp))
+                                Text(
+                                    text = "공개",
+                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                    fontSize = 12.sp,
+                                    letterSpacing = (-0.6).sp,
+                                    color = design_skip,
+                                    modifier = Modifier.padding(start = 4.dp)
+                                )
+                            }
+                            Icon(imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = "", tint = design_sharp.copy(alpha = 0.6f),
+                                modifier = Modifier.offset(x = animatedValue.dp, y = (-12).dp)
+                            )
+                        }
+
+
+                        Row (
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .padding(start = 12.dp)
+                                .clickable(
+                                    enabled = !rlsUpdateLoading && !booleanValue
+                                ) {
+                                    rlsUpdateLoading = true
+                                    viewModel.viewModelScope.launch {
+                                        val result = viewModel.updateDailyRls("N")
+                                        if (result) {
+                                            rlsUpdateLoading = false
+                                        } else {
+                                            rlsUpdateLoading = false
+                                            Toast
+                                                .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                .show()
+                                        }
+                                    }
+                                }
+                        ){
+                            Icon(
+                                painter = painterResource(id = R.drawable.icon_password),
+                                contentDescription = "", tint = Color.Unspecified,
+                                modifier = Modifier
+                                    .size(14.dp))
+                            Text(
+                                text = "비공개",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 12.sp,
+                                letterSpacing = (-0.6).sp,
+                                color = design_skip,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        }
+                    }
+                }
             }
 
             if (story?.userId == G.userId){

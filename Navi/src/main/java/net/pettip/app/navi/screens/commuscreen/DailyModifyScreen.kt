@@ -575,44 +575,44 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
-            Text(
-                text = "오늘 일상 스토리에 올리기",
-                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                fontSize = 20.sp,
-                letterSpacing = (-1.0).sp,
-                color = design_login_text,
-                modifier = Modifier.padding(start = 20.dp)
-            )
+            //Text(
+            //    text = "오늘 일상 스토리에 올리기",
+            //    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //    fontSize = 20.sp,
+            //    letterSpacing = (-1.0).sp,
+            //    color = design_login_text,
+            //    modifier = Modifier.padding(start = 20.dp)
+            //)
+            //
+            //Row(
+            //    modifier = Modifier
+            //        .padding(start = 20.dp)
+            //        .fillMaxWidth()
+            //        .offset(x = (-10).dp)
+            //        .clickable { viewModel.updateUploadPostStory(!uploadPostStory) },
+            //    verticalAlignment = Alignment.CenterVertically
+            //) {
+            //    Checkbox(
+            //        checked = uploadPostStory,
+            //        onCheckedChange = { viewModel.updateUploadPostStory(it) },
+            //        colors = CheckboxDefaults.colors(
+            //            checkedColor = design_select_btn_text,
+            //            uncheckedColor = design_textFieldOutLine,
+            //            checkmarkColor = design_white
+            //        )
+            //    )
+            //
+            //    Text(
+            //        text = "사진이 스토리에 공유됩니다.",
+            //        fontSize = 14.sp,
+            //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //        color = design_login_text,
+            //        modifier = Modifier.offset(x = (-8).dp),
+            //        letterSpacing = (-0.7).sp
+            //    )
+            //}
 
-            Row(
-                modifier = Modifier
-                    .padding(start = 20.dp)
-                    .fillMaxWidth()
-                    .offset(x = (-10).dp)
-                    .clickable { viewModel.updateUploadPostStory(!uploadPostStory) },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = uploadPostStory,
-                    onCheckedChange = { viewModel.updateUploadPostStory(it) },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = design_select_btn_text,
-                        uncheckedColor = design_textFieldOutLine,
-                        checkmarkColor = design_white
-                    )
-                )
-
-                Text(
-                    text = "사진이 스토리에 공유됩니다.",
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_login_text,
-                    modifier = Modifier.offset(x = (-8).dp),
-                    letterSpacing = (-0.7).sp
-                )
-            }
-
-            Spacer(modifier = Modifier.padding(top = 40.dp))
+            Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Button(
                 onClick = {
