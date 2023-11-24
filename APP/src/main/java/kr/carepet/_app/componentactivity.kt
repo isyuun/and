@@ -34,7 +34,7 @@ open class componentactivity : androidx.activity.ComponentActivity() {
     }
 
     override fun onPause() {
-        clearReferences()
+        //clearReferences()
         super.onPause()
     }
 

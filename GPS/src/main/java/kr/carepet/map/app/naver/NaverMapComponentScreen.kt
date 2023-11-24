@@ -407,7 +407,7 @@ fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boole
 
     val context = LocalContext.current
     Button(
-        onClick = withClick(context) {
+        onClick = withClick {
             check = !check
             onCheckedChange(check)
         },
@@ -895,7 +895,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         ) {
             /** NOTE */
             IconButton2(
-                onClick = withClick(context) {
+                onClick = withClick {
                     Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                 },
@@ -910,7 +910,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
             /** CAMERA */
             IconButton2(
-                onClick = withClick(context) {
+                onClick = withClick {
                     Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -949,7 +949,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         ) {
             /** pee */
             IconButton2(
-                onClick = withClick(context) {
+                onClick = withClick {
                     Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.pee
@@ -967,7 +967,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
             /** poo */
             IconButton2(
-                onClick = withClick(context) {
+                onClick = withClick {
                     Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.poo
@@ -985,7 +985,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
             /** mrk */
             IconButton2(
-                onClick = withClick(context) {
+                onClick = withClick {
                     Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.mrk
@@ -1004,7 +1004,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         }
         /** WALK */
         Button(
-            onClick = withClick(context) {
+            onClick = withClick {
                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                 if (pets.size == 1 && !start) {
                     application.start()
@@ -1084,7 +1084,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 ) {
                     items(application.pets) { pet ->
                         IconButton2(
-                            onClick = withClick(context) {
+                            onClick = withClick {
                                 Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 if (!start) return@withClick
                                 showPetsSheet = false
@@ -1209,7 +1209,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     }
                     /** walk */
                     Button(
-                        onClick = withClick(context) {
+                        onClick = withClick {
                             Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 if (!sheetState.isVisible) {
@@ -1258,7 +1258,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     ) {
                         R.string.walk_button_finish
                         Button(
-                            onClick = withClick(context) {
+                            onClick = withClick {
                                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
@@ -1287,7 +1287,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         }
                         R.string.walk_button_resume
                         Button(
-                            onClick = withClick(context) {
+                            onClick = withClick {
                                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
@@ -1328,7 +1328,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         Box(
             modifier = Modifier
                 .clickable(
-                    onClick = withClick(context) {
+                    onClick = withClick {
                         Log.wtf(__CLASSNAME__, "::withClick${getMethodName()}[$context][$version]")
                         version = !version
                     }

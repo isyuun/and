@@ -193,3 +193,17 @@ fun withClick(context: Context, onClick: () -> Unit): () -> Unit {
         onClick()
     }
 }
+
+/**
+ * How to play the platform CLICK sound in Jetpack Compose Button click
+ * @see <a href="https://stackoverflow.com/questions/66080018/how-to-play-the-platform-click-sound-in-jetpack-compose-button-click">How to play the platform CLICK sound in Jetpack Compose Button click</a>
+ */
+
+@Composable
+fun withClick(onClick: () -> Unit): () -> Unit {
+    val context = LocalContext.current
+    return {
+        post { (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK) }
+        onClick()
+    }
+}
