@@ -15,12 +15,12 @@
  *
  *
  * Copyright (c) 2023. PetTip All right reserved.
- * This software is the proprietary information of CarePet Co.,Ltd.
+ * This software is the proprietary information of PetTip Co.,Ltd.
  *
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 21.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 21.   description...
  */
 
 package com.example.test.ui.theme

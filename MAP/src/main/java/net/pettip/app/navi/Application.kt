@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 20.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 20.   description...
  */
 
 package net.pettip.app.navi
@@ -16,7 +16,7 @@ package net.pettip.app.navi
  * @Project     : carepet-android
  * @FileName    : Application.kt
  * @Date        : 2023. 08. 22.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 import android.content.ComponentName

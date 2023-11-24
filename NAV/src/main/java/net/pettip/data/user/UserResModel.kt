@@ -1,11 +1,11 @@
 /*
  *  * Copyright(c) 2023 PetTip All right reserved.
- *  * This software is the proprietary information of CarePet.
+ *  * This software is the proprietary information of PetTip.
  *  *
  *  * Revision History
  *  * Author                         Date             Description
  *  * --------------------------    -------------    ----------------------------------------
- *  * sanghun.lee@care-biz.co.kr     2023. 7. 28.    CarePet Development...
+ *  * sanghun.lee@care-biz.co.kr     2023. 7. 28.    PetTip Development...
  *  *
  */
 

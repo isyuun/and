@@ -248,7 +248,7 @@ class LoginViewModel() : ViewModel() {
     suspend fun naverLogin(context: Context):Boolean=
         suspendCancellableCoroutine { continuation ->
 
-            NaverIdLoginSDK.initialize(context, "fk5tuUBi3UzTVQRcBMGK", "kbSHyo7KeQ", "CarePet")
+            NaverIdLoginSDK.initialize(context, "fk5tuUBi3UzTVQRcBMGK", "kbSHyo7KeQ", "PetTip")
 
             val oAuthLoginCallback = object : OAuthLoginCallback{
                 override fun onError(errorCode: Int, message: String) {

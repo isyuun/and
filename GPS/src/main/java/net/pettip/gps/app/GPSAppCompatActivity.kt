@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 20.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 20.   description...
  */
 
 package net.pettip.gps.app
@@ -23,7 +23,7 @@ import net.pettip.util.getMethodName
  * @Project     : carepet-android
  * @FileName    : GPSAppCompatActivity.kt
  * @Date        : 2023. 09. 05.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 open class GPSAppCompatActivity : gpsappcompatactivity4() {

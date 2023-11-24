@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 20.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 20.   description...
  */
 
 package net.pettip.gps._app
@@ -28,7 +28,7 @@ import java.util.Date
  * @Project     : carepet-android
  * @FileName    : gpsapplication2.kt
  * @Date        : 2023. 09. 07.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver {

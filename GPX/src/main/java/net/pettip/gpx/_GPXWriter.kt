@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 13.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 13.   description...
  */
 
 package net.pettip.gpx
@@ -14,7 +14,7 @@ package net.pettip.gpx
  * @Project     : carepet-android
  * @FileName    : _GPXWriter.kt
  * @Date        : 2023. 09. 13.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 import java.text.DecimalFormat
@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 const val GPX_VERSION = "1.1"
-const val GPX_CREATOR = "CarePet"
+const val GPX_CREATOR = "PetTip"
 const val GPX_NAMESPACE = "http://www.topografix.com/GPX/1/1"
 const val GPX_XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
 val GPX_SIMPLE_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.KOREA)

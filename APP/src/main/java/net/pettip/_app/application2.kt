@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 7.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 7.   description...
  */
 
 package net.pettip._app
@@ -18,7 +18,7 @@ import android.os.Message
  * @Project     : carepet-android
  * @FileName    : application2.kt
  * @Date        : 2023. 09. 07.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 open class application2 : application() {

@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 20.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 20.   description...
  */
 
 package net.pettip.gps._app
@@ -32,7 +32,7 @@ internal const val SHARED_PREFERENCE_FILE_KEY = "$PACKAGE_NAME.PREFERENCE_FILE_K
  * @Project     : carepet-android
  * @FileName    : _foregroundonlylocationservice.kt
  * @Date        : 2023. 09. 14.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 open class _foregroundonlylocationservice : Service()

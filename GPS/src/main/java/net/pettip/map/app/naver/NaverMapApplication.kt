@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 21.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 21.   description...
  */
 
 package net.pettip.map.app.naver
@@ -17,7 +17,7 @@ import net.pettip.gps.app.GPSApplication
  * @Project     : carepet-android
  * @FileName    : NaverMapApplication.kt
  * @Date        : 2023. 09. 20.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 const val NAVERMAP_PERMISSION_REQUEST_CODE = 100

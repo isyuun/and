@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 10. 18.   description...
+ *  isyuun@care-biz.co.kr             2023. 10. 18.   description...
  */
 
 package net.pettip.gps._app
@@ -27,7 +27,7 @@ import java.util.Collections
  * @Project     : carepet-android
  * @FileName    : foregroundonlylocationservice4.kt
  * @Date        : 2023. 10. 18.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {

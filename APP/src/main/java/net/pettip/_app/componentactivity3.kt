@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 17.   description...
+ *  isyuun@care-biz.co.kr             2023. 8. 17.   description...
  */
 
 package net.pettip._app
@@ -19,7 +19,7 @@ import com.google.android.material.snackbar.Snackbar
  * @Project     : carepet-android
  * @FileName    : componentactivity3.kt
  * @Date        : 2023. 08. 17.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 open class componentactivity3 : componentactivity2() {

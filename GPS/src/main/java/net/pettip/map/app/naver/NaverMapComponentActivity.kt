@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 25.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 25.   description...
  */
 
 package net.pettip.map.app.naver
@@ -14,7 +14,7 @@ package net.pettip.map.app.naver
  * @Project     : carepet-android
  * @FileName    : NaverMapComponentActivity.kt
  * @Date        : 2023. 09. 20.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 import android.content.ComponentName

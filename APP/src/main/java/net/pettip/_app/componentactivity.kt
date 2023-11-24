@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 8.   description...
+ *  isyuun@care-biz.co.kr             2023. 8. 8.   description...
  */
 
 package net.pettip._app
@@ -16,7 +16,7 @@ import android.os.Bundle
  * @Project     : carepet-android
  * @FileName    : componentactivity.kt
  * @Date        : 2023. 08. 08.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 open class componentactivity : androidx.activity.ComponentActivity() {

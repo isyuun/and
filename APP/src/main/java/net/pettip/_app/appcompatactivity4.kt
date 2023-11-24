@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 7. 31.   description...
+ *  isyuun@care-biz.co.kr             2023. 7. 31.   description...
  */
 
 package net.pettip._app
@@ -17,7 +17,7 @@ import androidx.appcompat.app.AlertDialog
  * @Project     : carepet-android
  * @FileName    : appcompatactivity4.kt
  * @Date        : 2023. 07. 31.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 open class appcompatactivity4 : appcompatactivity3() {

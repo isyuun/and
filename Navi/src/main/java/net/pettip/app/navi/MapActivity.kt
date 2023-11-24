@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 10. 6.   description...
+ *  isyuun@care-biz.co.kr             2023. 10. 6.   description...
  */
 
 package net.pettip.app.navi
@@ -20,7 +20,7 @@ import net.pettip.util.getMethodName
  * @Project     : carepet-android
  * @FileName    : MapActivity.kt
  * @Date        : 2023. 10. 06.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 class MapActivity : net.pettip.map.app.MapActivity() {

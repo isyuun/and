@@ -15,12 +15,12 @@
  *
  *
  * Copyright (c) 2023. PetTip All right reserved.
- * This software is the proprietary information of CarePet Co.,Ltd.
+ * This software is the proprietary information of PetTip Co.,Ltd.
  *
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 27.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 27.   description...
  */
 
 package com.example.test
@@ -29,7 +29,7 @@ package com.example.test
  * @Project     : carepet-android
  * @FileName    : Application.kt
  * @Date        : 2023. 09. 27.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 class Application : net.pettip.app.Application()

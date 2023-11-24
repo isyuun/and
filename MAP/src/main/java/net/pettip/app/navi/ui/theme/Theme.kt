@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 20.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 20.   description...
  */
 
 package net.pettip.app.navi.ui.theme

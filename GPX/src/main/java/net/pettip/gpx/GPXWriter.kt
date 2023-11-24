@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 12.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 12.   description...
  */
 
 package net.pettip.gpx
@@ -20,7 +20,7 @@ import java.io.IOException
  * @Project     : carepet-android
  * @FileName    : GPXWriter.kt
  * @Date        : 2023. 09. 12.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 class GPXWriter {

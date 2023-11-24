@@ -15,12 +15,12 @@
  *
  *
  * Copyright (c) 2023. PetTip All right reserved.
- * This software is the proprietary information of CarePet Co.,Ltd.
+ * This software is the proprietary information of PetTip Co.,Ltd.
  *
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 27.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 27.   description...
  */
 
 package com.example.test
@@ -52,7 +52,7 @@ import net.pettip.util.getMethodName
  * @Project     : carepet-android
  * @FileName    : MainActivity2.kt
  * @Date        : 2023. 08. 16.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName

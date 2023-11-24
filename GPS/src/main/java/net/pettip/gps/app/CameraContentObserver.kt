@@ -21,7 +21,7 @@ import android.provider.MediaStore
  * @Project     : carepet-android
  * @FileName    : CameraContentObserver.kt
  * @Date        : 2023. 09. 18.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 interface ICameraContentObserver {

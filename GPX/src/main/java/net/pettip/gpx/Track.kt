@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 14.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 14.   description...
  */
 
 package net.pettip.gpx
@@ -17,7 +17,7 @@ import android.net.Uri
  * @Project     : carepet-android
  * @FileName    : Track.kt
  * @Date        : 2023. 09. 14.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 const val TRACK_ZERO_NO = "Pnnnnnnnnnnnnnn"

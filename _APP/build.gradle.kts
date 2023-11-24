@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 8. 28.   description...
+ *  isyuun@care-biz.co.kr             2023. 8. 28.   description...
  */
 
 plugins {

@@ -5,7 +5,7 @@
  *  Revision History
  *  Author                         Date          Description
  *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-pet.kr             2023. 9. 13.   description...
+ *  isyuun@care-biz.co.kr             2023. 9. 13.   description...
  */
 
 package net.pettip.gpx
@@ -17,7 +17,7 @@ import java.util.Date
  * @Project     : carepet-android
  * @FileName    : GPXWriter2.kt
  * @Date        : 2023. 09. 13.
- * @author      : isyuun@care-pet.kr
+ * @author      : isyuun@care-biz.co.kr
  * @description :
  */
 class GPXWriter2 : _GPXWriter() {
@@ -29,7 +29,7 @@ class GPXWriter2 : _GPXWriter() {
             val firstTime = GPX_SIMPLE_TICK_FORMAT.format(Date(tracks.first().time))
 
             val comment = """
-                <!-- Created with CarePet -->
+                <!-- Created with PetTip -->
                 <!-- Track = ${tracks.size} TrackPoints + 0 Placemarks -->
                 <!-- Track Statistics (based on Total Time | Time in Movement): -->
                 <!-- Distance = ${calculateTotalDistance(tracks)} -->
@@ -44,7 +44,7 @@ class GPXWriter2 : _GPXWriter() {
 
             val metadata = """
                 <metadata>
-                 <name>CarePet $firstTime</name>
+                 <name>PetTip $firstTime</name>
                  <time>${GPX_SIMPLE_DATE_FORMAT.format(tracks.first().time)}</time>
                 </metadata>
             """.trimIndent() + "\n"
