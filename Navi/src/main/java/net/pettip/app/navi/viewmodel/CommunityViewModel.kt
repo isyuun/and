@@ -1,4 +1,4 @@
-package kr.carepet.app.navi.viewmodel
+package net.pettip.app.navi.viewmodel
 
 import android.content.Context
 import android.net.Uri
@@ -13,46 +13,46 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kr.carepet.data.CommonCodeModel
-import kr.carepet.data.bbs.BbsCmnt
-import kr.carepet.data.bbs.BbsCmntCreateRes
-import kr.carepet.data.bbs.BbsCmntRcmdtnReq
-import kr.carepet.data.bbs.BbsCmntUpdateReq
-import kr.carepet.data.bbs.BbsCmtCreateReq
-import kr.carepet.data.bbs.EventDetailRes
-import kr.carepet.data.bbs.EventListRes
-import kr.carepet.data.cmm.CdDetail
-import kr.carepet.data.cmm.CmmRes
-import kr.carepet.data.cmm.CommonData
-import kr.carepet.data.daily.BbsCmntDeleteReq
-import kr.carepet.data.daily.Cmnt
-import kr.carepet.data.daily.CmntCreateReq
-import kr.carepet.data.daily.CmntCreateRes
-import kr.carepet.data.daily.CmntDeleteReq
-import kr.carepet.data.daily.CmntRcmdtnReq
-import kr.carepet.data.daily.CmntUpdateReq
-import kr.carepet.data.daily.DailyCreateReq
-import kr.carepet.data.daily.DailyCreateRes
-import kr.carepet.data.daily.DailyDetailRes
-import kr.carepet.data.daily.DailyLifeFile
-import kr.carepet.data.daily.DailyLifePet
-import kr.carepet.data.daily.DailyLifeSchHashTag
-import kr.carepet.data.daily.DailyLifeSchSe
-import kr.carepet.data.daily.DailyLifeUpdatePet
-import kr.carepet.data.daily.DailyRcmdtn
-import kr.carepet.data.daily.DailyRlsYnReq
-import kr.carepet.data.daily.DailyUpdateReq
-import kr.carepet.data.daily.Pet
-import kr.carepet.data.daily.PhotoData
-import kr.carepet.data.daily.PhotoRes
-import kr.carepet.data.daily.Story
-import kr.carepet.data.daily.StoryReq
-import kr.carepet.data.daily.StoryRes
-import kr.carepet.data.pet.CurrentPetData
-import kr.carepet.data.user.BbsReq
-import kr.carepet.singleton.G
-import kr.carepet.singleton.RetrofitClientServer
-import kr.carepet.util.Log
+import net.pettip.data.CommonCodeModel
+import net.pettip.data.bbs.BbsCmnt
+import net.pettip.data.bbs.BbsCmntCreateRes
+import net.pettip.data.bbs.BbsCmntRcmdtnReq
+import net.pettip.data.bbs.BbsCmntUpdateReq
+import net.pettip.data.bbs.BbsCmtCreateReq
+import net.pettip.data.bbs.EventDetailRes
+import net.pettip.data.bbs.EventListRes
+import net.pettip.data.cmm.CdDetail
+import net.pettip.data.cmm.CmmRes
+import net.pettip.data.cmm.CommonData
+import net.pettip.data.daily.BbsCmntDeleteReq
+import net.pettip.data.daily.Cmnt
+import net.pettip.data.daily.CmntCreateReq
+import net.pettip.data.daily.CmntCreateRes
+import net.pettip.data.daily.CmntDeleteReq
+import net.pettip.data.daily.CmntRcmdtnReq
+import net.pettip.data.daily.CmntUpdateReq
+import net.pettip.data.daily.DailyCreateReq
+import net.pettip.data.daily.DailyCreateRes
+import net.pettip.data.daily.DailyDetailRes
+import net.pettip.data.daily.DailyLifeFile
+import net.pettip.data.daily.DailyLifePet
+import net.pettip.data.daily.DailyLifeSchHashTag
+import net.pettip.data.daily.DailyLifeSchSe
+import net.pettip.data.daily.DailyLifeUpdatePet
+import net.pettip.data.daily.DailyRcmdtn
+import net.pettip.data.daily.DailyRlsYnReq
+import net.pettip.data.daily.DailyUpdateReq
+import net.pettip.data.daily.Pet
+import net.pettip.data.daily.PhotoData
+import net.pettip.data.daily.PhotoRes
+import net.pettip.data.daily.Story
+import net.pettip.data.daily.StoryReq
+import net.pettip.data.daily.StoryRes
+import net.pettip.data.pet.CurrentPetData
+import net.pettip.data.user.BbsReq
+import net.pettip.singleton.G
+import net.pettip.singleton.RetrofitClientServer
+import net.pettip.util.Log
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -422,7 +422,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun getStoryDetail(schUnqNo: Int): Boolean {
         val apiService = RetrofitClientServer.instance
 
-        val data = kr.carepet.data.daily.DailyDetailReq(schUnqNo = schUnqNo, cmntYn = "Y")
+        val data = net.pettip.data.daily.DailyDetailReq(schUnqNo = schUnqNo, cmntYn = "Y")
 
         _storyLoading.value = true
         val call = apiService.getDailyDetail(data)

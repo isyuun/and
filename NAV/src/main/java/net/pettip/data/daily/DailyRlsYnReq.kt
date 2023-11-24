@@ -1,4 +1,4 @@
-package kr.carepet.data.daily
+package net.pettip.data.daily
 
 
 import com.google.gson.annotations.SerializedName
