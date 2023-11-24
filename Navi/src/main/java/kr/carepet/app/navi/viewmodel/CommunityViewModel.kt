@@ -40,6 +40,7 @@ import kr.carepet.data.daily.DailyLifeSchHashTag
 import kr.carepet.data.daily.DailyLifeSchSe
 import kr.carepet.data.daily.DailyLifeUpdatePet
 import kr.carepet.data.daily.DailyRcmdtn
+import kr.carepet.data.daily.DailyRlsYnReq
 import kr.carepet.data.daily.DailyUpdateReq
 import kr.carepet.data.daily.Pet
 import kr.carepet.data.daily.PhotoData
@@ -877,6 +878,40 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         )
 
         val call = data.let { apiService.updateDaily(it) }
+
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<DailyDetailRes>{
+                override fun onResponse(call: Call<DailyDetailRes>, response: Response<DailyDetailRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _storyDetail.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<DailyDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun updateDailyRls(rlsYn : String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        concatUploadedFileList(_newFileList.value?: emptyList())
+
+        val data = DailyRlsYnReq(
+            rlsYn = rlsYn,
+            schUnqNo = _storyDetail.value?.data?.schUnqNo ?: 0
+        )
+
+        val call = data.let { apiService.dailyRlsUpdate(it) }
 
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<DailyDetailRes>{

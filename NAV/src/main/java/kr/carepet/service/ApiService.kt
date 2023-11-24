@@ -32,6 +32,7 @@ import kr.carepet.data.daily.DailyDetailRes
 import kr.carepet.data.daily.DailyMonthReq
 import kr.carepet.data.daily.DailyMonthRes
 import kr.carepet.data.daily.DailyRcmdtn
+import kr.carepet.data.daily.DailyRlsYnReq
 import kr.carepet.data.daily.DailyUpdateReq
 import kr.carepet.data.daily.PhotoRes
 import kr.carepet.data.daily.RTStoryListRes
@@ -181,6 +182,9 @@ interface ApiService {
 
     @POST("api/v1/daily-life/cmnt/rcmdtn")
     fun cmntRcmdtn(@Body data: CmntRcmdtnReq): Call<CmntCreateRes>
+
+    @POST("api/v1/daily-life/rls/update")
+    fun dailyRlsUpdate(@Body data: DailyRlsYnReq): Call<DailyDetailRes>
 
     // --------------------- 일상생활 ----------------------- //
 
