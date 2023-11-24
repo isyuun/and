@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:985887161836:android:34d90d20e61483a51ad4c9",
         "android_client_info": {
-          "package_name": "kr.carepet.app.navi"
+          "package_name": "net.pettip.app.navi"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "985887161836-3fun9eoi5ulfkd38bb14789c8qodn9vo.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "kr.carepet.app.navi",
+            "package_name": "net.pettip.app.navi",
             "certificate_hash": "e56d8c2aa237e30f360edde42bc42ea69cd0ca1a"
           }
         },
@@ -25,7 +25,7 @@
           "client_id": "985887161836-4ljh32r3c9jfgrg1rs5orc4o914v1o9d.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "kr.carepet.app.navi",
+            "package_name": "net.pettip.app.navi",
             "certificate_hash": "215758442d61433cb222b310ffae36c4e54ead8a"
           }
         },

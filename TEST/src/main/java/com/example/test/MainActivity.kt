@@ -33,11 +33,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import kr.carepet.app.ComponentActivity
-import kr.carepet.app.navi.ui.theme.AndTheme
-import kr.carepet.util.Log
-/**import kr.carepet.util.__CLASSNAME__*/
-import kr.carepet.util.getMethodName
+import net.pettip.app.ComponentActivity
+import net.pettip.app.navi.ui.theme.AndTheme
+import net.pettip.util.Log
+/**import net.pettip.util.__CLASSNAME__*/
+import net.pettip.util.getMethodName
 
 open class MainActivity : ComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName

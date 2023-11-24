@@ -11,11 +11,11 @@ plugins {
 }
 
 android {
-    namespace = "kr.carepet.app.navi"
+    namespace = "net.pettip.app.navi"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "kr.carepet.app.navi"
+        applicationId = "net.pettip.app.navi"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

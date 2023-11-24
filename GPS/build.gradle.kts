@@ -13,7 +13,7 @@ plugins {
 }
 
 android {
-    namespace = "kr.carepet.gps"
+    namespace = "net.pettip.gps"
     compileSdk = 34
 
     defaultConfig {

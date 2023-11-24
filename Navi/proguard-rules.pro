@@ -22,4 +22,4 @@
 
 # settings.gradle.kts : include(":NAV")
 # build.gradle.kts : implementation(project(mapOf("path" to ":NAV")))
--keep class kr.carepet.data.** { *; }
+-keep class net.pettip.data.** { *; }

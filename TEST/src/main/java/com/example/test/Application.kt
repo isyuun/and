@@ -32,4 +32,4 @@ package com.example.test
  * @author      : isyuun@care-pet.kr
  * @description :
  */
-class Application : kr.carepet.app.Application()
+class Application : net.pettip.app.Application()

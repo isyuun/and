@@ -41,7 +41,7 @@
             android:value="@string/default_notification_channel_id" />
 
         <activity
-            android:name="kr.carepet.app.navi.MainActivity"
+            android:name="net.pettip.app.navi.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.CarePetDemo"
@@ -67,7 +67,7 @@
         </activity>
 
         <activity
-            android:name="kr.carepet.app.navi.MapActivity"
+            android:name="net.pettip.app.navi.MapActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat" />
@@ -90,7 +90,7 @@
         </activity>
 
         <service
-            android:name="kr.carepet.app.navi.MyFirebaseMessagingService"
+            android:name="net.pettip.app.navi.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

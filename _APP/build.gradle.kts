@@ -14,7 +14,7 @@ plugins {
 }
 
 android {
-    namespace = "kr.carepet"
+    namespace = "net.pettip"
     compileSdk = 34
 
     defaultConfig {

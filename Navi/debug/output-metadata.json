@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "kr.carepet.app.navi",
+  "applicationId": "net.pettip.app.navi",
   "variantName": "debug",
   "elements": [
     {

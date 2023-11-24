@@ -42,10 +42,10 @@ subprojects {
             }
             signingConfigs {
                 getByName("debug") {
-                    storeFile = file("../.APK/kr.carepet.debug.jks")
+                    storeFile = file("../.APK/net.pettip.debug.jks")
                 }
                 create("release") {
-                    storeFile = file("../.APK/kr.carepet.release.jks")
+                    storeFile = file("../.APK/net.pettip.release.jks")
                     storePassword = "is230710!!"
                     keyAlias = "carepet"
                     keyPassword = "is230710!!"

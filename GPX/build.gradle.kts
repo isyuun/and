@@ -14,7 +14,7 @@ plugins {
 }
 
 android {
-    namespace = "kr.carepet.gpx"
+    namespace = "net.pettip.gpx"
     compileSdk = 33
 
     defaultConfig {

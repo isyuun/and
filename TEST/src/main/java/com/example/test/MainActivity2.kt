@@ -43,10 +43,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.parcelize.Parcelize
-import kr.carepet.app.navi.ui.theme.AndTheme
-import kr.carepet.util.Log
-/**import kr.carepet.util.__CLASSNAME__*/
-import kr.carepet.util.getMethodName
+import net.pettip.app.navi.ui.theme.AndTheme
+import net.pettip.util.Log
+/**import net.pettip.util.__CLASSNAME__*/
+import net.pettip.util.getMethodName
 
 /**
  * @Project     : carepet-android
