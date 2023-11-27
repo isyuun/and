@@ -66,10 +66,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -346,7 +353,8 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                         imeAction = ImeAction.Done),
                     modifier = Modifier
                         .weight(1f)
-                        .focusRequester(focusRequester),
+                        .focusRequester(focusRequester)
+                    ,
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedPlaceholderColor = design_placeHolder,
                         focusedPlaceholderColor = design_placeHolder,
@@ -621,7 +629,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                 verticalAlignment = Alignment.Bottom
                             ){
                                 Text(
-                                    text = comment.petNm,
+                                    text = comment.petNm?:"",
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
@@ -629,7 +637,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                 )
 
                                 Text(
-                                    text = comment.lastStrgDt,
+                                    text = comment.lastStrgDt?:"",
                                     fontSize = 10.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
@@ -639,7 +647,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                             }
 
                             Text(
-                                text = comment.cmntCn,
+                                text = comment.cmntCn?:"",
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp,
@@ -661,7 +669,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     TextField(
-                        value = updateComment,
+                        value = updateComment?:"",
                         onValueChange = { updateComment = it},
                         textStyle = TextStyle(
                             color = design_login_text,
@@ -680,7 +688,8 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Done),
                         modifier = Modifier
-                            .weight(1f),
+                            .weight(1f)
+                        ,
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedPlaceholderColor = design_placeHolder,
                             focusedPlaceholderColor = design_placeHolder,
@@ -712,7 +721,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                 onClick = {
                                     viewModel.viewModelScope.launch {
                                         updateLoading = true
-                                        val result = viewModel.bbsUpdateComment(updateComment, comment.pstCmntNo)
+                                        val result = viewModel.bbsUpdateComment(updateComment?:"", comment.pstCmntNo?:0)
                                         if (result) {
                                             updateComment = ""
                                             updateLoading = false
@@ -753,7 +762,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
 
     LaunchedEffect(key1 = commentDelete){
         if (commentDelete){
-            val result = viewModel.bbsDeleteComment(comment.pstCmntNo)
+            val result = viewModel.bbsDeleteComment(comment.pstCmntNo?:0)
             if (!result){
                 Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
             }
@@ -784,7 +793,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                         verticalAlignment = Alignment.Bottom
                     ){
                         Text(
-                            text = comment.petNm,
+                            text = comment.petNm?:"",
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
@@ -792,7 +801,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                         )
 
                         Text(
-                            text = comment.lastStrgDt,
+                            text = comment.lastStrgDt?:"",
                             fontSize = 10.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
@@ -824,7 +833,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                                     onClick = {
                                                         viewModel.viewModelScope.launch {
                                                             rcmdtnLoading = true
-                                                            val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo, rcmdtnSeCd = "001", pstSn = eventDetail?.data?.pstSn ?: 0)
+                                                            val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo?:0, rcmdtnSeCd = "001", pstSn = eventDetail?.data?.pstSn ?: 0)
                                                             if (result) {
                                                                 rcmdtnLoading = false
                                                             } else {
@@ -844,16 +853,16 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                                 )
                                         )
 
-                                        //Text(text = "${comment.rcmdtnCnt}",
-                                        //    style = TextStyle(
-                                        //        color = design_skip,
-                                        //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                        //        fontSize = 12.sp,
-                                        //        letterSpacing = (-0.6).sp),
-                                        //    textAlign = TextAlign.Center,
-                                        //    lineHeight = 12.sp,
-                                        //    modifier = Modifier.padding(start = 4.dp)
-                                        //)
+                                        Text(text = "${comment.rcmdtnCnt}",
+                                            style = TextStyle(
+                                                color = design_skip,
+                                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                                fontSize = 12.sp,
+                                                letterSpacing = (-0.6).sp),
+                                            textAlign = TextAlign.Center,
+                                            lineHeight = 12.sp,
+                                            modifier = Modifier.padding(start = 4.dp)
+                                        )
                                     }
 
                                     Icon(
@@ -927,7 +936,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                                         onClick = {
                                                             viewModel.viewModelScope.launch {
                                                                 rcmdtnLoading = true
-                                                                val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo, rcmdtnSeCd = "002", pstSn = eventDetail?.data?.pstSn ?: 0)
+                                                                val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo?:0, rcmdtnSeCd = "002", pstSn = eventDetail?.data?.pstSn ?: 0)
                                                                 if (result) {
                                                                     rcmdtnLoading = false
                                                                 } else {
@@ -947,16 +956,16 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                                     )
                                             )
 
-                                            //Text(text = "${comment.nrcmdtnCnt}",
-                                            //    style = TextStyle(
-                                            //        color = design_skip,
-                                            //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                            //        fontSize = 12.sp,
-                                            //        letterSpacing = (-0.6).sp),
-                                            //    textAlign = TextAlign.Center,
-                                            //    lineHeight = 12.sp,
-                                            //    modifier = Modifier.padding(start = 4.dp)
-                                            //)
+                                            Text(text = "${comment.nrcmdtnCnt}",
+                                                style = TextStyle(
+                                                    color = design_skip,
+                                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                                    fontSize = 12.sp,
+                                                    letterSpacing = (-0.6).sp),
+                                                textAlign = TextAlign.Center,
+                                                lineHeight = 12.sp,
+                                                modifier = Modifier.padding(start = 4.dp)
+                                            )
                                         }
 
                                         Icon(
@@ -1000,7 +1009,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
 
 
                 Text(
-                    text = comment.cmntCn,
+                    text = comment.cmntCn?:"",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
@@ -1062,7 +1071,7 @@ fun BbsCommentListItem2(
 
     LaunchedEffect(key1 = commentDelete){
         if (commentDelete){
-            val result = viewModel.bbsDeleteComment(comment.pstCmntNo)
+            val result = viewModel.bbsDeleteComment(comment.pstCmntNo?:0)
             if (!result){
                 Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
             }
@@ -1148,7 +1157,7 @@ fun BbsCommentListItem2(
                                 verticalAlignment = Alignment.Bottom
                             ){
                                 Text(
-                                    text = comment.petNm,
+                                    text = comment.petNm?:"",
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
@@ -1156,7 +1165,7 @@ fun BbsCommentListItem2(
                                 )
 
                                 Text(
-                                    text = comment.lastStrgDt,
+                                    text = comment.lastStrgDt?:"",
                                     fontSize = 10.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
@@ -1166,7 +1175,7 @@ fun BbsCommentListItem2(
                             }
 
                             Text(
-                                text = comment.cmntCn,
+                                text = comment.cmntCn?:"",
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp,
@@ -1188,7 +1197,7 @@ fun BbsCommentListItem2(
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     TextField(
-                        value = updateComment,
+                        value = updateComment?:"",
                         onValueChange = { updateComment = it},
                         textStyle = TextStyle(
                             color = design_login_text,
@@ -1229,7 +1238,7 @@ fun BbsCommentListItem2(
                                 onClick = {
                                     viewModel.viewModelScope.launch {
                                         updateLoading = true
-                                        val result = viewModel.updateComment(updateComment, comment.pstCmntNo)
+                                        val result = viewModel.updateComment(updateComment?:"", comment.pstCmntNo?:0)
                                         if (result) {
                                             updateComment = ""
                                             updateLoading = false
@@ -1288,7 +1297,7 @@ fun BbsCommentListItem2(
                     verticalAlignment = Alignment.Bottom
                 ){
                     Text(
-                        text = comment.petNm,
+                        text = comment.petNm?:"",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -1296,7 +1305,7 @@ fun BbsCommentListItem2(
                     )
 
                     Text(
-                        text = comment.lastStrgDt,
+                        text = comment.lastStrgDt?:"",
                         fontSize = 10.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -1327,7 +1336,7 @@ fun BbsCommentListItem2(
                                             onClick = {
                                                 viewModel.viewModelScope.launch {
                                                     rcmdtnLoading = true
-                                                    val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo, rcmdtnSeCd = "001", pstSn = eventDetail?.data?.pstSn ?: 0)
+                                                    val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo?:0, rcmdtnSeCd = "001", pstSn = eventDetail?.data?.pstSn ?: 0)
                                                     if (result) {
                                                         rcmdtnLoading = true
                                                     } else {
@@ -1403,7 +1412,7 @@ fun BbsCommentListItem2(
                                                     onClick = {
                                                         viewModel.viewModelScope.launch {
                                                             rcmdtnLoading = true
-                                                            val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo, rcmdtnSeCd = "002", pstSn = eventDetail?.data?.pstSn ?: 0)
+                                                            val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo?:0, rcmdtnSeCd = "002", pstSn = eventDetail?.data?.pstSn ?: 0)
                                                             if (result) {
                                                                 rcmdtnLoading = true
                                                             } else {
@@ -1475,7 +1484,7 @@ fun BbsCommentListItem2(
 
 
             Text(
-                text = comment.cmntCn,
+                text = comment.cmntCn?:"",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,

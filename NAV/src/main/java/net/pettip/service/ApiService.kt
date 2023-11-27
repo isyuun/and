@@ -11,6 +11,8 @@ import net.pettip.data.bbs.BbsCmntCreateRes
 import net.pettip.data.bbs.BbsCmntRcmdtnReq
 import net.pettip.data.bbs.BbsCmntUpdateReq
 import net.pettip.data.bbs.BbsCmtCreateReq
+import net.pettip.data.bbs.BbsDetailRes
+import net.pettip.data.bbs.EndEventListRes
 import net.pettip.data.bbs.EventDetailRes
 import net.pettip.data.bbs.EventListRes
 import net.pettip.data.cmm.CmmRes
@@ -91,7 +93,10 @@ interface ApiService {
     fun getEventList(@Body data: BbsReq): Call<EventListRes>
 
     @POST("api/v1/bbs/event/dtl/list")
-    fun getEventDetail(@Body data: Int): Call<EventDetailRes>
+    fun getEventDetail(@Body data: Int): Call<BbsDetailRes>
+
+    @POST("api/v1/bbs/ancmntWinner/list")
+    fun getEndEventList(@Body data: BbsReq): Call<EndEventListRes>
 
     @POST("api/v1/bbs/cmnt/delete")
     fun bbsCmntDelete(@Body data: BbsCmntDeleteReq): Call<BbsCmntCreateRes>

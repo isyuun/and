@@ -51,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -65,6 +66,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -84,6 +86,7 @@ import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
+import net.pettip.data.bbs.BbsAncmntWinner
 import net.pettip.data.bbs.BbsEvnt
 import net.pettip.util.Log
 import java.time.LocalDate
@@ -108,6 +111,10 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
             if (communityViewModel.eventList.value == null){
                 communityViewModel.updateEventListClear()
                 communityViewModel.getEventList(1)
+            }
+            if (communityViewModel.endEventList.value == null){
+                communityViewModel.updateEndEventListClear()
+                communityViewModel.getEndEventList(1)
             }
             init = false
         }
@@ -455,30 +462,79 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
-    val eventList by viewModel.eventList.collectAsState()
+    val eventList by viewModel.endEventList.collectAsState()
+
+    var refreshing by remember{ mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = refreshing,
+        onRefresh = {
+            refreshing = true
+        })
+
+    LaunchedEffect(key1 = refreshing) {
+        if (refreshing) {
+
+            viewModel.updateEventListClear()
+            viewModel.updateStoryPage(1)
+            viewModel.getEventList(1)
+
+            delay(300)
+            refreshing = false
+        }
+    }
+
 
     Box (
         Modifier
             .fillMaxSize()
             .background(color = design_white)
     ){
-        LazyColumn(
-            state = rememberLazyListState(),
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(40.dp)
-        ){
-            if (eventList?.data?.bbsEvntList != null){
-                items(eventList?.data?.bbsEvntList ?: emptyList()){ item ->
-                    EventEndItem(eventItemData = item, navController)
-                }
+
+        Crossfade(
+            targetState = eventList?.data?.bbsAncmntWinnerList?.isEmpty(),
+            label = "",
+        ) { eventList?.data?.bbsAncmntWinnerList?.isEmpty()
+            when(it){
+                true ->
+                    Box(modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        LoadingAnimation1()
+                    }
+                false ->
+                    LazyColumn(
+                        state = rememberLazyListState(),
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .pullRefresh(pullRefreshState)
+                            .fillMaxWidth(),
+                        contentPadding = PaddingValues(vertical = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(40.dp)
+                    ){
+                        if (eventList?.data?.bbsAncmntWinnerList != null){
+                            items(eventList?.data?.bbsAncmntWinnerList ?: emptyList()){ item ->
+                                EndEventItem(eventItemData = item, navController, viewModel)
+                            }
+                        }
+                    }
+
+                else ->
+                    Box(modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        LoadingAnimation1()
+                    }
+            }
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+                CustomIndicator(state = pullRefreshState, refreshing = refreshing)
             }
         }
+
     }
 }
 
@@ -504,16 +560,16 @@ fun EventItem(eventItemData: BbsEvnt, navController: NavHostController, viewMode
             modifier = Modifier
                 .onGloballyPositioned { sizeImage = it.size }
         ){
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data( eventItemData.rprsImgUrl )
-                    .crossfade(true)
-                    .build(),
+            val painter = rememberAsyncImagePainter(
+                model = eventItemData.rprsImgUrl?:R.drawable.img_blank,
+                filterQuality = FilterQuality.Low,
+            )
+
+            Image(
+                painter = painter,
+                modifier = Modifier.fillMaxSize(),
                 contentDescription = "",
-                placeholder = painterResource(id = R.drawable.profile_default),
-                error= painterResource(id = R.drawable.profile_default),
-                modifier= Modifier.fillMaxSize(),
-                contentScale = ContentScale.FillWidth
+                contentScale = ContentScale.Crop
             )
 
             if (compareTimes(eventItemData.pstgEndDt?: "")){
@@ -562,15 +618,18 @@ fun EventItem(eventItemData: BbsEvnt, navController: NavHostController, viewMode
 }
 
 @Composable
-fun EventEndItem(eventItemData: BbsEvnt,navController: NavHostController){
+fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostController, viewModel: CommunityViewModel){
     Column (
         modifier= Modifier
             .wrapContentWidth()
-            .wrapContentHeight()
+            .fillMaxWidth()
             .clickable(
-                enabled = compareTimes(eventItemData.pstgEndDt ?: "")
+                enabled = !compareTimes(eventItemData.pstgEndDt)
             ) {
-                navController.navigate(Screen.EventEndDetail.route)
+                viewModel.viewModelScope.launch {
+                    viewModel.getEventDetail(eventItemData.pstSn)
+                    navController.navigate(Screen.EventDetail.route)
+                }
             }
     ) {
         var sizeImage by remember { mutableStateOf(IntSize.Zero) }
@@ -579,11 +638,16 @@ fun EventEndItem(eventItemData: BbsEvnt,navController: NavHostController){
             modifier = Modifier
                 .onGloballyPositioned { sizeImage = it.size }
         ){
+            val painter = rememberAsyncImagePainter(
+                model = eventItemData.rprsImgUrl?:R.drawable.img_blank,
+                filterQuality = FilterQuality.Low,
+            )
+
             Image(
-                painter = painterResource(id = R.drawable.event_thumb1),
+                painter = painter,
+                modifier = Modifier.fillMaxSize(),
                 contentDescription = "",
-                modifier= Modifier.fillMaxWidth(),
-                contentScale = ContentScale.FillWidth
+                contentScale = ContentScale.Crop
             )
 
             if (compareTimes(eventItemData.pstgEndDt?: "")){
@@ -593,7 +657,7 @@ fun EventEndItem(eventItemData: BbsEvnt,navController: NavHostController){
                     contentAlignment = Alignment.Center
                 ){
                     Text(
-                        text = stringResource(id = R.string.commu_ended_event),
+                        text = stringResource(R.string.commu_ended_event),
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 16.sp,
                         letterSpacing = (-0.8).sp,
@@ -605,7 +669,7 @@ fun EventEndItem(eventItemData: BbsEvnt,navController: NavHostController){
 
 
         Text(
-            text =  "본아페티 관절 영양제 무료 체험단",
+            text =  eventItemData.pstTtl,
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
@@ -618,7 +682,7 @@ fun EventEndItem(eventItemData: BbsEvnt,navController: NavHostController){
         )
 
         Text(
-            text =  "2023.08.16(월) ~ 2023.08.19(수)",
+            text =  "${eventItemData.pstgBgngDt} ~ ${eventItemData.pstgEndDt}",
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp,
             letterSpacing = (-0.7).sp,

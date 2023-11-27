@@ -19,6 +19,8 @@ import net.pettip.data.bbs.BbsCmntCreateRes
 import net.pettip.data.bbs.BbsCmntRcmdtnReq
 import net.pettip.data.bbs.BbsCmntUpdateReq
 import net.pettip.data.bbs.BbsCmtCreateReq
+import net.pettip.data.bbs.BbsDetailRes
+import net.pettip.data.bbs.EndEventListRes
 import net.pettip.data.bbs.EventDetailRes
 import net.pettip.data.bbs.EventListRes
 import net.pettip.data.cmm.CdDetail
@@ -211,14 +213,27 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     val eventList: StateFlow<EventListRes?> = _eventList.asStateFlow()
     fun updateEventListClear(){_eventList.value = null}
 
-    private val _eventDetail = MutableStateFlow<EventDetailRes?>(null)
-    val eventDetail: StateFlow<EventDetailRes?> = _eventDetail.asStateFlow()
+    private val _eventDetail = MutableStateFlow<BbsDetailRes?>(null)
+    val eventDetail: StateFlow<BbsDetailRes?> = _eventDetail.asStateFlow()
 
     private val _eventCmntList = MutableStateFlow<List<BbsCmnt>?>(null)
     val eventCmntList:StateFlow<List<BbsCmnt>?> = _eventCmntList.asStateFlow()
     fun updateEventCmntList(newValue: List<BbsCmnt>?){
         _eventCmntList.value = newValue
     }
+
+    private val _endEventList = MutableStateFlow<EndEventListRes?>(null)
+    val endEventList: StateFlow<EndEventListRes?> = _endEventList.asStateFlow()
+    fun updateEndEventListClear(){_endEventList.value = null}
+
+    //private val _eventDetail = MutableStateFlow<BbsDetailRes?>(null)
+    //val eventDetail: StateFlow<BbsDetailRes?> = _eventDetail.asStateFlow()
+    //
+    //private val _eventCmntList = MutableStateFlow<List<BbsCmnt>?>(null)
+    //val eventCmntList:StateFlow<List<BbsCmnt>?> = _eventCmntList.asStateFlow()
+    //fun updateEventCmntList(newValue: List<BbsCmnt>?){
+    //    _eventCmntList.value = newValue
+    //}
 
     private val _eventReplyCmnt = MutableStateFlow<BbsCmnt?>(null)
     val eventReplyCmnt:StateFlow<BbsCmnt?> = _eventReplyCmnt.asStateFlow()
@@ -499,8 +514,8 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
 
         val call = apiService.getEventDetail(pstSn)
         return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<EventDetailRes>{
-                override fun onResponse(call: Call<EventDetailRes>, response: Response<EventDetailRes>) {
+            call.enqueue(object : Callback<BbsDetailRes>{
+                override fun onResponse(call: Call<BbsDetailRes>, response: Response<BbsDetailRes>) {
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
@@ -515,7 +530,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     }
                 }
 
-                override fun onFailure(call: Call<EventDetailRes>, t: Throwable) {
+                override fun onFailure(call: Call<BbsDetailRes>, t: Throwable) {
                     continuation.resume(false)
                 }
 
@@ -523,6 +538,36 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         }
     }
 
+    suspend fun getEndEventList(page:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsReq(bbsSn = 11, page = page, pageSize = 10, recordSize = 20)
+
+        val call = apiService.getEndEventList(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<EndEventListRes>{
+                override fun onResponse(call: Call<EndEventListRes>, response: Response<EndEventListRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _endEventList.value = body
+                            continuation.resume(true)
+                        }
+                    }else{
+                        val errorBodyString = response.errorBody()!!.string()
+
+                        _dm.value = errorBodyParse(errorBodyString)
+
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<EndEventListRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+            })
+        }
+    }
     suspend fun getSchList():Boolean{
         val apiService = RetrofitClientServer.instance
 

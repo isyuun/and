@@ -29,29 +29,31 @@ data class EventDetailData(
     var bbsCmnts: List<BbsCmnt>?
 )
 
-data class BbsCmnt(
-    @SerializedName("bldYn")
-    var bldYn: String,
-    @SerializedName("cmntCn")
-    var cmntCn: String,
-    @SerializedName("cmntType")
-    var cmntType: String,
-    @SerializedName("delYn")
-    var delYn: String,
-    @SerializedName("lastStrgDt")
-    var lastStrgDt: String,
-    @SerializedName("petImgUrl")
-    var petImgUrl: String?,
-    @SerializedName("petNm")
-    var petNm: String,
-    @SerializedName("prvtYn")
-    var prvtYn: String,
-    @SerializedName("pstCmntNo")
-    var pstCmntNo: Int,
-    @SerializedName("rcmdtnSeCd")
-    var rcmdtnSeCd: String?,
-    @SerializedName("upCmntNo")
-    var upCmntNo: Int,
-    @SerializedName("userId")
-    var userId: String
-)
+//data class BbsCmnt(
+//    @SerializedName("bldYn")
+//    var bldYn: String,
+//    @SerializedName("cmntCn")
+//    var cmntCn: String,
+//    @SerializedName("delYn")
+//    var delYn: String,
+//    @SerializedName("lastStrgDt")
+//    var lastStrgDt: String,
+//    @SerializedName("petImgUrl")
+//    var petImgUrl: String?,
+//    @SerializedName("petNm")
+//    var petNm: String,
+//    @SerializedName("prvtYn")
+//    var prvtYn: String,
+//    @SerializedName("pstCmntNo")
+//    var pstCmntNo: Int,
+//    @SerializedName("rcmdtnSeCd")
+//    var rcmdtnSeCd: String?,
+//    @SerializedName("rcmdtnCnt")
+//    var rcmdtnCnt: Int?,
+//    @SerializedName("nrcmdtnCnt")
+//    var nrcmdtnCnt: Int?,
+//    @SerializedName("upCmntNo")
+//    var upCmntNo: Int,
+//    @SerializedName("userId")
+//    var userId: String
+//)
