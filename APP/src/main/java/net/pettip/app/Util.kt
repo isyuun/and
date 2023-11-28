@@ -1,14 +1,15 @@
 /*
  * Copyright (c) 2023. PetTip All right reserved.
- * This software is the proprietary information of Care Pet.
+ * This software is the proprietary information of Care Biz.
  *
- *  Revision History
- *  Author                         Date          Description
- *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-biz.co.kr             2023. 9. 20.   description...
+ * Revision History
+ *   Author                         Date          Description
+ *   --------------------------     ----------    ----------------------------------------
+ *   isyuun                         2023.11.28
+ *
  */
 
-package net.pettip.map
+package net.pettip.app
 
 import android.content.Context
 import android.content.res.Resources
@@ -21,12 +22,11 @@ import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.media.AudioManager
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
 import android.util.DisplayMetrics
 import android.util.TypedValue
+import androidx.compose.foundation.gestures.PressGestureScope
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
-import com.naver.maps.geometry.LatLng
 
 /**
  * @Project     : carepet-android
@@ -43,36 +42,6 @@ import com.naver.maps.geometry.LatLng
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
-private val handler: Handler = Handler(Looper.getMainLooper())
-
-fun post(d: Long = 0, r: Runnable) {
-    handler.postDelayed(r, d)
-}
-
-fun remove(r: Runnable) {
-    handler.removeCallbacks(r)
-}
-
-fun send(d: Long = 0, m: Message) {
-    handler.sendMessageDelayed(m, d)
-}
-
-fun handle(m: Message) {
-    handler.handleMessage(m)
-}
-
-fun dispatch(m: Message) {
-    handler.dispatchMessage(m)
-}
-
-fun LatLng?.toText(): String {
-    return if (this != null) {
-        "($latitude, $longitude)"
-    } else {
-        "Unknown location"
-    }
-}
-
 private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
     val bitmap = Bitmap.createBitmap(
         drawable.intrinsicWidth,
@@ -189,21 +158,35 @@ fun getDeviceDensityString(context: Context): String? {
  */
 fun withClick(context: Context, onClick: () -> Unit): () -> Unit {
     return {
-        post { (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK) }
+        (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
         onClick()
     }
 }
 
-/**
- * How to play the platform CLICK sound in Jetpack Compose Button click
- * @see <a href="https://stackoverflow.com/questions/66080018/how-to-play-the-platform-click-sound-in-jetpack-compose-button-click">How to play the platform CLICK sound in Jetpack Compose Button click</a>
- */
-
-@Composable
-fun withClick(onClick: () -> Unit): () -> Unit {
-    val context = LocalContext.current
+fun withDoubleTap(context: Context, withDoubleTap: () -> Unit): ((Offset) -> Unit)? {
     return {
-        post { (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK) }
-        onClick()
+        //(context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
+        withDoubleTap()
+    }
+}
+
+fun withLongPress(context: Context, onLongPress: () -> Unit): ((Offset) -> Unit)? {
+    return {
+        (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
+        onLongPress()
+    }
+}
+
+fun withPress(context: Context, withPress: () -> Unit): PressGestureScope.(Offset) -> Unit {
+    return {
+        //(context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
+        withPress()
+    }
+}
+
+fun withTap(context: Context, withTap: () -> Unit): (Offset) -> Unit {
+    return {
+        (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
+        withTap()
     }
 }

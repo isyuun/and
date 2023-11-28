@@ -33,6 +33,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -84,6 +85,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -122,6 +124,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.DEBUG
 import net.pettip.RELEASE
+import net.pettip.app.getDeviceDensityString
+import net.pettip.app.getRounded
+import net.pettip.app.navigationBarHeight
+import net.pettip.app.toPx
+import net.pettip.app.withClick
+import net.pettip.app.withDoubleTap
+import net.pettip.app.withLongPress
+import net.pettip.app.withPress
+import net.pettip.app.withTap
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.gps.R
 import net.pettip.gps.app.GPSApplication
@@ -130,12 +141,6 @@ import net.pettip.gpx.GPX_LATITUDE_ZERO
 import net.pettip.gpx.GPX_LONGITUDE_ZERO
 import net.pettip.gpx.Track
 import net.pettip.map.app.LoadingDialog
-import net.pettip.map.getDeviceDensityString
-import net.pettip.map.getRounded
-import net.pettip.map.navigationBarHeight
-import net.pettip.map.toPx
-import net.pettip.map.toText
-import net.pettip.map.withClick
 import net.pettip.singleton.G
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
@@ -225,7 +230,15 @@ fun IconButton2(
     }
 }
 
-fun marker(context: Context, position: LatLng?, captionText: String = ""): Marker {
+fun LatLng?.toText(): String {
+    return if (this != null) {
+        "($latitude, $longitude)"
+    } else {
+        "Unknown location"
+    }
+}
+
+fun marker(context: Context, position: LatLng?, captionText: String = "", zIndex: Int = 1): Marker {
     val marker = Marker()
     if (position != null) {
         marker.position = position
@@ -239,8 +252,16 @@ fun marker(context: Context, position: LatLng?, captionText: String = ""): Marke
     marker.captionHaloColor = Color.Gray.toArgb()
     marker.captionTextSize = (3.8 * 0.85f).sp.toPx(context)
     marker.captionOffset = (-32 * 1.2f).dp.toPx(context).toInt()
-    marker.zIndex = 3
+    marker.zIndex = zIndex
     return marker
+}
+
+fun starter(context: Context, position: LatLng?): Marker {
+    return marker(context, position, context.resources.getString(R.string.departure), 1)
+}
+
+fun ender(context: Context, position: LatLng?): Marker {
+    return marker(context, position, context.resources.getString(R.string.arrival), 3)
 }
 
 fun marker(context: Context, position: LatLng?, id: Int, back: Color = Color.White): Marker {
@@ -361,8 +382,6 @@ fun naverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Tr
 }
 
 fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, finished: Boolean) {
-    val departure = context.resources.getString(R.string.departure)
-    val arrival = context.resources.getString(R.string.arrival)
     val markers = mutableListOf<Marker>()
     val coords = mutableListOf<LatLng>()
     markers.clear()
@@ -372,11 +391,9 @@ fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track
         coords.add(LatLng(track.latitude, track.longitude))
     }
     if (coords.isNotEmpty()) {
-        val starter = marker(context = context, position = coords.first(), captionText = departure)
-        starter.map = naverMap
+        starter(context = context, position = coords.first()).map = naverMap
         if (finished) {
-            val ender = marker(context = context, position = coords.last(), captionText = arrival)
-            ender.map = naverMap
+            ender(context = context, position = coords.last()).map = naverMap
         }
         if (coords.size > 1) {
             val path = PathOverlay()
@@ -407,7 +424,7 @@ fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boole
 
     val context = LocalContext.current
     Button(
-        onClick = withClick {
+        onClick = withClick(context) {
             check = !check
             onCheckedChange(check)
         },
@@ -895,7 +912,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         ) {
             /** NOTE */
             IconButton2(
-                onClick = withClick {
+                onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                 },
@@ -910,7 +927,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
             /** CAMERA */
             IconButton2(
-                onClick = withClick {
+                onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -949,7 +966,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         ) {
             /** pee */
             IconButton2(
-                onClick = withClick {
+                onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.pee
@@ -967,7 +984,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
             /** poo */
             IconButton2(
-                onClick = withClick {
+                onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.poo
@@ -985,7 +1002,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
             /** mrk */
             IconButton2(
-                onClick = withClick {
+                onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.mrk
@@ -1004,7 +1021,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         }
         /** WALK */
         Button(
-            onClick = withClick {
+            onClick = withClick(context) {
                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                 if (pets.size == 1 && !start) {
                     application.start()
@@ -1084,7 +1101,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 ) {
                     items(application.pets) { pet ->
                         IconButton2(
-                            onClick = withClick {
+                            onClick = withClick(context) {
                                 Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 if (!start) return@withClick
                                 showPetsSheet = false
@@ -1108,9 +1125,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 
     /** BOTTOM */
     Log.i(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-    val departure = stringResource(id = R.string.departure)
-    val arrival = stringResource(id = R.string.arrival)
-    Log.d(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[$departure][$arrival]")
+    Log.d(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[${stringResource(id = R.string.departure)}][${stringResource(id = R.string.arrival)}]")
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {
@@ -1209,7 +1224,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     }
                     /** walk */
                     Button(
-                        onClick = withClick {
+                        onClick = withClick(context) {
                             Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 if (!sheetState.isVisible) {
@@ -1258,7 +1273,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     ) {
                         R.string.walk_button_finish
                         Button(
-                            onClick = withClick {
+                            onClick = withClick(context) {
                                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
@@ -1268,8 +1283,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 application.stop()
                                 if (start) {
                                     mapView.getMapAsync { naverMap ->
-                                        val ender = marker(context = context, position = position, captionText = arrival)
-                                        ender.map = naverMap
+                                        ender(context = context, position = position).map = naverMap
                                         naverMap.takeSnapshot(false) {
                                             application.preview = it
                                         }
@@ -1287,7 +1301,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         }
                         R.string.walk_button_resume
                         Button(
-                            onClick = withClick {
+                            onClick = withClick(context) {
                                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
@@ -1327,12 +1341,21 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
-                .clickable(
-                    onClick = withClick {
-                        Log.wtf(__CLASSNAME__, "::withClick${getMethodName()}[$context][$version]")
-                        version = !version
-                    }
-                )
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onDoubleTap = withDoubleTap(context) { /** Called on Double Tap */ },
+                        onLongPress = withLongPress(context) {
+                            /** Called on Long Press */
+                            Log.wtf(__CLASSNAME__, "::withClick${getMethodName()}[$context][$version]")
+                            version = !version
+                        },
+                        onPress = withPress(context) { /** Called when the gesture starts */ },
+                        onTap = withTap(context) { /** Called on Tap */ },
+                    )
+                }
+                //.clickable(
+                //    onClick = withClick(context) {}
+                //)
                 .align(Alignment.BottomEnd)
                 //.fillMaxWidth()
                 .height(vertical),
