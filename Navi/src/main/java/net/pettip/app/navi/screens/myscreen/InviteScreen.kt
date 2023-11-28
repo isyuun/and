@@ -58,7 +58,6 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
     val context = LocalContext.current
     val inviteCode by settingViewModel.inviteCode.collectAsState()
     val selectPet by settingViewModel.selectedPetSave.collectAsState()
-    val name by settingViewModel.name.collectAsState()
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
     Scaffold (

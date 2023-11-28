@@ -23,6 +23,10 @@ import net.pettip.data.bbs.BbsDetailRes
 import net.pettip.data.bbs.EndEventListRes
 import net.pettip.data.bbs.EventDetailRes
 import net.pettip.data.bbs.EventListRes
+import net.pettip.data.bbs.NtcListRes
+import net.pettip.data.bbs.QnaDetailRes
+import net.pettip.data.bbs.QnaListRes
+import net.pettip.data.bbs.QnaReq
 import net.pettip.data.cmm.CdDetail
 import net.pettip.data.cmm.CmmRes
 import net.pettip.data.cmm.CommonData
@@ -52,6 +56,8 @@ import net.pettip.data.daily.StoryReq
 import net.pettip.data.daily.StoryRes
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.data.user.BbsReq
+import net.pettip.data.user.FAQData
+import net.pettip.data.user.FAQRes
 import net.pettip.singleton.G
 import net.pettip.singleton.RetrofitClientServer
 import net.pettip.util.Log
@@ -226,15 +232,6 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     val endEventList: StateFlow<EndEventListRes?> = _endEventList.asStateFlow()
     fun updateEndEventListClear(){_endEventList.value = null}
 
-    //private val _eventDetail = MutableStateFlow<BbsDetailRes?>(null)
-    //val eventDetail: StateFlow<BbsDetailRes?> = _eventDetail.asStateFlow()
-    //
-    //private val _eventCmntList = MutableStateFlow<List<BbsCmnt>?>(null)
-    //val eventCmntList:StateFlow<List<BbsCmnt>?> = _eventCmntList.asStateFlow()
-    //fun updateEventCmntList(newValue: List<BbsCmnt>?){
-    //    _eventCmntList.value = newValue
-    //}
-
     private val _eventReplyCmnt = MutableStateFlow<BbsCmnt?>(null)
     val eventReplyCmnt:StateFlow<BbsCmnt?> = _eventReplyCmnt.asStateFlow()
     fun updateEventReplyCmnt(newValue: BbsCmnt?){
@@ -258,6 +255,23 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     fun updateViewType(newValue: String) {
         _viewType.value = newValue
     }
+    // ----------------- 게시판 ------------------------
+    private val _ntcList = MutableStateFlow<NtcListRes?>(null)
+    val ntcList: StateFlow<NtcListRes?> = _ntcList.asStateFlow()
+    fun updateNtcListClear(){_ntcList.value = null}
+
+    private val _faqList = MutableStateFlow<FAQData?>(null)
+    val faqList: StateFlow<FAQData?> = _faqList.asStateFlow()
+    fun updateFaqListClear(){_faqList.value = null}
+
+    private val _qnaList = MutableStateFlow<QnaListRes?>(null)
+    val qnaList: StateFlow<QnaListRes?> = _qnaList.asStateFlow()
+    fun updateQnaListClear(){_qnaList.value = null}
+
+    private val _qnaDetail = MutableStateFlow<QnaDetailRes?>(null)
+    val qnaDetail: StateFlow<QnaDetailRes?> = _qnaDetail.asStateFlow()
+    fun updateQnaDetail(){_qnaDetail.value = null}
+    // ----------------- 게시판 ------------------------
 
     // ---------------------------Modify------------------------------
 
@@ -568,6 +582,36 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
             })
         }
     }
+
+    suspend fun getEndEventDetail(pstSn:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.getEndEventDetail(pstSn)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<BbsDetailRes>{
+                override fun onResponse(call: Call<BbsDetailRes>, response: Response<BbsDetailRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _eventDetail.value = it
+                            _eventCmntList.value = it.data.bbsCmnts
+                            continuation.resume(true)
+                        }
+                    }else{
+                        val errorBodyString = response.errorBody()!!.string()
+                        _dm.value = errorBodyParse(errorBodyString)
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<BbsDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
     suspend fun getSchList():Boolean{
         val apiService = RetrofitClientServer.instance
 
@@ -726,6 +770,146 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
             })
         }
     }
+    suspend fun getNtcList(page:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsReq(bbsSn = 7, page = page, pageSize = 30, recordSize = 30)
+
+        val call = apiService.getNtcList(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<NtcListRes>{
+                override fun onResponse(call: Call<NtcListRes>, response: Response<NtcListRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _ntcList.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        val errorBodyString = response.errorBody()!!.string()
+
+                        _dm.value = errorBodyParse(errorBodyString)
+
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<NtcListRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+            })
+        }
+    }
+    suspend fun getNctDetail(pstSn:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.getNtcDetail(pstSn)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<BbsDetailRes>{
+                override fun onResponse(call: Call<BbsDetailRes>, response: Response<BbsDetailRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _eventDetail.value = it
+                            _eventCmntList.value = it.data.bbsCmnts
+                            continuation.resume(true)
+                        }
+                    }else{
+                        val errorBodyString = response.errorBody()!!.string()
+                        _dm.value = errorBodyParse(errorBodyString)
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<BbsDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun getFaqList(page:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsReq(8, page, 100, 100)
+
+        val call = apiService.getFaqList(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<FAQRes>{
+                override fun onResponse(call: Call<FAQRes>, response: Response<FAQRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _faqList.value = body.data
+                            continuation.resume(true)
+                        }
+                    }else{
+                        _faqList.value = null
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<FAQRes>, t: Throwable) {
+                    _faqList.value = null
+                    continuation.resume(false)
+                }
+            })
+        }
+    }
+
+    suspend fun getQnaList(page:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsReq(10, page, 100, 100,G.userId)
+
+        val call = apiService.getQnaList(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<QnaListRes>{
+                override fun onResponse(call: Call<QnaListRes>, response: Response<QnaListRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _qnaList.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<QnaListRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+            })
+        }
+    }
+
+    suspend fun getQnaDetail(pstSn:Int):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.getQnaDetail(pstSn)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<QnaDetailRes>{
+                override fun onResponse(call: Call<QnaDetailRes>, response: Response<QnaDetailRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _qnaDetail.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<QnaDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+            })
+        }
+    }
+
 
     suspend fun deleteComment(cmntNo: Int):Boolean{
         val apiService = RetrofitClientServer.instance

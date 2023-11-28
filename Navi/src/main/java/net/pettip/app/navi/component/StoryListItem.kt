@@ -81,7 +81,6 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
                         viewModel.getStoryDetail(data.schUnqNo)
                     }
                 }
-
             }
     ){
         val painter = rememberAsyncImagePainter(

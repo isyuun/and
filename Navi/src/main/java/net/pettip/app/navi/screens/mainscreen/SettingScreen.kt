@@ -1,6 +1,7 @@
 package net.pettip.app.navi.screens.mainscreen
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
@@ -21,11 +22,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -55,10 +61,13 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
+import net.pettip.app.navi.component.CustomIndicator
+import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_f1f1f1
@@ -68,21 +77,34 @@ import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
-import net.pettip.app.navi.viewmodel.SettingViewModel
+import net.pettip.app.navi.viewmodel.CommunityViewModel
+import net.pettip.data.bbs.BbsNtc
+import net.pettip.data.bbs.BbsQna
 import net.pettip.data.user.BbsFaq
-import net.pettip.data.user.BbsQnaBsc
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun SettingScreen(navController: NavHostController, viewModel:SettingViewModel){
+fun SettingScreen(navController: NavHostController, viewModel:CommunityViewModel){
 
     val pagerState = rememberPagerState(initialPage = 0)
     val coroutineScope = rememberCoroutineScope()
     var tabVisible by remember { mutableFloatStateOf(1f) }
 
     LaunchedEffect(Unit){
-        viewModel.getFaqList(1)
-        viewModel.getQnaList(1)
+
+        if (viewModel.ntcList.value == null){
+            viewModel.updateNtcListClear()
+            viewModel.getNtcList(1)
+        }
+        if (viewModel.faqList.value ==null){
+            viewModel.updateFaqListClear()
+            viewModel.getFaqList(1)
+        }
+        if (viewModel.qnaList.value == null){
+            viewModel.updateQnaListClear()
+            viewModel.getQnaList(1)
+        }
+
     }
 
     Scaffold (
@@ -128,45 +150,87 @@ fun SettingScreen(navController: NavHostController, viewModel:SettingViewModel){
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NotiScreen(navController: NavHostController, viewModel: SettingViewModel){
+fun NotiScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
-    val dummy = arrayListOf(
-        NotiItemData(1),
-        NotiItemData(2),
-        NotiItemData(3),
-        NotiItemData(4),
-        NotiItemData(5),
-        NotiItemData(6),
-        NotiItemData(7),
-        NotiItemData(8),
-        NotiItemData(9),
-    )
+    val ntcList by viewModel.ntcList.collectAsState()
+
+    var refreshing by remember{ mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = refreshing,
+        onRefresh = {
+            refreshing = true
+        })
+
+    LaunchedEffect(key1 = refreshing) {
+        if (refreshing) {
+
+            viewModel.updateNtcListClear()
+            //viewModel.updateNtcyPage(1)
+            viewModel.getNtcList(1)
+
+            delay(300)
+            refreshing = false
+        }
+    }
+
 
     Box (
-        modifier = Modifier
+        Modifier
             .fillMaxSize()
-            .background(design_white)
+            .background(color = design_white)
     ){
-        LazyColumn(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth(),
-            state = rememberLazyListState(),
-            contentPadding = PaddingValues(vertical = 20.dp)
-        ){
-            items(dummy){ item->
-                NotiItem(item, navController)
+
+        Crossfade(
+            targetState = ntcList?.data?.bbsNtcList?.isEmpty(),
+            label = "",
+        ) { ntcList?.data?.bbsNtcList?.isEmpty()
+            when(it){
+                true ->
+                    Box(modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        LoadingAnimation1()
+                    }
+                false ->
+                    LazyColumn(
+                        state = rememberLazyListState(),
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .pullRefresh(pullRefreshState)
+                            .fillMaxWidth(),
+                        contentPadding = PaddingValues(vertical = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ){
+                        if (ntcList?.data?.bbsNtcList != null){
+                            items(ntcList?.data?.bbsNtcList ?: emptyList()){ item ->
+                                NotiItem(notiItemData = item, navController, viewModel)
+                            }
+                        }
+                    }
+
+                else ->
+                    Box(modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        LoadingAnimation1()
+                    }
+            }
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+                CustomIndicator(state = pullRefreshState, refreshing = refreshing)
             }
         }
+
     }
 
 }
 
 @Composable
-fun FAQScreen(navController: NavHostController, viewModel: SettingViewModel){
+fun FAQScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
-    val faqData by viewModel.faqData.collectAsState()
+    val faqData by viewModel.faqList.collectAsState()
 
     Box (
         modifier = Modifier
@@ -186,21 +250,9 @@ fun FAQScreen(navController: NavHostController, viewModel: SettingViewModel){
 }
 
 @Composable
-fun InquiryScreen(navController: NavHostController, viewModel: SettingViewModel){
+fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
-    val dummy = arrayListOf(
-        InquiryItemData(false),
-        InquiryItemData(true),
-        InquiryItemData(false),
-        InquiryItemData(true),
-        InquiryItemData(false),
-        InquiryItemData(false),
-        InquiryItemData(false),
-        InquiryItemData(false),
-        InquiryItemData(false),
-        InquiryItemData(false),
-    )
-    val qnaRes by viewModel.qnaData.collectAsState()
+    val qnaRes by viewModel.qnaList.collectAsState()
 
     Column (
         modifier = Modifier
@@ -247,7 +299,7 @@ fun InquiryScreen(navController: NavHostController, viewModel: SettingViewModel)
             .height(1.dp)
             .background(color = design_textFieldOutLine))
 
-        if (qnaRes?.data?.bbsQnaBscList?.isEmpty() == true){
+        if (qnaRes?.data?.bbsQnaList?.isEmpty() == true){
             Box (
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -265,8 +317,8 @@ fun InquiryScreen(navController: NavHostController, viewModel: SettingViewModel)
                 state = rememberLazyListState(),
                 //verticalArrangement = Arrangement.spacedBy(20.dp)
             ){
-                items(qnaRes?.data?.bbsQnaBscList ?: emptyList()){ item ->
-                    InquiryItem(inquiryItemData = item, navController)
+                items(qnaRes?.data?.bbsQnaList ?: emptyList()){ item ->
+                    InquiryItem(inquiryItemData = item, navController, viewModel)
                 }
             }
         }
@@ -274,15 +326,27 @@ fun InquiryScreen(navController: NavHostController, viewModel: SettingViewModel)
 }
 
 @Composable
-fun NotiItem(notiItemData: NotiItemData, navController: NavHostController){
+fun NotiItem(notiItemData: BbsNtc, navController: NavHostController, viewModel: CommunityViewModel){
+
+    val scope = rememberCoroutineScope()
+    var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     Column (
         modifier= Modifier
             .fillMaxWidth()
-            .clickable { navController.navigate(Screen.NotiDetail.route) }
+            .clickable {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastClickTime >= 500) {
+                    lastClickTime = currentTime
+                    scope.launch {
+                        viewModel.getNctDetail(notiItemData.pstSn)
+                        navController.navigate(Screen.NotiDetail.route)
+                    }
+                }
+            }
     ){
         Text(
-            text = "산책기능 이용 가능 안드로이드 버전 안내사항",
+            text = notiItemData.pstTtl,
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
@@ -291,7 +355,7 @@ fun NotiItem(notiItemData: NotiItemData, navController: NavHostController){
         )
 
         Text(
-            text = "2023.08.16",
+            text = notiItemData.pstgBgngDt?:"",
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp,
             letterSpacing = (-0.7).sp,
@@ -396,9 +460,23 @@ fun FAQItem(faqItemData: BbsFaq){
 }
 
 @Composable
-fun InquiryItem(inquiryItemData: BbsQnaBsc, navController: NavHostController){
+fun InquiryItem(inquiryItemData: BbsQna, navController: NavHostController, viewModel: CommunityViewModel){
+
+    val scope = rememberCoroutineScope()
+    var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
+
     Column (
-        modifier = Modifier.clickable { navController.navigate(Screen.InquiryDetail.route) }
+        modifier = Modifier
+            .clickable {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastClickTime >= 500) {
+                    lastClickTime = currentTime
+                    scope.launch {
+                        viewModel.getQnaDetail(inquiryItemData.pstSn)
+                        navController.navigate(Screen.InquiryDetail.route)
+                    }
+                }
+            }
     ){
         Box (
             modifier= Modifier
@@ -440,7 +518,7 @@ fun InquiryItem(inquiryItemData: BbsQnaBsc, navController: NavHostController){
         }
 
         Text(
-            text = "휴대폰 번호 수정하는 방법이 있나요?",
+            text = inquiryItemData.pstTtl?:"",
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
@@ -462,7 +540,7 @@ data class InquiryItemData(val complete:Boolean)
 
 data class MyScreenTabItem(
     val title: String,
-    val screen: @Composable (NavHostController, SettingViewModel) -> Unit // navController를 매개변수로 추가
+    val screen: @Composable (NavHostController, CommunityViewModel) -> Unit // navController를 매개변수로 추가
 )
 
 val MyScreenTabItems = listOf(
@@ -472,6 +550,7 @@ val MyScreenTabItems = listOf(
             NotiScreen(
                 navController = navController,
                 viewModel = viewModel
+
             ) }),
     MyScreenTabItem(
         title = "FAQ",

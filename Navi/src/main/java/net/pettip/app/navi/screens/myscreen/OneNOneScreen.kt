@@ -1,6 +1,7 @@
 package net.pettip.app.navi.screens.myscreen
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -43,6 +44,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -60,9 +63,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomTextField
+import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.screens.walkscreen.PhotoItem
 import net.pettip.app.navi.screens.walkscreen.PlusBox
 import net.pettip.app.navi.ui.theme.design_button_bg
@@ -74,29 +80,42 @@ import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SettingViewModel
+import net.pettip.data.cmm.CdDetail
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingViewModel){
 
-    val inquiryKindList = settingViewModel.inquiryKindList
+    val inquiryKindList by settingViewModel.inquiryKindList.collectAsState()
     var expanded by remember{ mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var loadingText by remember { mutableStateOf("문의 업로드중..") }
 
-    val name by settingViewModel.name.collectAsState()
     val inquiryKind by settingViewModel.inquiryKind.collectAsState()
-    val phoneNum by settingViewModel.phoneNum.collectAsState()
-    val email by settingViewModel.email.collectAsState()
     val title by settingViewModel.title.collectAsState()
     val inquiryMain by settingViewModel.inquiryMain.collectAsState()
     val isCheck by settingViewModel.isCheck.collectAsState()
 
     val scope= rememberCoroutineScope()
+    val context = LocalContext.current
 
     val state = settingViewModel.state
     val dummyUri = Uri.parse("")
 
+    DisposableEffect(Unit){
+
+        onDispose {
+            settingViewModel.updateTitle("")
+            settingViewModel.updateInquiryKind(null)
+            settingViewModel.updateInquiryMain("")
+            settingViewModel.updateIsCheck(false)
+            settingViewModel.clearSelectedImages()
+        }
+    }
+
     LaunchedEffect(Unit){
         settingViewModel.updateSelectedImageList(listOf(dummyUri))
+        settingViewModel.getCmmList("PST")
     }
 
     val galleryLauncher =
@@ -113,6 +132,12 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
     Scaffold (
         topBar = { BackTopBar(title = "1:1 문의", navController = navController) }
     ) { paddingValues ->
+
+        LoadingDialog(
+            loadingText = loadingText,
+            loadingState = isLoading
+        )
+
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -151,7 +176,7 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 Text(
-                    text = inquiryKind,
+                    text = inquiryKind?.cdNm ?: "문의유형을 선택해주세요",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
                     color = design_login_text,
@@ -175,35 +200,13 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
             ) {
                 LazyColumn(
                     state = rememberLazyListState(),
-                    modifier = Modifier.heightIn(max = 150.dp)
+                    modifier = Modifier.heightIn(max = 300.dp)
                 ){
-                    items(inquiryKindList){ item ->
-                        inquiryKindListItem(text = item.kind, viewModel = settingViewModel,{newValue -> expanded = newValue})
+                    items(items = inquiryKindList?.data?.get(0)?.cdDetailList?: emptyList()){ item ->
+                        InquiryKindListItem(cmmData = item, viewModel = settingViewModel) { newValue -> expanded = newValue }
                     }
                 }
             }
-
-            //Text(text = "휴대폰 번호", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-            //    modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
-            //)
-            //
-            //CustomTFInInquiry(
-            //    value = phoneNum,
-            //    onValueChange = {newValue -> settingViewModel.updatePhoneNum(newValue)},
-            //    placeholder = "'_'없이 숫자만",
-            //    keyboardType = KeyboardType.Number
-            //)
-            //
-            //Text(text = "이메일", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-            //    modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
-            //)
-            //
-            //CustomTFInInquiry(
-            //    value = email,
-            //    onValueChange = {newValue -> settingViewModel.updateEmail(newValue)},
-            //    placeholder = "이메일을 입력해주세요",
-            //    keyboardType = KeyboardType.Email
-            //)
 
             Text(text = "제목", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
@@ -331,7 +334,54 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
             }
 
             Button(
-                onClick = { },
+                onClick = {
+                          if (settingViewModel.inquiryKind.value ==null){
+                              Toast.makeText(context, "문의 유형을 선택해주세요", Toast.LENGTH_SHORT).show()
+                          }else if(settingViewModel.title.value == ""){
+                              Toast.makeText(context, "제목을 입력해주세요", Toast.LENGTH_SHORT).show()
+                          }else if(settingViewModel.inquiryMain.value ==""){
+                              Toast.makeText(context, "내용을 입력해주세요", Toast.LENGTH_SHORT).show()
+                          }else if (!settingViewModel.isCheck.value){
+                              Toast.makeText(context, "정보 수집에 동의해주세요", Toast.LENGTH_SHORT).show()
+                          }else{
+                              scope.launch {
+                                  isLoading = true
+                                  if (state.listOfSelectedImages.isNotEmpty()){
+                                      val photoUpload = settingViewModel.fileUpload(context = context)
+                                      if(photoUpload){
+                                          val qnaUpload = settingViewModel.qnaCreate()
+                                          if (qnaUpload){
+                                              loadingText = "등록 성공!"
+                                              delay(1000)
+                                              isLoading = false
+                                              navController.popBackStack()
+                                          }else{
+                                              loadingText = "등록 실패..."
+                                              delay(1000)
+                                              isLoading = false
+                                          }
+                                      }else{
+                                          loadingText = "등록 실패..."
+                                          delay(1000)
+                                          isLoading = false
+                                      }
+                                  }else{
+                                      val qnaUpload = settingViewModel.qnaCreate()
+                                      if (qnaUpload){
+                                          loadingText = "등록 성공!"
+                                          delay(1000)
+                                          isLoading = false
+                                          navController.popBackStack()
+                                      }else{
+                                          loadingText = "등록 실패..."
+                                          delay(1000)
+                                          isLoading = false
+                                      }
+                                  }
+                              }
+
+                          }
+                },
                 modifier = Modifier
                     .padding(top = 20.dp, bottom = 20.dp)
                     .fillMaxWidth()
@@ -348,7 +398,7 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
 }
 
 @Composable
-fun inquiryKindListItem(text:String, viewModel: SettingViewModel, onChange:(Boolean)->Unit){
+fun InquiryKindListItem(cmmData: CdDetail, viewModel: SettingViewModel, onChange:(Boolean)->Unit){
     Row (
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp)
@@ -361,13 +411,13 @@ fun inquiryKindListItem(text:String, viewModel: SettingViewModel, onChange:(Bool
             )
             .clip(RoundedCornerShape(4.dp))
             .clickable {
-                viewModel.updateInquiryKind(text)
+                viewModel.updateInquiryKind(cmmData)
                 onChange(false)
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = text,
+            text = cmmData.cdNm,
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp, letterSpacing = (-0.7).sp,
             color = design_login_text,

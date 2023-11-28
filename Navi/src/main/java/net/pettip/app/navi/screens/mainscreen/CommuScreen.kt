@@ -624,10 +624,10 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
             .wrapContentWidth()
             .fillMaxWidth()
             .clickable(
-                enabled = !compareTimes(eventItemData.pstgEndDt)
+                //enabled = !compareTimes(eventItemData.pstgEndDt)
             ) {
                 viewModel.viewModelScope.launch {
-                    viewModel.getEventDetail(eventItemData.pstSn)
+                    viewModel.getEndEventDetail(eventItemData.pstSn)
                     navController.navigate(Screen.EventDetail.route)
                 }
             }

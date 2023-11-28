@@ -1,6 +1,7 @@
 package net.pettip.app.navi.viewmodel
 
 import android.content.ContentValues
+import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +16,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import net.pettip.data.CommonCodeModel
+import net.pettip.data.bbs.BbsDetailRes
+import net.pettip.data.bbs.QnaReq
+import net.pettip.data.cmm.CdDetail
+import net.pettip.data.cmm.CmmRes
 import net.pettip.data.cmm.commonRes
+import net.pettip.data.daily.PhotoData
+import net.pettip.data.daily.PhotoRes
 import net.pettip.data.pet.ChangePetWgtReq
 import net.pettip.data.pet.InviteCodeReq
 import net.pettip.data.pet.InviteCodeRes
@@ -28,13 +36,8 @@ import net.pettip.data.pet.PetWgtData
 import net.pettip.data.pet.PetWgtRes
 import net.pettip.data.pet.RegPetWgtReq
 import net.pettip.data.pet.SetInviteCodeRes
-import net.pettip.data.user.BbsReq
-import net.pettip.data.user.FAQData
-import net.pettip.data.user.FAQRes
 import net.pettip.data.user.LogoutRes
 import net.pettip.data.user.NickNameCheckRes
-import net.pettip.data.user.QnaReq
-import net.pettip.data.user.QnaRes
 import net.pettip.data.user.RelCloseReq
 import net.pettip.data.user.ResetNickNameReq
 import net.pettip.data.user.ResetPwReq
@@ -42,6 +45,9 @@ import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import net.pettip.singleton.RetrofitClientServer
 import net.pettip.util.Log
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -121,27 +127,12 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     // -------------------PetInfo Screen---------------------
 
     // -----------------Setting Screen------------------------
-    val inquiryKindList = arrayListOf(
-        InquiryKindList("1"),
-        InquiryKindList("2"),
-        InquiryKindList("3")
-    )
+    private val _inquiryKindList = MutableStateFlow<CmmRes?>(null)
+    val inquiryKindList: StateFlow<CmmRes?> = _inquiryKindList.asStateFlow() // state 노출
 
-    private val _name = MutableStateFlow("") // Data 저장
-    val name: StateFlow<String> = _name.asStateFlow() // state 노출
-    fun updateName(newValue: String) { _name.value = newValue }
-
-    private val _inquiryKind = MutableStateFlow("서비스 이용 문의") // Data 저장
-    val inquiryKind: StateFlow<String> = _inquiryKind.asStateFlow() // state 노출
-    fun updateInquiryKind(newValue: String) { _inquiryKind.value = newValue }
-
-    private val _phoneNum = MutableStateFlow("") // Data 저장
-    val phoneNum: StateFlow<String> = _phoneNum.asStateFlow() // state 노출
-    fun updatePhoneNum(newValue: String) { _phoneNum.value = newValue }
-
-    private val _email = MutableStateFlow("") // Data 저장
-    val email: StateFlow<String> = _email.asStateFlow() // state 노출
-    fun updateEmail(newValue: String) { _email.value = newValue }
+    private val _inquiryKind = MutableStateFlow<CdDetail?>(null) // Data 저장
+    val inquiryKind: StateFlow<CdDetail?> = _inquiryKind.asStateFlow() // state 노출
+    fun updateInquiryKind(newValue: CdDetail?) { _inquiryKind.value = newValue }
 
     private val _title = MutableStateFlow("") // Data 저장
     val title: StateFlow<String> = _title.asStateFlow() // state 노출
@@ -158,6 +149,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     private val _detailMessage = MutableStateFlow("") // Data 저장
     val detailMessage: StateFlow<String> = _detailMessage.asStateFlow() // state 노출
 
+    private val _photoRes = MutableStateFlow<List<PhotoData>?>(emptyList())
     var state by mutableStateOf(MyScreenState())
         private set
     fun updateSelectedImageList(listOfImages: List<Uri>) {
@@ -178,6 +170,9 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                 listOfSelectedImages = updatedImageList.distinct()
             )
         }
+    }
+    fun clearSelectedImages() {
+        state = state.copy(listOfSelectedImages = emptyList())
     }
     // -----------------Setting Screen------------------------
 
@@ -211,13 +206,34 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
         })
     }
 
-    // ----------------- 게시판 ------------------------
-    private val _faqData = MutableStateFlow<FAQData?>(null)
-    val faqData: StateFlow<FAQData?> = _faqData.asStateFlow()
+    suspend fun getCmmList(cmmCdData:String):Boolean{
+        val apiService = RetrofitClientServer.instance
 
-    private val _qnaData = MutableStateFlow<QnaRes?>(null)
-    val qnaData: StateFlow<QnaRes?> = _qnaData.asStateFlow()
-    // ----------------- 게시판 ------------------------
+        val data = CommonCodeModel(cmmCdData)
+
+        val call = apiService.getCmmList(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object :Callback<CmmRes>{
+                override fun onResponse(call: Call<CmmRes>, response: Response<CmmRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _inquiryKindList.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<CmmRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
     suspend fun logOut():Boolean{
         val apiService = RetrofitClientServer.instance
 
@@ -543,63 +559,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     }
 
     // 게시판
-    suspend fun getFaqList(page:Int):Boolean{
-        val apiService = RetrofitClientServer.instance
 
-        val data = BbsReq(8, page, 10, 20)
-
-        val call = apiService.getFaqList(data)
-        return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<FAQRes>{
-                override fun onResponse(call: Call<FAQRes>, response: Response<FAQRes>) {
-                    if (response.isSuccessful){
-                        val body = response.body()
-                        body?.let {
-                            _faqData.value = body.data
-                            continuation.resume(true)
-                        }
-                    }else{
-                        _faqData.value = null
-                        continuation.resume(false)
-                    }
-                }
-
-                override fun onFailure(call: Call<FAQRes>, t: Throwable) {
-                    _faqData.value = null
-                    continuation.resume(false)
-                }
-            })
-        }
-    }
-
-    suspend fun getQnaList(page: Int):Boolean{
-        val apiService = RetrofitClientServer.instance
-
-        val data = QnaReq(10, page, 10, 20, G.userId)
-
-        val call = apiService.getQnaList(data)
-        return suspendCancellableCoroutine { continuation ->
-            call.enqueue(object : Callback<QnaRes>{
-                override fun onResponse(call: Call<QnaRes>, response: Response<QnaRes>) {
-                    if (response.isSuccessful){
-                        val body = response.body()
-                        body?.let {
-                            _qnaData.value = it
-                            continuation.resume(true)
-                        }
-                    }else{
-                        _qnaData.value = response.body()
-                        continuation.resume(false)
-                    }
-                }
-
-                override fun onFailure(call: Call<QnaRes>, t: Throwable) {
-                    continuation.resume(false)
-                }
-
-            })
-        }
-    }
 
     suspend fun regPetWgt(ownrPetUnqNo: String):Boolean{
         val apiService = RetrofitClientServer.instance
@@ -732,13 +692,87 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
         }
     }
 
+    suspend fun qnaCreate():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = QnaReq(
+            bbsSn = 10,
+            files = _photoRes.value,
+            pstCn = _inquiryMain.value,
+            pstSeCd = _inquiryKind.value?.cdId ?: "",
+            pstTtl = _title.value,
+            userId = G.userId
+        )
+
+        val call = apiService.createQna(data = data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<BbsDetailRes>{
+                override fun onResponse(call: Call<BbsDetailRes>, response: Response<BbsDetailRes>) {
+                    if (response.isSuccessful){
+                        continuation.resume(true)
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<BbsDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun fileUpload(context: Context): Boolean {
+        val apiService = RetrofitClientServer.instance
+
+        val parts = ArrayList<MultipartBody.Part>()
+
+        val maxImages = 5
+
+        for (i in 0 until Integer.min(maxImages, state.listOfSelectedImages.size - 1)) {
+            val fileUri = state.listOfSelectedImages[i]
+
+            val resizedFile = resizeImage(context, fileUri , i)
+
+            resizedFile?.let {
+                val requestBody = it.asRequestBody("image/*".toMediaType())
+                val part = MultipartBody.Part.createFormData("files", "image$i.jpg", requestBody)
+                parts.add(part)
+            }
+        }
+
+        val call = apiService.uploadPhotoInBbs(parts)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<PhotoRes> {
+                override fun onResponse(call: Call<PhotoRes>, response: Response<PhotoRes>) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        body?.let {
+                            _photoRes.value = it.data
+                            continuation.resume(true)
+                        }
+                    } else {
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<PhotoRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
 }
+
+
 
 fun getDateTime(date: Date): String {
     val dateFormat = SimpleDateFormat("yyyyMMddHHmm", Locale.getDefault())
     return dateFormat.format(date)
 }
-data class InquiryKindList(val kind:String)
 
 data class MyScreenState(
     val listOfSelectedImages:List<Uri> = emptyList()

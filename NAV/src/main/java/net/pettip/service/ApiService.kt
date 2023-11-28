@@ -15,6 +15,10 @@ import net.pettip.data.bbs.BbsDetailRes
 import net.pettip.data.bbs.EndEventListRes
 import net.pettip.data.bbs.EventDetailRes
 import net.pettip.data.bbs.EventListRes
+import net.pettip.data.bbs.NtcListRes
+import net.pettip.data.bbs.QnaDetailRes
+import net.pettip.data.bbs.QnaListRes
+import net.pettip.data.bbs.QnaReq
 import net.pettip.data.cmm.CmmRes
 import net.pettip.data.cmm.WeatherReq
 import net.pettip.data.cmm.WeatherRes
@@ -64,8 +68,6 @@ import net.pettip.data.user.LoginData
 import net.pettip.data.user.LoginResModel
 import net.pettip.data.user.LogoutRes
 import net.pettip.data.user.NickNameCheckRes
-import net.pettip.data.user.QnaReq
-import net.pettip.data.user.QnaRes
 import net.pettip.data.user.RelCloseReq
 import net.pettip.data.user.ResetNickNameReq
 import net.pettip.data.user.ResetPwReq
@@ -83,11 +85,18 @@ import retrofit2.http.Part
 interface ApiService {
 
     // --------------------- 게시판 ----------------------- //
+
+    @POST("api/v1/bbs/qna/create")
+    fun createQna(@Body data:QnaReq): Call<BbsDetailRes>
+
     @POST("api/v1/bbs/faq/list")
     fun getFaqList(@Body data: BbsReq): Call<FAQRes>
 
     @POST("api/v1/bbs/qna/bsc/list")
-    fun getQnaList(@Body data: QnaReq): Call<QnaRes>
+    fun getQnaList(@Body data: BbsReq): Call<QnaListRes>
+
+    @POST("api/v1/bbs/qna/dtl/list")
+    fun getQnaDetail(@Body data: Int): Call<QnaDetailRes>
 
     @POST("api/v1/bbs/event/list")
     fun getEventList(@Body data: BbsReq): Call<EventListRes>
@@ -97,6 +106,15 @@ interface ApiService {
 
     @POST("api/v1/bbs/ancmntWinner/list")
     fun getEndEventList(@Body data: BbsReq): Call<EndEventListRes>
+
+    @POST("api/v1/bbs/ancmntWinner/dtl/list")
+    fun getEndEventDetail(@Body data: Int): Call<BbsDetailRes>
+
+    @POST("api/v1/bbs/ntc/list")
+    fun getNtcList(@Body data: BbsReq): Call<NtcListRes>
+
+    @POST("api/v1/bbs/ntc/dtl/list")
+    fun getNtcDetail(@Body data: Int): Call<BbsDetailRes>
 
     @POST("api/v1/bbs/cmnt/delete")
     fun bbsCmntDelete(@Body data: BbsCmntDeleteReq): Call<BbsCmntCreateRes>
@@ -167,6 +185,10 @@ interface ApiService {
     @Multipart
     @POST("api/v1/daily-life/upload")
     fun uploadPhoto(@Part files: ArrayList<MultipartBody.Part>): Call<PhotoRes>
+
+    @Multipart
+    @POST("api/v1/bbs/qna/atch/upload")
+    fun uploadPhotoInBbs(@Part files: ArrayList<MultipartBody.Part>): Call<PhotoRes>
 
     @POST("api/v1/daily-life/view")
     fun getDailyDetail(@Body data: DailyDetailReq): Call<DailyDetailRes>

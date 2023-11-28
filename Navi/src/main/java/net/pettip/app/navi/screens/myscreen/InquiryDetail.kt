@@ -18,6 +18,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,10 +39,13 @@ import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
+import net.pettip.app.navi.viewmodel.CommunityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InquiryDetail(navController: NavHostController){
+fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewModel){
+
+    val qnaDetail by viewModel.qnaDetail.collectAsState()
 
     Scaffold (
         topBar = { BackTopBar(title = "1:1 문의", navController = navController) }
@@ -53,7 +58,7 @@ fun InquiryDetail(navController: NavHostController){
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "휴대폰 번호 수정하는 방법이 있나요?",
+                text = qnaDetail?.data?.get(0)?.pstTtl ?: "",
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 24.sp,
                 letterSpacing = (-1.2).sp,
@@ -62,7 +67,7 @@ fun InquiryDetail(navController: NavHostController){
             )
 
             Text(
-                text = "2023.08.16",
+                text = qnaDetail?.data?.get(0)?.frstInptDt?: "",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,
@@ -78,7 +83,7 @@ fun InquiryDetail(navController: NavHostController){
             )
 
             Text(
-                text = "휴대폰 번호 수정하는 방법이 있나요? 휴대폰 번호 수정하는 방법이 있나요? 휴대폰 번호 수정하는 방법이 있나요? 휴대폰 번 호 수정하는 방법이 있나요?",
+                text = qnaDetail?.data?.get(0)?.pstCn?: "",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                 color = design_login_text,
@@ -92,8 +97,11 @@ fun InquiryDetail(navController: NavHostController){
                 .background(color = design_f1f1f1)
             )
 
-            InquiryDetailAnswer()
-
+            if (qnaDetail?.data?.size == 2){
+                InquiryDetailAnswer()
+            }else{
+                InquiryDetailNoAnswer()
+            }
         }
     }
 

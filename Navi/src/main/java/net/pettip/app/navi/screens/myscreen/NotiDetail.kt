@@ -13,6 +13,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -25,10 +27,13 @@ import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
+import net.pettip.app.navi.viewmodel.CommunityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotiDetail(navController: NavHostController){
+fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
+
+    val notiDetail by viewModel.eventDetail.collectAsState()
 
     Scaffold (
         topBar = { BackTopBar(title = "공지사항", navController = navController) }
@@ -41,7 +46,7 @@ fun NotiDetail(navController: NavHostController){
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "산책기능 이용 가능 안드로이드 버전 안내사항",
+                text = notiDetail?.data?.pstTtl?:"",
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 24.sp,
                 letterSpacing = (-1.2).sp,
@@ -50,7 +55,7 @@ fun NotiDetail(navController: NavHostController){
             )
 
             Text(
-                text = "2023.08.16",
+                text = notiDetail?.data?.lastStrgDt?:"",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,
@@ -66,7 +71,7 @@ fun NotiDetail(navController: NavHostController){
             )
 
             Text(
-                text = "안녕하세요 케어펫 입니다. 산책기능을 업데이트 하였습니다. 이작업에 따른 일부 안드로이드 버전에서 산책기능이용에 제한이 있을 수 있음을 안내 드립니다. 정상적인 이용을 위해 회원님의 안드로이드 버전을 확인 부탁드리며 ~~~~안녕하세요 케어펫 입니다. 산책기능을 업데이트 하였습니다 이작업에 따른 일부 안드로이드 버전에서 산책기능이용에 제한이 있을 수 있음을 안내 드립니다.",
+                text = notiDetail?.data?.pstCn?:"",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                 color = design_login_text,

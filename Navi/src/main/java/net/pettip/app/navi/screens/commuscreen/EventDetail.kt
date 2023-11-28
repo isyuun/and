@@ -12,6 +12,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -35,6 +37,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -48,13 +51,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -102,6 +108,7 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
 import net.pettip.app.navi.component.LoadingAnimation3
+import net.pettip.app.navi.screens.mainscreen.BackOnPressed
 import net.pettip.app.navi.screens.myscreen.CustomDialogDelete
 import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
@@ -118,6 +125,7 @@ import net.pettip.data.bbs.BbsCmnt
 import net.pettip.singleton.G
 import net.pettip.util.Log
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel) {
 
@@ -146,7 +154,6 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
         }
     }
 
-
     LaunchedEffect(key1 = onReply){
         if (onReply){
             focusManager.clearFocus()
@@ -161,7 +168,44 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
 
 
     Scaffold(
-        topBar = { BackTopBar(title = stringResource(R.string.title_event), navController = navController) }
+        topBar = {
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
+                modifier = Modifier.height(60.dp),
+                title = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clip(shape = CircleShape)
+                                .clickable {
+
+                                }
+                                .align(Alignment.CenterStart),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Icon(painter = painterResource(id = R.drawable.arrow_back),
+                                contentDescription = "",
+                                tint = Color.Unspecified
+                            )
+                        }
+
+                        Text(
+                            text = "이벤트",
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            letterSpacing = (-1.0).sp,
+                            color = design_login_text,
+                            modifier = Modifier.align(Alignment.Center),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            )
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -208,21 +252,21 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
             pstCn?.let { WebViewHtml(html = it, modifier = Modifier.fillMaxSize()) }
             // ------------------------ html 문 들어갈 자리 --------------------------
 
-            Spacer(modifier = Modifier.padding(top = 40.dp))
+            //Spacer(modifier = Modifier.padding(top = 40.dp))
 
-            Button(
-                onClick = {
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
-            )
-            {
-                Text(text = stringResource(R.string.event_apply), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-            }
+            //Button(
+            //    onClick = {
+            //    },
+            //    modifier = Modifier
+            //        .fillMaxWidth()
+            //        .height(48.dp)
+            //        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
+            //    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            //    colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
+            //)
+            //{
+            //    Text(text = stringResource(R.string.event_apply), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+            //}
 
             Row (
                 modifier = Modifier
@@ -721,7 +765,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                 onClick = {
                                     viewModel.viewModelScope.launch {
                                         updateLoading = true
-                                        val result = viewModel.bbsUpdateComment(updateComment?:"", comment.pstCmntNo?:0)
+                                        val result = viewModel.bbsUpdateComment(updateComment ?: "", comment.pstCmntNo ?: 0)
                                         if (result) {
                                             updateComment = ""
                                             updateLoading = false
@@ -833,7 +877,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                                     onClick = {
                                                         viewModel.viewModelScope.launch {
                                                             rcmdtnLoading = true
-                                                            val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo?:0, rcmdtnSeCd = "001", pstSn = eventDetail?.data?.pstSn ?: 0)
+                                                            val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo ?: 0, rcmdtnSeCd = "001", pstSn = eventDetail?.data?.pstSn ?: 0)
                                                             if (result) {
                                                                 rcmdtnLoading = false
                                                             } else {
@@ -936,7 +980,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                                         onClick = {
                                                             viewModel.viewModelScope.launch {
                                                                 rcmdtnLoading = true
-                                                                val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo?:0, rcmdtnSeCd = "002", pstSn = eventDetail?.data?.pstSn ?: 0)
+                                                                val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo ?: 0, rcmdtnSeCd = "002", pstSn = eventDetail?.data?.pstSn ?: 0)
                                                                 if (result) {
                                                                     rcmdtnLoading = false
                                                                 } else {
@@ -1238,7 +1282,7 @@ fun BbsCommentListItem2(
                                 onClick = {
                                     viewModel.viewModelScope.launch {
                                         updateLoading = true
-                                        val result = viewModel.updateComment(updateComment?:"", comment.pstCmntNo?:0)
+                                        val result = viewModel.updateComment(updateComment ?: "", comment.pstCmntNo ?: 0)
                                         if (result) {
                                             updateComment = ""
                                             updateLoading = false
@@ -1336,7 +1380,7 @@ fun BbsCommentListItem2(
                                             onClick = {
                                                 viewModel.viewModelScope.launch {
                                                     rcmdtnLoading = true
-                                                    val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo?:0, rcmdtnSeCd = "001", pstSn = eventDetail?.data?.pstSn ?: 0)
+                                                    val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo ?: 0, rcmdtnSeCd = "001", pstSn = eventDetail?.data?.pstSn ?: 0)
                                                     if (result) {
                                                         rcmdtnLoading = true
                                                     } else {
@@ -1412,7 +1456,7 @@ fun BbsCommentListItem2(
                                                     onClick = {
                                                         viewModel.viewModelScope.launch {
                                                             rcmdtnLoading = true
-                                                            val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo?:0, rcmdtnSeCd = "002", pstSn = eventDetail?.data?.pstSn ?: 0)
+                                                            val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo ?: 0, rcmdtnSeCd = "002", pstSn = eventDetail?.data?.pstSn ?: 0)
                                                             if (result) {
                                                                 rcmdtnLoading = true
                                                             } else {

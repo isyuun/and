@@ -55,5 +55,7 @@ data class BbsReq(
     @SerializedName("pageSize")
     var pageSize: Int, // 10
     @SerializedName("recordSize")
-    var recordSize: Int // 20
+    var recordSize: Int, // 20
+    @SerializedName("userId")
+    var userId: String? = null // 20
 )

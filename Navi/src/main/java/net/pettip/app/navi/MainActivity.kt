@@ -240,7 +240,7 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
 
         composable(
             route = "storyDetail",
-                enterTransition = {
+            enterTransition = {
             fadeIn(
                 animationSpec = tween(
                     300, easing = LinearEasing
@@ -269,17 +269,61 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
         composable("eventEndDetail"){
             EventEndDetail(navController = navController)
         }
-        composable("notiDetail"){
-            NotiDetail(navController = navController)
+        composable(
+            route = "notiDetail",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
+                    )
+                ) + slideIntoContainer(
+                    animationSpec = tween(300, easing = EaseIn),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
+                    )
+                ) + slideOutOfContainer(
+                    animationSpec = tween(300, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.End
+                )
+            }
+        ){
+            NotiDetail(navController = navController, viewModel = communityViewModel)
         }
-        composable("inquiryDetail"){
-            InquiryDetail(navController = navController)
+        composable(
+            route = "inquiryDetail",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
+                    )
+                ) + slideIntoContainer(
+                    animationSpec = tween(300, easing = EaseIn),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
+                    )
+                ) + slideOutOfContainer(
+                    animationSpec = tween(300, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.End
+                )
+            }
+        ){
+            InquiryDetail(navController = navController, viewModel = communityViewModel)
         }
         composable("oneNOneScreen"){
             OneNOneScreen(navController = navController, settingViewModel = settingViewModel)
         }
         composable("settingScreen"){
-            SettingScreen(navController = navController, viewModel = settingViewModel)
+            SettingScreen(navController = navController, viewModel = communityViewModel)
         }
         composable("userInfoScreen"){
             UserInfoScreen(navController = navController, settingViewModel = settingViewModel)
