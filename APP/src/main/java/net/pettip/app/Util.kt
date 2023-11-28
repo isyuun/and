@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
+import net.pettip.util.Log
+import net.pettip.util.getMethodName
 
 /**
  * @Project     : carepet-android
@@ -42,6 +44,9 @@ import androidx.core.content.res.ResourcesCompat
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
+
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
 private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
     val bitmap = Bitmap.createBitmap(
         drawable.intrinsicWidth,
@@ -140,7 +145,7 @@ fun navigationBarHeight(): Dp {
     return navigationBarHeight
 }
 
-fun getDeviceDensityString(context: Context): String? {
+fun getDeviceDensityString(context: Context): String {
     when (context.resources.displayMetrics.densityDpi) {
         DisplayMetrics.DENSITY_LOW -> return "ldpi"
         DisplayMetrics.DENSITY_MEDIUM -> return "mdpi"
@@ -158,35 +163,40 @@ fun getDeviceDensityString(context: Context): String? {
  */
 fun withClick(context: Context, onClick: () -> Unit): () -> Unit {
     return {
+        Log.v(__CLASSNAME__, "::withClick${getMethodName()}[$context][$onClick]")
         (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
         onClick()
     }
 }
 
-fun withDoubleTap(context: Context, withDoubleTap: () -> Unit): ((Offset) -> Unit)? {
+fun withDoubleTap(context: Context, onDoubleTap: () -> Unit): (Offset) -> Unit {
     return {
+        Log.v(__CLASSNAME__, "::withClick${getMethodName()}[$context][$onDoubleTap]")
         //(context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
-        withDoubleTap()
+        onDoubleTap()
     }
 }
 
-fun withLongPress(context: Context, onLongPress: () -> Unit): ((Offset) -> Unit)? {
+fun withLongPress(context: Context, onLongPress: () -> Unit): (Offset) -> Unit {
     return {
+        Log.v(__CLASSNAME__, "::withClick${getMethodName()}[$context][$onLongPress]")
         (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
         onLongPress()
     }
 }
 
-fun withPress(context: Context, withPress: () -> Unit): PressGestureScope.(Offset) -> Unit {
+fun withPress(context: Context, onPress: () -> Unit): PressGestureScope.(Offset) -> Unit {
     return {
-        //(context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
-        withPress()
+        Log.v(__CLASSNAME__, "::withClick${getMethodName()}[$context][$onPress]")
+        (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
+        onPress()
     }
 }
 
-fun withTap(context: Context, withTap: () -> Unit): (Offset) -> Unit {
+fun withTap(context: Context, onTap: () -> Unit): (Offset) -> Unit {
     return {
-        (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
-        withTap()
+        Log.v(__CLASSNAME__, "::withClick${getMethodName()}[$context][$onTap]")
+        //(context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
+        onTap()
     }
 }

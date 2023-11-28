@@ -65,7 +65,7 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
             .setContentIntent(activityPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setOnlyAlertOnce(true)
-            .setAutoCancel(false)
+            //.setAutoCancel(false)
             .build()
         Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $ret")
         return ret
