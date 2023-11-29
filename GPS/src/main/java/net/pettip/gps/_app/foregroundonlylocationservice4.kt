@@ -153,22 +153,6 @@ open class foregroundonlylocationservice4 : foregroundonlylocationservice3(), Se
         return rotate
     }
 
-    //override fun onCameraChange(selfChange: Boolean, uri: Uri) {
-    //    val path = observer.path(uri)
-    //    val time = observer.time(uri) ?: return
-    //    //Log.d(__CLASSNAME__, "${getMethodName()}$selfChange, $uri, $path, $time")
-    //    val file = File(path)
-    //    val name = file.name
-    //    val exists = file.exists()
-    //    val camera = exists && observer.camera(uri) && !_imgs.contains(uri) && !name.startsWith(".")
-    //    if (camera) {
-    //        val rotate = rotate(this, uri)
-    //        val orient = orient(this, uri)
-    //        Log.wtf(__CLASSNAME__, "${getMethodName()}[$selfChange][camera:$camera][orient:$orient][rotate:$rotate][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
-    //        img(uri)
-    //        GPSApplication.instance.onCameraChange(file)
-    //    }
-    //}
     override fun onChange(uri: Uri, file: File) {
         val camera = !_imgs.contains(uri)
         Log.wtf(__CLASSNAME__, "${getMethodName()}[$camera][uri:$uri][file:$file]")

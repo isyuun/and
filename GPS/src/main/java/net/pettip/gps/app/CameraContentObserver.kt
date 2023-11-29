@@ -162,7 +162,7 @@ class CameraContentObserver(
 
     private var uri: Uri? = null
     private fun onChange(uri: Uri) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.uri == uri}][this.uri:$this.uri][uri:$uri]")
+        //Log.i(__CLASSNAME__, "${getMethodName()}[${this.uri == uri}][this.uri:$this.uri][uri:$uri]")
         if (this.uri == uri) return
         val path = uri.let { path(it) }
         val time = uri.let { time(it) } ?: return
@@ -173,31 +173,26 @@ class CameraContentObserver(
         if (camera) {
             val rotate = rotate(uri)
             val orient = orient(uri)
-            Log.wtf(__CLASSNAME__, "${getMethodName()}[camera:$camera][rotate:$rotate][orient:$orient][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
-            //GPSApplication.instance.onChange(uri, file)
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[$camera][rotate:$rotate][orient:$orient][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
             uri.let { listener.onChange(it, file) }
             this.uri = uri
         }
     }
 
     override fun onChange(selfChange: Boolean, uri: Uri?) {
-        Log.w(__CLASSNAME__, "${getMethodName()}[${this.uri == uri}][selfChange:$selfChange][uri:$uri]")
         super.onChange(selfChange, uri)
         uri?.let { onChange(it) }
     }
 
     override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
-        Log.w(__CLASSNAME__, "${getMethodName()}[${this.uri == uri}][selfChange:$selfChange][uri:$uri][flags:$flags]")
         super.onChange(selfChange, uri, flags)
         uri?.let { onChange(it) }
     }
 
     override fun onChange(selfChange: Boolean, uris: MutableCollection<Uri>, flags: Int) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.uri == uri}][selfChange:$selfChange][uris:$uris][flags:$flags]")
         super.onChange(selfChange, uris, flags)
         uris.forEach { uri ->
-            Log.w(__CLASSNAME__, "${getMethodName()}[${this.uri == uri}][selfChange:$selfChange][uris:$uris][flags:$flags]")
-            uri.let { onChange(selfChange, it) }
+            uri.let { onChange(it) }
         }
     }
 }
