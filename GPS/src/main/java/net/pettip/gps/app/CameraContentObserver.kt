@@ -66,7 +66,7 @@ class CameraContentObserver(
     fun time(uri: Uri): Long? {
         var time: Long? = null
         try {
-            val projection = arrayOf(MediaStore.Images.Media.DATE_ADDED)
+            val projection = arrayOf(MediaStore.Images.Media.DATE_MODIFIED)
             val cursor = resolver.query(uri, projection, null, null, null)
             cursor?.use {
                 if (it.moveToFirst()) {
@@ -180,7 +180,7 @@ class CameraContentObserver(
             if (this.file == file) return
             val rotate = rotate(uri)
             val orient = orient(uri)
-            Log.wtf(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][$camera][rotate:$rotate][orient:$orient][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][$camera][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
             uri.let { listener.onChange(it, file) }
             this.file = file
         }
