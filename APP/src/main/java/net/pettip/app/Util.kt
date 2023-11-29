@@ -22,6 +22,7 @@ import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.media.AudioManager
+import android.net.Uri
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import androidx.compose.foundation.gestures.PressGestureScope
@@ -122,6 +123,14 @@ fun getRounded(context: Context, id: Int, backColor: Color): Bitmap? {
     val drawable = ResourcesCompat.getDrawable(resources, id, null)?.let { getDrawableWithBackgroundColor(it, backColor.toArgb()) }
     val source = drawable?.let { getBitmapFromDrawable(it) }
     return source?.let { getRounded(it, backColor.toArgb(), Color.Black.toArgb()) }
+}
+
+fun getRounded(context: Context, uri: Uri, backColor: Color): Bitmap? {
+    val `is` = context.contentResolver.openInputStream(uri)
+    val drawable = Drawable.createFromStream(`is`, uri.toString())?.let { getDrawableWithBackgroundColor(it, backColor.toArgb()) }
+    val source = drawable?.let { getBitmapFromDrawable(it) }
+    //return source?.let { getRounded(it, backColor.toArgb(), Color.Black.toArgb()) }
+    return source
 }
 
 fun Dp.toPx(context: Context): Float {

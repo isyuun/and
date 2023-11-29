@@ -42,18 +42,6 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
         FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}...")
-        super.onCreate(savedInstanceState)
-    }
-
-    //fun setContent(
-    //    parent: CompositionContext? = null,
-    //    content: @Composable () -> Unit
-    //) {
-    //    ComponentActivity.setContent(parent, content)
-    //}
-
     protected open fun setContent() {
         setContent { NaverMapApp() }
     }
@@ -68,6 +56,11 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
         Log.v(__CLASSNAME__, "${getMethodName()}[application.service:${application.service}]")
         application.service ?: return
         NaverMapApp(fusedLocationSource)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}...")
+        super.onCreate(savedInstanceState)
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {

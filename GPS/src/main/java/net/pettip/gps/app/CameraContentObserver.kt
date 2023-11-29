@@ -40,8 +40,14 @@ class CameraContentObserver(
 ) : ContentObserver(handler) {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    fun path(uri: Uri): String {
-        var path = ""
+    override fun deliverSelfNotifications(): Boolean {
+        val ret = super.deliverSelfNotifications()
+        Log.v(__CLASSNAME__, "${getMethodName()}[${this.file == file}][this.uri:$this.uri][uri:$file]")
+        return ret
+    }
+
+    fun path(uri: Uri): String? {
+        var path: String? = null
         try {
             val projection = arrayOf(MediaStore.Images.Media.DATA)
             val cursor = resolver.query(uri, projection, null, null, null)
@@ -109,21 +115,22 @@ class CameraContentObserver(
      */
     private fun rotate(uri: Uri): ROTATE {
         val path = path(uri)
-        val file = File(path)
+        val file = path?.let { File(it) }
         var rotate = ROTATE.ROTATE_NG
-        val orientation: Int
+        var orientation: Int? = null
         try {
             resolver.notifyChange(uri, null)
-            val exif = ExifInterface(file.absolutePath)
-            //val exif = ExifInterface(path)
-            orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-            when (orientation) {
-                ExifInterface.ORIENTATION_ROTATE_270 -> rotate = ROTATE.ROTATE_270
-                ExifInterface.ORIENTATION_ROTATE_180 -> rotate = ROTATE.ROTATE_180
-                ExifInterface.ORIENTATION_ROTATE_90 -> rotate = ROTATE.ROTATE_90
-                ExifInterface.ORIENTATION_NORMAL -> rotate = ROTATE.ROTATE_0
+            val exif = file?.let { ExifInterface(it.absolutePath) }
+            if (exif != null) {
+                orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+                when (orientation) {
+                    ExifInterface.ORIENTATION_ROTATE_270 -> rotate = ROTATE.ROTATE_270
+                    ExifInterface.ORIENTATION_ROTATE_180 -> rotate = ROTATE.ROTATE_180
+                    ExifInterface.ORIENTATION_ROTATE_90 -> rotate = ROTATE.ROTATE_90
+                    ExifInterface.ORIENTATION_NORMAL -> rotate = ROTATE.ROTATE_0
+                }
             }
-            Log.i(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file.absolutePath}]")
+            Log.i(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file?.absolutePath}]")
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
@@ -135,7 +142,7 @@ class CameraContentObserver(
      */
     private fun orient(uri: Uri): ROTATE {
         val path = path(uri)
-        val file = File(path)
+        val file = path?.let { File(it) }
         var rotate = ROTATE.ROTATE_NG
         var orientation: Int = -1
         try {
@@ -153,43 +160,51 @@ class CameraContentObserver(
                 }
                 it.close()
             }
-            Log.w(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file.absolutePath}]")
+            Log.w(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file?.absolutePath}]")
         } catch (e: Exception) {
             e.printStackTrace()
         }
         return rotate
     }
 
-    private var uri: Uri? = null
+    private var file: File? = null
     private fun onChange(uri: Uri) {
         //Log.i(__CLASSNAME__, "${getMethodName()}[${this.uri == uri}][this.uri:$this.uri][uri:$uri]")
-        if (this.uri == uri) return
-        val path = uri.let { path(it) }
-        val time = uri.let { time(it) } ?: return
+        val path = path(uri) ?: return
+        val time = time(uri) ?: return
         val file = File(path)
         val name = file.name
         val exists = file.exists()
         val camera = exists && camera(uri) && !name.startsWith(".")
         if (camera) {
+            if (this.file == file) return
             val rotate = rotate(uri)
             val orient = orient(uri)
-            Log.wtf(__CLASSNAME__, "${getMethodName()}[$camera][rotate:$rotate][orient:$orient][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][$camera][rotate:$rotate][orient:$orient][$name][path:$path][time:${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
             uri.let { listener.onChange(it, file) }
-            this.uri = uri
+            this.file = file
         }
     }
 
+    override fun onChange(selfChange: Boolean) {
+        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange]")
+        super.onChange(selfChange)
+    }
+
     override fun onChange(selfChange: Boolean, uri: Uri?) {
+        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uri:$uri]")
         super.onChange(selfChange, uri)
         uri?.let { onChange(it) }
     }
 
     override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
+        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uri:$uri][flags:$flags]")
         super.onChange(selfChange, uri, flags)
         uri?.let { onChange(it) }
     }
 
     override fun onChange(selfChange: Boolean, uris: MutableCollection<Uri>, flags: Int) {
+        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uris:$uris][flags:$flags]")
         super.onChange(selfChange, uris, flags)
         uris.forEach { uri ->
             uri.let { onChange(it) }

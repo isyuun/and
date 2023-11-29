@@ -17,7 +17,7 @@ import android.net.Uri
 import android.os.IBinder
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.gps.app.ICameraContentListener
-import net.pettip.gpx.TRACK_ZERO_NO
+import net.pettip.gpx.TRACK_ZERO_NUM
 import net.pettip.gpx.Track
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
@@ -116,7 +116,7 @@ open class gpsapplication4 : gpsapplication3(), ICameraContentListener {
     }
 
     private fun select() {
-        if (!this.pets.isEmpty()) select(this.pets.last()) else no = TRACK_ZERO_NO
+        if (!this.pets.isEmpty()) select(this.pets.last()) else no = TRACK_ZERO_NUM
     }
 
     private fun select(pet: CurrentPetData) {
@@ -128,7 +128,7 @@ open class gpsapplication4 : gpsapplication3(), ICameraContentListener {
     }
 
     private var no: String
-        get() = this.service?.no ?: TRACK_ZERO_NO
+        get() = this.service?.no ?: TRACK_ZERO_NUM
         set(no) {
             this.service?.no = no
         }
@@ -153,11 +153,11 @@ open class gpsapplication4 : gpsapplication3(), ICameraContentListener {
 
     fun mark(pet: CurrentPetData, event: Track.EVENT) {
         when (event) {
-            Track.EVENT.nnn -> {}
-            Track.EVENT.img -> {}
-            Track.EVENT.pee -> pee(pet)
-            Track.EVENT.poo -> poo(pet)
-            Track.EVENT.mrk -> mrk(pet)
+            Track.EVENT.NNN -> {}
+            Track.EVENT.IMG -> {}
+            Track.EVENT.PEE -> pee(pet)
+            Track.EVENT.POO -> poo(pet)
+            Track.EVENT.MRK -> mrk(pet)
         }
     }
 
