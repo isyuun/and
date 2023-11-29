@@ -20,6 +20,7 @@ package net.pettip.map.app.naver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.compose.setContent
@@ -30,6 +31,7 @@ import net.pettip.gps.app.GPSApplication
 import net.pettip.gps.app.GPSComponentActivity
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
+import java.io.File
 
 open class NaverMapComponentActivity : GPSComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
@@ -88,7 +90,13 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        Log.wtf(__CLASSNAME__, "::NaverMapApp${getMethodName()}[loading:...]${location?.toText()}, $location, $context, $intent")
+        Log.i(__CLASSNAME__, "::NaverMapApp${getMethodName()}[loading:...]${location?.toText()}, $location, $context, $intent")
+        setContent()
+    }
+
+    override fun onChange(uri: Uri, file: File) {
+        super.onChange(uri, file)
+        Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}[loading:...]${location?.toText()}, $location, $file")
         setContent()
     }
 }

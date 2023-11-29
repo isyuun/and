@@ -16,11 +16,12 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.IBinder
 import net.pettip.data.pet.CurrentPetData
-import net.pettip.gps.app.ICameraContentObserver
+import net.pettip.gps.app.ICameraContentListener
 import net.pettip.gpx.TRACK_ZERO_NO
 import net.pettip.gpx.Track
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
+import java.io.File
 
 /**
  * @Project     : carepet-android
@@ -29,7 +30,7 @@ import net.pettip.util.getMethodName
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
-open class gpsapplication4 : gpsapplication3(), ICameraContentObserver {
+open class gpsapplication4 : gpsapplication3(), ICameraContentListener {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
     override fun start() {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
@@ -173,8 +174,8 @@ open class gpsapplication4 : gpsapplication3(), ICameraContentObserver {
 
     var preview: Bitmap? = null
 
-    override fun onCameraChange(selfChange: Boolean, uri: Uri) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ICameraContentObserver)}][selfChange:$selfChange][uri:$uri]")
-        if (this.activity is ICameraContentObserver) (this.activity as ICameraContentObserver).onCameraChange(selfChange, uri)
+    override fun onChange(uri: Uri, file: File) {
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ICameraContentListener)}][uri:$uri][file:$file]")
+        if (this.activity is ICameraContentListener) (this.activity as ICameraContentListener).onChange(uri, file)
     }
 }
