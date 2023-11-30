@@ -957,7 +957,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     if (!start) return@withClick
                     var intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                     Log.i(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent]")
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    if (true || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                         val ri = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         val pm: PackageManager = context.packageManager
                         val ai = pm.resolveActivity(ri, 0)?.activityInfo
