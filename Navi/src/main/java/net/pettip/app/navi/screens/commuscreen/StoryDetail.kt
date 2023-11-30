@@ -1118,6 +1118,12 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
         updateComment = comment.cmntCn
     }
 
+    LaunchedEffect(key1 = cmntList){
+        if (comment.cmntNo == viewModel.replyCmnt.value?.cmntNo){
+            step2Expand = true
+        }
+    }
+
     if (deleteDialog){
         CustomDialogDelete(
             onDismiss = { newValue -> deleteDialog = newValue },
@@ -1789,7 +1795,16 @@ fun CommentListItem2(
                             unfocusedContainerColor = design_white,
                             focusedContainerColor = design_white,
                             unfocusedLeadingIconColor = design_placeHolder,
-                            focusedLeadingIconColor = design_login_text)
+                            focusedLeadingIconColor = design_login_text),
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "", tint = design_skip,
+                                modifier = Modifier
+                                    .size(14.dp)
+                                    .clickable { updateComment = "" }
+                            )
+                        }
                     )
 
                     Box(

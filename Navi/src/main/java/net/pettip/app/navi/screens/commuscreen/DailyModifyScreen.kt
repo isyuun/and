@@ -166,6 +166,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             viewModel.clearNewSelectPet()
             viewModel.clearUploadSchSeList()
             viewModel.clearUploadHashTag()
+            viewModel.updateUploadedFileList(null)
             //viewModel.updatePostStory(false)
             //viewModel.updateHashTag(emptyList())
         }

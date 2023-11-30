@@ -55,6 +55,7 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomTextField
+import net.pettip.app.navi.screens.isAlphaNumeric
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_placeHolder
@@ -385,21 +386,30 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                 withDismissAction = true
                             )
                         }else if (userPw == userPwCheck){
-                            val result = settingViewModel.resetPw()
-                            if (result){
+                            if (!isAlphaNumeric(userPw)){
                                 snackbarHostState.showSnackbar(
-                                    message = "비밀번호가 변경되었습니다",
+                                    message = "올바른 비밀번호 형식이 아닙니다",
                                     actionLabel = "확인",
                                     duration = SnackbarDuration.Short,
                                     withDismissAction = true
                                 )
                             }else{
-                                snackbarHostState.showSnackbar(
-                                    message = "비밀번호변경에 실패했습니다",
-                                    actionLabel = "확인",
-                                    duration = SnackbarDuration.Short,
-                                    withDismissAction = true
-                                )
+                                val result = settingViewModel.resetPw()
+                                if (result){
+                                    snackbarHostState.showSnackbar(
+                                        message = "비밀번호가 변경되었습니다",
+                                        actionLabel = "확인",
+                                        duration = SnackbarDuration.Short,
+                                        withDismissAction = true
+                                    )
+                                }else{
+                                    snackbarHostState.showSnackbar(
+                                        message = "비밀번호변경에 실패했습니다",
+                                        actionLabel = "확인",
+                                        duration = SnackbarDuration.Short,
+                                        withDismissAction = true
+                                    )
+                                }
                             }
                         }
                     }

@@ -60,6 +60,7 @@ import net.pettip.app.navi.screens.mainscreen.WalkWithMap
 import net.pettip.app.navi.screens.myscreen.AddPetScreen
 import net.pettip.app.navi.screens.myscreen.InquiryDetail
 import net.pettip.app.navi.screens.myscreen.InviteScreen
+import net.pettip.app.navi.screens.myscreen.ModifyInquiryScreen
 import net.pettip.app.navi.screens.myscreen.ModifyPetInfoScreen
 import net.pettip.app.navi.screens.myscreen.NotiDetail
 import net.pettip.app.navi.screens.myscreen.OneNOneScreen
@@ -317,8 +318,33 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
                 )
             }
         ){
-            InquiryDetail(navController = navController, viewModel = communityViewModel)
+            InquiryDetail(navController = navController, viewModel = communityViewModel, settingViewModel = settingViewModel)
         }
+        //composable(
+        //    route = "modifyInquiryScreen",
+        //    enterTransition = {
+        //        fadeIn(
+        //            animationSpec = tween(
+        //                300, easing = LinearEasing
+        //            )
+        //        ) + slideIntoContainer(
+        //            animationSpec = tween(300, easing = EaseIn),
+        //            towards = AnimatedContentTransitionScope.SlideDirection.Start
+        //        )
+        //    },
+        //    exitTransition = {
+        //        fadeOut(
+        //            animationSpec = tween(
+        //                300, easing = LinearEasing
+        //            )
+        //        ) + slideOutOfContainer(
+        //            animationSpec = tween(300, easing = EaseOut),
+        //            towards = AnimatedContentTransitionScope.SlideDirection.End
+        //        )
+        //    }
+        //){
+        //    ModifyInquiryScreen(navController = navController, viewModel = communityViewModel, settingViewModel = settingViewModel)
+        //}
         composable("oneNOneScreen"){
             OneNOneScreen(navController = navController, settingViewModel = settingViewModel)
         }
@@ -425,6 +451,7 @@ sealed class Screen(val route: String) {
     object ModifyPetInfoScreen : Screen("modifyPetInfoScreen/{index}")
     object PetProfileScreen : Screen("petProfileScreen/{index}")
     object DailyPostScreen : Screen("dailyPostScreen")
+
 }
 
 sealed class BottomNav(val route: String, val title: String, val unSelectedIcon: Int, val selectedIcon: Int,){

@@ -107,6 +107,7 @@ fun MainScreen(
 
     val selectedPet by sharedViewModel.selectPet.collectAsState()
     val currentPet by sharedViewModel.currentPetInfo.collectAsState()
+    val currentTab by sharedViewModel.currentTab.collectAsState()
 
     // logoTopbar back on/off
     var backBtnOnLT by remember { mutableStateOf(false) }
@@ -123,28 +124,6 @@ fun MainScreen(
             sharedViewModel.updateInit(false)
         }
     }
-
-    //LaunchedEffect(Unit){
-    //    val page = MySharedPreference.getFcmDataPage()
-    //    val schUnqNo = MySharedPreference.getFcmDataSchUnqNo()
-    //    if (page!="" && schUnqNo!=""){
-    //        clearPushDataFromIntent()
-    //        when(page){
-    //            "story" -> {
-    //
-    //                navController.navigate(Screen.StoryDetail.route)
-    //            }
-    //            "walk" ->{
-    //                val result = schUnqNo?.toInt()?.let { walkViewModel.getDailyDetail(it) }
-    //                if (result == true){
-    //                    navController.navigate(Screen.WalkDetailContent.route)
-    //                }else{
-    //                    sharedViewModel.updatePushData(null)
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
 
     BackOnPressed()
     Scaffold(
@@ -206,40 +185,50 @@ fun MainScreen(
                             }
 
                         "commu" ->
-                            FloatingActionButton(
-                                onClick = {
-                                    if (currentPet.isNotEmpty()) {
-                                        if (currentPet[0].ownrPetUnqNo=="") {
+                            AnimatedVisibility(
+                                visible = currentTab == "스토리",
+                                enter = scaleIn(
+                                    animationSpec = tween(200,easing = FastOutLinearInEasing)
+                                ),
+                                exit = scaleOut(
+                                    animationSpec = tween(durationMillis = 200, easing = FastOutLinearInEasing)
+                                )
+                            ){
+                                FloatingActionButton(
+                                    onClick = {
+                                        if (currentPet.isNotEmpty()) {
+                                            if (currentPet[0].ownrPetUnqNo=="") {
 
-                                        }else{
-                                            navController.navigate(Screen.DailyPostScreen.route)
+                                            }else{
+                                                navController.navigate(Screen.DailyPostScreen.route)
+                                            }
                                         }
-                                    }
-                                },
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(65.dp),
-                                backgroundColor = design_sharp,
-                                shape = CircleShape
-                            ) {
-                                Column (
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ){
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.icon_daily),
-                                        contentDescription = "",
-                                        tint = Color.Unspecified
-                                    )
+                                    },
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .size(65.dp),
+                                    backgroundColor = design_sharp,
+                                    shape = CircleShape
+                                ) {
+                                    Column (
+                                        modifier = Modifier.fillMaxSize(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ){
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.icon_daily),
+                                            contentDescription = "",
+                                            tint = Color.Unspecified
+                                        )
 
-                                    Text(
-                                        text = stringResource(R.string.fab_daily),
-                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                        fontSize = 12.sp,
-                                        letterSpacing = (-0.6).sp,
-                                        color = design_white
-                                    )
+                                        Text(
+                                            text = stringResource(R.string.fab_daily),
+                                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                            fontSize = 12.sp,
+                                            letterSpacing = (-0.6).sp,
+                                            color = design_white
+                                        )
+                                    }
                                 }
                             }
                     }

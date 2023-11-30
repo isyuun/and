@@ -167,7 +167,6 @@ fun HomeScreen(
 
     val selectedPet by sharedViewModel.selectPet.collectAsState()
 
-    val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
@@ -270,7 +269,7 @@ fun HomeScreen(
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = design_btn_border),
                     onClick = {
-                        //sharedViewModel.updateMoreStoryClick(true)
+                        sharedViewModel.updateToStory(true)
                         bottomNavController.navigate("commu") {
                             bottomNavController.graph.startDestinationRoute?.let {
                                 popUpTo(it) { saveState = true }
@@ -365,17 +364,11 @@ fun ProfileContent(
     val alphaWeather by infiniteTransition.animateFloat(
         initialValue = 0.5f,
         targetValue = 1f,
-        // `infiniteRepeatable` repeats the specified duration-based `AnimationSpec` infinitely.
         animationSpec = infiniteRepeatable(
-            // The `keyframes` animates the value by specifying multiple timestamps.
             animation = keyframes {
-                // One iteration is 1000 milliseconds.
                 durationMillis = 1000
-                // 0.7f at the middle of an iteration.
                 0.7f at 500
             },
-            // When the value finishes animating from 0f to 1f, it repeats by reversing the
-            // animation direction.
             repeatMode = RepeatMode.Reverse
         ), label = ""
     )
@@ -941,6 +934,7 @@ fun StoryItem(data: RTStoryData, bottomNavController: NavHostController, sharedV
             .clip(shape = RoundedCornerShape(20.dp))
             .onGloballyPositioned { sizeImage = it.size }
             .clickable {
+                sharedViewModel.updateToStory(true)
                 sharedViewModel.updateMoreStoryClick(data.schUnqNo)
                 bottomNavController.navigate("commu") {
                     bottomNavController.graph.startDestinationRoute?.let {

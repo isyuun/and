@@ -127,6 +127,9 @@ interface ApiService {
 
     @POST("api/v1/bbs/cmnt/update")
     fun bbsCmntUpdate(@Body data: BbsCmntUpdateReq): Call<BbsCmntCreateRes>
+
+    @POST("api/v1/bbs/qna/delete")
+    fun deleteQna(@Body data: Int): Call<CmmRes>
     // --------------------- 게시판 ----------------------- //
 
 

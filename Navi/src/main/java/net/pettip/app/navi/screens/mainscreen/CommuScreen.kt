@@ -40,6 +40,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -98,9 +99,24 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
 
     val pagerState = rememberPagerState(initialPage = 0)
     val coroutineScope = rememberCoroutineScope()
-    var tabVisible by remember { mutableFloatStateOf(1f) }
+    val tabVisible by remember { mutableFloatStateOf(1f) }
+    val toStory by sharedViewModel.toStory.collectAsState()
 
     var init by rememberSaveable{ mutableStateOf(true) }
+
+    LaunchedEffect(key1 = toStory){
+        if (toStory){
+            pagerState.scrollToPage(0)
+        }
+    }
+
+    LaunchedEffect(key1 = pagerState.currentPage){
+        when(pagerState.currentPage){
+            0 -> sharedViewModel.updateCurrentTab("스토리")
+            1 -> sharedViewModel.updateCurrentTab("이벤트")
+            2 -> sharedViewModel.updateCurrentTab("당첨자 발표")
+        }
+    }
 
     LaunchedEffect(init){
         if (init){
@@ -133,15 +149,19 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
                 backgroundColor = design_white,
                 contentColor = design_login_text
             ) {
-                CommunityTabItems.forEachIndexed { index, idpwTabItem ->
+                CommunityTabItems.forEachIndexed { index, commuTabItem ->
                     Tab(
-                        text = { Text(text = idpwTabItem.title, fontSize = 16.sp,color = design_login_text,
+                        text = { Text(text = commuTabItem.title, fontSize = 16.sp,color = design_login_text,
                             fontFamily =
                             if(index == pagerState.currentPage) FontFamily(Font(R.font.pretendard_bold))
                             else FontFamily(Font(R.font.pretendard_regular))
                         )},
                         selected = index == pagerState.currentPage,
-                        onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) }}
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        }
                     )
                 }
             }
@@ -188,6 +208,10 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
 
     val oTItems = listOf("최신순", "인기순")
     val vTItems = listOf("전체", "내 스토리")
+
+    SideEffect {
+        viewModel.updateToStory(false)
+    }
 
     LaunchedEffect(key1 = typeChange){
         if (typeChange){

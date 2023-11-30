@@ -24,5 +24,8 @@ data class QnaDetailData(
     @SerializedName("pstTtl")
     var pstTtl: String, // ㅁ
     @SerializedName("pstType")
-    var pstType: String // Org
+    var pstType: String, // Org
+    @SerializedName("pstSeCd")
+    var pstSeCd: String // Org
+
 )

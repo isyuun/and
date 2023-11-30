@@ -100,11 +100,6 @@ fun SettingScreen(navController: NavHostController, viewModel:CommunityViewModel
             viewModel.updateFaqListClear()
             viewModel.getFaqList(1)
         }
-        if (viewModel.qnaList.value == null){
-            viewModel.updateQnaListClear()
-            viewModel.getQnaList(1)
-        }
-
     }
 
     Scaffold (
@@ -253,6 +248,11 @@ fun FAQScreen(navController: NavHostController, viewModel: CommunityViewModel){
 fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
     val qnaRes by viewModel.qnaList.collectAsState()
+
+    LaunchedEffect(Unit){
+        viewModel.updateQnaListClear()
+        viewModel.getQnaList(1)
+    }
 
     Column (
         modifier = Modifier
