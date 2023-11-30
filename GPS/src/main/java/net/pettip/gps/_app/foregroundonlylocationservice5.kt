@@ -1,90 +1,14 @@
-/*
- * Copyright (c) 2023. PetTip All right reserved.
- * This software is the proprietary information of Care Pet.
- *
- *  Revision History
- *  Author                         Date          Description
- *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-biz.co.kr             2023. 10. 18.   description...
- */
-
 package net.pettip.gps._app
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Intent
 import android.location.Location
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.LocationResult
-import net.pettip.gps.R
 import net.pettip.gpx.Track
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.util.Collections
 
-/**
- * @Project     : carepet-android
- * @FileName    : foregroundonlylocationservice4.kt
- * @Date        : 2023. 10. 18.
- * @author      : isyuun@care-biz.co.kr
- * @description :
- */
 open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    internal var launchActivityIntent: Intent? = null
-    override fun launchActivityIntent(): Intent? {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${super.launchActivityIntent()}][$launchActivityIntent]")
-        return launchActivityIntent ?: super.launchActivityIntent()
-    }
-
-    override fun generateNotificationChannel(importance: Int) {
-        val title = getString(R.string.app_name)
-        val notificationChannel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID, title, importance
-        )
-        with(NotificationManagerCompat.from(this@foregroundonlylocationservice5)) {
-            createNotificationChannel(notificationChannel)
-        }
-    }
-
-    private var notification = false
-    override fun generateNotification(location: Location?): Notification {
-        generateNotificationChannel(NotificationManager.IMPORTANCE_MAX)
-        val title = "${getString(R.string.walk_title_walking)} - ${__duration}"
-        val text = "${getString(R.string.app_name)}이 ${getString(R.string.walk_text_in_tracking)}"
-        val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent(), PendingIntent.FLAG_MUTABLE)
-        val ret = if (notification) notificationCompatBuilder.build() else
-            notificationCompatBuilder
-                //.setStyle(style)      //ㅆㅂ
-                .setContentTitle(title)
-                .setContentText(text)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setOngoing(true)
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .addAction(
-                    R.drawable.ic_launch,
-                    getString(R.string.open),
-                    activityPendingIntent
-                )
-                //.addAction(
-                //    R.drawable.ic_cancel,
-                //    getString(R.string.stop),
-                //    servicePendingIntent
-                //)
-                .setContentIntent(activityPendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setOnlyAlertOnce(true)
-                .setAutoCancel(false)
-                .build()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}${location.toText()}, $ret")
-        notification = true
-        return ret
-    }
 
     override fun onLocationResult(locationResult: LocationResult) {
         Log.i(__CLASSNAME__, "${getMethodName()}[${(start && pause)}][start:$start][pause:$pause]$_pauses")
@@ -144,5 +68,4 @@ open class foregroundonlylocationservice5 : foregroundonlylocationservice4() {
         pause = false
         _pauses.clear()
     }
-
 }

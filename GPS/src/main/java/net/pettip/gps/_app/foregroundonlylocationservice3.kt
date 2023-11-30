@@ -15,6 +15,7 @@ import android.content.Intent
 import android.location.Location
 import com.google.android.gms.location.LocationResult
 import net.pettip.RELEASE
+import net.pettip.gps.R
 import net.pettip.gpx.GPXWriter2
 import net.pettip.gpx.GPX_INTERVAL_UPDATE_METERS
 import net.pettip.gpx.GPX_SIMPLE_TICK_FORMAT
@@ -159,6 +160,10 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}[$start][${lastLocation.toText()}][$lastLocation]")
         super.stop()
         this.write()
+    }
+
+    override fun title(): String {
+        return "${getString(R.string.walk_title_walking)} - ${__duration}"
     }
 
     val __duration: String

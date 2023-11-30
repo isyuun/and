@@ -14,7 +14,7 @@ package net.pettip.gps.app
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import net.pettip.gps._app.foregroundonlylocationservice6
+import net.pettip.gps._app.foregroundonlylocationservice5
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
@@ -25,7 +25,7 @@ import net.pettip.util.getMethodName
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
-class ForegroundOnlyLocationService : foregroundonlylocationservice6() {
+class ForegroundOnlyLocationService : foregroundonlylocationservice5() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     /**
@@ -41,7 +41,7 @@ class ForegroundOnlyLocationService : foregroundonlylocationservice6() {
 
     override fun onBind(intent: Intent): IBinder {
         val ret = super.onBind(intent)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$serviceRunningInForeground], $ret, $localBinder")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$ret][$localBinder]")
         return localBinder
     }
 }
