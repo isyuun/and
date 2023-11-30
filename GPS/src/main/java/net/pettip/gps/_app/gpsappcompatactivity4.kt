@@ -12,9 +12,10 @@
 package net.pettip.gps._app
 
 import android.net.Uri
-import net.pettip.gps.app.ICameraContentObserver
+import net.pettip.gps.app.ICameraContentListener
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
+import java.io.File
 
 /**
  * @Project     : PetTip-Android
@@ -24,9 +25,9 @@ import net.pettip.util.getMethodName
  * @description : net.pettip.gps._app
  * @see net.pettip.gps._app.gpsappcompatactivity4
  */
-open class gpsappcompatactivity4 : gpsappcompatactivity3(), ICameraContentObserver {
+open class gpsappcompatactivity4 : gpsappcompatactivity3(), ICameraContentListener {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-    override fun onCameraChange(selfChange: Boolean, uri: Uri) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[selfChange:$selfChange][uri:$uri]")
+    override fun onChange(uri: Uri, file: File) {
+        Log.v(__CLASSNAME__, "${getMethodName()}[uri:$uri][file:$file]")
     }
 }

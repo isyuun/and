@@ -20,6 +20,7 @@ package net.pettip.map.app.naver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.compose.setContent
@@ -30,6 +31,7 @@ import net.pettip.gps.app.GPSApplication
 import net.pettip.gps.app.GPSComponentActivity
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
+import java.io.File
 
 open class NaverMapComponentActivity : GPSComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
@@ -39,18 +41,6 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
     private val fusedLocationSource: FusedLocationSource by lazy {
         FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}...")
-        super.onCreate(savedInstanceState)
-    }
-
-    //fun setContent(
-    //    parent: CompositionContext? = null,
-    //    content: @Composable () -> Unit
-    //) {
-    //    ComponentActivity.setContent(parent, content)
-    //}
 
     protected open fun setContent() {
         setContent { NaverMapApp() }
@@ -66,6 +56,11 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
         Log.v(__CLASSNAME__, "${getMethodName()}[application.service:${application.service}]")
         application.service ?: return
         NaverMapApp(fusedLocationSource)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}...")
+        super.onCreate(savedInstanceState)
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -88,7 +83,13 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        Log.wtf(__CLASSNAME__, "::NaverMapApp${getMethodName()}[loading:...]${location?.toText()}, $location, $context, $intent")
+        Log.i(__CLASSNAME__, "::NaverMapApp${getMethodName()}[loading:...]${location?.toText()}, $location, $context, $intent")
+        setContent()
+    }
+
+    override fun onChange(uri: Uri, file: File) {
+        super.onChange(uri, file)
+        Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}[loading:...]${location?.toText()}, $location, $file")
         setContent()
     }
 }

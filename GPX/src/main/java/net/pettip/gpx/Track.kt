@@ -20,7 +20,6 @@ import android.net.Uri
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
-const val TRACK_ZERO_NO = "Pnnnnnnnnnnnnnn"
 const val TRACK_ZERO_NUM = "P00000000000000"
 const val TRACK_ZERO_IMG = 0
 const val TRACK_ZERO_PEE = 0
@@ -30,7 +29,7 @@ val TRACK_ZERO_URI = Uri.parse("")!!
 
 data class Track(
     private val loc: Location,
-    val no: String = TRACK_ZERO_NO,
+    val no: String = TRACK_ZERO_NUM,
     val img: Int = TRACK_ZERO_IMG,
     val pee: Int = TRACK_ZERO_PEE,
     val poo: Int = TRACK_ZERO_POO,
@@ -46,16 +45,16 @@ data class Track(
     }
 
     enum class EVENT {
-        nnn, img, pee, poo, mrk
+        NNN, IMG, PEE, POO, MRK
     }
 
     val event: EVENT
         get() {
-            return if (img > TRACK_ZERO_IMG) EVENT.img
-            else if (pee > TRACK_ZERO_PEE) EVENT.pee
-            else if (poo > TRACK_ZERO_POO) EVENT.poo
-            else if (mrk > TRACK_ZERO_MRK) EVENT.mrk
-            else EVENT.nnn
+            return if (img > TRACK_ZERO_IMG) EVENT.IMG
+            else if (pee > TRACK_ZERO_PEE) EVENT.PEE
+            else if (poo > TRACK_ZERO_POO) EVENT.POO
+            else if (mrk > TRACK_ZERO_MRK) EVENT.MRK
+            else EVENT.NNN
         }
 
     val location: Location

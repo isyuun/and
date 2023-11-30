@@ -74,11 +74,11 @@ class GPXWriter2 : _GPXWriter() {
                 val img = track.img
                 //val uri = track.uri
                 val uri = ""
-                var event = Track.EVENT.nnn
-                if (pee > TRACK_ZERO_PEE) event = Track.EVENT.pee
-                if (poo > TRACK_ZERO_POO) event = Track.EVENT.poo
-                if (mrk > TRACK_ZERO_MRK) event = Track.EVENT.mrk
-                if (img > TRACK_ZERO_IMG) event = Track.EVENT.img
+                var event = Track.EVENT.NNN
+                if (pee > TRACK_ZERO_PEE) event = Track.EVENT.PEE
+                if (poo > TRACK_ZERO_POO) event = Track.EVENT.POO
+                if (mrk > TRACK_ZERO_MRK) event = Track.EVENT.MRK
+                if (img > TRACK_ZERO_IMG) event = Track.EVENT.IMG
                 val trkpt = """ <trkpt no="${no}" event="${event}" lat="${lat}" lon="${lon}"><time>$time</time><speed>$speed</speed><ele>$ele</ele><uri>$uri</uri></trkpt>""" + "\n"
                 trksegStringBuilder.append(trkpt)
             }

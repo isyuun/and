@@ -16,6 +16,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.view.Gravity
@@ -139,6 +140,7 @@ import net.pettip.gps.app.GPSApplication
 import net.pettip.gpx.GPX_CAMERA_ZOOM_ZERO
 import net.pettip.gpx.GPX_LATITUDE_ZERO
 import net.pettip.gpx.GPX_LONGITUDE_ZERO
+import net.pettip.gpx.TRACK_ZERO_URI
 import net.pettip.gpx.Track
 import net.pettip.map.app.LoadingDialog
 import net.pettip.singleton.G
@@ -160,7 +162,7 @@ import java.util.Locale
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 @Composable
-fun CircleImageUrl(size: Int, imageUri: String?) {
+private fun CircleImageUrl(size: Int, imageUri: String?) {
     Box(
         modifier = Modifier
             .size(size.dp)
@@ -183,7 +185,7 @@ fun CircleImageUrl(size: Int, imageUri: String?) {
 }
 
 @Composable
-fun IconButton2(
+private fun IconButton2(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String = "",
@@ -230,7 +232,7 @@ fun IconButton2(
     }
 }
 
-fun LatLng?.toText(): String {
+private fun LatLng?.toText(): String {
     return if (this != null) {
         "($latitude, $longitude)"
     } else {
@@ -238,7 +240,7 @@ fun LatLng?.toText(): String {
     }
 }
 
-fun marker(context: Context, position: LatLng?, captionText: String = "", zIndex: Int = 1): Marker {
+private fun marker(context: Context, position: LatLng?, captionText: String = "", zIndex: Int = 1): Marker {
     val marker = Marker()
     if (position != null) {
         marker.position = position
@@ -256,54 +258,107 @@ fun marker(context: Context, position: LatLng?, captionText: String = "", zIndex
     return marker
 }
 
-fun starter(context: Context, position: LatLng?): Marker {
+private fun starter(context: Context, position: LatLng?): Marker {
     return marker(context, position, context.resources.getString(R.string.departure), 1)
 }
 
-fun ender(context: Context, position: LatLng?): Marker {
+private fun ender(context: Context, position: LatLng?): Marker {
     return marker(context, position, context.resources.getString(R.string.arrival), 3)
 }
 
-fun marker(context: Context, position: LatLng?, id: Int, back: Color = Color.White): Marker {
+private fun marker(context: Context, position: LatLng, id: Int, back: Color = Color.White, size: Int = 32): Marker? {
+    if (id == -1) return null
     val marker = Marker()
-    if (position != null) {
-        marker.position = position
-    }
-    marker.width = (32 * 0.9f).dp.toPx(context).toInt()
-    marker.height = (32 * 0.9f).dp.toPx(context).toInt()
+    marker.position = position
+    marker.width = (size * 0.9f).dp.toPx(context).toInt()
+    marker.height = (size * 0.9f).dp.toPx(context).toInt()
     getRounded(context, id, back)?.let { marker.icon = OverlayImage.fromBitmap(it) }
     marker.zIndex = 2
     return marker
 }
 
-fun marker(position: LatLng, event: Track.EVENT): Marker? {
-    val context = GPSApplication.instance.applicationContext
-    val id = when (event) {
-        Track.EVENT.nnn -> -1
-        Track.EVENT.img -> -1
-        Track.EVENT.pee -> R.drawable.marker_pee
-        Track.EVENT.poo -> R.drawable.marker_poop
-        Track.EVENT.mrk -> R.drawable.marker_marking
-    }
-    val back = when (event) {
-        Track.EVENT.nnn -> Color.White
-        Track.EVENT.img -> Color.White
-        Track.EVENT.pee -> Color(0xFFEEBF00)
-        Track.EVENT.poo -> Color(0xFF956A5C)
-        Track.EVENT.mrk -> Color(0xFF4AB0F5)
-    }
-    return if (id > -1) marker(context, position, id, back) else null
+private fun marker(context: Context, position: LatLng, uri: Uri, back: Color = Color.White, size: Int = 64): Marker? {
+    if (uri == TRACK_ZERO_URI) return null
+    val marker = Marker()
+    marker.position = position
+    marker.width = (size * 0.9f).dp.toPx(context).toInt()
+    marker.height = (size * 0.9f).dp.toPx(context).toInt()
+    getRounded(context, uri, back)?.let { marker.icon = OverlayImage.fromBitmap(it) }
+    marker.zIndex = 2
+    return marker
 }
 
-fun mark(pet: CurrentPetData, event: Track.EVENT, position: LatLng, mapView: MapView): Marker? {
-    GPSApplication.instance.mark(pet, event)
-    val marker = marker(position, event)
+private fun marker(position: LatLng, track: Track): Marker? {
+    val context = GPSApplication.instance.applicationContext
+    val id = when (track.event) {
+        Track.EVENT.NNN -> -1
+        Track.EVENT.IMG -> R.drawable.icon_camera_map
+        Track.EVENT.PEE -> R.drawable.marker_pee
+        Track.EVENT.POO -> R.drawable.marker_poop
+        Track.EVENT.MRK -> R.drawable.marker_marking
+    }
+    val back = when (track.event) {
+        Track.EVENT.NNN -> Color.White
+        Track.EVENT.IMG -> Color.White
+        Track.EVENT.PEE -> Color(0xFFEEBF00)
+        Track.EVENT.POO -> Color(0xFF956A5C)
+        Track.EVENT.MRK -> Color(0xFF4AB0F5)
+    }
+    val marker = when (track.event) {
+        //Track.EVENT.IMG -> if (track.uri != TRACK_ZERO_URI) marker(context, position, track.uri, back) else marker(context, position, id, back)
+        Track.EVENT.IMG -> marker(context, position, id, back, 48)
+        else -> marker(context, position, id, back)
+    }
+    //Log.v(__CLASSNAME__, "${getMethodName()}::onChange()[position:$position][track.event:${track.event}][track.uri:${track.uri}][marker:$marker]")
+    return marker
+}
+
+private fun mark(track: Track, position: LatLng, mapView: MapView): Marker? {
+    val marker = marker(position, track)
     marker?.let {
         mapView.getMapAsync { naverMap ->
             it.map = naverMap
         }
     }
+    Log.v(__CLASSNAME__, "${getMethodName()}::onChange()[position:$position][track.event:${track.event}][track.uri:${track.uri}][marker:$marker]")
     return marker
+}
+
+private fun mark(pet: CurrentPetData, event: Track.EVENT, position: LatLng, mapView: MapView): Marker? {
+    val application = GPSApplication.instance
+    application.mark(pet, event)
+    val track = if (application.tracks?.isNotEmpty() == true) application.tracks?.last() else null
+    val marker = track?.let { mark(track, position, mapView) }
+    Log.i(__CLASSNAME__, "${getMethodName()}::onChange()[position:$position][track.event:${track?.event}][track.uri:${track?.uri}][marker:$marker]")
+    return marker
+}
+
+fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, finished: Boolean) {
+    val markers = mutableListOf<Marker>()
+    val coords = mutableListOf<LatLng>()
+    markers.clear()
+    coords.clear()
+    tracks.forEach { track ->
+        marker(LatLng(track.latitude, track.longitude), track)?.let { markers.add(it) }
+        coords.add(LatLng(track.latitude, track.longitude))
+    }
+    if (coords.isNotEmpty()) {
+        starter(context = context, position = coords.first()).map = naverMap
+        if (finished) {
+            ender(context = context, position = coords.last()).map = naverMap
+        }
+        if (coords.size > 1) {
+            val path = PathOverlay()
+            path.coords = coords
+            path.color = 0xA0FFDBDB.toInt()
+            path.outlineColor = 0xA0FF5000.toInt()
+            path.width = 18
+            path.globalZIndex = 10
+            path.outlineWidth = 3
+            path.map = naverMap
+        }
+    }
+    markers.forEach { it.map = naverMap }
 }
 
 @Composable
@@ -381,38 +436,8 @@ fun naverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Tr
     }
 }
 
-fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, finished: Boolean) {
-    val markers = mutableListOf<Marker>()
-    val coords = mutableListOf<LatLng>()
-    markers.clear()
-    coords.clear()
-    tracks.forEach { track ->
-        marker(LatLng(track.latitude, track.longitude), track.event)?.let { markers.add(it) }
-        coords.add(LatLng(track.latitude, track.longitude))
-    }
-    if (coords.isNotEmpty()) {
-        starter(context = context, position = coords.first()).map = naverMap
-        if (finished) {
-            ender(context = context, position = coords.last()).map = naverMap
-        }
-        if (coords.size > 1) {
-            val path = PathOverlay()
-            path.coords = coords
-            path.color = 0xA0FFDBDB.toInt()
-            path.outlineColor = 0xA0FF5000.toInt()
-            path.width = 18
-            path.globalZIndex = 10
-            path.outlineWidth = 3
-            path.map = naverMap
-        }
-    }
-    markers.forEach {
-        it.map = naverMap
-    }
-}
-
 @Composable
-fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+private fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     val petNm: String = pet.petNm
     val petRprsImgAddr: String = pet.petRprsImgAddr
 
@@ -483,7 +508,7 @@ fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boole
 }
 
 @Composable
-fun WalkInfoSheet() {
+private fun WalkInfoSheet() {
     val application = GPSApplication.instance
     val duration = remember { application.duration }
     val distance = remember { application.distance }
@@ -539,7 +564,7 @@ fun WalkInfoSheet() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WalkInfoNavi(
+private fun WalkInfoNavi(
     onGloballyPositioned: (LayoutCoordinates) -> Unit
 ) {
     val application = GPSApplication.instance
@@ -751,14 +776,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     if (pets.size == 1) application.add(pets[0])
     Log.i(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
 
-    val markers = mutableListOf<Marker>()
-    if (start) {
-        markers.clear()
-        tracks?.forEach { track ->
-            marker(LatLng(track.latitude, track.longitude), track.event)?.let { markers.add(it) }
-        }
-    }
-
     val location = application.lastLocation ?: source.lastLocation
     var position by rememberSaveable { mutableStateOf(if (location != null) LatLng(location.latitude, location.longitude) else LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
     var zoom by rememberSaveable { mutableDoubleStateOf(GPX_CAMERA_ZOOM_ZERO) }
@@ -781,6 +798,14 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             .indoorEnabled(true)
     }
     val mapView = rememberMapViewWithLifecycle(context, mapOptions)
+
+    val markers = remember { mutableListOf<Marker>() }
+    if (start) {
+        markers.clear()
+        tracks?.forEach { track ->
+            marker(LatLng(track.latitude, track.longitude), track)?.let { markers.add(it) }
+        }
+    }
 
     val scope = rememberCoroutineScope()
     var refresh by remember { mutableStateOf(false) }
@@ -810,7 +835,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var checkedAll by rememberSaveable { mutableStateOf(false) }
     checkedAll = (application.pets == pets)
     var checkedSel by rememberSaveable { mutableStateOf(false) }
-    var event by remember { mutableStateOf(Track.EVENT.nnn) }
+    var event by remember { mutableStateOf(Track.EVENT.NNN) }
     var showPetsSheet by remember { mutableStateOf(false) }
 
     /** map */
@@ -930,21 +955,19 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        context.startActivity(intent)
-                        Log.i(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent]")
-                    } else {
+                    var intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    Log.i(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent]")
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                         val ri = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         val pm: PackageManager = context.packageManager
                         val ai = pm.resolveActivity(ri, 0)?.activityInfo
-                        val intent = Intent()
+                        intent = Intent()
                         intent.component = ai?.let { ComponentName(it.packageName, it.name) }
                         intent.action = Intent.ACTION_MAIN
                         intent.addCategory(Intent.CATEGORY_LAUNCHER)
-                        context.startActivity(intent)
-                        Log.i(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent][pm:$pm][ai:$ai]")
+                        Log.w(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent][pm:$pm][ai:$ai]")
                     }
+                    context.startActivity(intent)
                 },
                 back = Color.White,
                 shape = RectangleShape,
@@ -969,7 +992,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
-                    event = Track.EVENT.pee
+                    event = Track.EVENT.PEE
                     if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
                     else showPetsSheet = true
                 },
@@ -987,7 +1010,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
-                    event = Track.EVENT.poo
+                    event = Track.EVENT.POO
                     if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
                     else showPetsSheet = true
                 },
@@ -1005,7 +1028,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
-                    event = Track.EVENT.mrk
+                    event = Track.EVENT.MRK
                     if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
                     else showPetsSheet = true
                 },
@@ -1082,11 +1105,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 horizontalAlignment = Alignment.End
             ) {
                 val item = when (event) {
-                    Track.EVENT.nnn -> stringResource(id = R.string.nnn)
-                    Track.EVENT.img -> stringResource(id = R.string.nnn)
-                    Track.EVENT.pee -> stringResource(id = R.string.pee)
-                    Track.EVENT.poo -> stringResource(id = R.string.poop)
-                    Track.EVENT.mrk -> stringResource(id = R.string.mark)
+                    Track.EVENT.NNN -> stringResource(id = R.string.nnn)
+                    Track.EVENT.IMG -> stringResource(id = R.string.nnn)
+                    Track.EVENT.PEE -> stringResource(id = R.string.pee)
+                    Track.EVENT.POO -> stringResource(id = R.string.poop)
+                    Track.EVENT.MRK -> stringResource(id = R.string.mark)
                 }
                 val text = String.format(stringResource(id = R.string.walk_title_marking), item)
                 Text(
