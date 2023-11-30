@@ -11,7 +11,5 @@ data class BbsCmtCreateReq(
     @SerializedName("pstSn")
     var pstSn: Int, // INT
     @SerializedName("upCmntNo")
-    var upCmntNo: Int, // INT
-    @SerializedName("userId")
-    var userId: String // d8a80b0e-333b-4bba-94f7-fe89749a7eea
+    var upCmntNo: Int // INT
 )

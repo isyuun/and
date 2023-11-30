@@ -22,6 +22,7 @@ import net.pettip.data.bbs.QnaReq
 import net.pettip.data.cmm.CdDetail
 import net.pettip.data.cmm.CmmRes
 import net.pettip.data.cmm.commonRes
+import net.pettip.data.daily.DailyLifeFile
 import net.pettip.data.daily.PhotoData
 import net.pettip.data.daily.PhotoRes
 import net.pettip.data.pet.ChangePetWgtReq
@@ -145,6 +146,27 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     private val _isCheck = MutableStateFlow(false) // Data 저장
     val isCheck: StateFlow<Boolean> = _isCheck.asStateFlow() // state 노출
     fun updateIsCheck(newValue: Boolean) { _isCheck.value = newValue }
+
+    // 이미 등록된 사진 리스트
+    private val _uploadedFileList = MutableStateFlow<List<DailyLifeFile>?>(null)
+    val uploadedFileList:StateFlow<List<DailyLifeFile>?> = _uploadedFileList.asStateFlow()
+    fun updateUploadedFileList(newValue: List<DailyLifeFile>?){
+        _uploadedFileList.value = newValue
+    }
+    fun subUploadedFileList(newValue:Uri){
+        val fileName = getLastSegmentAfterSlash(newValue.toString())
+        _uploadedFileList.value = (_uploadedFileList.value?.map { file ->
+            if (file.atchFileNm == fileName) {
+                file.copy(rowState = "D")
+            } else {
+                file
+            }
+        } ?: emptyList()) as MutableList<DailyLifeFile>?
+    }
+
+    private val _newFileList = MutableStateFlow<List<DailyLifeFile>?>(null)
+    val newFileList:StateFlow<List<DailyLifeFile>?> = _newFileList.asStateFlow()
+    fun clearNewFileList(){_newFileList.value = null}
 
     private val _detailMessage = MutableStateFlow("") // Data 저장
     val detailMessage: StateFlow<String> = _detailMessage.asStateFlow() // state 노출
@@ -700,8 +722,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
             files = _photoRes.value,
             pstCn = _inquiryMain.value,
             pstSeCd = _inquiryKind.value?.cdId ?: "",
-            pstTtl = _title.value,
-            userId = G.userId
+            pstTtl = _title.value
         )
 
         val call = apiService.createQna(data = data)
@@ -792,4 +813,9 @@ fun errorBodyParse(errorBodyString: String?):String{
     }
 
     return "통신에 실패했습니다"
+}
+
+fun getLastSegmentAfterSlash(inputString: String): String {
+    val segments = inputString.split('/')
+    return segments.last()
 }

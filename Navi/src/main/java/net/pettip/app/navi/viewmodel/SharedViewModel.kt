@@ -31,6 +31,10 @@ import kotlin.coroutines.resume
 
 class SharedViewModel:ViewModel(){
 
+    private val _currentTab = MutableStateFlow<String>("스토리")
+    val currentTab:StateFlow<String> = _currentTab.asStateFlow()
+    fun updateCurrentTab(newValue: String){ _currentTab.value = newValue}
+
     private val _profilePet = MutableStateFlow<PetDetailData?>(null)
     val profilePet:StateFlow<PetDetailData?> = _profilePet.asStateFlow()
     fun updateProfilePet(newValue: PetDetailData?){ _profilePet.value = newValue}
@@ -51,6 +55,12 @@ class SharedViewModel:ViewModel(){
     val moreStoryClick:StateFlow<Int?> = _moreStoryClick.asStateFlow()
     fun updateMoreStoryClick(newValue: Int?){
         _moreStoryClick.value = newValue
+    }
+
+    private val _toStory = MutableStateFlow<Boolean>(false)
+    val toStory:StateFlow<Boolean> = _toStory.asStateFlow()
+    fun updateToStory(newValue: Boolean){
+        _toStory.value = newValue
     }
 
     private val _weekRecord = MutableStateFlow<WeekData?>(null)

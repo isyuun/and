@@ -424,7 +424,14 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                                 duration = SnackbarDuration.Short,
                                 withDismissAction = true
                             )
-                        } else if (pw != pwCheck) {
+                        }else if (!isAlphaNumeric(pw)) {
+                            snackbarHostState.showSnackbar(
+                                message = "올바른 비밀번호 형식이 아닙니다",
+                                actionLabel = "확인",
+                                duration = SnackbarDuration.Short,
+                                withDismissAction = true
+                            )
+                        }else if (pw != pwCheck) {
                             snackbarHostState.showSnackbar(
                                 message = "비밀번호가 일치하지 않습니다",
                                 actionLabel = "확인",
@@ -464,32 +471,11 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                 Text(text = "다음", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
             }
 
-
-
-            //Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            //    Row(
-            //        modifier = Modifier
-            //            .fillMaxWidth()
-            //            .padding(start = 50.dp, top = 5.dp, end = 50.dp, bottom = 3.dp),
-            //        horizontalArrangement = Arrangement.Start
-            //    ) {
-            //        Text(text = "생년월일")
-            //    }
-            //    Text(
-            //        text = mDate.value,
-            //        modifier = Modifier
-            //            .fillMaxWidth()
-            //            .padding(top = 3.dp, bottom = 2.dp, start = 50.dp, end = 50.dp)
-            //            .border(
-            //                width = 1.dp,
-            //                color = Color(R.color.hint_text),
-            //                shape = RoundedCornerShape(8.dp)
-            //            )
-            //            .padding(horizontal = 30.dp, vertical = 20.dp)
-            //            .clickable { mDatePickerDialog.show() })
-            //}
         }
     }
 }
 
-
+fun isAlphaNumeric(input: String): Boolean {
+    val pattern = Regex("^[a-zA-Z0-9]{8,16}\$")
+    return pattern.matches(input)
+}

@@ -15,6 +15,4 @@ data class QnaReq(
     var pstSeCd: String, // 001
     @SerializedName("pstTtl")
     var pstTtl: String, // String
-    @SerializedName("userId")
-    var userId: String // String
 )

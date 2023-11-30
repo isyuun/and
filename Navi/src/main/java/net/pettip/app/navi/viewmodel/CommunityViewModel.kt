@@ -78,6 +78,10 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         sharedViewModel.updateMoreStoryClick(newValue)
     }
 
+    fun updateToStory(newValue: Boolean){
+        sharedViewModel.updateToStory(newValue)
+    }
+
     val selectedPet = sharedViewModel.selectPet
 
     private val _storyRes = MutableStateFlow<StoryRes?>(null)
@@ -270,7 +274,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
 
     private val _qnaDetail = MutableStateFlow<QnaDetailRes?>(null)
     val qnaDetail: StateFlow<QnaDetailRes?> = _qnaDetail.asStateFlow()
-    fun updateQnaDetail(){_qnaDetail.value = null}
+
     // ----------------- 게시판 ------------------------
 
     // ---------------------------Modify------------------------------
@@ -861,7 +865,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun getQnaList(page:Int):Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val data = BbsReq(10, page, 100, 100,G.userId)
+        val data = BbsReq(10, page, 100, 100)
 
         val call = apiService.getQnaList(data)
         return suspendCancellableCoroutine { continuation ->
@@ -910,6 +914,32 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         }
     }
 
+    suspend fun deleteQna():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.deleteQna(_qnaDetail.value?.data?.get(0)?.pstSn?:0)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<CmmRes>{
+                override fun onResponse(call: Call<CmmRes>, response: Response<CmmRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        if (body?.statusCode == 200){
+                            continuation.resume(true)
+                        }else{
+                            continuation.resume(false)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<CmmRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
 
     suspend fun deleteComment(cmntNo: Int):Boolean{
         val apiService = RetrofitClientServer.instance
@@ -1133,7 +1163,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun updateDailyRls(rlsYn : String):Boolean{
         val apiService = RetrofitClientServer.instance
 
-        concatUploadedFileList(_newFileList.value?: emptyList())
+       // concatUploadedFileList(_newFileList.value?: emptyList())
 
         val data = DailyRlsYnReq(
             rlsYn = rlsYn,
@@ -1204,8 +1234,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
             cmntCn = cmntCn,
             petRelUnqNo = selectedPet.value?.petRelUnqNo?:0,
             pstSn = _eventDetail.value?.data?.pstSn?:0,
-            upCmntNo = _eventReplyCmnt.value?.pstCmntNo ?: 0,
-            userId = G.userId,
+            upCmntNo = _eventReplyCmnt.value?.pstCmntNo ?: 0
         )
 
         val call = apiService.bbsCmntCreate(data)
@@ -1238,8 +1267,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
             cmntCn = _bbsComment.value,
             petRelUnqNo = selectedPet.value?.petRelUnqNo?:0,
             pstSn = _eventDetail.value?.data?.pstSn?:0,
-            upCmntNo = 0,
-            userId = G.userId,
+            upCmntNo = 0
         )
 
         val call = apiService.bbsCmntCreate(data)
