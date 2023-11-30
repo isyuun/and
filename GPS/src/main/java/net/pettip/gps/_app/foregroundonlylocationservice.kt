@@ -57,7 +57,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
 
     private val localBinder = LocalBinder()
 
-    protected lateinit var notificationManager: NotificationManager
+    //protected lateinit var notificationManager: NotificationManager
 
     // TODO: Step 1.1, Review variables (no changes).
     // FusedLocationProviderClient - Main class for receiving location updates.
@@ -82,7 +82,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
     override fun onCreate() {
         Log.d(__CLASSNAME__, "${getMethodName()}[$serviceRunningInForeground]")        //Log.d(__CLASSNAME__, "onCreate()")
 
-        notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        //notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationCompatBuilder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
 
         // TODO: Step 1.2, Review the FusedLocationProviderClient.
@@ -237,7 +237,6 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
             startService(intent)
             ContextCompat.startForegroundService(applicationContext, intent)
         } catch (e: Exception) {
-            //TODO("Not yet implemented")
             e.printStackTrace()
         }
 
@@ -296,12 +295,12 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
      * no operation, so it's safe to perform the below sequence.
      */
     //https://developer.android.com/training/notify-user/channels?hl=ko
-    protected fun generateNotificationChannel(importance: Int) {
+    protected open fun generateNotificationChannel(importance: Int) {
         val title = getString(R.string.app_name)
         val notificationChannel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID, title, importance
         )
-        notificationManager.createNotificationChannel(notificationChannel)
+        //notificationManager.createNotificationChannel(notificationChannel)
     }
 
     /*

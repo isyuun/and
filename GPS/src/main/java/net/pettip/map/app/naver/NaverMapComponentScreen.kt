@@ -339,7 +339,7 @@ fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track
     markers.clear()
     coords.clear()
     tracks.forEach { track ->
-        //marker(LatLng(track.latitude, track.longitude), track)?.let { markers.add(it) }
+        marker(LatLng(track.latitude, track.longitude), track)?.let { markers.add(it) }
         coords.add(LatLng(track.latitude, track.longitude))
     }
     if (coords.isNotEmpty()) {
@@ -805,9 +805,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         tracks?.forEach { track ->
             marker(LatLng(track.latitude, track.longitude), track)?.let { markers.add(it) }
         }
-    }
-    mapView.getMapAsync { naverMap ->
-        markers.forEach { it.map = naverMap }
     }
 
     val scope = rememberCoroutineScope()

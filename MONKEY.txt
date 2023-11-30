@@ -1,0 +1,16 @@
+type= user
+speed= 1000
+start data >>
+//touch-search text input box
+//DispatchPointer(0, 0, 0, 200,100, 0,0,0,0,0,0,0) //push x-200, y-50
+//DispatchPointer(0, 0, 1, 200,100, 0,0,0,0,0,0,0) //release x-200, y-50
+//UserWait(1000) //wait 1 sec
+//DispatchPress(KEYCODE_HOME)
+//UserWait(200) //wait 200 msec
+//DispatchPress(KEYCODE_BACK)
+//UserWait(200) //wait 200 msec
+//DispatchPress(KEYCODE_MENU)
+//touch - search button
+//DispatchPointer(0, 0, 0, 470,50, 0,0,0,0,0,0,0) //push x-470, y-50
+//DispatchPointer(0, 0, 1, 470,50, 0,0,0,0,0,0,0) //release x-470, y-50
+quit

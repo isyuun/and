@@ -1,10 +1,13 @@
 package net.pettip.gps._app
 
-import android.app.Notification
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import net.pettip.gps.R
 import net.pettip.util.Log
@@ -15,25 +18,45 @@ import java.util.TimerTask
 open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private lateinit var timer: Timer
+    private var timer: Timer? = null
+    private var cancel = true
     private fun timer() {
         if (!serviceRunningInForeground) return
         timer = Timer()
-        timer.scheduleAtFixedRate(object : TimerTask() {
+        timer?.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
+                if (cancel) return
                 val title = "${getString(R.string.walk_title_walking)} - ${__duration}"
                 //Log.wtf(__CLASSNAME__, "${getMethodName()} $title")
-                notification = notificationCompatBuilder.setContentTitle(title).build()
-                notificationManager.notify(NOTIFICATION_ID, notification)
+                //notificationManager.notify(NOTIFICATION_ID, notificationCompatBuilder.setContentTitle(title).build())
+                with(NotificationManagerCompat.from(this@foregroundonlylocationservice6)) {
+                    // notificationId is a unique int for each notification that you must define
+                    if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        return
+                    }
+                    notify(NOTIFICATION_ID, notificationCompatBuilder.setContentTitle(title).build())
+                }
             }
         }, 1000, 1000) // 1초마다 실행
+        cancel = false
     }
 
-    private var notification: Notification? = null
+    private fun cancel() {
+        with(NotificationManagerCompat.from(this)) {
+            cancel(NOTIFICATION_ID)
+            cancelAll()
+        }
+        cancel = true
+        timer?.cancel()
+        timer?.purge()
+        timer = null
+    }
+
+    //private var notification: Notification? = null
     private fun startForeground() {
         Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
-        if (notification == null) notification = generateNotification(lastLocation)
-        notification?.let {
+        cancel()
+        generateNotification(lastLocation)?.let {
             ServiceCompat.startForeground(
                 this,
                 NOTIFICATION_ID,
@@ -43,23 +66,29 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
                 } else 0
             )
             serviceRunningInForeground = true
-            notificationManager.notify(NOTIFICATION_ID, it)
+            //notificationManager.notify(NOTIFICATION_ID, it)
+            with(NotificationManagerCompat.from(this@foregroundonlylocationservice6)) {
+                // notificationId is a unique int for each notification that you must define
+                if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    return
+                }
+                notify(NOTIFICATION_ID, it)
+            }
             timer()
         }
     }
 
     private fun stopForeground() {
         Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
+        cancel()
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-        timer.cancel()
-        timer.purge()
-        notification = null
     }
 
     override fun onBind(intent: Intent): IBinder {
         Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
+        val ret = super.onBind(intent)
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-        return super.onBind(intent)
+        return ret
     }
 
     override fun onUnbind(intent: Intent): Boolean {
@@ -80,7 +109,7 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
 
     override fun stop() {
         Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
-        super.stop()
         stopForeground()
+        super.stop()
     }
 }
