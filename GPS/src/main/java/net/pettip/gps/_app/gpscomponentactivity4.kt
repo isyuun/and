@@ -51,26 +51,31 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
         )
     }
 
-    override fun camera() {
-        //val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        //_takePicture.launch(intent)
-        file = createImageFile()
-        if (file.exists()) {
-            uri = getUriForFile(this, "${packageName}.provider", file)
-            cameraLauncher.launch(uri)
-        }
-    }
-
-    val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::onChange()[uri:$uri][file:$file]")
         if (isSuccess) {
             onChange(uri, file)
         }
     }
 
-    val takePicture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val takePicture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         Log.wtf(__CLASSNAME__, "${getMethodName()}::onChange()[result.data:$result.data]")
         if (result.resultCode == Activity.RESULT_OK) {
             onChange(uri, file)
+        }
+    }
+
+    override fun camera() {
+        //val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        //takePicture.launch(intent)
+        try {
+            file = createImageFile()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        if (file.exists()) {
+            uri = getUriForFile(this, "${packageName}.provider", file)
+            cameraLauncher.launch(uri)
         }
     }
 
