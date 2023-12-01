@@ -11,14 +11,10 @@
 package net.pettip.map.app.naver
 
 import android.app.Activity
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -955,19 +951,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
-                    var intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    Log.i(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent]")
-                    if (true || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                        val ri = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        val pm: PackageManager = context.packageManager
-                        val ai = pm.resolveActivity(ri, 0)?.activityInfo
-                        intent = Intent()
-                        intent.component = ai?.let { ComponentName(it.packageName, it.name) }
-                        intent.action = Intent.ACTION_MAIN
-                        intent.addCategory(Intent.CATEGORY_LAUNCHER)
-                        Log.w(__CLASSNAME__, "::NaverMapApp@CAM.onChange(...)[intent:$intent][pm:$pm][ai:$ai]")
-                    }
-                    context.startActivity(intent)
+                    application.camera()
                 },
                 back = Color.White,
                 shape = RectangleShape,

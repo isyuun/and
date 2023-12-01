@@ -30,6 +30,8 @@ import java.io.File
  * @description :
  */
 interface ICameraContentListener {
+    //var takePicture: ActivityResultLauncher<Intent>
+    fun camera()
     fun onChange(uri: Uri, file: File)
 }
 
