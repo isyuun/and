@@ -11,15 +11,18 @@
 
 package net.pettip.gps._app
 
-import android.app.Activity
-import android.content.Intent
 import android.net.Uri
-import android.provider.MediaStore
+import android.os.Environment
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
+import net.pettip.gps.app.GPSApplication
 import net.pettip.gps.app.ICameraContentListener
+import net.pettip.gpx.GPX_SIMPLE_TICK_FORMAT
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
+import java.io.IOException
+import java.util.Date
 
 /**
  * @Project     : PetTip-Android
@@ -32,23 +35,54 @@ import java.io.File
 open class gpsappcompatactivity4 : gpsappcompatactivity3(), ICameraContentListener {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    val takePicture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        Log.wtf(__CLASSNAME__, "${getMethodName()}::onChange()[result:$result]")
-        if (result.resultCode == Activity.RESULT_OK) {
-            //val data: Intent? = result.data
-            //// Process the captured image data
-            //// For example, you can retrieve the image from the data Intent and update the state
-            //val thumbnail = data?.extras?.get("data") as? android.graphics.Bitmap
-            //imageBitmap = thumbnail
+    lateinit var file: File
+    lateinit var uri: Uri
+
+    @Throws(IOException::class)
+    private fun File(): File {
+        // Create an image file name
+        val time = System.currentTimeMillis()
+        val name = GPX_SIMPLE_TICK_FORMAT.format(Date(time))
+        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+        path.mkdirs()
+        return File.createTempFile(
+            "IMG.${name}", /* prefix */
+            ".jpg", /* suffix */
+            path /* directory */
+        )
+    }
+
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[uri:$uri][file:$file]")
+        if (isSuccess) {
+            onCamera(uri, file)
         }
     }
 
     override fun camera() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        takePicture.launch(intent)
+        try {
+            file = File()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return
+        }
+        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[file:$file]")
+        if (file.exists()) {
+            //uri = Uri.fromFile(file)
+            uri = FileProvider.getUriForFile(this, "${packageName}.provider", file)
+            cameraLauncher.launch(uri)
+        }
     }
 
-    override fun onChange(uri: Uri, file: File) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[uri:$uri][file:$file]")
+    override fun onCamera(uri: Uri, file: File) {
+        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[${(this.file.exists() && this.file != file)}][uri:$uri][file:$file]")
+        if (this.file.exists() && file.exists() && this.file != file) {
+            val ret = this.file.delete()
+            Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[$ret][${file.exists()}][${this.file.exists()}[this.file:${this.file}]")
+        }
+        if (file.exists()) {
+            GPSApplication.instance.img(uri)
+        }
     }
+
 }

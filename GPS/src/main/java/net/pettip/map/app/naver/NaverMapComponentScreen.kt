@@ -305,7 +305,7 @@ private fun marker(position: LatLng, track: Track): Marker? {
         Track.EVENT.IMG -> marker(context, position, id, back, 48)
         else -> marker(context, position, id, back)
     }
-    //Log.v(__CLASSNAME__, "${getMethodName()}::onChange()[position:$position][track.event:${track.event}][track.uri:${track.uri}][marker:$marker]")
+    //Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[position:$position][track.event:${track.event}][track.uri:${track.uri}][marker:$marker]")
     return marker
 }
 
@@ -316,7 +316,7 @@ private fun mark(track: Track, position: LatLng, mapView: MapView): Marker? {
             it.map = naverMap
         }
     }
-    Log.v(__CLASSNAME__, "${getMethodName()}::onChange()[position:$position][track.event:${track.event}][track.uri:${track.uri}][marker:$marker]")
+    Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[position:$position][track.event:${track.event}][track.uri:${track.uri}][marker:$marker]")
     return marker
 }
 
@@ -325,7 +325,7 @@ private fun mark(pet: CurrentPetData, event: Track.EVENT, position: LatLng, mapV
     application.mark(pet, event)
     val track = if (application.tracks?.isNotEmpty() == true) application.tracks?.last() else null
     val marker = track?.let { mark(track, position, mapView) }
-    Log.i(__CLASSNAME__, "${getMethodName()}::onChange()[position:$position][track.event:${track?.event}][track.uri:${track?.uri}][marker:$marker]")
+    Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[position:$position][track.event:${track?.event}][track.uri:${track?.uri}][marker:$marker]")
     return marker
 }
 
@@ -1339,7 +1339,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     Log.v(__CLASSNAME__, "${getMethodName()}[ED][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
     /** VERSION */
     //if (RELEASE) return
-    val df = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.KOREA)
+    val df = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
     val bt = df.format(Date(stringResource(id = R.string.build_time).toLong()))
     val pi = context.packageManager.getPackageInfo(context.packageName, 0)
     val vs = "[${pi.versionName}(${if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode else pi.versionCode})][${if (RELEASE) "REL" else "DEB"}][$bt]"

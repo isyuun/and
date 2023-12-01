@@ -32,7 +32,7 @@ import java.io.File
 interface ICameraContentListener {
     //var takePicture: ActivityResultLauncher<Intent>
     fun camera()
-    fun onChange(uri: Uri, file: File)
+    fun onCamera(uri: Uri, file: File)
 }
 
 class CameraContentObserver(
@@ -132,7 +132,7 @@ class CameraContentObserver(
                     ExifInterface.ORIENTATION_NORMAL -> rotate = ROTATE.ROTATE_0
                 }
             }
-            Log.i(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file?.absolutePath}]")
+            Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file?.absolutePath}]")
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
@@ -162,7 +162,7 @@ class CameraContentObserver(
                 }
                 it.close()
             }
-            Log.w(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file?.absolutePath}]")
+            Log.w(__CLASSNAME__, "${getMethodName()}::onCamera()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file?.absolutePath}]")
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -183,7 +183,7 @@ class CameraContentObserver(
             val rotate = rotate(uri)
             val orient = orient(uri)
             Log.v(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][$camera][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
-            uri.let { listener.onChange(it, file) }
+            uri.let { listener.onCamera(it, file) }
             this.file = file
         }
     }

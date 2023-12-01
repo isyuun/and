@@ -86,8 +86,20 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     }
 
 
+    fun root(): String {
+        val ret = if (RELEASE) filesDir.path else getExternalFilesDirs("")[0].path
+        Log.w(__CLASSNAME__, "${getMethodName()}$ret")
+        return ret
+    }
+
+    private fun pics(): String {
+        val ret = "${root()}/.PIC"
+        Log.w(__CLASSNAME__, "${getMethodName()}$ret")
+        return ret
+    }
+
     private fun path(): String {
-        val ret = if (RELEASE) "${filesDir.path}/.GPX" else getExternalFilesDirs(".GPX")[0].path
+        val ret = "${root()}/.GPX"
         Log.w(__CLASSNAME__, "${getMethodName()}$ret")
         return ret
     }
@@ -101,6 +113,11 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     protected val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
     internal val tracks: MutableList<Track>
         get() = _tracks
+
+    internal val root
+        get() = root()
+    internal val pics
+        get() = pics()
 
     internal val path
         get() = path()

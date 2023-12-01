@@ -78,7 +78,7 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
         _imgs.clear()
     }
 
-    private fun img(uri: Uri) {
+    internal fun img(uri: Uri) {
         if (_imgs.size > 0 && _imgs.contains(uri)) return
         _imgs.add(uri)
         val loc = lastLocation
@@ -101,7 +101,7 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
      * 카메라 이미지 회전방향: ExifInterface사용
      */
     internal fun rotate(context: Context, uri: Uri): ROTATE {
-        val path = observer.path(uri)
+        val path = observer.path(uri) ?: return ROTATE.ROTATE_NG
         val file = File(path)
         var rotate = ROTATE.ROTATE_NG
         val orientation: Int
@@ -127,7 +127,7 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
      * 카메라 이미지 회전방향: 컨텐츠리졸버(DB)사용
      */
     internal fun orient(context: Context, uri: Uri): ROTATE {
-        val path = observer.path(uri)
+        val path = observer.path(uri) ?: return ROTATE.ROTATE_NG
         val file = File(path)
         var rotate = ROTATE.ROTATE_NG
         var orientation: Int = -1
@@ -157,12 +157,12 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
         if (application is ICameraContentListener) (application as ICameraContentListener).camera()
     }
 
-    override fun onChange(uri: Uri, file: File) {
+    override fun onCamera(uri: Uri, file: File) {
         val camera = !_imgs.contains(uri)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$camera][uri:$uri][file:$file]")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[uri:$uri][file:$file]")
         if (camera) {
             img(uri)
-            GPSApplication.instance.onChange(uri, file)
+            GPSApplication.instance.onCamera(uri, file)
         }
     }
 }

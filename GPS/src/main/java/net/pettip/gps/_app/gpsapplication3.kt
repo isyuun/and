@@ -77,6 +77,12 @@ open class gpsapplication3 : gpsapplication2() {
         this.service?.resume()
     }
 
+    val root
+        get() = this.service?.root
+
+    val pics
+        get() = this.service?.pics
+
     val path
         get() = this.service?.path
 
