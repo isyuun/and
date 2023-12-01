@@ -45,17 +45,21 @@ open class gpsappcompatactivity4 : gpsappcompatactivity3(), ICameraContentListen
         val name = GPX_SIMPLE_TICK_FORMAT.format(Date(time))
         val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
         path.mkdirs()
-        return File.createTempFile(
-            "IMG.${name}", /* prefix */
-            ".jpg", /* suffix */
-            path /* directory */
-        )
+        //return File.createTempFile(
+        //    "IMG.${name}.", /* prefix */
+        //    ".jpg", /* suffix */
+        //    path /* directory */
+        //)
+        val file = File("$path/IMG.$name.jpg")
+        file.createNewFile()
+        //Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[exists:${file.exists()}][length:${file.length()}][name:${file.name}][$file]")
+        return file
     }
 
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
-        Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[uri:$uri][file:$file]")
+        Log.w(__CLASSNAME__, "${getMethodName()}::onCamera()[exists:${file.exists()}][length:${file.length()}][name:${file.name}][$file]")
         if (isSuccess) {
-            onCamera(uri, file)
+            onCamera(file, uri)
         }
     }
 
@@ -66,23 +70,27 @@ open class gpsappcompatactivity4 : gpsappcompatactivity3(), ICameraContentListen
             e.printStackTrace()
             return
         }
-        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[file:$file]")
         if (file.exists()) {
-            //uri = Uri.fromFile(file)
+            Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[exists:${file.exists()}][length:${file.length()}][name:${file.name}][$file]")
             uri = FileProvider.getUriForFile(this, "${packageName}.provider", file)
             cameraLauncher.launch(uri)
+            return
         }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[exists:${file.exists()}][length:${file.length()}][name:${file.name}][$file]")
     }
 
-    override fun onCamera(uri: Uri, file: File) {
-        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[${(this.file.exists() && this.file != file)}][uri:$uri][file:$file]")
-        if (this.file.exists() && file.exists() && this.file != file) {
-            val ret = this.file.delete()
-            Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[$ret][${file.exists()}][${this.file.exists()}[this.file:${this.file}]")
+    override fun onCamera(file: File, uri: Uri) {
+        if (file.length() < 1) return
+        if (this.file != file) {
+            val delete = this.file.delete()
+            Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[delete:$delete][${file.exists()}][${this.file.exists()}[this.file:${this.file}]")
         }
-        if (file.exists()) {
+        if (file.exists() && file.length() > 0) {
+            Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[exists:${file.exists()}][length:${file.length()}][name:${file.name}][$file]")
             GPSApplication.instance.img(uri)
+            return
         }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[exists:${file.exists()}][length:${file.length()}][name:${file.name}][$file]")
     }
 
 }

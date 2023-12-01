@@ -157,12 +157,12 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
         if (application is ICameraContentListener) (application as ICameraContentListener).camera()
     }
 
-    override fun onCamera(uri: Uri, file: File) {
+    override fun onCamera(file: File, uri: Uri) {
         val camera = !_imgs.contains(uri)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[uri:$uri][file:$file]")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[length:${file.length()}][file:$file][uri:$uri]")
         if (camera) {
             img(uri)
-            GPSApplication.instance.onCamera(uri, file)
+            GPSApplication.instance.onCamera(file, uri)
         }
     }
 }

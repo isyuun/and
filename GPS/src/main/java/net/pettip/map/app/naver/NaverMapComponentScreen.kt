@@ -950,8 +950,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             IconButton2(
                 onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                    if (!start) return@withClick
+                    //if (!start) return@withClick  //test
                     application.camera()
+
                 },
                 back = Color.White,
                 shape = RectangleShape,

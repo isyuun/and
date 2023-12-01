@@ -32,7 +32,7 @@ import java.io.File
 interface ICameraContentListener {
     //var takePicture: ActivityResultLauncher<Intent>
     fun camera()
-    fun onCamera(uri: Uri, file: File)
+    fun onCamera(file: File, uri: Uri)
 }
 
 class CameraContentObserver(
@@ -170,7 +170,7 @@ class CameraContentObserver(
     }
 
     private var file: File? = null
-    private fun onChange(uri: Uri) {
+    private fun onCamera(uri: Uri) {
         //Log.i(__CLASSNAME__, "${getMethodName()}[${this.uri == uri}][this.uri:$this.uri][uri:$uri]")
         val path = path(uri) ?: return
         val time = time(uri) ?: return
@@ -183,7 +183,7 @@ class CameraContentObserver(
             val rotate = rotate(uri)
             val orient = orient(uri)
             Log.v(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][$camera][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
-            uri.let { listener.onCamera(it, file) }
+            listener.onCamera(file, uri)
             this.file = file
         }
     }
@@ -196,20 +196,18 @@ class CameraContentObserver(
     override fun onChange(selfChange: Boolean, uri: Uri?) {
         Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uri:$uri]")
         super.onChange(selfChange, uri)
-        uri?.let { onChange(it) }
+        uri?.let { onCamera(it) }
     }
 
     override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
         Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uri:$uri][flags:$flags]")
         super.onChange(selfChange, uri, flags)
-        uri?.let { onChange(it) }
+        uri?.let { onCamera(it) }
     }
 
     override fun onChange(selfChange: Boolean, uris: MutableCollection<Uri>, flags: Int) {
         Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uris:$uris][flags:$flags]")
         super.onChange(selfChange, uris, flags)
-        uris.forEach { uri ->
-            uri.let { onChange(it) }
-        }
+        uris.forEach { uri -> onCamera(uri) }
     }
 }

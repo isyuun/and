@@ -87,9 +87,9 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
         setContent()
     }
 
-    override fun onCamera(uri: Uri, file: File) {
-        super.onCamera(uri, file)
-        Log.w(__CLASSNAME__, "::NaverMapApp${getMethodName()}[loading:...]${location?.toText()}, $location, $file")
+    override fun onCamera(file: File, uri: Uri) {
+        Log.v(__CLASSNAME__, "::NaverMapApp${getMethodName()}[loading:...]${location?.toText()}, $location, $file")
+        super.onCamera(file, uri)
         setContent()
     }
 }

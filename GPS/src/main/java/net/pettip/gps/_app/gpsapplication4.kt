@@ -29,25 +29,15 @@ open class gpsapplication4 : gpsapplication3(), ICameraContentListener {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun camera() {
-        Log.i(__CLASSNAME__, "::NaverMapApp@CAM::onCamera()")
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()")
         //var intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        ////if (true || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-        ////    val ri = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        ////    val pm: PackageManager = context.packageManager
-        ////    val ai = pm.resolveActivity(ri, 0)?.activityInfo
-        ////    intent = Intent()
-        ////    intent.component = ai?.let { ComponentName(it.packageName, it.name) }
-        ////    intent.action = Intent.ACTION_MAIN
-        ////    intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        ////    Log.w(__CLASSNAME__, "::NaverMapApp@CAM::onCamera()(...)[intent:$intent][pm:$pm][ai:$ai]")
-        ////}
-        //startActivity(intent)
+        //activity?.startActivity(intent/*.addFlags(FLAG_ACTIVITY_NEW_TASK)*/)
         if (activity is ICameraContentListener) (activity as ICameraContentListener).camera()
     }
 
-    override fun onCamera(uri: Uri, file: File) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ICameraContentListener)}][uri:$uri][file:$file]")
-        if (this.activity is ICameraContentListener) (this.activity as ICameraContentListener).onCamera(uri, file)
+    override fun onCamera(file: File, uri: Uri) {
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ICameraContentListener)}][file:$file][uri:$uri]")
+        if (this.activity is ICameraContentListener) (this.activity as ICameraContentListener).onCamera(file, uri)
     }
 
     fun img(uri: Uri) {
