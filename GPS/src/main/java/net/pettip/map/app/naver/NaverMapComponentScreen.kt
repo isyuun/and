@@ -931,28 +931,27 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 .align(Alignment.BottomStart),
             verticalArrangement = Arrangement.spacedBy(space)
         ) {
-            /** NOTE */
-            IconButton2(
-                onClick = withClick(context) {
-                    Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                    if (!start) return@withClick
-                },
-                back = Color.White,
-                shape = RectangleShape,
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_list),
-                    contentDescription = stringResource(R.string.note),
-                    tint = Color.Black,
-                )
-            }
+            ///** NOTE */
+            //IconButton2(
+            //    onClick = withClick(context) {
+            //        Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+            //        if (!start) return@withClick
+            //    },
+            //    back = Color.White,
+            //    shape = RectangleShape,
+            //) {
+            //    Icon(
+            //        imageVector = ImageVector.vectorResource(id = R.drawable.icon_list),
+            //        contentDescription = stringResource(R.string.note),
+            //        tint = Color.Black,
+            //    )
+            //}
             /** CAMERA */
             IconButton2(
                 onClick = withClick(context) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                    //if (!start) return@withClick  //test
+                    //if (!start) return@withClick
                     application.camera()
-
                 },
                 back = Color.White,
                 shape = RectangleShape,
