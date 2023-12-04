@@ -30,7 +30,6 @@ import java.io.File
  * @description :
  */
 interface ICameraContentListener {
-    //var takePicture: ActivityResultLauncher<Intent>
     fun camera()
     fun onCamera(file: File, uri: Uri)
 }
@@ -171,18 +170,18 @@ class CameraContentObserver(
 
     private var file: File? = null
     private fun onCamera(uri: Uri) {
-        //Log.i(__CLASSNAME__, "${getMethodName()}[${this.uri == uri}][this.uri:$this.uri][uri:$uri]")
+        Log.v(__CLASSNAME__, "${getMethodName()}[uri:$uri]")
         val path = path(uri) ?: return
         val time = time(uri) ?: return
         val file = File(path)
         val name = file.name
-        val exists = file.exists()
+        val exists = (file.exists() && file.length() > 0)
         val camera = exists && camera(uri) && !name.startsWith(".")
         if (camera) {
             if (this.file == file) return
             val rotate = rotate(uri)
             val orient = orient(uri)
-            Log.v(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][$camera][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
+            Log.v(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
             listener.onCamera(file, uri)
             this.file = file
         }
