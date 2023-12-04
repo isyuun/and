@@ -34,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -78,6 +79,7 @@ import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.singleton.G
+import net.pettip.util.Log
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -288,7 +290,8 @@ fun MainScreen(
                         onDissMiss = {newValue -> openBottomSheet = newValue},
                         bottomNavController = bottomNavController,
                         showDialog = showDialog,
-                        showDialogChange = {newValue -> showDialog = newValue}
+                        showDialogChange = {newValue -> showDialog = newValue},
+                        communityViewModel = communityViewModel
                     )
                 }
                 composable(BottomNav.WalkScreen.route) {

@@ -208,6 +208,8 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
 
     LaunchedEffect(Unit){
         viewModel.updateAppKey()
+
+        sharedViewModel.clear()
     }
 
     Scaffold (

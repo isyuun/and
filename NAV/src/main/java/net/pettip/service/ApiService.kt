@@ -12,6 +12,7 @@ import net.pettip.data.bbs.BbsCmntRcmdtnReq
 import net.pettip.data.bbs.BbsCmntUpdateReq
 import net.pettip.data.bbs.BbsCmtCreateReq
 import net.pettip.data.bbs.BbsDetailRes
+import net.pettip.data.bbs.BbsRcmdtnReq
 import net.pettip.data.bbs.EndEventListRes
 import net.pettip.data.bbs.EventDetailRes
 import net.pettip.data.bbs.EventListRes
@@ -19,6 +20,7 @@ import net.pettip.data.bbs.NtcListRes
 import net.pettip.data.bbs.QnaDetailRes
 import net.pettip.data.bbs.QnaListRes
 import net.pettip.data.bbs.QnaReq
+import net.pettip.data.bbs.QnaUpdateReq
 import net.pettip.data.cmm.CmmRes
 import net.pettip.data.cmm.WeatherReq
 import net.pettip.data.cmm.WeatherRes
@@ -130,6 +132,12 @@ interface ApiService {
 
     @POST("api/v1/bbs/qna/delete")
     fun deleteQna(@Body data: Int): Call<CmmRes>
+
+    @POST("api/v1/bbs/qna/update")
+    fun updateQna(@Body data: QnaUpdateReq): Call<QnaDetailRes>
+
+    @POST("api/v1/bbs/rcmdtn")
+    fun bbsRcmdtn(@Body data: BbsRcmdtnReq): Call<BbsDetailRes>
     // --------------------- 게시판 ----------------------- //
 
 

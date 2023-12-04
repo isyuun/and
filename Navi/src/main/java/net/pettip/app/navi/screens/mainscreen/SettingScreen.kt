@@ -301,7 +301,7 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
 
         if (qnaRes?.data?.bbsQnaList?.isEmpty() == true){
             Box (
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(top = 20.dp).fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ){
                 Text(

@@ -142,7 +142,7 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                     .fillMaxWidth()
                     .height(48.dp),
-                placeholder = { Text(text = "3~15자 영문/숫자 조합", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                placeholder = { Text(text = "이메일 주소를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedPlaceholderColor = design_placeHolder,
                     focusedPlaceholderColor = design_placeHolder,
@@ -307,105 +307,105 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            Row (Modifier.fillMaxWidth()){
-                Text(text = "휴대폰 번호", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier=Modifier.padding(start = 20.dp), color = design_login_text)
-                Text(
-                    text = "*",
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    color= design_sharp
-                )
-            }
-
-            Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
-                CustomTextField(
-                    value = phoneNum,
-                    onValueChange = {viewModel.updateUserPhone(it)},
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next),
-                    modifier = Modifier
-                        .padding(start = 20.dp, top = 8.dp, end = 8.dp)
-                        .weight(1f)
-                        .height(48.dp),
-                    placeholder = { Text(text = "“-” 없이 숫자만", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text),
-                    shape = RoundedCornerShape(4.dp),
-                    innerPadding = PaddingValues(start=16.dp)
-                )
-
-                Button(
-                    onClick = {
-                        countTime = true
-                        focusManager.moveFocus(FocusDirection.Next)
-                    },
-                    modifier = Modifier
-                        .padding(end = 20.dp, top = 8.dp)
-                        .wrapContentWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(design_white),
-                    border = BorderStroke(1.dp, color = design_btn_border),
-                    contentPadding = PaddingValues(start = 14.dp,end=14.dp)
-                ) {
-                    Text(text = "인증번호 발송", color = design_login_text,
-                        fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        letterSpacing = (-0.7).sp)
-                }
-
-            }
-
-            Box (
-                modifier = Modifier
-                    .padding(start = 20.dp, top = 8.dp, end = 20.dp)
-                    .fillMaxWidth()
-                    .height(48.dp)
-            ){
-                CustomTextField(
-                    value = certiNum,
-                    onValueChange = {viewModel.updateCertiNum(it)},
-                    singleLine = true,
-                    modifier = Modifier.fillMaxSize(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done),
-                    placeholder = { Text(text = "인증번호 입력", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = if(countTime) design_weather_4 else design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text),
-                    shape = RoundedCornerShape(4.dp),
-                    innerPadding = PaddingValues(start=16.dp)
-                )
-
-                if(countTime){
-                    Text(
-                        text = "${String.format("%02d", timer / 60)}:${String.format("%02d", timer % 60)}",
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 14.sp,
-                        letterSpacing = (-0.7).sp,
-                        color = design_weather_4,
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .align(Alignment.CenterEnd)
-                    )
-                }
-            }
+            //Row (Modifier.fillMaxWidth()){
+            //    Text(text = "휴대폰 번호", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //        modifier=Modifier.padding(start = 20.dp), color = design_login_text)
+            //    Text(
+            //        text = "*",
+            //        fontSize = 16.sp,
+            //        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //        color= design_sharp
+            //    )
+            //}
+            //
+            //Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+            //    CustomTextField(
+            //        value = phoneNum,
+            //        onValueChange = {viewModel.updateUserPhone(it)},
+            //        singleLine = true,
+            //        keyboardOptions = KeyboardOptions(
+            //            keyboardType = KeyboardType.Number,
+            //            imeAction = ImeAction.Next),
+            //        modifier = Modifier
+            //            .padding(start = 20.dp, top = 8.dp, end = 8.dp)
+            //            .weight(1f)
+            //            .height(48.dp),
+            //        placeholder = { Text(text = "“-” 없이 숫자만", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+            //        colors = OutlinedTextFieldDefaults.colors(
+            //            unfocusedPlaceholderColor = design_placeHolder,
+            //            focusedPlaceholderColor = design_placeHolder,
+            //            unfocusedBorderColor = design_textFieldOutLine,
+            //            focusedBorderColor = design_login_text,
+            //            unfocusedContainerColor = design_white,
+            //            focusedContainerColor = design_white,
+            //            unfocusedLeadingIconColor = design_placeHolder,
+            //            focusedLeadingIconColor = design_login_text),
+            //        shape = RoundedCornerShape(4.dp),
+            //        innerPadding = PaddingValues(start=16.dp)
+            //    )
+            //
+            //    Button(
+            //        onClick = {
+            //            countTime = true
+            //            focusManager.moveFocus(FocusDirection.Next)
+            //        },
+            //        modifier = Modifier
+            //            .padding(end = 20.dp, top = 8.dp)
+            //            .wrapContentWidth()
+            //            .height(48.dp),
+            //        shape = RoundedCornerShape(12.dp),
+            //        colors = ButtonDefaults.buttonColors(design_white),
+            //        border = BorderStroke(1.dp, color = design_btn_border),
+            //        contentPadding = PaddingValues(start = 14.dp,end=14.dp)
+            //    ) {
+            //        Text(text = "인증번호 발송", color = design_login_text,
+            //            fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //            letterSpacing = (-0.7).sp)
+            //    }
+            //
+            //}
+            //
+            //Box (
+            //    modifier = Modifier
+            //        .padding(start = 20.dp, top = 8.dp, end = 20.dp)
+            //        .fillMaxWidth()
+            //        .height(48.dp)
+            //){
+            //    CustomTextField(
+            //        value = certiNum,
+            //        onValueChange = {viewModel.updateCertiNum(it)},
+            //        singleLine = true,
+            //        modifier = Modifier.fillMaxSize(),
+            //        keyboardOptions = KeyboardOptions(
+            //            keyboardType = KeyboardType.Number,
+            //            imeAction = ImeAction.Done),
+            //        placeholder = { Text(text = "인증번호 입력", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+            //        colors = OutlinedTextFieldDefaults.colors(
+            //            unfocusedPlaceholderColor = design_placeHolder,
+            //            focusedPlaceholderColor = design_placeHolder,
+            //            unfocusedBorderColor = design_textFieldOutLine,
+            //            focusedBorderColor = if(countTime) design_weather_4 else design_login_text,
+            //            unfocusedContainerColor = design_white,
+            //            focusedContainerColor = design_white,
+            //            unfocusedLeadingIconColor = design_placeHolder,
+            //            focusedLeadingIconColor = design_login_text),
+            //        shape = RoundedCornerShape(4.dp),
+            //        innerPadding = PaddingValues(start=16.dp)
+            //    )
+            //
+            //    if(countTime){
+            //        Text(
+            //            text = "${String.format("%02d", timer / 60)}:${String.format("%02d", timer % 60)}",
+            //            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //            fontSize = 14.sp,
+            //            letterSpacing = (-0.7).sp,
+            //            color = design_weather_4,
+            //            modifier = Modifier
+            //                .padding(end = 16.dp)
+            //                .align(Alignment.CenterEnd)
+            //        )
+            //    }
+            //}
 
             Button(
                 onClick = {

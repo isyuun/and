@@ -46,6 +46,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -71,12 +74,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
-import net.pettip.app.navi.screens.walkscreen.PhotoItem
+import net.pettip.app.navi.screens.commuscreen.PhotoItemInModify
 import net.pettip.app.navi.screens.walkscreen.PlusBox
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_f1f1f1
@@ -111,6 +113,7 @@ fun ModifyInquiryScreen(
 
     val scope= rememberCoroutineScope()
     val context = LocalContext.current
+    val snackState = remember { SnackbarHostState() }
 
     val dummyUri = Uri.parse("")
     val state = settingViewModel.state
@@ -128,6 +131,7 @@ fun ModifyInquiryScreen(
     DisposableEffect(Unit){
 
         onDispose {
+            settingViewModel.clearNewFileList()
             settingViewModel.updateTitle("")
             settingViewModel.updateInquiryKind(null)
             settingViewModel.updateInquiryMain("")
@@ -142,15 +146,26 @@ fun ModifyInquiryScreen(
     }
 
     LaunchedEffect(Unit){
-        settingViewModel.updateSelectedImageList(listOf(dummyUri))
         settingViewModel.getCmmList("PST")
         settingViewModel.updateTitle(modifiedQna?.data?.get(0)?.pstTtl ?: "")
         settingViewModel.updateInquiryMain(modifiedQna?.data?.get(0)?.pstCn ?: "")
         settingViewModel.updateIsCheck(true)
+        if (modifiedQna?.data?.get(0)?.files?.isNotEmpty() == true){
+            val atchPath = modifiedQna?.data?.get(0)?.atchPath
+            val uriList: List<Uri>? = modifiedQna?.data?.get(0)?.files?.map {
+                Uri.parse("$atchPath${it.filePathNm}${it.atchFileNm}")
+            }
 
+            if (uriList != null) {
+                settingViewModel.updateSelectedImageList(uriList)
+            }
+        }
+        settingViewModel.updateSelectedImageList(listOf(dummyUri))
+        settingViewModel.updateUploadedFileList(modifiedQna?.data?.get(0)?.files)
     }
 
     Scaffold (
+        snackbarHost = { SnackbarHost(hostState = snackState, Modifier) },
         modifier = Modifier.fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
@@ -314,7 +329,7 @@ fun ModifyInquiryScreen(
             ) {
                 itemsIndexed(state.listOfSelectedImages){index, uri ->
                     if (index<state.listOfSelectedImages.size-1 && index<5){
-                        PhotoItem(uri = uri, index = index, onClick = { settingViewModel.onItemRemove(index)})
+                        PhotoItemInModify(uri = uri, index = index, onClick = { settingViewModel.onItemRemove(index)}, onDelete = { settingViewModel.subUploadedFileList(uri) } )
                     }else if(index==state.listOfSelectedImages.size-1 && index<5){
                         PlusBox (galleryLauncher)
                     }
@@ -386,55 +401,64 @@ fun ModifyInquiryScreen(
             }
 
             Button(
-                //onClick = {
-                //    if (settingViewModel.inquiryKind.value ==null){
-                //        Toast.makeText(context, "문의 유형을 선택해주세요", Toast.LENGTH_SHORT).show()
-                //    }else if(settingViewModel.title.value == ""){
-                //        Toast.makeText(context, "제목을 입력해주세요", Toast.LENGTH_SHORT).show()
-                //    }else if(settingViewModel.inquiryMain.value ==""){
-                //        Toast.makeText(context, "내용을 입력해주세요", Toast.LENGTH_SHORT).show()
-                //    }else if (!settingViewModel.isCheck.value){
-                //        Toast.makeText(context, "정보 수집에 동의해주세요", Toast.LENGTH_SHORT).show()
-                //    }else{
-                //        scope.launch {
-                //            isLoading = true
-                //            if (state.listOfSelectedImages.size > 1){
-                //                val photoUpload = settingViewModel.fileUpload(context = context)
-                //                if(photoUpload){
-                //                    val qnaUpload = settingViewModel.qnaCreate()
-                //                    if (qnaUpload){
-                //                        loadingText = "등록 성공!"
-                //                        delay(1000)
-                //                        isLoading = false
-                //                        navController.popBackStack()
-                //                    }else{
-                //                        loadingText = "등록 실패..."
-                //                        delay(1000)
-                //                        isLoading = false
-                //                    }
-                //                }else{
-                //                    loadingText = "등록 실패..."
-                //                    delay(1000)
-                //                    isLoading = false
-                //                }
-                //            }else{
-                //                val qnaUpload = settingViewModel.qnaCreate()
-                //                if (qnaUpload){
-                //                    loadingText = "등록 성공!"
-                //                    delay(1000)
-                //                    isLoading = false
-                //                    navController.popBackStack()
-                //                }else{
-                //                    loadingText = "등록 실패..."
-                //                    delay(1000)
-                //                    isLoading = false
-                //                }
-                //            }
-                //        }
-                //
-                //    }
-                //},
-                onClick = {},
+                onClick = {
+                    val localUriList = state.listOfSelectedImages.filter { uri ->
+                        uri.scheme != "http" && uri.scheme != "https"
+                    }
+
+                    if (settingViewModel.inquiryKind.value ==null){
+                        Toast.makeText(context, "문의 유형을 선택해주세요", Toast.LENGTH_SHORT).show()
+                    }else if(settingViewModel.title.value == ""){
+                        Toast.makeText(context, "제목을 입력해주세요", Toast.LENGTH_SHORT).show()
+                    }else if(settingViewModel.inquiryMain.value ==""){
+                        Toast.makeText(context, "내용을 입력해주세요", Toast.LENGTH_SHORT).show()
+                    }else{
+                        scope.launch {
+                            isLoading = true
+                            if(localUriList.size<=1){
+                                val result = settingViewModel.updateQna(modifiedQna!!,viewModel)
+                                if (result){
+                                    isLoading = false
+                                    onDismiss(false)
+                                }else{
+                                    isLoading=false
+                                    snackState.showSnackbar(
+                                        message = "일상생활 수정에 실패했습니다. 다시 시도해주세요",
+                                        actionLabel = "확인",
+                                        duration = SnackbarDuration.Short,
+                                        withDismissAction = false
+                                    )
+                                }
+
+                            }else{
+                                val photoUpload = settingViewModel.fileUploadModify(context)
+                                if(photoUpload){
+                                    val result = settingViewModel.updateQna(modifiedQna!!, viewModel)
+                                    if (result){
+                                        isLoading = false
+                                        onDismiss(false)
+                                    }else{
+                                        isLoading = false
+                                        snackState.showSnackbar(
+                                            message = "일상생활 수정에 실패했습니다. 다시 시도해주세요",
+                                            actionLabel = "확인",
+                                            duration = SnackbarDuration.Short,
+                                            withDismissAction = false
+                                        )
+                                    }
+                                }else{
+                                    isLoading = false
+                                    snackState.showSnackbar(
+                                        message = "사진 전송에 실패했습니다. 다시 시도해주세요",
+                                        actionLabel = "확인",
+                                        duration = SnackbarDuration.Short,
+                                        withDismissAction = false
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
                 modifier = Modifier
                     .padding(top = 20.dp, bottom = 20.dp)
                     .fillMaxWidth()

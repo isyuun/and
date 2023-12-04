@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
+import net.pettip.app.navi.screens.commuscreen.HtmlText
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
@@ -33,7 +34,7 @@ import net.pettip.app.navi.viewmodel.CommunityViewModel
 @Composable
 fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
 
-    val notiDetail by viewModel.eventDetail.collectAsState()
+    val notiDetail by viewModel.bbsDetail.collectAsState()
 
     Scaffold (
         topBar = { BackTopBar(title = "공지사항", navController = navController) }
@@ -70,13 +71,15 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
                 .background(color = design_textFieldOutLine)
             )
 
-            Text(
-                text = notiDetail?.data?.pstCn?:"",
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                color = design_login_text,
-                modifier = Modifier.padding(start = 20.dp, end = 20.dp)
-            )
+            HtmlText(htmlString = notiDetail?.data?.pstCn?:"", modifier = Modifier.padding(horizontal = 20.dp))
+            //Text(
+            //    text = notiDetail?.data?.pstCn?:"",
+            //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //    fontSize = 14.sp, letterSpacing = (-0.7).sp,
+            //    color = design_login_text,
+            //    modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+            //)
+
 
         }
     }

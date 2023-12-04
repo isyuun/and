@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import net.pettip.app.navi.screens.mainscreen.getFormattedTodayDate
 import net.pettip.data.daily.DailyCreateReq
 import net.pettip.data.daily.DailyCreateRes
 import net.pettip.data.daily.DailyDetailData
@@ -45,7 +46,10 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.Integer.min
 import java.text.SimpleDateFormat
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.util.Date
+import java.util.Locale
 import java.util.Random
 import kotlin.coroutines.resume
 
@@ -62,8 +66,8 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         sharedViewModel.updatePetInfo(newData)
     }
 
-    suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String) {
-        sharedViewModel.getWeekRecord(ownrPetUnqNo, searchDay)
+    suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String):Boolean {
+        return sharedViewModel.getWeekRecord(ownrPetUnqNo, searchDay)
     }
 
     private val _dailyMonth = MutableStateFlow<DailyMonthData?>(null)
@@ -78,11 +82,22 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
     }
 
     private val _toMonthCalendar = MutableStateFlow(false)
-
     // 검색 중인지 여부를 StateFlow로 노출
     val toMonthCalendar = _toMonthCalendar.asStateFlow()
     fun updateToMonthCalendar(newValue: Boolean) {
         _toMonthCalendar.value = newValue
+    }
+
+    private val _selectDay = MutableStateFlow(getFormattedTodayDate())
+    val selectDay = _selectDay.asStateFlow()
+    fun updateSelectDay(newValue: String) {
+        _selectDay.value = newValue
+    }
+
+    private val _selectMonth = MutableStateFlow(getCurrentYearMonthKr())
+    val selectMonth = _selectMonth.asStateFlow()
+    fun updateSelectMonth(newValue: String) {
+        _selectMonth.value = newValue
     }
 
     private val _walkListItem = MutableStateFlow<DailyLifeWalk?>(null)
@@ -561,4 +576,10 @@ fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
         e.printStackTrace()
     }
     return null
+}
+
+fun getCurrentYearMonthKr(): String {
+    val currentYearMonth = YearMonth.now()
+    val formatter = DateTimeFormatter.ofPattern("yyyy년 M월", Locale.getDefault())
+    return currentYearMonth.format(formatter)
 }

@@ -55,6 +55,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
@@ -101,6 +102,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewModelScope
@@ -112,12 +114,14 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
+import net.pettip.app.navi.component.DclrDialog
 import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.component.LoadingAnimation3
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.screens.mainscreen.calculateCurrentOffsetForPage
 import net.pettip.app.navi.screens.mainscreen.metersToKilometers
 import net.pettip.app.navi.screens.myscreen.CustomDialogDelete
+import net.pettip.app.navi.screens.myscreen.isValidFloat
 import net.pettip.app.navi.screens.walkscreen.FullScreenImage
 import net.pettip.app.navi.ui.theme.design_DDDDDD
 import net.pettip.app.navi.ui.theme.design_btn_border
@@ -137,9 +141,10 @@ import net.pettip.singleton.G
 import net.pettip.util.Log
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.Properties
 import kotlin.math.absoluteValue
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel, navController:NavHostController){
 
@@ -316,7 +321,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                     modifier = Modifier.padding(start = 20.dp))
 
                 Text(
-                    text = "댓글 ${story?.cmntCnt?:0}",
+                    text = "댓글 ${cmntList?.size?:0}",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,
@@ -585,9 +590,12 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel, navcontroller:NavHostController,modifyChange:(Boolean) ->Unit) {
 
+    var expanded by remember{ mutableStateOf(false) }
+    var dclrDialogOpen by remember{ mutableStateOf(false) }
     var deleteDialog by remember { mutableStateOf(false) }
     var storyDelete by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
@@ -656,6 +664,15 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
             }
         }
         storyDelete = false
+    }
+
+    if (dclrDialogOpen){
+        DclrDialog(
+            viewModel = viewModel,
+            expanded = expanded,
+            expandChange = {newValue -> expanded = newValue},
+            onDismiss ={newValue -> dclrDialogOpen = newValue}
+        )
     }
 
     Column (
@@ -756,6 +773,9 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                                             val result = viewModel.updateDailyRls("Y")
                                             if (result) {
                                                 rlsUpdateLoading = false
+                                                Toast
+                                                    .makeText(context, "공개처리 되었습니다", Toast.LENGTH_SHORT)
+                                                    .show()
                                             } else {
                                                 rlsUpdateLoading = false
                                                 Toast
@@ -799,6 +819,9 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                                         val result = viewModel.updateDailyRls("N")
                                         if (result) {
                                             rlsUpdateLoading = false
+                                            Toast
+                                                .makeText(context, "비공개처리 되었습니다", Toast.LENGTH_SHORT)
+                                                .show()
                                         } else {
                                             rlsUpdateLoading = false
                                             Toast
@@ -878,7 +901,12 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                     }
                 }
             }else{
-                Row (verticalAlignment = Alignment.CenterVertically){
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        dclrDialogOpen = true
+                    }
+                ){
                     Icon(
                         painter = painterResource(id = R.drawable.icon_report),
                         contentDescription = "", tint = Color.Unspecified,

@@ -1,19 +1,19 @@
 package net.pettip.app.navi.screens.commuscreen
 
-import android.util.Base64
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.text.Html
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -47,8 +47,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -66,23 +64,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -92,26 +85,26 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import coil.Coil
+import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
-import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
+import net.pettip.app.navi.component.ErrorPage
 import net.pettip.app.navi.component.LoadingAnimation3
-import net.pettip.app.navi.screens.mainscreen.BackOnPressed
 import net.pettip.app.navi.screens.myscreen.CustomDialogDelete
 import net.pettip.app.navi.ui.theme.design_btn_border
-import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_bg
 import net.pettip.app.navi.ui.theme.design_login_text
@@ -129,28 +122,59 @@ import net.pettip.util.Log
 @Composable
 fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel) {
 
-    val detailData by viewModel.eventDetail.collectAsState()
+    val detailData by viewModel.bbsDetail.collectAsState()
     val cmntList by viewModel.eventCmntList.collectAsState()
     val comment by viewModel.bbsComment.collectAsState()
     val replyCmnt by viewModel.eventReplyCmnt.collectAsState()
+    val lastPstsn by viewModel.lastPstSn.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var cmntExpanded by remember{ mutableStateOf(true) }
     val upCmntNo0:List<BbsCmnt> = cmntList?.filter { cmnt ->
         cmnt.upCmntNo == 0 } ?: emptyList()
 
+    var refresh by remember{ mutableStateOf(false) }
     var isLoading by remember{ mutableStateOf(false) }
     var onReply by remember{ mutableStateOf(false) }
     var replyText by remember{ mutableStateOf("") }
+    var rcmdtnLoading by remember { mutableStateOf(false) }
+
+    var back by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = back){
+        if (back){
+            navController.popBackStack()
+        }
+    }
+
+    DisposableEffect(Unit){
+
+        onDispose {
+            viewModel.updateBbsDetail(null)
+            viewModel.updateLastPstSn(null)
+        }
+    }
 
     BackHandler {
         if (onReply){
             onReply =false
         }else{
             navController.popBackStack()
+        }
+    }
+
+    LaunchedEffect(key1 = refresh){
+        if (refresh){
+            val result = lastPstsn?.let { viewModel.getEventDetail(it) }
+            if (result == true){
+                refresh =false
+            }else{
+                refresh = false
+            }
         }
     }
 
@@ -182,7 +206,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                 .size(30.dp)
                                 .clip(shape = CircleShape)
                                 .clickable {
-
+                                    back = true
                                 }
                                 .align(Alignment.CenterStart),
                             contentAlignment = Alignment.Center
@@ -207,365 +231,396 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .background(color = design_white)
-                .verticalScroll(rememberScrollState())
+
+        Crossfade(
+            targetState = detailData?.data,
+            label = "",
         ) {
-            AsyncImage(
-                onLoading = { },
-                onError = { Log.d("LOG", "onError") },
-                onSuccess = { Log.d("LOG", "onSuccess") },
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(detailData?.data?.rprsImgUrl)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = "",
-                placeholder = painterResource(id = R.drawable.profile_default),
-                error = painterResource(id = R.drawable.profile_default),
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.FillWidth
-            )
+            when(it){
+                null ->
+                    ErrorPage(
+                        isLoading = refresh,
+                        onClick = {newValue -> refresh = newValue}
+                    )
 
-            Text(
-                text = detailData?.data?.pstTtl ?: "",
-                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                fontSize = 24.sp,
-                letterSpacing = (-1.2).sp,
-                color = design_login_text,
-                modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)
-            )
-
-            Spacer(
-                modifier = Modifier
-                    .padding(top = 20.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(design_textFieldOutLine)
-            )
-
-
-            // ------------------------ html 문 들어갈 자리 --------------------------
-            val pstCn = detailData?.data?.pstCn
-            pstCn?.let { WebViewHtml(html = it, modifier = Modifier.fillMaxSize()) }
-            // ------------------------ html 문 들어갈 자리 --------------------------
-
-            //Spacer(modifier = Modifier.padding(top = 40.dp))
-
-            //Button(
-            //    onClick = {
-            //    },
-            //    modifier = Modifier
-            //        .fillMaxWidth()
-            //        .height(48.dp)
-            //        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-            //    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-            //    colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
-            //)
-            //{
-            //    Text(text = stringResource(R.string.event_apply), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-            //}
-
-            Row (
-                modifier = Modifier
-                    .padding(top = 40.dp)
-                    .fillMaxWidth()
-                    .background(design_login_bg)
-                    .height(36.dp)
-                    .clickable { cmntExpanded = !cmntExpanded }
-                ,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_comment_line),
-                    contentDescription = "", tint = Color.Unspecified,
-                    modifier = Modifier.padding(start = 20.dp))
-
-                Text(
-                    text = "댓글 ${detailData?.data?.bbsCmnts?.size ?: 0}",
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.6).sp,
-                    color = design_skip,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-
-            AnimatedVisibility(
-                visible = cmntExpanded && upCmntNo0.isNotEmpty(),
-                enter = expandVertically(tween(durationMillis = 300)).plus(fadeIn()),
-                exit = shrinkVertically(tween(durationMillis = 300)).plus(fadeOut())
-            ) {
-                LazyColumn(
-                    state = rememberLazyListState(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 1000.dp),
-                    contentPadding = PaddingValues(top = 18.dp, bottom = 20.dp)
-                ){
-                    itemsIndexed(upCmntNo0){ index, item ->
-                        EventCommentListItem(comment = item, viewModel = viewModel, onReply, onReplyChange = {newValue -> onReply = newValue})
-
-                        if(index != (upCmntNo0?.size?.minus(1) ?: 0)){
-                            Spacer(modifier = Modifier
-                                .padding(vertical = 16.dp, horizontal = 20.dp)
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(color = design_textFieldOutLine))
-                        }
-                    }
-                }
-            }
-
-            AnimatedVisibility(
-                visible =  onReply,
-                enter = expandVertically(expandFrom = Alignment.Top),
-                exit = shrinkVertically(shrinkTowards = Alignment.Top)
-            ) {
-                Row (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = design_intro_bg),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    Row (
-                        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
-                        verticalAlignment = Alignment.Bottom
-                    ){
-                        Text(
-                            text = "${replyCmnt?.petNm+"에게"} 답글 쓰는중",
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                            color = design_white,
-                            lineHeight = 14.sp,
-                            modifier = Modifier.padding(start = 20.dp, end = 8.dp)
+                else ->
+                    Column(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .fillMaxSize()
+                            .background(color = design_white)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        AsyncImage(
+                            onLoading = { },
+                            onError = { Log.d("LOG", "onError") },
+                            onSuccess = { Log.d("LOG", "onSuccess") },
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(detailData?.data?.rprsImgUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "",
+                            placeholder = null,
+                            error = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.FillWidth
                         )
 
-                        LoadingAnimation3(circleSize = 4.dp, circleColor = design_white, animationDelay = 600)
-                    }
+                        Text(
+                            text = detailData?.data?.pstTtl ?: "",
+                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            fontSize = 24.sp,
+                            letterSpacing = (-1.2).sp,
+                            color = design_login_text,
+                            modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)
+                        )
 
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = "", tint = design_white,
-                        modifier = Modifier
-                            .padding(end = 20.dp)
-                            .clickable { onReply = false })
-                }
+                        Spacer(
+                            modifier = Modifier
+                                .padding(top = 20.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(design_textFieldOutLine)
+                        )
 
-                Spacer(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(design_login_text))
-            }
+                        HtmlText(htmlString = detailData?.data?.pstCn?:"", modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth())
 
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(design_login_text))
+                        Row (
+                            modifier = Modifier
+                                .padding(top = 40.dp)
+                                .fillMaxWidth()
+                                .background(design_login_bg)
+                                .height(36.dp)
+                                .clickable { cmntExpanded = !cmntExpanded }
+                            ,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
 
-            Row (
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                TextField(
-                    value = if (onReply) replyText else comment,
-                    onValueChange = {
-                        if (onReply){
-                            replyText = it
-                        }else{
-                            viewModel.updateBbsComment(it)
+                            Icon(
+                                painter = painterResource(id = R.drawable.icon_comment_line),
+                                contentDescription = "", tint = Color.Unspecified,
+                                modifier = Modifier.padding(start = 20.dp))
+
+                            Text(
+                                text = "댓글 ${cmntList?.size ?: 0}",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 12.sp,
+                                letterSpacing = (-0.6).sp,
+                                color = design_skip,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
                         }
-                    },
-                    textStyle = TextStyle(
-                        color = design_login_text,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 14.sp,
-                        letterSpacing = (-0.7).sp
-                    ),
-                    placeholder = {
-                        Text(text = stringResource(R.string.ph_comment), style = TextStyle(
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 14.sp,
-                            letterSpacing = (-0.7).sp
-                        )) },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done),
-                    modifier = Modifier
-                        .weight(1f)
-                        .focusRequester(focusRequester)
-                    ,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text)
-                )
 
-                Box(
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(width = 56.dp, height = 40.dp)
-                        .background(color = design_btn_border, shape = RoundedCornerShape(12.dp))
-                        .clip(shape = RoundedCornerShape(12.dp))
-                        .clickable(
-                            enabled = if (onReply) replyText != "" && !isLoading else comment != "" && !isLoading,
-                            onClick = {
-                                viewModel.viewModelScope.launch {
-                                    isLoading = true
+                        AnimatedVisibility(
+                            visible = cmntExpanded && upCmntNo0.isNotEmpty(),
+                            enter = expandVertically(tween(durationMillis = 300)).plus(fadeIn()),
+                            exit = shrinkVertically(tween(durationMillis = 300)).plus(fadeOut())
+                        ) {
+                            LazyColumn(
+                                state = rememberLazyListState(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 1000.dp),
+                                contentPadding = PaddingValues(top = 18.dp, bottom = 20.dp)
+                            ){
+                                itemsIndexed(upCmntNo0){ index, item ->
+                                    EventCommentListItem(comment = item, viewModel = viewModel, onReply, onReplyChange = {newValue -> onReply = newValue})
 
-                                    if (onReply) {
-                                        val result = viewModel.bbsCmntCreate(replyText)
-                                        if (result) {
-                                            replyText = ""
-                                            onReply = false
-                                            isLoading = false
-                                        } else {
-                                            isLoading = false
-                                            Toast
-                                                .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
-                                                .show()
-                                        }
-                                    } else {
-                                        val result = viewModel.bbsCmntCreate()
-                                        if (result) {
-                                            viewModel.updateBbsComment("")
-                                            isLoading = false
-                                        } else {
-                                            isLoading = false
-                                            Toast
-                                                .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
-                                                .show()
-                                        }
+                                    if(index != (upCmntNo0?.size?.minus(1) ?: 0)){
+                                        Spacer(modifier = Modifier
+                                            .padding(vertical = 16.dp, horizontal = 20.dp)
+                                            .fillMaxWidth()
+                                            .height(1.dp)
+                                            .background(color = design_textFieldOutLine))
                                     }
                                 }
                             }
-                        ),
-                    contentAlignment = Alignment.Center
-                ){
-                    if (isLoading){
-                        LoadingAnimation3(
-                            circleColor = design_white,
-                            circleSize = 4.dp
-                        )
-                    }else{
-                        Text(text = stringResource(R.string.comment_apply), style = TextStyle(
-                            color = design_white,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 14.sp,
-                            letterSpacing = (-0.7).sp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .size(40.dp)
-                        .background(color = design_white, shape = RoundedCornerShape(12.dp))
-                        .clip(shape = RoundedCornerShape(12.dp))
-                        .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
-                        .clickable {
-
                         }
-                    ,
-                    contentAlignment = Alignment.Center
-                ){
-                    Icon(painter = painterResource(
-                        id = R.drawable.icon_like_default),
-                        contentDescription = "", tint = Color.Unspecified)
-                }
 
-                Box(
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(40.dp)
-                        .background(color = design_white, shape = RoundedCornerShape(12.dp))
-                        .clip(shape = RoundedCornerShape(12.dp))
-                        .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
-                        .clickable {
+                        AnimatedVisibility(
+                            visible =  onReply,
+                            enter = expandVertically(expandFrom = Alignment.Top),
+                            exit = shrinkVertically(shrinkTowards = Alignment.Top)
+                        ) {
+                            Row (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(color = design_intro_bg),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ){
+                                Row (
+                                    modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
+                                    verticalAlignment = Alignment.Bottom
+                                ){
+                                    Text(
+                                        text = "${replyCmnt?.petNm+"에게"} 답글 쓰는중",
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                        color = design_white,
+                                        lineHeight = 14.sp,
+                                        modifier = Modifier.padding(start = 20.dp, end = 8.dp)
+                                    )
 
+                                    LoadingAnimation3(circleSize = 4.dp, circleColor = design_white, animationDelay = 600)
+                                }
+
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "", tint = design_white,
+                                    modifier = Modifier
+                                        .padding(end = 20.dp)
+                                        .clickable { onReply = false })
+                            }
+
+                            Spacer(modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(design_login_text))
                         }
-                    ,
-                    contentAlignment = Alignment.Center
-                ){
-                    Icon(painter = painterResource(
-                        id = R.drawable.icon_dislike_default),
-                        contentDescription = "", tint = Color.Unspecified)
-                }
+
+                        Spacer(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(design_login_text))
+
+                        Row (
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            TextField(
+                                value = if (onReply) replyText else comment,
+                                onValueChange = {
+                                    if (onReply){
+                                        replyText = it
+                                    }else{
+                                        viewModel.updateBbsComment(it)
+                                    }
+                                },
+                                textStyle = TextStyle(
+                                    color = design_login_text,
+                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                    fontSize = 14.sp,
+                                    letterSpacing = (-0.7).sp
+                                ),
+                                placeholder = {
+                                    Text(text = stringResource(R.string.ph_comment), style = TextStyle(
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 14.sp,
+                                        letterSpacing = (-0.7).sp
+                                    )) },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Text,
+                                    imeAction = ImeAction.Done),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .focusRequester(focusRequester)
+                                ,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    unfocusedPlaceholderColor = design_placeHolder,
+                                    focusedPlaceholderColor = design_placeHolder,
+                                    unfocusedBorderColor = design_textFieldOutLine,
+                                    focusedBorderColor = design_login_text,
+                                    unfocusedContainerColor = design_white,
+                                    focusedContainerColor = design_white,
+                                    unfocusedLeadingIconColor = design_placeHolder,
+                                    focusedLeadingIconColor = design_login_text)
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .size(width = 56.dp, height = 40.dp)
+                                    .background(color = design_btn_border, shape = RoundedCornerShape(12.dp))
+                                    .clip(shape = RoundedCornerShape(12.dp))
+                                    .clickable(
+                                        enabled = if (onReply) replyText != "" && !isLoading else comment != "" && !isLoading,
+                                        onClick = {
+                                            viewModel.viewModelScope.launch {
+                                                isLoading = true
+
+                                                if (onReply) {
+                                                    val result = viewModel.bbsCmntCreate(replyText)
+                                                    if (result) {
+                                                        replyText = ""
+                                                        onReply = false
+                                                        isLoading = false
+                                                    } else {
+                                                        isLoading = false
+                                                        Toast
+                                                            .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
+                                                            .show()
+                                                    }
+                                                } else {
+                                                    val result = viewModel.bbsCmntCreate()
+                                                    if (result) {
+                                                        viewModel.updateBbsComment("")
+                                                        isLoading = false
+                                                    } else {
+                                                        isLoading = false
+                                                        Toast
+                                                            .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
+                                                            .show()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ){
+                                if (isLoading){
+                                    LoadingAnimation3(
+                                        circleColor = design_white,
+                                        circleSize = 4.dp
+                                    )
+                                }else{
+                                    Text(text = stringResource(R.string.comment_apply), style = TextStyle(
+                                        color = design_white,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 14.sp,
+                                        letterSpacing = (-0.7).sp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .padding(end = 4.dp)
+                                    .size(40.dp)
+                                    .background(color = design_white, shape = RoundedCornerShape(12.dp))
+                                    .clip(shape = RoundedCornerShape(12.dp))
+                                    .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
+                                    .clickable(
+                                        enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
+                                    ) {
+                                        scope.launch {
+                                            rcmdtnLoading = true
+                                            val result = viewModel.bbsRcmdtn(pstSn = detailData?.data?.pstSn ?: 0, rcmdtnSeCd = "001")
+                                            if (result) {
+                                                rcmdtnLoading = false
+                                            } else {
+                                                rcmdtnLoading = false
+                                                Toast
+                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                    .show()
+                                            }
+                                        }
+                                    }
+                                ,
+                                contentAlignment = Alignment.Center
+                            ){
+                                Icon(painter = painterResource(id = if (detailData?.data?.rcmdtnSeCd == "001" ) R.drawable.icon_like else R.drawable.icon_like_default),
+                                    contentDescription = "", tint = Color.Unspecified)
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .size(40.dp)
+                                    .background(color = design_white, shape = RoundedCornerShape(12.dp))
+                                    .clip(shape = RoundedCornerShape(12.dp))
+                                    .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
+                                    .clickable(
+                                        enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
+                                    ) {
+                                        scope.launch {
+                                            rcmdtnLoading = true
+                                            val result = viewModel.bbsRcmdtn(pstSn = detailData?.data?.pstSn ?: 0, rcmdtnSeCd = "002")
+                                            if (result) {
+                                                rcmdtnLoading = false
+                                            } else {
+                                                rcmdtnLoading = false
+                                                Toast
+                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                    .show()
+                                            }
+                                        }
+                                    }
+                                ,
+                                contentAlignment = Alignment.Center
+                            ){
+                                Icon(painter = painterResource(id = if (detailData?.data?.rcmdtnSeCd == "002" ) R.drawable.icon_dislike else R.drawable.icon_dislike_default),
+                                    contentDescription = "", tint = Color.Unspecified)
+                            }
+                        }
+                    }//col
             }
-        }//col
-
+        }
     }
 
 }
 
 @Composable
-fun WebViewHtml(html: String, modifier: Modifier) {
-    AndroidView(
-        factory = { context ->
-            WebView(context).apply {
-                settings.javaScriptEnabled = true
-                webViewClient = WebViewClient()
-                loadData(html, "text/html; charset=utf-8", "UTF-8")
-            }
-        },
-        modifier = modifier
-    )
-}
-@Composable
-fun WebViewUrl(url: String, data: String, modifier: Modifier) {
-    AndroidView(
-        factory = { context ->
-            WebView(context).apply {
-                settings.javaScriptEnabled = true
-                webViewClient = WebViewClient()
-                postUrl(url, Base64.encode(data.toByteArray(), Base64.DEFAULT))
-            }
-        },
-        modifier = modifier
-    )
-}
-@Composable
-fun EventDetailMainText(text: String, bottomPadding: Int) {
-    Text(
-        text = text,
-        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-        fontSize = 14.sp, letterSpacing = (-0.7).sp,
-        color = design_skip,
-        modifier = Modifier.padding(bottom = bottomPadding.dp),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
-    )
-}
-@Composable
-fun EventDetailSubText(text: String, bottomPadding: Int) {
-    Text(
-        text = text,
-        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-        fontSize = 14.sp, letterSpacing = (-0.7).sp,
-        color = design_login_text,
-        modifier = Modifier.padding(bottom = bottomPadding.dp),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
-    )
-}
-@Composable
-fun HtmlText(html: String, modifier: Modifier = Modifier) {
+fun HtmlText(htmlString: String, modifier: Modifier = Modifier) {
+
+    val context = LocalContext.current
+
     AndroidView(
         modifier = modifier,
         factory = { context -> TextView(context) },
-        update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_COMPACT) }
+        update = { textView ->
+            val typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
+            textView.text = HtmlCompat.fromHtml(
+                htmlString, HtmlCompat.FROM_HTML_MODE_COMPACT,
+                CoilImageGetter(textView),null
+            )
+            textView.setTextColor(design_login_text.toArgb())
+            textView.typeface = typeface
+        }
     )
+}
+
+open class CoilImageGetter(
+    private val textView: TextView,
+    private val imageLoader: ImageLoader = Coil.imageLoader(textView.context),
+    private val sourceModifier: ((source: String) -> String)? = null
+) : Html.ImageGetter {
+
+    override fun getDrawable(source: String): Drawable {
+        val finalSource = sourceModifier?.invoke(source) ?: source
+
+        val drawablePlaceholder = DrawablePlaceHolder(textView)
+        imageLoader.enqueue(ImageRequest.Builder(textView.context).data(finalSource).apply {
+            target { drawable ->
+                drawablePlaceholder.updateDrawable(drawable)
+                textView.text = textView.text
+            }
+        }.build())
+        return drawablePlaceholder
+    }
+
+    @Suppress("DEPRECATION")
+    private class DrawablePlaceHolder(private val textView: TextView) : BitmapDrawable() {
+
+        private var drawable: Drawable? = null
+
+        override fun draw(canvas: Canvas) {
+            drawable?.draw(canvas)
+        }
+
+        fun updateDrawable(drawable: Drawable) {
+            this.drawable = drawable
+
+            // TextView의 가로 크기를 가져와서 이미지의 가로 크기로 설정
+            val textViewWidth = textView.rootView.measuredWidth
+
+            // 이미지의 가로, 세로 크기
+            val imageWidth = drawable.intrinsicWidth
+            val imageHeight = drawable.intrinsicHeight
+
+            // 이미지의 종횡비 계산
+            val aspectRatio = imageWidth.toFloat() / imageHeight.toFloat()
+
+            // TextView에 이미지를 맞추기 위해 가로 크기를 TextView의 폭과 같게 설정
+            val targetWidth = textViewWidth
+            val targetHeight = (targetWidth / aspectRatio).toInt()
+
+            // 이미지 크기 설정
+            drawable.setBounds(0, 0, targetWidth, targetHeight)
+            setBounds(0, 0, targetWidth, targetHeight)
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
@@ -576,7 +631,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
     val step2CmntList:List<BbsCmnt> = cmntList?.filter { cmnt ->
         cmnt.upCmntNo == comment.pstCmntNo } ?: emptyList()
 
-    val eventDetail by viewModel.eventDetail.collectAsState()
+    val eventDetail by viewModel.bbsDetail.collectAsState()
     var expand by remember { mutableStateOf(false) }
     var step2Expand by remember { mutableStateOf(false) }
 
@@ -593,6 +648,12 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
 
     LaunchedEffect(key1 = comment.cmntCn){
         updateComment = comment.cmntCn
+    }
+
+    LaunchedEffect(key1 = cmntList){
+        if (comment.pstCmntNo == viewModel.eventReplyCmnt.value?.pstCmntNo){
+            step2Expand = true
+        }
     }
 
     if (deleteDialog){
@@ -1102,7 +1163,7 @@ fun BbsCommentListItem2(
     comment: BbsCmnt,
     viewModel: CommunityViewModel,
     ){
-    val eventDetail by viewModel.eventDetail.collectAsState()
+    val eventDetail by viewModel.bbsDetail.collectAsState()
     var expand by remember { mutableStateOf(false) }
     var commentDelete by remember{ mutableStateOf(false) }
     var openBottomSheet by remember{ mutableStateOf(false) }

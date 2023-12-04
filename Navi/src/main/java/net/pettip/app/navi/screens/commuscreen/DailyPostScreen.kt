@@ -129,6 +129,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
     val postStory by viewModel.postStory.collectAsState()
     val selectedPet by viewModel.selectPetMulti.collectAsState()
     val selectedCategory by viewModel.selectCategory.collectAsState()
+    val petList by sharedViewModel.currentPetInfo.collectAsState()
     val schList by viewModel.schList.collectAsState()
     val cdDetailList = if (schList.isNotEmpty()){
         schList[0].cdDetailList.toMutableList().filter { it.cdId != "001" }
@@ -139,7 +140,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
     val state = viewModel.state
     val dummyUri = Uri.parse("")
     var expanded by remember { mutableStateOf(false) }
-    val items = listOf("Option 1", "Option 2", "Option 3")
+    val items = petList.map { "${it.petNm}와 즐거운 산책~!" }
     val focusManager = LocalFocusManager.current
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
     val scrollState = rememberScrollState()
@@ -152,8 +153,6 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
 
     var isLoading by remember { mutableStateOf(false) }
     var hashString by remember { mutableStateOf("") }
-
-    val petList by sharedViewModel.currentPetInfo.collectAsState()
 
     DisposableEffect(Unit) {
         onDispose {

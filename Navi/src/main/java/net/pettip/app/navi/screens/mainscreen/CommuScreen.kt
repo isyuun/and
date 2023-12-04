@@ -6,6 +6,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -32,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,6 +48,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -78,6 +83,7 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.CustomIndicator
+import net.pettip.app.navi.component.ErrorPage
 import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.component.StoryListItem
 import net.pettip.app.navi.ui.theme.design_B5B9BE
@@ -193,6 +199,9 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
     var isLoading by remember{ mutableStateOf(false) }
     val orderType by viewModel.orderType.collectAsState()
     val viewType by viewModel.viewType.collectAsState()
+    val currentTab by viewModel.currentTab.collectAsState()
+
+
 
     var refreshing by remember{ mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
@@ -239,8 +248,8 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
     }
 
     LaunchedEffect(key1 = lazyGridState.canScrollForward){
-        Log.d("LOG", lazyGridState.canScrollForward.toString())
-        if (!lazyGridState.canScrollForward && !refreshing){
+        Log.d("LOG","여기실행")
+        if (!lazyGridState.canScrollForward && !refreshing && currentTab=="스토리"){
             if (storyListRes?.data?.paginate?.existNextPage == true){
                 if (!isLoading){
                     isLoading = true
@@ -427,7 +436,6 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
         if (refreshing) {
 
             viewModel.updateEventListClear()
-            viewModel.updateStoryPage(1)
             viewModel.getEventList(1)
 
             delay(300)
@@ -448,11 +456,10 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
         ) { eventList?.data?.bbsEvntList?.isEmpty()
             when(it){
                 true ->
-                    Box(modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ){
-                        LoadingAnimation1()
-                    }
+                    ErrorPage(
+                        isLoading = refreshing,
+                        onClick = {newValue -> refreshing = newValue}
+                    )
                 false ->
                     LazyColumn(
                         state = rememberLazyListState(),
@@ -503,8 +510,7 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
         if (refreshing) {
 
             viewModel.updateEventListClear()
-            viewModel.updateStoryPage(1)
-            viewModel.getEventList(1)
+            viewModel.getEndEventList(1)
 
             delay(300)
             refreshing = false
@@ -524,11 +530,10 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
         ) { eventList?.data?.bbsAncmntWinnerList?.isEmpty()
             when(it){
                 true ->
-                    Box(modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ){
-                        LoadingAnimation1()
-                    }
+                    ErrorPage(
+                        isLoading = refreshing,
+                        onClick = {newValue -> refreshing = newValue}
+                    )
                 false ->
                     LazyColumn(
                         state = rememberLazyListState(),
@@ -565,24 +570,30 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
 @Composable
 fun EventItem(eventItemData: BbsEvnt, navController: NavHostController, viewModel: CommunityViewModel){
 
+    var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
+
     Column (
         modifier= Modifier
-            .wrapContentWidth()
             .fillMaxWidth()
+            .wrapContentHeight()
             .clickable(
-                enabled = !compareTimes(eventItemData.pstgEndDt)
+                enabled = !compareTimes(eventItemData.pstgEndDt),
             ) {
-                viewModel.viewModelScope.launch {
-                    viewModel.getEventDetail(eventItemData.pstSn)
-                    navController.navigate(Screen.EventDetail.route)
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastClickTime >= 500) {
+                    lastClickTime = currentTime
+                    viewModel.viewModelScope.launch {
+                        viewModel.updateLastPstSn(eventItemData.pstSn)
+                        viewModel.getEventDetail(eventItemData.pstSn)
+                        navController.navigate(Screen.EventDetail.route)
+                    }
                 }
             }
     ) {
-        var sizeImage by remember { mutableStateOf(IntSize.Zero) }
-
         Box(
             modifier = Modifier
-                .onGloballyPositioned { sizeImage = it.size }
+                .fillMaxSize()
+                .heightIn(min = 120.dp, max = 180.dp)
         ){
             val painter = rememberAsyncImagePainter(
                 model = eventItemData.rprsImgUrl?:R.drawable.img_blank,
@@ -643,24 +654,31 @@ fun EventItem(eventItemData: BbsEvnt, navController: NavHostController, viewMode
 
 @Composable
 fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostController, viewModel: CommunityViewModel){
+
+    var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
+
     Column (
         modifier= Modifier
-            .wrapContentWidth()
+            .wrapContentHeight()
             .fillMaxWidth()
             .clickable(
                 //enabled = !compareTimes(eventItemData.pstgEndDt)
             ) {
-                viewModel.viewModelScope.launch {
-                    viewModel.getEndEventDetail(eventItemData.pstSn)
-                    navController.navigate(Screen.EventDetail.route)
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastClickTime >= 500) {
+                    lastClickTime = currentTime
+                    viewModel.viewModelScope.launch {
+                        viewModel.updateLastPstSn(eventItemData.pstSn)
+                        viewModel.getEndEventDetail(eventItemData.pstSn)
+                        navController.navigate(Screen.EventDetail.route)
+                    }
                 }
             }
     ) {
-        var sizeImage by remember { mutableStateOf(IntSize.Zero) }
-
         Box(
             modifier = Modifier
-                .onGloballyPositioned { sizeImage = it.size }
+                .fillMaxWidth()
+                .heightIn(min = 120.dp, max = 180.dp)
         ){
             val painter = rememberAsyncImagePainter(
                 model = eventItemData.rprsImgUrl?:R.drawable.img_blank,
@@ -674,21 +692,21 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
                 contentScale = ContentScale.Crop
             )
 
-            if (compareTimes(eventItemData.pstgEndDt?: "")){
-                Box(modifier = Modifier
-                    .matchParentSize()
-                    .background(color = design_alpha60_black),
-                    contentAlignment = Alignment.Center
-                ){
-                    Text(
-                        text = stringResource(R.string.commu_ended_event),
-                        fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                        fontSize = 16.sp,
-                        letterSpacing = (-0.8).sp,
-                        color = design_white
-                    )
-                }
-            }
+            //if (compareTimes(eventItemData.pstgEndDt?: "")){
+            //    Box(modifier = Modifier
+            //        .matchParentSize()
+            //        .background(color = design_alpha60_black),
+            //        contentAlignment = Alignment.Center
+            //    ){
+            //        Text(
+            //            text = stringResource(R.string.commu_ended_event),
+            //            fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+            //            fontSize = 16.sp,
+            //            letterSpacing = (-0.8).sp,
+            //            color = design_white
+            //        )
+            //    }
+            //}
         }
 
 
@@ -697,11 +715,7 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
-            color = if(compareTimes(eventItemData.pstgEndDt?: "")){
-                design_B5B9BE
-            }else{
-                design_login_text
-            },
+            color = design_login_text,
             modifier = Modifier.padding(top = 12.dp, bottom = 8.dp)
         )
 
@@ -710,11 +724,7 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp,
             letterSpacing = (-0.7).sp,
-            color = if(compareTimes(eventItemData.pstgEndDt?: "")){
-                design_B5B9BE
-            }else{
-                design_skip
-            }
+            color = design_login_text
         )
     }
 }

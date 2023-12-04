@@ -41,6 +41,8 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.List
@@ -94,6 +96,7 @@ import net.pettip.app.navi.component.CustomBottomSheet
 import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.component.MonthCalendar
 import net.pettip.app.navi.component.WalkTimeNDis
+import net.pettip.app.navi.component.addOneMonth
 import net.pettip.app.navi.ui.theme.design_76A1EF
 import net.pettip.app.navi.ui.theme.design_C3D3EC
 import net.pettip.app.navi.ui.theme.design_btn_border
@@ -114,6 +117,11 @@ import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.DailyLifeWalk
 import net.pettip.data.daily.Day
 import net.pettip.data.pet.PetDetailData
+import net.pettip.util.Log
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.WeekFields
+import java.util.Locale
 
 
 @Composable
@@ -147,13 +155,17 @@ fun WalkScreen(
     }
 
     var selectPetPre:String? by rememberSaveable { mutableStateOf(null) }
+    val selectDay by walkViewModel.selectDay.collectAsState()
 
+    LaunchedEffect(key1 = selectDay){
+        homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  selectDay)
+    }
 
     LaunchedEffect(key1 = selectPet){
         if (selectPet?.ownrPetUnqNo != selectPetPre){
             isLoading = true
             selectPetPre = selectPet?.ownrPetUnqNo
-            val result = homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  getFormattedTodayDate())
+            val result = homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  selectDay)
             isLoading = !result
         }
     }
@@ -448,6 +460,10 @@ fun WeekContent(
     val weekRecord by viewModel.weekRecord.collectAsState()
     val toDetail by viewModel.toDetail.collectAsState()
 
+    val selectDay by viewModel.selectDay.collectAsState()
+    val isThisWeek = getMonthAndWeek(getFormattedTodayDate()) == getMonthAndWeek(selectDay)
+    val (month, week) = getMonthAndWeek(selectDay) ?: Pair(0,0)
+
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -460,14 +476,41 @@ fun WeekContent(
         ) {
 
             Column {
-                Text(
-                    text = "이번주 산책 기록",
-                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    fontSize = 20.sp,
-                    letterSpacing = (-1.0).sp,
-                    color = design_white,
+                Row (
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(top = 20.dp, start = 20.dp)
-                )
+                ){
+                    Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "", tint = design_white,
+                        modifier = Modifier
+                            .clickable {
+                                viewModel.updateSelectDay(subtract7Days(selectDay))
+                            }
+                    )
+
+                    Text(
+                        text = if (!isThisWeek){
+                            "${month}월 ${week}주차 산책기록"
+                        } else {
+                            "이번주 산책기록"
+                        },
+                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                        fontSize = 20.sp,
+                        letterSpacing = (-1.0).sp,
+                        color = design_white,
+                        //modifier = Modifier.padding(top = 20.dp, start = 20.dp)
+                    )
+
+                    Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "", tint = design_white,
+                        modifier = Modifier
+                            .clickable {
+                                viewModel.updateSelectDay(add7Days(selectDay))
+                            }
+                    )
+                }
+
 
                 Row (modifier = Modifier
                     .padding(top = 16.dp, start = 20.dp, end = 20.dp)
@@ -549,7 +592,7 @@ fun WeekContent(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     items(weekRecord?.dayList?: data){ data ->
-                        WeekItem(data)
+                        WeekItem(data,isThisWeek)
                     }
                 }
 
@@ -584,7 +627,7 @@ fun WeekContent(
 }
 
 @Composable
-fun WeekItem(day : Day){
+fun WeekItem(day : Day, isThisWeek:Boolean){
 
     val currentDate = getTodayDayOfWeek()
 
@@ -605,7 +648,7 @@ fun WeekItem(day : Day){
                 .size(16.dp)
                 .clip(CircleShape)
                 .background(
-                    color = if (day.dayNm == currentDate) {
+                    color = if ( (day.dayNm == currentDate) && isThisWeek) {
                         design_white
                     } else {
                         Color.Transparent
@@ -619,7 +662,7 @@ fun WeekItem(day : Day){
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.6).sp,
                 lineHeight = 12.sp,
-                color = if(day.dayNm == currentDate){
+                color = if( (day.dayNm == currentDate) && isThisWeek){
                     design_intro_bg
                 }else{
                     design_C3D3EC
@@ -629,561 +672,28 @@ fun WeekItem(day : Day){
     }
 }
 
-@Composable
-fun WalkWithMap(viewModel: WalkViewModel, navController: NavHostController){
+fun getMonthAndWeek(date: String): Pair<Int, Int>? {
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-    var tipVisible by remember { mutableStateOf(false) }
-
-    val scope = rememberCoroutineScope()
-
-    val bottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = false
-    )
-
-    val petList by viewModel.petInfo.collectAsState()
-
-    val isWalking by viewModel.isWalking.collectAsState()
-
-    val sheetChange by viewModel.sheetChange.collectAsState()
-
-    LaunchedEffect(Unit){
-        delay(1000)
-        tipVisible=true
-    }
-
-    BackHandler (enabled = bottomSheetState.isVisible){
-        scope.launch { bottomSheetState.hide() }
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ){
-
-        ModalBottomSheetLayout(
-            sheetContent = {
-                when(sheetChange){
-                    "select" ->
-                        WalkBottomSheet(
-                            title = "누구랑 산책할까요?",
-                            btnText = "산책하기",
-                            viewModel = viewModel,
-                            bottomSheetState = bottomSheetState
-                        )
-
-                    "change" ->
-                        WalkBottomSheet(
-                            title =  "반려동물 변경",
-                            btnText = "반려동물 변경",
-                            viewModel = viewModel,
-                            bottomSheetState = bottomSheetState
-                        )
-
-                    "end" ->
-                        WalkBottomSheetEnd(viewModel= viewModel, bottomSheetState = bottomSheetState, navController = navController)
-
-                    else -> null
-                }
- },
-            sheetState = bottomSheetState,
-            sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-            sheetGesturesEnabled = false
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(design_skip)
-            ){
-                //Text(text = "Map 들어갈 자리", modifier = Modifier.align(Alignment.Center))
-
-            }
-
-            Column (modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter)
-            ){
-                AnimatedVisibility(
-                    visible =  tipVisible&&!isWalking,
-                    enter = expandVertically(),
-                    exit = shrinkVertically()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .shadow(
-                                color = design_shadow,
-                                offsetX = 20.dp,
-                                offsetY = 20.dp,
-                                spread = 3.dp,
-                                blurRadius = 5.dp,
-                                borderRadius = 20.dp
-                            )
-                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-                            .background(
-                                color = design_white,
-                                shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
-                            )
-                    ) {
-                        Spacer(modifier = Modifier.padding(top = 16.dp))
-                        Row (
-                            modifier = Modifier
-                                .padding(start = 20.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Icon(painter = painterResource(id = R.drawable.icon_bulb), contentDescription = "", tint = Color.Unspecified)
-                            Text(
-                                text = "소소한 산책 TIP",
-                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                fontSize = 12.sp,
-                                letterSpacing = (-0.6).sp,
-                                color = design_skip,
-                                modifier = Modifier.padding(start = 4.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.padding(top = 4.dp))
-                        Text(
-                            text = "슬개골 건강에는 비탈길, 계단보다 평지가 좋아요~",
-                            fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                            fontSize = 14.sp,
-                            letterSpacing = (-0.7).sp,
-                            color = design_login_text,
-                            modifier = Modifier.padding(start = 20.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(top = 16.dp))
-                    }
-                }
-
-                AnimatedVisibility(
-                    visible =  isWalking,
-                    enter = expandVertically(
-                        animationSpec = tween(delayMillis = 500)
-                    ),
-                    exit = shrinkVertically()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .shadow(
-                                color = design_shadow,
-                                offsetX = 20.dp,
-                                offsetY = 20.dp,
-                                spread = 3.dp,
-                                blurRadius = 5.dp,
-                                borderRadius = 20.dp
-                            )
-                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-                            .background(
-                                color = design_white,
-                                shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
-                            )
-                    ){
-                        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-                        Row (
-                            modifier = Modifier
-                                .padding(horizontal = 20.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ){
-                            Row (
-                                verticalAlignment = Alignment.CenterVertically
-                            ){
-                                CircleImageTopBar(size = 40, imageUri = petList[0].petRprsImgAddr)
-
-                                Column (
-                                    modifier = Modifier
-                                        .padding(start = 12.dp)
-                                ){
-                                    Text(
-                                        text = "행복한 산책중" ,
-                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                        fontSize = 12.sp,
-                                        letterSpacing = (-0.6).sp,
-                                        color = design_skip
-                                    )
-
-                                    Text(
-                                        text = "01:20:54" ,
-                                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                                        fontSize = 22.sp,
-                                        letterSpacing = (-0.0).sp,
-                                        color = design_login_text
-                                    )
-                                }
-                            }
-
-                            Text(
-                                text = "반려동물 변경" ,
-                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                fontSize = 14.sp,
-                                letterSpacing = (-0.6).sp,
-                                textDecoration = TextDecoration.Underline,
-                                color = design_skip,
-                                modifier = Modifier.clickable {
-                                    viewModel.updateSheetChange("change")
-                                    scope.launch { bottomSheetState.show() }
-                                }
-                            )
-                        }
-                        Spacer(modifier = Modifier.padding(top = 16.dp))
-                    }
-                }
-
-                Spacer(modifier = Modifier.padding(top = 16.dp))
-
-                Box(
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-                        .size(40.dp)
-                        .background(color = design_white, shape = CircleShape)
-                        .clip(shape = CircleShape)
-                ){
-                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "", tint = design_login_text,
-                        modifier = Modifier.align(Alignment.Center))
-                }
-            }
-
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-            ){
-                Box(
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-                        .size(40.dp)
-                        .background(design_white, shape = RoundedCornerShape(10.dp))
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentAlignment = Alignment.Center
-                ){
-                    Icon(imageVector = Icons.Default.Place, contentDescription = "", tint = Color.Transparent)
-                }
-
-                Spacer(modifier = Modifier.padding(top = 8.dp))
-
-                Row (
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(design_white, shape = RoundedCornerShape(10.dp))
-                            .clip(RoundedCornerShape(10.dp)),
-                        contentAlignment = Alignment.Center
-                    ){
-                        Icon(imageVector = Icons.Default.Email, contentDescription = "", tint = Color.Transparent)
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 20.dp)
-                            .size(40.dp)
-                            .background(design_white, shape = RoundedCornerShape(10.dp))
-                            .clip(RoundedCornerShape(10.dp)),
-                        contentAlignment = Alignment.Center
-                    ){
-                        Icon(imageVector = Icons.Default.List, contentDescription = "", tint = Color.Transparent)
-                    }
-                }
-
-                Spacer(modifier = Modifier.padding(top = 16.dp))
-
-                Button(
-                    onClick = {
-                        if (!isWalking){
-                            viewModel.updateSheetChange("select")
-                            scope.launch { bottomSheetState.show() }
-                        }else{
-                            viewModel.updateSheetChange("end")
-                            scope.launch { bottomSheetState.show() }
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    colors = if (!isWalking){
-                        ButtonDefaults.buttonColors(containerColor = design_button_bg)
-                    }else{
-                        ButtonDefaults.buttonColors(containerColor = design_btn_border)
-                    }
-                ){
-                    Text(
-                        text = if (!isWalking){
-                            "산책하기"
-                        }else{
-                            "산책 종료"
-                        },
-                        color = design_white,
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-                }
-
-                Spacer(modifier = Modifier.padding(bottom = 20.dp))
-            }
-        }
+    return try {
+        val localDate = LocalDate.parse(date, dateFormatter)
+        val weekFields = WeekFields.of(Locale.getDefault())
+        Pair(localDate.monthValue, localDate.get(weekFields.weekOfMonth()))
+    } catch (e: Exception) {
+        null
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun WalkBottomSheet(title:String, btnText:String, viewModel: WalkViewModel, bottomSheetState: ModalBottomSheetState){
-
-    val petList by viewModel.petInfo.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-
-    var isCheck by remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
-
-    val isWalking by viewModel.isWalking.collectAsState()
-
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .background(design_white)
-    ) {
-        Spacer(modifier = Modifier.padding(top = 20.dp))
-
-        Text(
-            text = title,
-            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-            fontSize = 20.sp,
-            letterSpacing = (-1.0).sp,
-            color = design_login_text,
-            modifier = Modifier.padding(start = 20.dp)
-        )
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            contentPadding = PaddingValues(horizontal = 20.dp)
-        ){
-            items(petList){ petList ->
-                Box (modifier = Modifier.padding(horizontal = 4.dp)){
-                    WalkBottomSheetItem(viewModel = viewModel, petList = petList)
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.padding(top = 4.dp))
-
-        Row (
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ){
-            Row (modifier = Modifier
-                .clickable { isCheck = !isCheck },
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Checkbox(
-                    checked = isCheck,
-                    onCheckedChange = {isCheck = it},
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = design_select_btn_text,
-                        uncheckedColor = design_textFieldOutLine)
-                )
-
-                Text(
-                    text = "계속 이 아이와 산책할게요",
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_login_text,
-                    letterSpacing = (-0.7).sp
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.padding(top = 4.dp))
-
-        Button(
-            onClick = {
-                if(!isWalking){
-                    scope.launch { bottomSheetState.hide() }
-                    viewModel.updateIsWalking(true)
-                }else{
-                    scope.launch { bottomSheetState.hide() }
-                }
-                      },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
-        ){
-            Text(text = btnText, color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-        }
-
-        Spacer(modifier = Modifier.padding(top = 20.dp))
-    }
+fun add7Days(dateString: String): String {
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val date = LocalDate.parse(dateString, dateFormatter)
+    val addedDate = date.plusDays(7)
+    return addedDate.format(dateFormatter)
 }
 
-@Composable
-fun WalkBottomSheetEnd(viewModel: WalkViewModel, bottomSheetState: ModalBottomSheetState, navController: NavHostController) {
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .background(design_white)
-    ) {
-        Spacer(modifier = Modifier.padding(top = 20.dp))
-
-        Text(
-            text = "산책을 종료할까요?",
-            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-            fontSize = 20.sp,
-            letterSpacing = (-1.0).sp,
-            color = design_login_text,
-            modifier = Modifier.padding(start = 20.dp)
-        )
-
-        // 데이터만 넘겨주기
-        WalkTimeNDis()
-
-        Spacer(modifier = Modifier.padding(top = 20.dp))
-
-        Row (
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
-        ){
-            Button(
-                onClick = {
-                          navController.navigate(Screen.PostScreen.route){
-                              popUpTo(Screen.WalkWithMap.route){inclusive=true}
-                          }
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(design_white),
-                border = BorderStroke(1.dp, color = design_btn_border)
-            ) {
-                Text(text = "네,종료할게요", color = design_login_text,
-                    fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-            }
-
-            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-
-            Button(
-                onClick = { },
-                modifier = Modifier
-                    .height(48.dp)
-                    .weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
-            )
-            {
-                Text(text = "조금 더 할게요", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-            }
-        }
-
-        Spacer(modifier = Modifier.padding(top = 20.dp))
-    }
+fun subtract7Days(dateString: String): String {
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val date = LocalDate.parse(dateString, dateFormatter)
+    val subtractedDate = date.minusDays(7)
+    return subtractedDate.format(dateFormatter)
 }
-
-@Composable
-fun WalkBottomSheetItem(viewModel: WalkViewModel, petList : PetDetailData){
-
-    val configuration = LocalConfiguration.current
-
-    val screenWidth = configuration.screenWidthDp.dp -60.dp
-
-    val petName:String = petList.petNm
-    val imageUri:String? = petList.petRprsImgAddr
-
-    val selectedPet by viewModel.selectPet.collectAsState()
-    var isSeleted by remember { mutableStateOf(false) }
-
-    Button(
-        onClick = { isSeleted= !isSeleted },
-        modifier = Modifier
-            .size(width = screenWidth / 3, height = screenWidth / 3 - 9.dp)
-            .shadow(ambientColor = design_shadow, elevation = 0.dp)
-        ,
-        shape = RoundedCornerShape(12.dp),
-        colors = if(isSeleted) {
-            ButtonDefaults.buttonColors(design_select_btn_bg)
-        } else {
-            ButtonDefaults.buttonColors(design_white)
-        },
-        border = if(isSeleted) {
-            BorderStroke(1.dp, color = design_select_btn_text)
-        } else {
-            BorderStroke(1.dp, color = design_textFieldOutLine)
-        },
-        contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-        elevation = if(isSeleted){
-            ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
-        } else {
-            ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-        }
-
-    ) {
-        Column (
-            modifier= Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ){
-            Box(
-                modifier = Modifier
-                    .size(46.dp)
-                    .border(shape = CircleShape, border = BorderStroke(3.dp, color = design_white))
-                    //.shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
-                    .shadow(
-                        color = design_shadow,
-                        offsetY = 10.dp,
-                        offsetX = 10.dp,
-                        spread = 4.dp,
-                        blurRadius = 3.dp,
-                        borderRadius = 90.dp
-                    )
-                    .clip(CircleShape)
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(imageUri)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = "",
-                    placeholder = painterResource(id = R.drawable.profile_default),
-                    error= painterResource(id = R.drawable.profile_default),
-                    modifier= Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-
-            }
-
-            Spacer(modifier = Modifier.padding(top = 8.dp))
-
-            Text(
-                text = petName,
-                fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                fontSize = 16.sp,
-                letterSpacing = (-0.8).sp,
-                color = design_login_text
-            )
-        }
-    }
-}
-
-
-data class week(val string: String, val int: Int)
-

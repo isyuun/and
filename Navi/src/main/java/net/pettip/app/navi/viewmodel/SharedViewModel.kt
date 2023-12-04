@@ -323,12 +323,19 @@ class SharedViewModel:ViewModel(){
     )
 
     fun clear(){
-        _moreStoryClick.value = null
-        _weekRecord.value = null
+        _currentTab.value = "스토리"
+        _profilePet.value = null
+        _pushData.value = null
+        _nickName.value = ""
         _init.value = true
-        _petInfo.value = arrayListOf(emptyPet)
-        _currentPetInfo.value = arrayListOf(emptyCurrentPet)
+        _moreStoryClick.value = null
+        _toStory.value = false
+        _weekRecord.value = null
+        _petInfo.value = emptyList()
+        _currentPetInfo.value = emptyList()
         _selectPet.value = null
+        _selectPetTemp.value = null
+        _selectPetMulti.value = mutableListOf()
     }
 }
 

@@ -64,7 +64,7 @@ fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel
 
     val selectPet by sharedViewModel.selectPet.collectAsState()
 
-    var currentMonth by remember { mutableStateOf(getCurrentYearMonthKr()) }
+    val currentMonth by walkViewModel.selectMonth.collectAsState()
 
     // 애니메이션 기다리기 위한 작업
     var firstLoad by remember { mutableStateOf(true) }
@@ -100,7 +100,11 @@ fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel
             ){
                 Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = "", tint = design_white,
-                    modifier = Modifier.clickable { currentMonth = addOneMonth(currentMonth, -1) })
+                    modifier = Modifier
+                        .clickable {
+                            walkViewModel.updateSelectMonth(addOneMonth(currentMonth, -1))
+                        }
+                )
 
                 Text(
                     text = currentMonth,
@@ -110,7 +114,11 @@ fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel
 
                 Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "", tint = design_white,
-                    modifier = Modifier.clickable { currentMonth = addOneMonth(currentMonth, 1) })
+                    modifier = Modifier
+                        .clickable {
+                            walkViewModel.updateSelectMonth(addOneMonth(currentMonth, 1))
+                        }
+                )
             }
 
             Spacer(modifier = Modifier.padding(top = 20.dp))
@@ -241,7 +249,7 @@ fun RunCountData(walkViewModel: WalkViewModel){
             )
 
             Text(
-                text = (runCountData?.runDstnc ?: 0).toString()+"km",
+                text = (runCountData?.runDstnc ?: 0).toString()+"m",
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 letterSpacing = 0.sp,
@@ -291,7 +299,14 @@ fun CalendarDay(day: MonthDay, viewModel: WalkViewModel, selectPet: CurrentPetDa
                 contentDescription = "", tint = Color.Unspecified,
                 modifier = Modifier.clickable {
                     viewModel.viewModelScope.launch {
-                        selectPet?.ownrPetUnqNo?.let { viewModel.getWeekRecord(ownrPetUnqNo = it, searchDay = day.date) }
+                        selectPet?.ownrPetUnqNo?.let {
+                            val result = viewModel.getWeekRecord(ownrPetUnqNo = it, searchDay = day.date)
+                            if (result){
+                                viewModel.updateSelectDay(day.date)
+                                viewModel.updateToMonthCalendar(false)
+                            }
+                        }
+
                     }
                 }
             )
@@ -334,12 +349,6 @@ fun formatKoreanDateToYearMonth(inputDate: String): String {
 
     val date = YearMonth.parse(inputDate, inputFormatter)
     return date.format(outputFormatter)
-}
-
-fun getCurrentYearMonthKr(): String {
-    val currentYearMonth = YearMonth.now()
-    val formatter = DateTimeFormatter.ofPattern("yyyy년 M월", Locale.getDefault())
-    return currentYearMonth.format(formatter)
 }
 
 fun extractDayFromDate(dateString: String): Int {

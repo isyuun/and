@@ -56,7 +56,6 @@ import net.pettip.app.navi.screens.commuscreen.EventEndDetail
 import net.pettip.app.navi.screens.commuscreen.StoryDetail
 import net.pettip.app.navi.screens.mainscreen.MainScreen
 import net.pettip.app.navi.screens.mainscreen.SettingScreen
-import net.pettip.app.navi.screens.mainscreen.WalkWithMap
 import net.pettip.app.navi.screens.myscreen.AddPetScreen
 import net.pettip.app.navi.screens.myscreen.InquiryDetail
 import net.pettip.app.navi.screens.myscreen.InviteScreen
@@ -81,6 +80,7 @@ import net.pettip.app.navi.viewmodel.UserCreateViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.SCDLocalData
 import net.pettip.singleton.G
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -103,8 +103,12 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        val intent = intent
-        intent.data = null
+        val filesDir = this.filesDir
+        val files = filesDir.listFiles()
+
+        files?.forEach { file ->
+            file.delete()
+        }
     }
 }
 
@@ -224,11 +228,6 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
                 walkViewModel = walkViewModel,
                 communityViewModel = communityViewModel,
                 settingViewModel = settingViewModel)
-        }
-
-        composable("walkWithMap"){
-
-            WalkWithMap(walkViewModel, navController)
         }
 
         composable("postScreen"){

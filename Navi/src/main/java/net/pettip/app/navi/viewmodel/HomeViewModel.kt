@@ -45,35 +45,6 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
         return sharedViewModel.changeBirth(birth)
     }
 
-    val emptyPet = PetDetailData(
-        ownrPetUnqNo = "",
-        petBrthYmd = "미상",
-        petInfoUnqNo = 0,
-        petKindNm = "웨스트 하이랜드 화이트 테리어",
-        petMngrYn = "",
-        petNm = "배추",
-        petRegNo = "",
-        petRelCd = "",
-        petRelNm = "",
-        petRelUnqNo = 0,
-        petRprsImgAddr = "",
-        petRprsYn = "Y",
-        sexTypCd = "",
-        sexTypNm = "수컷",
-        stdgCtpvCd = "",
-        stdgCtpvNm = "",
-        stdgSggCd = "",
-        stdgSggNm = "",
-        stdgUmdCd = "",
-        stdgUmdNm = "",
-        wghtVl = 0.0f,
-        ntrTypCd = "",
-        ntrTypNm = "",
-        endDt = "",
-        mngrType = "",
-        memberList = emptyList()
-    )
-
     val emptyCurrentPet = CurrentPetData(
         age = "0살",
         petNm = "펫을 등록해주세요",

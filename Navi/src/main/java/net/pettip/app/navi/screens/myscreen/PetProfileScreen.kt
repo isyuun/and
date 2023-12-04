@@ -656,7 +656,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                 when(item.mngrType){
                     "M" -> "관리중"
                     "I" -> if (!expandText)"참여중" else "참여를 중단하시겠습니까?"
-                    "C" -> "동참중단"
+                    "C" -> "동행중단"
                     else -> "에러"
                 },
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -951,7 +951,7 @@ fun WeightDialog(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    var weight by remember{ mutableStateOf("") }
+    var pickDate by remember{ mutableStateOf("") }
 
     DisposableEffect(Unit){
         onDispose {
@@ -1021,7 +1021,7 @@ fun WeightDialog(
                                     val sdfDate = SimpleDateFormat("yyyy년 MM월 dd일")
                                     val date = sdfDate.format(Date(datePickerState.selectedDateMillis ?: Date().time))
 
-                                    weight = date
+                                    pickDate = date
                                     viewModel.updatePetWeightRgDate(dateForSend)
                                     showDatePicker = false
                                 },
@@ -1078,10 +1078,10 @@ fun WeightDialog(
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart){
                             Text(
                                 text =
-                                if(weight ==""){ "등록일자를 입력해주세요" } else { weight },
+                                if(pickDate ==""){ "등록일자를 입력해주세요" } else { pickDate },
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                                color = if(weight ==""){ design_placeHolder } else { design_login_text },
+                                color = if(pickDate ==""){ design_placeHolder } else { design_login_text },
                                 modifier = Modifier.padding(start = 8.dp)
                             )
                         }
@@ -1161,7 +1161,15 @@ fun WeightDialog(
                                 .weight(1f)
                                 .background(design_intro_bg)
                                 .clickable {
-                                    if (isValidFloat(petWeight)) {
+                                    if (pickDate == ""){
+                                        Toast
+                                            .makeText(context, "날짜를 입력해주세요", Toast.LENGTH_SHORT)
+                                            .show()
+                                    }else if ( !isValidFloat(petWeight) ){
+                                        Toast
+                                            .makeText(context, "올바른 체중을 입력해주세요", Toast.LENGTH_SHORT)
+                                            .show()
+                                    }else{
                                         scope.launch {
                                             val result = viewModel.regPetWgt(ownrPetUnqNo)
                                             if (result) {
@@ -1176,12 +1184,7 @@ fun WeightDialog(
                                                     .show()
                                             }
                                         }
-                                    } else {
-                                        Toast
-                                            .makeText(context, "올바른 체중을 입력해주세요", Toast.LENGTH_SHORT)
-                                            .show()
                                     }
-
                                 },
                             contentAlignment = Alignment.Center
                         ){

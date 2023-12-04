@@ -58,7 +58,7 @@
     <string name="cancel">Cancel</string>
     <string name="ing_manage">관리중</string>
     <string name="ing_join">참여중</string>
-    <string name="stop_join">동참중단</string>
+    <string name="stop_join">동행중단</string>
     <string name="error">에러</string>
     <string name="neutering_comp">(중성화수술 완료)</string>
     <string name="invite_cmt">누구를 위해 초대를 할까요?</string>

@@ -18,11 +18,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.pettip.data.CommonCodeModel
 import net.pettip.data.bbs.BbsDetailRes
+import net.pettip.data.bbs.File
+import net.pettip.data.bbs.QnaDetailRes
 import net.pettip.data.bbs.QnaReq
+import net.pettip.data.bbs.QnaUpdateReq
 import net.pettip.data.cmm.CdDetail
 import net.pettip.data.cmm.CmmRes
 import net.pettip.data.cmm.commonRes
-import net.pettip.data.daily.DailyLifeFile
 import net.pettip.data.daily.PhotoData
 import net.pettip.data.daily.PhotoRes
 import net.pettip.data.pet.ChangePetWgtReq
@@ -148,9 +150,9 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     fun updateIsCheck(newValue: Boolean) { _isCheck.value = newValue }
 
     // 이미 등록된 사진 리스트
-    private val _uploadedFileList = MutableStateFlow<List<DailyLifeFile>?>(null)
-    val uploadedFileList:StateFlow<List<DailyLifeFile>?> = _uploadedFileList.asStateFlow()
-    fun updateUploadedFileList(newValue: List<DailyLifeFile>?){
+    private val _uploadedFileList = MutableStateFlow<List<File>?>(null)
+    val uploadedFileList:StateFlow<List<File>?> = _uploadedFileList.asStateFlow()
+    fun updateUploadedFileList(newValue: List<File>?){
         _uploadedFileList.value = newValue
     }
     fun subUploadedFileList(newValue:Uri){
@@ -161,11 +163,13 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
             } else {
                 file
             }
-        } ?: emptyList()) as MutableList<DailyLifeFile>?
+        } ?: emptyList()) as MutableList<File>?
+
+        Log.d("LOG",_uploadedFileList.value.toString())
     }
 
-    private val _newFileList = MutableStateFlow<List<DailyLifeFile>?>(null)
-    val newFileList:StateFlow<List<DailyLifeFile>?> = _newFileList.asStateFlow()
+    private val _newFileList = MutableStateFlow<List<File>?>(null)
+    val newFileList:StateFlow<List<File>?> = _newFileList.asStateFlow()
     fun clearNewFileList(){_newFileList.value = null}
 
     private val _detailMessage = MutableStateFlow("") // Data 저장
@@ -783,6 +787,111 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                 }
 
             })
+        }
+    }
+
+    suspend fun updateQna(modifiedQna: QnaDetailRes, viewModel: CommunityViewModel):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        concatUploadedFileList(_newFileList.value?: emptyList())
+
+        val data = QnaUpdateReq(
+            pstSn = modifiedQna.data[0].pstSn,
+            pstTtl = _title.value,
+            pstCn = _inquiryMain.value,
+            pstSeCd = _inquiryKind.value?.cdId ?: "",
+            files = _uploadedFileList.value?: emptyList()
+        )
+
+        val call =apiService.updateQna(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<QnaDetailRes>{
+                override fun onResponse(call: Call<QnaDetailRes>, response: Response<QnaDetailRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            viewModel.updateQnaDetail(it)
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<QnaDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun fileUploadModify(context: Context): Boolean {
+        val apiService = RetrofitClientServer.instance
+
+        val parts = ArrayList<MultipartBody.Part>()
+
+        val maxImages = 5
+
+        val localUriList = state.listOfSelectedImages.filter { uri ->
+            uri.scheme != "http" && uri.scheme != "https"
+        }
+
+        for (i in 0 until Integer.min(maxImages, localUriList.size - 1)) {
+            val fileUri = localUriList[i]
+
+            val resizedFile = resizeImage(context, fileUri , i)
+
+            resizedFile?.let {
+                val requestBody = it.asRequestBody("image/*".toMediaType())
+                val part = MultipartBody.Part.createFormData("files", "image$i.jpg", requestBody)
+                parts.add(part)
+            }
+        }
+
+        val call = apiService.uploadPhotoInBbs(parts)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<PhotoRes> {
+                override fun onResponse(call: Call<PhotoRes>, response: Response<PhotoRes>) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        body?.let {
+                            val qnaFileList = body.data.map { photoData ->
+                                File(
+                                    atchFileSn = null,
+                                    atchFileNm = photoData.atchFileNm,
+                                    atchFileSz = photoData.atchFileSz,
+                                    orgnlAtchFileNm = photoData.orgnlAtchFileNm,
+                                    fileExtnNm = photoData.fileExtnNm,
+                                    filePathNm = photoData.filePathNm,
+                                    rowState = "C",
+                                    pstSn = null,
+                                    pstRprsYn = null
+                                )
+                            }
+                            _newFileList.value = qnaFileList
+                            continuation.resume(true)
+                        }
+                    } else {
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<PhotoRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    fun concatUploadedFileList(newFiles: List<File>) {
+        _uploadedFileList.value?.let { currentList ->
+            val combinedList = mutableListOf<File>().apply {
+                addAll(currentList)
+                addAll(newFiles)
+            }
+            _uploadedFileList.value = combinedList
         }
     }
 

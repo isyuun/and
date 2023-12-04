@@ -130,6 +130,7 @@ import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_weather_1
 import net.pettip.app.navi.ui.theme.design_white
+import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.HomeViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.daily.RTStoryData
@@ -152,6 +153,7 @@ fun HomeScreen(
     navController: NavHostController,
     viewModel: HomeViewModel,
     sharedViewModel: SharedViewModel,
+    communityViewModel: CommunityViewModel,
     backChange: (Boolean) -> Unit,
     openBottomSheet: Boolean,
     onDissMiss: (Boolean) -> Unit,
@@ -253,7 +255,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
-            StoryContent(viewModel = viewModel, sharedViewModel,bottomNavController)
+            StoryContent(viewModel = viewModel, communityViewModel = communityViewModel ,navController = navController)
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
@@ -863,7 +865,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
 }
 
 @Composable
-fun StoryContent(viewModel: HomeViewModel, sharedViewModel: SharedViewModel, bottomNavController: NavHostController){
+fun StoryContent(viewModel: HomeViewModel, navController: NavHostController, communityViewModel: CommunityViewModel){
 
     LaunchedEffect(Unit){
         viewModel.getRTStoryList()
@@ -909,7 +911,7 @@ fun StoryContent(viewModel: HomeViewModel, sharedViewModel: SharedViewModel, bot
             ) {
                 if (storyList!=null){
                     items(storyList?.data ?: emptyList()){ item ->
-                        StoryItem(data = item, bottomNavController = bottomNavController, sharedViewModel = sharedViewModel)
+                        StoryItem(data = item, navController = navController, communityViewModel = communityViewModel)
                     }
                 }
             }
@@ -918,7 +920,9 @@ fun StoryContent(viewModel: HomeViewModel, sharedViewModel: SharedViewModel, bot
 }
 
 @Composable
-fun StoryItem(data: RTStoryData, bottomNavController: NavHostController, sharedViewModel: SharedViewModel){
+fun StoryItem(data: RTStoryData, navController: NavHostController, communityViewModel: CommunityViewModel){
+
+    val scope = rememberCoroutineScope()
 
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 
@@ -934,14 +938,18 @@ fun StoryItem(data: RTStoryData, bottomNavController: NavHostController, sharedV
             .clip(shape = RoundedCornerShape(20.dp))
             .onGloballyPositioned { sizeImage = it.size }
             .clickable {
-                sharedViewModel.updateToStory(true)
-                sharedViewModel.updateMoreStoryClick(data.schUnqNo)
-                bottomNavController.navigate("commu") {
-                    bottomNavController.graph.startDestinationRoute?.let {
-                        popUpTo(it) { saveState = true }
-                    }
-                    launchSingleTop = true
-                    restoreState = true
+                //sharedViewModel.updateToStory(true)
+                //sharedViewModel.updateMoreStoryClick(data.schUnqNo)
+                //bottomNavController.navigate("commu") {
+                //    bottomNavController.graph.startDestinationRoute?.let {
+                //        popUpTo(it) { saveState = true }
+                //    }
+                //    launchSingleTop = true
+                //    restoreState = true
+                //}
+                scope.launch {
+                    communityViewModel.getStoryDetail(data.schUnqNo)
+                    navController.navigate(Screen.StoryDetail.route)
                 }
             }
     ){

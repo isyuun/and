@@ -20,13 +20,12 @@ import net.pettip.data.bbs.BbsCmntRcmdtnReq
 import net.pettip.data.bbs.BbsCmntUpdateReq
 import net.pettip.data.bbs.BbsCmtCreateReq
 import net.pettip.data.bbs.BbsDetailRes
+import net.pettip.data.bbs.BbsRcmdtnReq
 import net.pettip.data.bbs.EndEventListRes
-import net.pettip.data.bbs.EventDetailRes
 import net.pettip.data.bbs.EventListRes
 import net.pettip.data.bbs.NtcListRes
 import net.pettip.data.bbs.QnaDetailRes
 import net.pettip.data.bbs.QnaListRes
-import net.pettip.data.bbs.QnaReq
 import net.pettip.data.cmm.CdDetail
 import net.pettip.data.cmm.CmmRes
 import net.pettip.data.cmm.CommonData
@@ -58,7 +57,6 @@ import net.pettip.data.pet.CurrentPetData
 import net.pettip.data.user.BbsReq
 import net.pettip.data.user.FAQData
 import net.pettip.data.user.FAQRes
-import net.pettip.singleton.G
 import net.pettip.singleton.RetrofitClientServer
 import net.pettip.util.Log
 import okhttp3.MediaType.Companion.toMediaType
@@ -82,7 +80,15 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         sharedViewModel.updateToStory(newValue)
     }
 
+    val currentTab = sharedViewModel.currentTab
+
     val selectedPet = sharedViewModel.selectPet
+
+    private val _lastPstSn = MutableStateFlow<Int?>(null)
+    val lastPstSn: StateFlow<Int?> = _lastPstSn.asStateFlow()
+    fun updateLastPstSn(newValue: Int?){
+        _lastPstSn.value = newValue
+    }
 
     private val _storyRes = MutableStateFlow<StoryRes?>(null)
     val storyRes: StateFlow<StoryRes?> = _storyRes.asStateFlow()
@@ -223,8 +229,11 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     val eventList: StateFlow<EventListRes?> = _eventList.asStateFlow()
     fun updateEventListClear(){_eventList.value = null}
 
-    private val _eventDetail = MutableStateFlow<BbsDetailRes?>(null)
-    val eventDetail: StateFlow<BbsDetailRes?> = _eventDetail.asStateFlow()
+    private val _bbsDetail = MutableStateFlow<BbsDetailRes?>(null)
+    val bbsDetail: StateFlow<BbsDetailRes?> = _bbsDetail.asStateFlow()
+    fun updateBbsDetail(newValue: BbsDetailRes?){
+        _bbsDetail.value = newValue
+    }
 
     private val _eventCmntList = MutableStateFlow<List<BbsCmnt>?>(null)
     val eventCmntList:StateFlow<List<BbsCmnt>?> = _eventCmntList.asStateFlow()
@@ -274,6 +283,9 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
 
     private val _qnaDetail = MutableStateFlow<QnaDetailRes?>(null)
     val qnaDetail: StateFlow<QnaDetailRes?> = _qnaDetail.asStateFlow()
+    fun updateQnaDetail(newValue: QnaDetailRes){
+        _qnaDetail.value = newValue
+    }
 
     // ----------------- 게시판 ------------------------
 
@@ -421,6 +433,45 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     }
     // ---------------------------Modify------------------------------
 
+    // ---------------------------신고------------------------------
+    private val _dclrCn = MutableStateFlow<String>("")
+    val dclrCn: StateFlow<String> = _dclrCn.asStateFlow()
+    fun updateDclrCn(newValue: String) {
+        _dclrCn.value = newValue
+    }
+
+    // ---------------------------신고------------------------------
+
+    suspend fun bbsRcmdtn(pstSn:Int, rcmdtnSeCd: String):Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = BbsRcmdtnReq(
+            pstSn = pstSn,
+            rcmdtnSeCd = rcmdtnSeCd
+        )
+
+        val call = apiService.bbsRcmdtn(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<BbsDetailRes>{
+                override fun onResponse(call: Call<BbsDetailRes>, response: Response<BbsDetailRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _bbsDetail.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<BbsDetailRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+            })
+        }
+    }
+
     suspend fun getStoryList(page: Int):Boolean{
         val apiService = RetrofitClientServer.instance
 
@@ -537,7 +588,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _eventDetail.value = it
+                            _bbsDetail.value = it
                             _eventCmntList.value = it.data.bbsCmnts
                             continuation.resume(true)
                         }
@@ -597,7 +648,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _eventDetail.value = it
+                            _bbsDetail.value = it
                             _eventCmntList.value = it.data.bbsCmnts
                             continuation.resume(true)
                         }
@@ -814,7 +865,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _eventDetail.value = it
+                            _bbsDetail.value = it
                             _eventCmntList.value = it.data.bbsCmnts
                             continuation.resume(true)
                         }
@@ -1233,7 +1284,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         val data = BbsCmtCreateReq(
             cmntCn = cmntCn,
             petRelUnqNo = selectedPet.value?.petRelUnqNo?:0,
-            pstSn = _eventDetail.value?.data?.pstSn?:0,
+            pstSn = _bbsDetail.value?.data?.pstSn?:0,
             upCmntNo = _eventReplyCmnt.value?.pstCmntNo ?: 0
         )
 
@@ -1266,7 +1317,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         val data = BbsCmtCreateReq(
             cmntCn = _bbsComment.value,
             petRelUnqNo = selectedPet.value?.petRelUnqNo?:0,
-            pstSn = _eventDetail.value?.data?.pstSn?:0,
+            pstSn = _bbsDetail.value?.data?.pstSn?:0,
             upCmntNo = 0
         )
 
