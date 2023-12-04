@@ -48,26 +48,35 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
         Log.i(__CLASSNAME__, "${getMethodName()}...")
     }
 
-    private lateinit var observer: CameraContentObserver
-    private val handler: Handler = Handler(Looper.getMainLooper())
+    private var observer: CameraContentObserver? = null
+    private fun observer() {
+        observer = CameraContentObserver(handler, contentResolver, this)
+        observer?.let { observer ->
+            val contentResolver: ContentResolver = contentResolver
+            val cameraImageUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            contentResolver.registerContentObserver(
+                cameraImageUri,
+                true,
+                observer
+            )
+        }
+    }
 
     //@RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
     override fun onCreate() {
+        Log.i(__CLASSNAME__, "${getMethodName()}$observer")
         super.onCreate()
-        observer = CameraContentObserver(handler, contentResolver, this)
-        val contentResolver: ContentResolver = contentResolver
-        val cameraImageUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        contentResolver.registerContentObserver(
-            cameraImageUri,
-            true,
-            observer
-        )
+        //observer()
     }
 
     override fun onDestroy() {
+        Log.i(__CLASSNAME__, "${getMethodName()}$observer")
         super.onDestroy()
-        contentResolver.unregisterContentObserver(observer)
+        observer?.let { observer -> contentResolver.unregisterContentObserver(observer) }
     }
+
+
+    private val handler: Handler = Handler(Looper.getMainLooper())
 
     private val _imgs = Collections.synchronizedList(ArrayList<Uri>()) // The list of Tracks
     internal val images
@@ -101,7 +110,7 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
      * 카메라 이미지 회전방향: ExifInterface사용
      */
     internal fun rotate(context: Context, uri: Uri): ROTATE {
-        val path = observer.path(uri) ?: return ROTATE.ROTATE_NG
+        val path = observer?.path(uri) ?: return ROTATE.ROTATE_NG
         val file = File(path)
         var rotate = ROTATE.ROTATE_NG
         val orientation: Int
@@ -127,7 +136,7 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
      * 카메라 이미지 회전방향: 컨텐츠리졸버(DB)사용
      */
     internal fun orient(context: Context, uri: Uri): ROTATE {
-        val path = observer.path(uri) ?: return ROTATE.ROTATE_NG
+        val path = observer?.path(uri) ?: return ROTATE.ROTATE_NG
         val file = File(path)
         var rotate = ROTATE.ROTATE_NG
         var orientation: Int = -1
@@ -153,14 +162,12 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
         return rotate
     }
 
-    override fun camera() {
-        if (application is ICameraContentListener) (application as ICameraContentListener).camera()
-    }
+    override fun camera() {}
 
     override fun onCamera(file: File, uri: Uri) {
-        val camera = !_imgs.contains(uri)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[length:${file.length()}][file:$file][uri:$uri]")
+        val camera = file.length() > 0 && !_imgs.contains(uri)
         if (camera) {
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[file.length() > 0:${(file.length() > 0)}][length:${file.length()}][file:$file][uri:$uri]")
             img(uri)
             GPSApplication.instance.onCamera(file, uri)
         }
