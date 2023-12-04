@@ -13,8 +13,6 @@ package net.pettip.gps._app
 
 import android.net.Uri
 import net.pettip.gps.app.ICameraContentListener
-import net.pettip.util.Log
-import net.pettip.util.getMethodName
 import java.io.File
 
 /**
@@ -26,8 +24,11 @@ import java.io.File
  * @see net.pettip.gps._app.gpsappcompatactivity4
  */
 open class gpsappcompatactivity4 : gpsappcompatactivity3(), ICameraContentListener {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-    override fun onChange(uri: Uri, file: File) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[uri:$uri][file:$file]")
+    override fun camera() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onCamera(file: File, uri: Uri) {
+        //TODO("Not yet implemented")
     }
 }

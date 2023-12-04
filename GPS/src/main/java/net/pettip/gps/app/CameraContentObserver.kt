@@ -30,7 +30,8 @@ import java.io.File
  * @description :
  */
 interface ICameraContentListener {
-    fun onChange(uri: Uri, file: File)
+    fun camera()
+    fun onCamera(file: File, uri: Uri)
 }
 
 class CameraContentObserver(
@@ -130,7 +131,7 @@ class CameraContentObserver(
                     ExifInterface.ORIENTATION_NORMAL -> rotate = ROTATE.ROTATE_0
                 }
             }
-            Log.i(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file?.absolutePath}]")
+            Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file?.absolutePath}]")
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
@@ -160,7 +161,7 @@ class CameraContentObserver(
                 }
                 it.close()
             }
-            Log.w(__CLASSNAME__, "${getMethodName()}::onChange()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file?.absolutePath}]")
+            Log.w(__CLASSNAME__, "${getMethodName()}::onCamera()[orientation:$orientation][rotate:$rotate][uri:$uri][path:$path][file:${file?.absolutePath}]")
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -168,46 +169,44 @@ class CameraContentObserver(
     }
 
     private var file: File? = null
-    private fun onChange(uri: Uri) {
-        //Log.i(__CLASSNAME__, "${getMethodName()}[${this.uri == uri}][this.uri:$this.uri][uri:$uri]")
+    private fun onCamera(uri: Uri) {
+        Log.v(__CLASSNAME__, "${getMethodName()}[uri:$uri]")
         val path = path(uri) ?: return
         val time = time(uri) ?: return
         val file = File(path)
         val name = file.name
-        val exists = file.exists()
+        val exists = (file.exists() && file.length() > 0)
         val camera = exists && camera(uri) && !name.startsWith(".")
         if (camera) {
             if (this.file == file) return
             val rotate = rotate(uri)
             val orient = orient(uri)
-            Log.wtf(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][$camera][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
-            uri.let { listener.onChange(it, file) }
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
+            listener.onCamera(file, uri)
             this.file = file
         }
     }
 
     override fun onChange(selfChange: Boolean) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange]")
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[$selfChange]")
         super.onChange(selfChange)
     }
 
     override fun onChange(selfChange: Boolean, uri: Uri?) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uri:$uri]")
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[$selfChange][uri:$uri]")
         super.onChange(selfChange, uri)
-        uri?.let { onChange(it) }
+        uri?.let { onCamera(it) }
     }
 
     override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uri:$uri][flags:$flags]")
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[$selfChange][uri:$uri][flags:$flags]")
         super.onChange(selfChange, uri, flags)
-        uri?.let { onChange(it) }
+        uri?.let { onCamera(it) }
     }
 
     override fun onChange(selfChange: Boolean, uris: MutableCollection<Uri>, flags: Int) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uris:$uris][flags:$flags]")
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[${uris.size}][$selfChange][uris:$uris][flags:$flags]")
         super.onChange(selfChange, uris, flags)
-        uris.forEach { uri ->
-            uri.let { onChange(it) }
-        }
+        uris.forEach { uri -> onCamera(uri) }
     }
 }

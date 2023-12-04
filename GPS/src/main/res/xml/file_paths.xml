@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><!--<paths>-->
+<!--출처: https://shary1012.tistory.com/248 [노마의 낡은 수첩:티스토리]-->
+<paths>
+    <files-path
+        name="files"
+        path="." />
+    <external-files-path
+        name="external_files_path"
+        path="." />
+    <external-path
+        name="external_files"
+        path="." />
+</paths>
