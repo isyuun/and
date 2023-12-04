@@ -181,31 +181,31 @@ class CameraContentObserver(
             if (this.file == file) return
             val rotate = rotate(uri)
             val orient = orient(uri)
-            Log.v(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
             listener.onCamera(file, uri)
             this.file = file
         }
     }
 
     override fun onChange(selfChange: Boolean) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange]")
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[$selfChange]")
         super.onChange(selfChange)
     }
 
     override fun onChange(selfChange: Boolean, uri: Uri?) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uri:$uri]")
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[$selfChange][uri:$uri]")
         super.onChange(selfChange, uri)
         uri?.let { onCamera(it) }
     }
 
     override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uri:$uri][flags:$flags]")
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[$selfChange][uri:$uri][flags:$flags]")
         super.onChange(selfChange, uri, flags)
         uri?.let { onCamera(it) }
     }
 
     override fun onChange(selfChange: Boolean, uris: MutableCollection<Uri>, flags: Int) {
-        Log.v(__CLASSNAME__, "${getMethodName()}[$selfChange][uris:$uris][flags:$flags]")
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[${uris.size}][$selfChange][uris:$uris][flags:$flags]")
         super.onChange(selfChange, uris, flags)
         uris.forEach { uri -> onCamera(uri) }
     }
