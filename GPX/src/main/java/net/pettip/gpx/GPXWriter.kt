@@ -20,7 +20,7 @@ import java.util.Date
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
-class GPXWriter : _GPXWriter() {
+class GPXWriter : _GPX() {
     companion object {
         fun write(tracks: List<Track>, file: File) {
             if (tracks.isEmpty()) {

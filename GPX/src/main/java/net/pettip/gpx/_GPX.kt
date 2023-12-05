@@ -12,7 +12,7 @@ package net.pettip.gpx
 
 /**
  * @Project     : carepet-android
- * @FileName    : _GPXWriter.kt
+ * @FileName    : _GPX.kt
  * @Date        : 2023. 09. 13.
  * @author      : isyuun@care-biz.co.kr
  * @description :
@@ -36,7 +36,7 @@ const val GPX_LATITUDE_ZERO = 37.546855      //37.5
 const val GPX_LONGITUDE_ZERO = 127.065330    //127.0
 const val GPX_CAMERA_ZOOM_ZERO = 17.0
 
-open class _GPXWriter {
+open class _GPX {
     companion object {
         @JvmStatic
         fun calculateDuration(tracks: List<Track>): String {
