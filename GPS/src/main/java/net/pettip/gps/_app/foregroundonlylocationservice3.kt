@@ -16,7 +16,7 @@ import android.location.Location
 import com.google.android.gms.location.LocationResult
 import net.pettip.RELEASE
 import net.pettip.gps.R
-import net.pettip.gpx.GPXWriter2
+import net.pettip.gpx.GPXWriter
 import net.pettip.gpx.GPX_INTERVAL_UPDATE_METERS
 import net.pettip.gpx.GPX_SIMPLE_TICK_FORMAT
 import net.pettip.gpx.Track
@@ -134,7 +134,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         val file = this.file
         file.parentFile?.mkdirs()
         Log.w(__CLASSNAME__, "${getMethodName()}$file, ${_tracks.first().time}")
-        GPXWriter2.write(_tracks, file)
+        GPXWriter.write(_tracks, file)
     }
 
     protected val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
