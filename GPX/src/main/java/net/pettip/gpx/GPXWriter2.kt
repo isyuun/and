@@ -68,17 +68,9 @@ class GPXWriter2 : _GPXWriter() {
                 val speed = GPX_DECIMAL_FORMAT_3.format(track.speed)
                 val ele = GPX_DECIMAL_FORMAT_3.format(track.altitude)
                 val no = track.no
-                val pee = track.pee
-                val poo = track.poo
-                val mrk = track.mrk
-                val img = track.img
+                val event = track.event
                 //val uri = track.uri
                 val uri = ""
-                var event = Track.EVENT.NNN
-                if (pee > TRACK_ZERO_PEE) event = Track.EVENT.PEE
-                if (poo > TRACK_ZERO_POO) event = Track.EVENT.POO
-                if (mrk > TRACK_ZERO_MRK) event = Track.EVENT.MRK
-                if (img > TRACK_ZERO_IMG) event = Track.EVENT.IMG
                 val trkpt = """ <trkpt no="${no}" event="${event}" lat="${lat}" lon="${lon}"><time>$time</time><speed>$speed</speed><ele>$ele</ele><uri>$uri</uri></trkpt>""" + "\n"
                 trksegStringBuilder.append(trkpt)
             }

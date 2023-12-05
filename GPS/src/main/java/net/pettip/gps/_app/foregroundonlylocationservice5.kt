@@ -92,7 +92,7 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
         _imgs.add(uri)
         val loc = lastLocation
         val img = _imgs.size
-        val trk = loc?.let { Track(it/*, no = this.no*/, img = img, uri = uri) }
+        val trk = loc?.let { Track(it/*, no = this.no*/, event = Track.EVENT.IMG, uri = uri) }
         Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${_imgs.size}], ${_imgs[img - 1]}, $trk")
         trk?.let { _tracks.add(it) }
         write()

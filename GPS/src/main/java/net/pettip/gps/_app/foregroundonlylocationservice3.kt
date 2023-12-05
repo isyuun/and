@@ -108,6 +108,33 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         Log.d(__CLASSNAME__, "${getMethodName()}$_tracks")
         super.onCreate()
         _tracks.clear()
+        read()  //test
+    }
+
+    fun read() {
+        val path = File(this.path)
+        var file: File? = null
+        var last = 0L
+        Log.v(__CLASSNAME__, "${getMethodName()}[${path.listFiles()?.size}][${path}]")
+        path.listFiles()?.forEach {
+            //println(it)
+            if (last < it.lastModified()) file = it
+            last = it.lastModified()
+        }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${file}]")
+        file?.let { read(it) }
+    }
+
+    private fun read(file: File) {
+        Log.w(__CLASSNAME__, "${getMethodName()}$file, $_tracks")
+    }
+
+    protected fun write() {
+        if (_tracks.isEmpty()) return
+        val file = this.file
+        file.parentFile?.mkdirs()
+        Log.w(__CLASSNAME__, "${getMethodName()}$file, ${_tracks.first().time}")
+        GPXWriter2.write(_tracks, file)
     }
 
     protected val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
@@ -125,14 +152,6 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     internal val file
         get() = File("${path}/${GPX_SIMPLE_TICK_FORMAT.format(_tracks.first().time)}.gpx")
 
-    protected fun write() {
-        if (_tracks.isEmpty()) return
-        val file = this.file
-        file.parentFile?.mkdirs()
-        Log.w(__CLASSNAME__, "${getMethodName()}$file, ${_tracks.first().time}")
-        GPXWriter2.write(_tracks, file)
-    }
-
     private var _no = ""
     internal var no: String
         get() = this._no
@@ -142,21 +161,21 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
 
     internal fun pee() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = lastLocation?.let { Track(it, no = no, pee = 1) }
+        val track = lastLocation?.let { Track(it, no = no, event = Track.EVENT.PEE) }
         track?.let { _tracks.add(it) }
         this.write()
     }
 
     internal fun poo() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = lastLocation?.let { Track(it, no = no, poo = 1) }
+        val track = lastLocation?.let { Track(it, no = no, event = Track.EVENT.POO) }
         track?.let { _tracks.add(it) }
         this.write()
     }
 
     internal fun mrk() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = lastLocation?.let { Track(it, no = no, mrk = 1) }
+        val track = lastLocation?.let { Track(it, no = no, event = Track.EVENT.MRK) }
         track?.let { _tracks.add(it) }
         this.write()
     }
