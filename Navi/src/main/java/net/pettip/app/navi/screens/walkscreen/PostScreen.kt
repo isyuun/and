@@ -124,6 +124,7 @@ import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.Pet
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.gps.app.GPSApplication
+import net.pettip.gpx.Track
 import net.pettip.map.app.naver.naverMapPath
 import net.pettip.map.app.naver.naverMapPreview
 import net.pettip.map.app.naver.rememberMapViewWithLifecycle
@@ -200,9 +201,13 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
 
                 tracks?.forEach { track ->
                     if (track.no == petData.ownrPetUnqNo) {
-                        pee += track.pee
-                        poo += track.poo
-                        mrk += track.mrk
+                        when (track.event) {
+                            Track.EVENT.NNN -> {}
+                            Track.EVENT.IMG -> {}
+                            Track.EVENT.PEE -> pee++
+                            Track.EVENT.POO -> poo++
+                            Track.EVENT.MRK -> mrk++
+                        }
                     }
                 }
 
