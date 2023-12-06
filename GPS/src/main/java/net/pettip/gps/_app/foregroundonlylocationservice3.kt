@@ -16,9 +16,11 @@ import android.location.Location
 import com.google.android.gms.location.LocationResult
 import net.pettip.RELEASE
 import net.pettip.gps.R
-import net.pettip.gpx.GPXWriter2
+import net.pettip.gpx.GPXParser
+import net.pettip.gpx.GPXWriter
+import net.pettip.gpx.GPX_DATE_FORMAT
 import net.pettip.gpx.GPX_INTERVAL_UPDATE_METERS
-import net.pettip.gpx.GPX_SIMPLE_TICK_FORMAT
+import net.pettip.gpx.GPX_TICK_FORMAT
 import net.pettip.gpx.Track
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
@@ -108,6 +110,57 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         Log.d(__CLASSNAME__, "${getMethodName()}$_tracks")
         super.onCreate()
         _tracks.clear()
+        read()  //test
+        last()
+    }
+
+    override fun start() {
+        _start = System.currentTimeMillis()
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start][${lastLocation.toText()}][$lastLocation]")
+        super.start()
+        _tracks.clear()
+    }
+
+    override fun stop() {
+        _start = 0L
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start][${lastLocation.toText()}][$lastLocation]")
+        super.stop()
+        this.write()
+    }
+
+    private fun last() {
+        //TODO("Not yet implemented")
+    }
+
+    private fun read() {
+        val path = File(this.path)
+        var file: File? = null
+        var last = 0L
+        //Log.v(__CLASSNAME__, "${getMethodName()}[${path.listFiles()}][${path}]")
+        path.listFiles()?.forEach {
+            //println(it)
+            if (last < it.lastModified()) file = it
+            last = it.lastModified()
+        }
+        Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
+        file?.let { read(it) }
+    }
+
+    private fun read(file: File) {
+        Log.w(__CLASSNAME__, "${getMethodName()}$file, $_tracks")
+        GPXParser(_tracks).read(file)
+        Log.v(__CLASSNAME__, "${getMethodName()}[_tracks.size:${_tracks.size}]")
+        //_tracks.forEach {
+        //    Log.w(__CLASSNAME__, "${getMethodName()}[${GPX_DATE_FORMAT.format(it.time)}]$it")
+        //}
+    }
+
+    protected fun write() {
+        if (_tracks.isEmpty()) return
+        val file = this.file
+        file.parentFile?.mkdirs()
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${GPX_DATE_FORMAT.format(_tracks.first().time)}]$file")
+        GPXWriter().write(_tracks, file)
     }
 
     protected val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
@@ -123,15 +176,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         get() = path()
 
     internal val file
-        get() = File("${path}/${GPX_SIMPLE_TICK_FORMAT.format(_tracks.first().time)}.gpx")
-
-    protected fun write() {
-        if (_tracks.isEmpty()) return
-        val file = this.file
-        file.parentFile?.mkdirs()
-        Log.w(__CLASSNAME__, "${getMethodName()}$file, ${_tracks.first().time}")
-        GPXWriter2.write(_tracks, file)
-    }
+        get() = File("${path}/${GPX_TICK_FORMAT.format(_tracks.first().time)}.gpx")
 
     private var _no = ""
     internal var no: String
@@ -142,21 +187,21 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
 
     internal fun pee() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = lastLocation?.let { Track(it, no = no, pee = 1) }
+        val track = lastLocation?.let { Track(it, no = no, event = Track.EVENT.PEE) }
         track?.let { _tracks.add(it) }
         this.write()
     }
 
     internal fun poo() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = lastLocation?.let { Track(it, no = no, poo = 1) }
+        val track = lastLocation?.let { Track(it, no = no, event = Track.EVENT.POO) }
         track?.let { _tracks.add(it) }
         this.write()
     }
 
     internal fun mrk() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
-        val track = lastLocation?.let { Track(it, no = no, mrk = 1) }
+        val track = lastLocation?.let { Track(it, no = no, event = Track.EVENT.MRK) }
         track?.let { _tracks.add(it) }
         this.write()
     }
@@ -164,20 +209,6 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     private var _start = 0L
     val start
         get() = (_start > 0L) && _tracks.isNotEmpty()
-
-    override fun start() {
-        _start = System.currentTimeMillis()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start][${lastLocation.toText()}][$lastLocation]")
-        super.start()
-        _tracks.clear()
-    }
-
-    override fun stop() {
-        _start = 0L
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$start][${lastLocation.toText()}][$lastLocation]")
-        super.stop()
-        this.write()
-    }
 
     override fun title(): String {
         return "${getString(R.string.walk_title_walking)} - ${__duration}"

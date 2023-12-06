@@ -1030,14 +1030,15 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         Button(
             onClick = withClick(context) {
                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                if (start)
+                    mapView.getMapAsync { naverMap ->
+                        tracks?.let { naverMapPreview(context = context, naverMap = naverMap, tracks = it, padding = 104.0.dp) }
+                    }
                 if (pets.size == 1 && !start) {
                     application.start()
                     loading = true
                 } else {
                     showBottomSheet = !showBottomSheet
-                    mapView.getMapAsync { naverMap ->
-                        tracks?.let { naverMapPreview(context = context, naverMap = naverMap, tracks = it, padding = 104.0.dp) }
-                    }
                 }
             },
             shape = RoundedCornerShape(12.0.dp),
@@ -1136,10 +1137,10 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {
-                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                 showBottomSheet = false
                 application.resume()
                 mapView.getMapAsync { naverMap ->
+                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
                     naverMap.cameraPosition = CameraPosition(position, zoom)
                 }
@@ -1264,7 +1265,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 } else {
                     application.pause()
                     mapView.getMapAsync { naverMap ->
+                        Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                         zoom = naverMap.cameraPosition.zoom
+                        position = naverMap.cameraPosition.target
                     }
                     Text(
                         text = stringResource(id = R.string.walk_title_end),

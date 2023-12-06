@@ -21,19 +21,16 @@ import android.net.Uri
  * @description :
  */
 const val TRACK_ZERO_NUM = "P00000000000000"
-const val TRACK_ZERO_IMG = 0
-const val TRACK_ZERO_PEE = 0
-const val TRACK_ZERO_POO = 0
-const val TRACK_ZERO_MRK = 0
 val TRACK_ZERO_URI = Uri.parse("")!!
 
 data class Track(
     private val loc: Location,
     val no: String = TRACK_ZERO_NUM,
-    val img: Int = TRACK_ZERO_IMG,
-    val pee: Int = TRACK_ZERO_PEE,
-    val poo: Int = TRACK_ZERO_POO,
-    val mrk: Int = TRACK_ZERO_MRK,
+    val event: EVENT = EVENT.NNN,
+    //val img: Int = TRACK_ZERO_IMG,
+    //val pee: Int = TRACK_ZERO_PEE,
+    //val poo: Int = TRACK_ZERO_POO,
+    //val mrk: Int = TRACK_ZERO_MRK,
     val uri: Uri = TRACK_ZERO_URI,
 ) {
     companion object {
@@ -48,14 +45,14 @@ data class Track(
         NNN, IMG, PEE, POO, MRK
     }
 
-    val event: EVENT
-        get() {
-            return if (img > TRACK_ZERO_IMG) EVENT.IMG
-            else if (pee > TRACK_ZERO_PEE) EVENT.PEE
-            else if (poo > TRACK_ZERO_POO) EVENT.POO
-            else if (mrk > TRACK_ZERO_MRK) EVENT.MRK
-            else EVENT.NNN
-        }
+    //val event: EVENT
+    //    get() {
+    //        return if (img > TRACK_ZERO_IMG) EVENT.IMG
+    //        else if (pee > TRACK_ZERO_PEE) EVENT.PEE
+    //        else if (poo > TRACK_ZERO_POO) EVENT.POO
+    //        else if (mrk > TRACK_ZERO_MRK) EVENT.MRK
+    //        else EVENT.NNN
+    //    }
 
     val location: Location
         get() = loc

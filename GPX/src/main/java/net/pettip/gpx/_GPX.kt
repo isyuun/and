@@ -12,7 +12,7 @@ package net.pettip.gpx
 
 /**
  * @Project     : carepet-android
- * @FileName    : _GPXWriter.kt
+ * @FileName    : _GPX.kt
  * @Date        : 2023. 09. 13.
  * @author      : isyuun@care-biz.co.kr
  * @description :
@@ -25,8 +25,10 @@ const val GPX_VERSION = "1.1"
 const val GPX_CREATOR = "PetTip"
 const val GPX_NAMESPACE = "http://www.topografix.com/GPX/1/1"
 const val GPX_XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
-val GPX_SIMPLE_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-val GPX_SIMPLE_TICK_FORMAT = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
+
+//val GPX_SIMPLE_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+val GPX_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz", Locale.getDefault())
+val GPX_TICK_FORMAT = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
 val GPX_DECIMAL_FORMAT_3 = DecimalFormat("0.000")
 val GPX_DECIMAL_FORMAT_7 = DecimalFormat("0.0000000")
 
@@ -36,7 +38,53 @@ const val GPX_LATITUDE_ZERO = 37.546855      //37.5
 const val GPX_LONGITUDE_ZERO = 127.065330    //127.0
 const val GPX_CAMERA_ZOOM_ZERO = 17.0
 
-open class _GPXWriter {
+const val TAG_GPX = "gpx"
+const val TAG_VERSION = "version"
+const val TAG_CREATOR = "creator"
+const val TAG_METADATA = "metadata"
+const val TAG_TRACK = "trk"
+const val TAG_SEGMENT = "trkseg"
+const val TAG_TRACK_POINT = "trkpt"
+const val TAG_LAT = "lat"
+const val TAG_LON = "lon"
+const val TAG_ELEVATION = "ele"
+const val TAG_TIME = "time"
+const val TAG_SYM = "sym"
+const val TAG_WAY_POINT = "wpt"
+const val TAG_ROUTE = "rte"
+const val TAG_ROUTE_POINT = "rtept"
+const val TAG_NAME = "name"
+const val TAG_DESC = "desc"
+const val TAG_CMT = "cmt"
+const val TAG_SRC = "src"
+const val TAG_LINK = "link"
+const val TAG_NUMBER = "number"
+const val TAG_TYPE = "type"
+const val TAG_TEXT = "text"
+const val TAG_AUTHOR = "author"
+const val TAG_COPYRIGHT = "copyright"
+const val TAG_KEYWORDS = "keywords"
+const val TAG_BOUNDS = "bounds"
+const val TAG_MIN_LAT = "minlat"
+const val TAG_MIN_LON = "minlon"
+const val TAG_MAX_LAT = "maxlat"
+const val TAG_MAX_LON = "maxlon"
+const val TAG_HREF = "href"
+const val TAG_YEAR = "year"
+const val TAG_LICENSE = "license"
+const val TAG_EMAIL = "email"
+const val TAG_ID = "id"
+const val TAG_DOMAIN = "domain"
+
+// extensions-related tags
+const val TAG_EXTENSIONS = "extensions"
+const val TAG_SPEED = "speed"
+
+val namespace: String? = null
+
+const val TAG_URI = "uri"
+
+open class _GPX {
     companion object {
         @JvmStatic
         fun calculateDuration(tracks: List<Track>): String {
