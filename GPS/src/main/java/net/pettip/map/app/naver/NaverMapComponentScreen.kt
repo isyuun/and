@@ -770,11 +770,12 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
     val pets = G.mapPetInfo
     if (pets.size == 1) application.add(pets[0])
-    Log.i(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
 
     val location = application.lastLocation ?: source.lastLocation
     var position by rememberSaveable { mutableStateOf(if (location != null) LatLng(location.latitude, location.longitude) else LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
     var zoom by rememberSaveable { mutableDoubleStateOf(GPX_CAMERA_ZOOM_ZERO) }
+
+    Log.i(__CLASSNAME__, "${getMethodName()}[$start][$zoom][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
 
     source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }
     source.isCompassEnabled = true
@@ -805,11 +806,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 
     val scope = rememberCoroutineScope()
     var refresh by remember { mutableStateOf(false) }
-    Log.w(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+    Log.w(__CLASSNAME__, "${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
     LaunchedEffect(refresh, position) {
         scope.launch {
             mapView.getMapAsync { naverMap ->
-                Log.v(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                Log.v(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
                 if (start) {
                     tracks?.let { naverMapPath(context = context, naverMap = naverMap, tracks = it, finished = false) }
                 }
@@ -1265,9 +1266,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 } else {
                     application.pause()
                     mapView.getMapAsync { naverMap ->
-                        Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                         zoom = naverMap.cameraPosition.zoom
-                        position = naverMap.cameraPosition.target
+                        Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     }
                     Text(
                         text = stringResource(id = R.string.walk_title_end),
@@ -1284,7 +1284,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         R.string.walk_button_finish
                         Button(
                             onClick = withClick(context) {
-                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
                                         showBottomSheet = false
@@ -1312,7 +1312,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         R.string.walk_button_resume
                         Button(
                             onClick = withClick(context) {
-                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
                                         showBottomSheet = false
@@ -1341,26 +1341,47 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     )
     Log.v(__CLASSNAME__, "${getMethodName()}[ED][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
     /** VERSION */
+    version(context, vertical)
+}
+
+@Composable
+fun version(context: Context, height: Dp) {
     //if (RELEASE) return
     val df = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
     val bt = df.format(Date(stringResource(id = R.string.build_time).toLong()))
     val pi = context.packageManager.getPackageInfo(context.packageName, 0)
     val vs = "[${pi.versionName}(${if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode else pi.versionCode})][${if (RELEASE) "REL" else "DEB"}][$bt]"
     var version by remember { mutableStateOf(false) }
-    Log.i(__CLASSNAME__, "${getMethodName()}[$version][$vs]")
+    var doublet by remember { mutableStateOf(false) }
+    LaunchedEffect(doublet) {
+        delay(1000)
+        doublet = false
+        Log.w(__CLASSNAME__, "${getMethodName()}[$context][doublet:$doublet][version:$version][$vs]")
+    }
+    Log.v(__CLASSNAME__, "${getMethodName()}[$context][doublet:$doublet][version:$version][$vs]")
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .pointerInput(Unit) {
                     detectTapGestures(
-                        onDoubleTap = withDoubleTap(context) { /** Called on Double Tap */ },
+                        onDoubleTap = withDoubleTap(context) {
+                            /** Called on Double Tap */
+                            doublet = true
+                            version = false
+                        },
                         onLongPress = withLongPress(context) {
                             /** Called on Long Press */
-                            Log.wtf(__CLASSNAME__, "::withClick${getMethodName()}[$context][$version]")
-                            version = !version
+                            if (doublet) version = !version
+                            doublet = false
                         },
-                        onPress = withPress(context) { /** Called when the gesture starts */ },
-                        onTap = withTap(context) { /** Called on Tap */ },
+                        onPress = withPress(context) {
+                            /** Called when the gesture starts */
+                            version = false
+                        },
+                        onTap = withTap(context) {
+                            /** Called on Tap */
+                            version = false
+                        },
                     )
                 }
                 //.clickable(
@@ -1368,7 +1389,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 //)
                 .align(Alignment.BottomEnd)
                 //.fillMaxWidth()
-                .height(vertical),
+                .height(height),
         ) {
             Text(
                 text = "${stringResource(id = R.string.app_version)}:$vs",

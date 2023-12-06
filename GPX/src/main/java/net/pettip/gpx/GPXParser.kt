@@ -120,7 +120,7 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
             if (parser.eventType != XmlPullParser.START_TAG) continue
             val name = parser.name
             val text = readText(parser)
-            //println("\t\t\tread() $name - $text")
+            println("\t\t\tread() $name - $text")
             when (name) {
                 TAG_TIME -> time = parseDateTime(text)
                 TAG_SPEED -> speed = if (text.isNotEmpty()) text.toFloat() else 0.0f
@@ -135,18 +135,18 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
         loc.speed = speed
         loc.altitude = ele
         val track = Track(loc = loc, no = no, event = event, uri = Uri.parse(uri))
-        //println("read() [${GPX_DATE_FORMAT.format(time)}][$track]")
+        println("read() [${GPX_DATE_FORMAT.format(time)}][$track]")
         tracks.add(track)
     }
 
     private fun parseDateTime(text: String): Long {
         if (text.isEmpty()) return 0L
-        try {
-            return GPX_DATE_FORMAT.parse(text).time
+        return try {
+            GPX_DATE_FORMAT.parse(text)?.time ?: 0L
         } catch (e: Exception) {
             //println(e.message)
             val time = ISODateTimeFormat.dateTimeParser().parseDateTime(text)
-            return (time.millis - 9 * 3600 * 1000)
+            (time.millis - 9 * 3600 * 1000)
         }
     }
 
