@@ -31,13 +31,43 @@ import kotlin.coroutines.resume
 
 class SharedViewModel:ViewModel(){
 
+    val emptyPet = PetDetailData(
+        ownrPetUnqNo = "",
+        petBrthYmd = "미상",
+        petInfoUnqNo = 0,
+        petKindNm = "웨스트 하이랜드 화이트 테리어",
+        petMngrYn = "",
+        petNm = "배추",
+        petRegNo = "",
+        petRelCd = "",
+        petRelNm = "",
+        petRelUnqNo = 0,
+        petRprsImgAddr = "",
+        petRprsYn = "Y",
+        sexTypCd = "",
+        sexTypNm = "모름",
+        stdgCtpvCd = "",
+        stdgCtpvNm = "",
+        stdgSggCd = "",
+        stdgSggNm = "",
+        stdgUmdCd = "",
+        stdgUmdNm = "",
+        wghtVl = 0.0f,
+        ntrTypCd = "",
+        ntrTypNm = "모름",
+        endDt = "",
+        mngrType = "M",
+        memberList = emptyList()
+    )
+
+
     private val _currentTab = MutableStateFlow<String>("스토리")
     val currentTab:StateFlow<String> = _currentTab.asStateFlow()
     fun updateCurrentTab(newValue: String){ _currentTab.value = newValue}
 
-    private val _profilePet = MutableStateFlow<PetDetailData?>(null)
-    val profilePet:StateFlow<PetDetailData?> = _profilePet.asStateFlow()
-    fun updateProfilePet(newValue: PetDetailData?){ _profilePet.value = newValue}
+    private val _profilePet = MutableStateFlow<PetDetailData>(emptyPet)
+    val profilePet:StateFlow<PetDetailData> = _profilePet.asStateFlow()
+    fun updateProfilePet(newValue: PetDetailData){ _profilePet.value = newValue}
 
     private val _pushData = MutableStateFlow<Bundle?>(null)
     val pushData:StateFlow<Bundle?> = _pushData.asStateFlow()
@@ -50,6 +80,12 @@ class SharedViewModel:ViewModel(){
     private val _init = MutableStateFlow<Boolean>(true)
     val init:StateFlow<Boolean> = _init.asStateFlow()
     fun updateInit(newValue: Boolean){ _init.value = newValue }
+
+    private val _dupleLogin = MutableStateFlow<Boolean>(false)
+    val dupleLogin:StateFlow<Boolean> = _dupleLogin.asStateFlow()
+    fun updateDupleLogin(newValue: Boolean){
+        _dupleLogin.value = newValue
+    }
 
     private val _moreStoryClick = MutableStateFlow<Int?>(null)
     val moreStoryClick:StateFlow<Int?> = _moreStoryClick.asStateFlow()
@@ -154,7 +190,6 @@ class SharedViewModel:ViewModel(){
                     }
                 }
                 override fun onFailure(call: Call<MyPetListRes>, t: Throwable) {
-                    Log.d("LOG","FAIL"+t.message)
                     continuation.resume(false)
                 }
 
@@ -178,12 +213,10 @@ class SharedViewModel:ViewModel(){
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            if(body.data.isEmpty()){
+                            if(it.data.isEmpty()){
                                 _currentPetInfo.value= arrayListOf(emptyCurrentPet)
-                                updateCurrentPetInfo(arrayListOf(emptyCurrentPet))
                             }else{
-                                _currentPetInfo.value=body.data
-                                updateCurrentPetInfo(body.data)
+                                _currentPetInfo.value=it.data
                             }
                             continuation.resume(true)
                         }
@@ -293,38 +326,9 @@ class SharedViewModel:ViewModel(){
         petRelUnqNo = 0
     )
 
-    val emptyPet = PetDetailData(
-        ownrPetUnqNo = "",
-        petBrthYmd = "미상",
-        petInfoUnqNo = 0,
-        petKindNm = "웨스트 하이랜드 화이트 테리어",
-        petMngrYn = "",
-        petNm = "배추",
-        petRegNo = "",
-        petRelCd = "",
-        petRelNm = "",
-        petRelUnqNo = 0,
-        petRprsImgAddr = "",
-        petRprsYn = "Y",
-        sexTypCd = "",
-        sexTypNm = "모름",
-        stdgCtpvCd = "",
-        stdgCtpvNm = "",
-        stdgSggCd = "",
-        stdgSggNm = "",
-        stdgUmdCd = "",
-        stdgUmdNm = "",
-        wghtVl = 0.0f,
-        ntrTypCd = "",
-        ntrTypNm = "모름",
-        endDt = "",
-        mngrType = "M",
-        memberList = emptyList()
-    )
-
     fun clear(){
         _currentTab.value = "스토리"
-        _profilePet.value = null
+        _profilePet.value = emptyPet
         _pushData.value = null
         _nickName.value = ""
         _init.value = true

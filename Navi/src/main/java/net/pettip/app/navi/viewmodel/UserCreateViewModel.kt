@@ -63,6 +63,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
 
     private val _sggList = MutableStateFlow<List<SggList>>(emptyList()) // 시군구
     val sggList: StateFlow<List<SggList>> = _sggList.asStateFlow()
+    fun updateSggList(newValue: List<SggList>) { _sggList.value = newValue }
 
     private val _umdList = MutableStateFlow<List<UmdList>>(emptyList()) // 읍면동
     val umdList: StateFlow<List<UmdList>> = _umdList.asStateFlow()
@@ -417,10 +418,10 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
         }
     }
 
-    fun umdListLoad(sggCd:String){
+    fun umdListLoad(sggCd:String, sidoCd: String){
         val apiService = RetrofitClientServer.instance
 
-        val data = net.pettip.data.UmdListReq(sggCd = sggCd, sidoCd = _selectedItem1.value.cdld)
+        val data = net.pettip.data.UmdListReq(sggCd = sggCd, sidoCd = sidoCd)
 
         val call = apiService.getUmdList(data)
 

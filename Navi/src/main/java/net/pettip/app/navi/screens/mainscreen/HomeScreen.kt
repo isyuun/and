@@ -45,6 +45,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -147,7 +148,7 @@ import kotlin.math.absoluteValue
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -210,10 +211,8 @@ fun HomeScreen(
 
     LaunchedEffect(key1 = refreshing){
         if (refreshing){
-            viewModel.updateIsLoading(true)
-            val result1 = sharedViewModel.loadCurrentPetInfo()
-            val result2 = sharedViewModel.loadPetInfo()
-            viewModel.updateIsLoading(!(result1 && result2))
+            sharedViewModel.loadCurrentPetInfo()
+            sharedViewModel.loadPetInfo()
             refreshing = false
         }
     }
@@ -329,7 +328,8 @@ fun ProfileContent(
 ){
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val isLoading by viewModel.isLoading.collectAsState()
+    val currentPetLoading by viewModel.currentPetLoading.collectAsState()
+    val petLoading by viewModel.petLoading.collectAsState()
 
     val context = LocalContext.current
     val density = LocalDensity.current.density
@@ -497,11 +497,11 @@ fun ProfileContent(
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
                 Crossfade(
-                    targetState = isLoading,
+                    targetState = currentPetLoading,
                     label = "" ,
                     animationSpec = tween(durationMillis = 700)
-                ) { isLoading ->
-                    when(isLoading){
+                ) { currentPetLoading ->
+                    when(currentPetLoading){
                         true ->
                             Box (modifier = Modifier
                                 .fillMaxWidth()
@@ -511,35 +511,48 @@ fun ProfileContent(
                                 LoadingAnimation1(circleColor = design_intro_bg)
                             }
                         false ->
-                            HorizontalPager(
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                state = pagerState,
-                                beyondBoundsPageCount = 1,
-                                flingBehavior = PagerDefaults.flingBehavior(
-                                    state = pagerState, snapVelocityThreshold = 20.dp)
-                            ) { page ->
-                                val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
-
-                                // 선택된 아이템의 Z-index를 높게 설정
-                                val zIndexModifier = if (isSelected) Modifier.zIndex(1f) else Modifier
-
-                                Box(Modifier
-                                    .then(zIndexModifier)
-                                    .graphicsLayer {
-                                        val pageOffset = pagerState.calculateCurrentOffsetForPage(page)
-                                        // translate the contents by the size of the page, to prevent the pages from sliding in from left or right and stays in the center
-                                        translationX = pageOffset * size.width / 4 * 3
-                                        // apply an alpha to fade the current page in and the old page out
-                                        alpha = 1 - pageOffset.absoluteValue / 2
-                                        scaleX = 1 - pageOffset.absoluteValue / 4
-                                        scaleY = 1 - pageOffset.absoluteValue / 4
-                                    }
-                                    .fillMaxSize(),
+                            if (currentPetInfo.isEmpty()){
+                                Box (modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp),
                                     contentAlignment = Alignment.Center
-                                ) {
+                                ){
+                                    Text(text = "불러오기 실패", color = design_login_text)
+                                }
+                            }else{
+                                HorizontalPager(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    state = pagerState,
+                                    beyondBoundsPageCount = 1,
+                                    flingBehavior = PagerDefaults.flingBehavior(
+                                        state = pagerState,
+                                        snapVelocityThreshold = 1.dp,
+                                        pagerSnapDistance = PagerSnapDistance.atMost(10)
+                                    )
+                                ) { page ->
+                                    val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
 
-                                    CircleImageHome(size = 180, imageUri = currentPetInfo[page].petRprsImgAddr, page, pagerState)
+                                    // 선택된 아이템의 Z-index를 높게 설정
+                                    val zIndexModifier = if (isSelected) Modifier.zIndex(1f) else Modifier
+
+                                    Box(Modifier
+                                        .then(zIndexModifier)
+                                        .graphicsLayer {
+                                            val pageOffset = pagerState.calculateCurrentOffsetForPage(page)
+                                            // translate the contents by the size of the page, to prevent the pages from sliding in from left or right and stays in the center
+                                            translationX = pageOffset * size.width / 4 * 3
+                                            // apply an alpha to fade the current page in and the old page out
+                                            alpha = 1 - pageOffset.absoluteValue / 2
+                                            scaleX = 1 - pageOffset.absoluteValue / 4
+                                            scaleY = 1 - pageOffset.absoluteValue / 4
+                                        }
+                                        .fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+
+                                        CircleImageHome(size = 180, imageUri = currentPetInfo[page].petRprsImgAddr, page, pagerState)
+                                    }
                                 }
                             }
                     }
@@ -605,7 +618,11 @@ fun ProfileContent(
                     }
 
                     Text(
-                        text = sexTypNm ?: stringResource(R.string.type_uk),
+                        text = if (sexTypNm == null || sexTypNm == ""){
+                            stringResource(R.string.type_uk)
+                        }else{
+                            sexTypNm
+                        },
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -686,7 +703,9 @@ fun ProfileContent(
                 color = design_skip,
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .clickable {
+                    .clickable(
+                        enabled = !petLoading
+                    ) {
                         openBottomSheet = true
                     }
             )
@@ -1041,21 +1060,12 @@ fun BottomSheetContent(
     navController: NavHostController,
     onDisMiss: (Boolean) -> Unit ){
     
-    val originPetList by viewModel.petInfo.collectAsState()
+    val petList by viewModel.petInfo.collectAsState()
     val index by viewModel.petListSelectIndex.collectAsState()
-
-    val petList = originPetList.sortedBy {
-        when(it.mngrType){
-            "M" -> 1
-            "I" -> 2
-            "C" -> 3
-            else -> 4
-        }
-    }
 
     LaunchedEffect(Unit){
         viewModel.updateSelectPetManage(petList[0])
-        viewModel.updatePetListSelectIndex("0")
+        viewModel.updateProfilePet(petList[0])
     }
 
 
@@ -1084,8 +1094,8 @@ fun BottomSheetContent(
                     .heightIn(max = 300.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ){
-                itemsIndexed(petList){ index, petList ->
-                    BottomSheetItem(viewModel = viewModel, petList, index)
+                items(petList){ petList ->
+                    BottomSheetItem(viewModel = viewModel, petList)
                 }
             }
         }else{
@@ -1147,7 +1157,7 @@ fun BottomSheetContent(
                 border = BorderStroke(1.dp, design_btn_border),
                 onClick = {
                     onDisMiss(false)
-                    navController.navigate("petProfileScreen/${index.toString()}")
+                    navController.navigate("petProfileScreen")
                 },
                 enabled = petList[0].petInfoUnqNo!=0
             ) {
@@ -1166,7 +1176,7 @@ fun BottomSheetContent(
 }
 
 @Composable
-fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData, index: Int){
+fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
 
     val petName:String = petList.petNm
     val imageUri:String? = petList.petRprsImgAddr
@@ -1183,7 +1193,8 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData, index: In
     Button(
         onClick = {
             viewModel.updateSelectPetManage(petList)
-            viewModel.updatePetListSelectIndex(index.toString())
+            viewModel.updateProfilePet(petList)
+            //viewModel.updatePetListSelectIndex(index.toString())
                   },
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp)
@@ -1443,7 +1454,8 @@ fun CircleImageHome(size: Int, imageUri: String?, page: Int, pagerState: PagerSt
             placeholder = painterResource(id = R.drawable.profile_default),
             error= painterResource(id = R.drawable.profile_default),
             modifier= Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            filterQuality = FilterQuality.Low
         )
 
     }
@@ -1533,7 +1545,7 @@ fun getFormattedDate(): String {
     return simpleDateFormat.format(currentDate)
 }
 
-data class StoryList(val imageUri: Any?,val title: String, val petName: String, val likeCount: String, val commentCount: String)
+
 
 fun metersToKilometers(meters: Int): String {
     val kilometers = meters / 1000.0

@@ -104,11 +104,11 @@ fun MainScreen(
     var showDialog by remember { mutableStateOf(false) }
 
     val init by sharedViewModel.init.collectAsState()
-
-    val pushData by sharedViewModel.pushData.collectAsState()
+    val dupleLogin by sharedViewModel.dupleLogin.collectAsState()
 
     val selectedPet by sharedViewModel.selectPet.collectAsState()
     val currentPet by sharedViewModel.currentPetInfo.collectAsState()
+    val petInfo by sharedViewModel.petInfo.collectAsState()
     val currentTab by sharedViewModel.currentTab.collectAsState()
 
     // logoTopbar back on/off
@@ -117,12 +117,23 @@ fun MainScreen(
     val context = LocalContext.current
 
     LaunchedEffect(key1 = init){
-        if (init){
-            homeViewModel.updateIsLoading(true)
-            delay(500)
+        if (init && !dupleLogin){
+
+            homeViewModel.updateCurrentPetLoading(true)
             val result1 = sharedViewModel.loadCurrentPetInfo()
+            if (result1){
+                homeViewModel.updateCurrentPetLoading(false)
+            }else{
+                homeViewModel.updateCurrentPetLoading(false)
+            }
+            homeViewModel.updatePetLoading(true)
             val result2 = sharedViewModel.loadPetInfo()
-            homeViewModel.updateIsLoading(!(result1 && result2))
+            if (result2){
+                homeViewModel.updatePetLoading(false)
+            }else{
+                homeViewModel.updatePetLoading(false)
+            }
+
             sharedViewModel.updateInit(false)
         }
     }
@@ -261,7 +272,8 @@ fun MainScreen(
                             openBottomSheet = {newValue -> openBottomSheet = newValue},
                             backBtnOn = backBtnOnLT,
                             walkViewModel = walkViewModel,
-                            backBtnOnChange = { newValue -> backBtnOnLT = newValue}
+                            backBtnOnChange = { newValue -> backBtnOnLT = newValue},
+                            sharedViewModel = sharedViewModel
                         )
                     "commu" ->
                         BackTopBar(title = stringResource(R.string.title_commu), navController = navController, false)

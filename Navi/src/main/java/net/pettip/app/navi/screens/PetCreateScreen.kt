@@ -11,7 +11,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -49,6 +53,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -58,6 +63,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -131,6 +137,7 @@ import net.pettip.data.UmdList
 import net.pettip.data.pet.PetListData
 import java.util.Calendar
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetCreateScreen(
     modifier: Modifier = Modifier,
@@ -182,13 +189,16 @@ fun PetCreateScreen(
     val petNtr by viewModel.petNtr.collectAsState()
 
     val address by viewModel.address.collectAsState()
+    val scd by viewModel.selectedItem1.collectAsState()
+    val sgg by viewModel.selectedItem2.collectAsState()
+    val umd by viewModel.selectedItem3.collectAsState()
 
     val userId by viewModel.userID.collectAsState()
     val userPw by viewModel.userPW.collectAsState()
     val snsLogin by viewModel.snsLogin.collectAsState()
     var isLoading by remember{ mutableStateOf(false) }
 
-    Log.d("LOG","petCreate composing")
+    Log.d("LOG",scd.cdNm+":"+sgg.sggNm)
 
     Scaffold (
         modifier = modifier.fillMaxSize(),
@@ -213,14 +223,6 @@ fun PetCreateScreen(
                     modifier= Modifier
                         .padding(end = 20.dp)
                         .clickable {
-                            //if (MySharedPreference.getIsLogin()) {
-                            //    navController.navigate(Screen.MainScreen.route) {
-                            //        popUpTo(0)
-                            //    }
-                            //} else {
-                            //
-                            //}
-
                             scope.launch {
                                 val userCreateSuccess = viewModel.sendUserToServer()
                                 if (userCreateSuccess) {
@@ -387,7 +389,9 @@ fun PetCreateScreen(
                 border = BorderStroke(1.dp, color = design_btn_border)
             ) {
                 Row(modifier=Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
-                    Text(text = address, color = design_login_text,
+                    Text(
+                        text = if(scd.cdld == "") "주소 선택" else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
+                        color = design_login_text,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -914,6 +918,7 @@ fun CircleImageCreate(viewModel: UserCreateViewModel){
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetKindContent(
     viewModel: UserCreateViewModel,
@@ -924,11 +929,14 @@ fun PetKindContent(
         viewModel.onKindClick()
     }
 
+    val context = LocalContext.current
     val searchText by viewModel.searchText.collectAsState()
     val pets by viewModel.pets.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
     var expanded by remember { mutableStateOf (false) }
+
+    var selectPet by remember{ mutableStateOf<PetListData?>(null) }
 
     Scaffold (
         modifier = Modifier.fillMaxSize(),
@@ -1005,7 +1013,7 @@ fun PetKindContent(
                             verticalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             items(pets){ pets ->
-                                petKindItem(viewModel = viewModel, pet = pets, focusRequester = focusRequester)
+                                petKindItem(viewModel = viewModel, pet = pets, focusRequester = focusRequester, onSelect = {newValue -> selectPet = newValue})
                             }
                         }
                     }
@@ -1014,7 +1022,14 @@ fun PetKindContent(
             }
 
             Button(
-                onClick = { navController.popBackStack() },
+                onClick = {
+                    if (selectPet == null){
+                        Toast.makeText(context, "품종을 선택해주세요", Toast.LENGTH_SHORT).show()
+                    }else{
+                        viewModel.updatePetKind(selectPet!!)
+                        navController.popBackStack()
+                    }
+                          },
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 40.dp)
                     .align(Alignment.BottomCenter)
@@ -1033,7 +1048,7 @@ fun PetKindContent(
 }
 
 @Composable
-fun petKindItem(viewModel: UserCreateViewModel, pet: PetListData, focusRequester:FocusRequester){
+fun petKindItem(viewModel: UserCreateViewModel, pet: PetListData, focusRequester: FocusRequester, onSelect: (PetListData)->Unit){
 
     val focusManager = LocalFocusManager.current
 
@@ -1050,7 +1065,8 @@ fun petKindItem(viewModel: UserCreateViewModel, pet: PetListData, focusRequester
             )
             .clickable {
                 viewModel.onSearchTextChange(pet.petNm)
-                viewModel.updatePetKind(pet)
+                //viewModel.updatePetKind(pet)
+                onSelect(pet)
                 focusManager.clearFocus()
             },
         verticalArrangement = Arrangement.Center
@@ -1077,15 +1093,22 @@ fun LocationPickContent(
     val sggList by viewModel.sggList.collectAsState()
     val umdList by viewModel.umdList.collectAsState()
 
-    val scdSelect by viewModel.selectedItem1.collectAsState()
-    val sggSelect by viewModel.selectedItem2.collectAsState()
-    val umdSelect by viewModel.selectedItem3.collectAsState()
-
-    val isSearching by viewModel.isSearching.collectAsState()
-    val focusRequester by remember { mutableStateOf(FocusRequester()) }
     var expanded1 by remember { mutableStateOf (false) }
     var expanded2 by remember { mutableStateOf (false) }
     var expanded3 by remember { mutableStateOf (false) }
+
+    var selectSCD by remember{ mutableStateOf<SCD?>(null) }
+    var selectSGG by remember{ mutableStateOf<SggList?>(null) }
+    var selectUMD by remember{ mutableStateOf<UmdList?>(null) }
+
+    val context = LocalContext.current
+
+    DisposableEffect(Unit){
+        onDispose {
+            viewModel.updateSggList(emptyList())
+            viewModel.updateUmdList(emptyList())
+        }
+    }
 
     Scaffold (
         modifier = Modifier.fillMaxSize(),
@@ -1106,38 +1129,39 @@ fun LocationPickContent(
                     modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
                 )
 
-                CustomTextField(
-                    value = scdSelect.cdNm,
-                    onValueChange = {},
-                    singleLine = true,
-                    readOnly = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next),
+                Row (
                     modifier = Modifier
-                        .focusRequester(focusRequester)
-                        .padding(start = 20.dp, top = 8.dp, end = 20.dp)
+                        .padding(start = 20.dp, end = 20.dp, top = 8.dp)
                         .fillMaxWidth()
                         .height(48.dp)
-                        .onFocusChanged { focusState ->
-                            expanded1 = focusState.isFocused
+                        .border(
+                            width = 1.dp,
+                            color = if (expanded1) design_login_text else design_textFieldOutLine,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { expanded1 = !expanded1 },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text(
+                        text = selectSCD?.cdNm ?: "시/도를 선택해주세요",
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = if(selectSCD == null) 14.sp else 16.sp,
+                        letterSpacing = if(selectSCD == null) (-0.7).sp else (-0.8).sp,
+                        color = if(selectSCD == null) design_placeHolder else design_login_text,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+
+                    Icon(
+                        imageVector = if(expanded1){
+                            Icons.Default.KeyboardArrowUp
+                        }else{
+                            Icons.Default.KeyboardArrowDown
                         },
-                    placeholder = { Text(text = "시/도를 선택해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text),
-                    shape = RoundedCornerShape(12.dp),
-                    innerPadding = PaddingValues(start=16.dp),
-                    trailingIcon = {
-                        Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "")
-                    }
-                )
+                        contentDescription = "", tint = design_login_text,
+                        modifier = Modifier.padding(end = 16.dp))
+                }
 
                 Spacer(modifier = Modifier.padding(top= 4.dp))
 
@@ -1154,48 +1178,63 @@ fun LocationPickContent(
                         verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         items(scdList){ scd ->
-                            addressItem1(viewModel = viewModel, address = scd, focusRequester = focusRequester)
+                            addressItem1(
+                                viewModel = viewModel,
+                                address = scd,
+                                onClick = {newValue -> expanded1 = newValue},
+                                onSelect = {newValue -> selectSCD = newValue},
+                                sggClear = { selectSGG = null },
+                                umdClear = { selectUMD = null }
+                            )
                         }
                     }
                 }
 
+                AnimatedVisibility(
+                    visible = sggList.isNotEmpty(),
+                    enter = slideInHorizontally(initialOffsetX = {-it})+ fadeIn(),
+                    exit = slideOutHorizontally(targetOffsetX = {-it})+ fadeOut()
+                ) {
+                    Column {
+                        Text(text = "시/군/구", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+                        )
 
-                Text(text = "시/군/구", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
-                )
+                        Row (
+                            modifier = Modifier
+                                .padding(start = 20.dp, end = 20.dp, top = 8.dp)
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .border(
+                                    width = 1.dp,
+                                    color = if (expanded2) design_login_text else design_textFieldOutLine,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { expanded2 = !expanded2 },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ){
+                            Text(
+                                text = selectSGG?.sggNm ?: "시/군/구를 선택해주세요",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = if(selectSGG == null) 14.sp else 16.sp,
+                                letterSpacing = if(selectSGG == null) (-0.7).sp else (-0.8).sp,
+                                color = if(selectSGG == null) design_placeHolder else design_login_text,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
 
-                CustomTextField(
-                    value = sggSelect.sggNm,
-                    onValueChange = {},
-                    singleLine = true,
-                    readOnly = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next),
-                    modifier = Modifier
-                        .focusRequester(focusRequester)
-                        .padding(start = 20.dp, top = 8.dp, end = 20.dp)
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .onFocusChanged { focusState ->
-                            expanded2 = focusState.isFocused
-                        },
-                    placeholder = { Text(text = "시/군/구를 선택해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text),
-                    shape = RoundedCornerShape(12.dp),
-                    innerPadding = PaddingValues(start=16.dp),
-                    trailingIcon = {
-                        Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "")
+                            Icon(
+                                imageVector = if(expanded2){
+                                    Icons.Default.KeyboardArrowUp
+                                }else{
+                                    Icons.Default.KeyboardArrowDown
+                                },
+                                contentDescription = "", tint = design_login_text,
+                                modifier = Modifier.padding(end = 16.dp))
+                        }
                     }
-                )
+                }
 
                 Spacer(modifier = Modifier.padding(top= 4.dp))
 
@@ -1212,47 +1251,64 @@ fun LocationPickContent(
                         verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         items(sggList){ sggList ->
-                            addressItem2(viewModel = viewModel, address = sggList, focusRequester = focusRequester)
+                            addressItem2(
+                                viewModel = viewModel,
+                                address = sggList,
+                                sidoCd = selectSCD?.cdld?:"",
+                                onClick = {newValue -> expanded2 = newValue},
+                                onSelect = {newValue -> selectSGG = newValue},
+                                umdClear = { selectUMD = null }
+                            )
                         }
                     }
                 }
 
-                Text(text = "읍/면/동", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
-                )
 
-                CustomTextField(
-                    value = umdSelect.umdNm,
-                    onValueChange = {},
-                    singleLine = true,
-                    readOnly = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next),
-                    modifier = Modifier
-                        .focusRequester(focusRequester)
-                        .padding(start = 20.dp, top = 8.dp, end = 20.dp)
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .onFocusChanged { focusState ->
-                            expanded3 = focusState.isFocused
-                        },
-                    placeholder = { Text(text = "읍/면/동을 선택해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text),
-                    shape = RoundedCornerShape(12.dp),
-                    innerPadding = PaddingValues(start=16.dp),
-                    trailingIcon = {
-                        Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "")
+                AnimatedVisibility(
+                    visible = umdList.isNotEmpty(),
+                    enter = slideInHorizontally(initialOffsetX = {-it})+ fadeIn(),
+                    exit = slideOutHorizontally(targetOffsetX = {-it})+ fadeOut()
+                ) {
+                    Column {
+                        Text(text = "읍/면/동", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+                        )
+
+                        Row (
+                            modifier = Modifier
+                                .padding(start = 20.dp, end = 20.dp, top = 8.dp)
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .border(
+                                    width = 1.dp,
+                                    color = if (expanded3) design_login_text else design_textFieldOutLine,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { expanded3 = !expanded3 },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ){
+                            Text(
+                                text = selectUMD?.umdNm ?: "읍/면/동을 선택해주세요",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = if(selectUMD == null) 14.sp else 16.sp,
+                                letterSpacing = if(selectUMD == null) (-0.7).sp else (-0.8).sp,
+                                color = if(selectUMD == null) design_placeHolder else design_login_text,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+
+                            Icon(
+                                imageVector = if(expanded3){
+                                    Icons.Default.KeyboardArrowUp
+                                }else{
+                                    Icons.Default.KeyboardArrowDown
+                                },
+                                contentDescription = "", tint = design_login_text,
+                                modifier = Modifier.padding(end = 16.dp))
+                        }
                     }
-                )
+                }
 
                 Spacer(modifier = Modifier.padding(top= 4.dp))
 
@@ -1269,7 +1325,7 @@ fun LocationPickContent(
                         verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         items(umdList){ umdList ->
-                            addressItem3(viewModel = viewModel, address = umdList, focusRequester = focusRequester)
+                            addressItem3(viewModel = viewModel, address = umdList, onClick = {newValue -> expanded3 = newValue},  onSelect = {newValue -> selectUMD = newValue})
                         }
                     }
                 }
@@ -1277,12 +1333,22 @@ fun LocationPickContent(
 
             Button(
                 onClick = {
-                    viewModel.updateAddress(
-                        "${viewModel.selectedItem1.value.cdNm} " +
-                                "${viewModel.selectedItem2.value.sggNm} " +
-                                "${viewModel.selectedItem3.value.umdNm}"
-                    )
-                    navController.popBackStack()
+                    if (selectSCD == null){
+                        Toast.makeText(context, "시/도를 선택해주세요", Toast.LENGTH_SHORT).show()
+                    }else if (selectSGG == null){
+                        Toast.makeText(context, "시/군/구를 선택해주세요", Toast.LENGTH_SHORT).show()
+                    }else if (umdList.isNotEmpty() && selectUMD == null){
+                        Toast.makeText(context, "읍/면/동을 선택해주세요", Toast.LENGTH_SHORT).show()
+                    }else{
+
+                        viewModel.updateSelectedItem1(selectSCD!!)
+                        viewModel.updateSelectedItem2(selectSGG!!)
+                        if (umdList.isNotEmpty()) viewModel.updateSelectedItem3(selectUMD!!) else viewModel.updateSelectedItem3(UmdList("",""))
+
+                        Log.d("LOG",selectSCD!!.cdNm+":"+selectSGG!!.sggNm)
+                        navController.popBackStack()
+                    }
+
                           },
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 40.dp)
@@ -1303,9 +1369,7 @@ fun LocationPickContent(
 }
 
 @Composable
-fun addressItem1(viewModel: UserCreateViewModel, address: SCD, focusRequester:FocusRequester){
-
-    val focusManager = LocalFocusManager.current
+fun addressItem1(viewModel: UserCreateViewModel, address: SCD, onClick: (Boolean) -> Unit, onSelect: (SCD)->Unit, sggClear:()->Unit, umdClear:()->Unit){
 
     Column (
         modifier = Modifier
@@ -1319,15 +1383,16 @@ fun addressItem1(viewModel: UserCreateViewModel, address: SCD, focusRequester:Fo
                 shape = RoundedCornerShape(12.dp)
             )
             .clickable {
-                viewModel.updateSelectedItem1(address)
+                onSelect(address)
 
                 // 시군구, 읍면동 초기화
-                viewModel.updateSelectedItem2(SggList("", ""))
-                viewModel.updateSelectedItem3(UmdList("", ""))
-                viewModel.updateUmdList(emptyList())
+                sggClear()
+                umdClear()
 
+                viewModel.updateUmdList(emptyList())
                 viewModel.sggListLoad(address.cdld)
-                focusManager.clearFocus()
+
+                onClick(false)
             },
         verticalArrangement = Arrangement.Center
     ){
@@ -1344,9 +1409,7 @@ fun addressItem1(viewModel: UserCreateViewModel, address: SCD, focusRequester:Fo
 }
 
 @Composable
-fun addressItem2(viewModel: UserCreateViewModel, address: SggList, focusRequester:FocusRequester){
-
-    val focusManager = LocalFocusManager.current
+fun addressItem2(viewModel: UserCreateViewModel, address: SggList, sidoCd: String, onClick: (Boolean) -> Unit, onSelect: (SggList) -> Unit, umdClear: () -> Unit){
 
     Column (
         modifier = Modifier
@@ -1360,10 +1423,10 @@ fun addressItem2(viewModel: UserCreateViewModel, address: SggList, focusRequeste
                 shape = RoundedCornerShape(12.dp)
             )
             .clickable {
-                viewModel.updateSelectedItem2(address)
-                viewModel.updateSelectedItem3(UmdList("", ""))
-                viewModel.umdListLoad(address.sggCd)
-                focusManager.clearFocus()
+                onSelect(address)
+                umdClear()
+                viewModel.umdListLoad(address.sggCd, sidoCd)
+                onClick(false)
             },
         verticalArrangement = Arrangement.Center
     ){
@@ -1380,9 +1443,7 @@ fun addressItem2(viewModel: UserCreateViewModel, address: SggList, focusRequeste
 }
 
 @Composable
-fun addressItem3(viewModel: UserCreateViewModel, address: UmdList, focusRequester:FocusRequester){
-
-    val focusManager = LocalFocusManager.current
+fun addressItem3(viewModel: UserCreateViewModel, address: UmdList, onClick: (Boolean) -> Unit, onSelect: (UmdList)->Unit){
 
     Column (
         modifier = Modifier
@@ -1396,8 +1457,8 @@ fun addressItem3(viewModel: UserCreateViewModel, address: UmdList, focusRequeste
                 shape = RoundedCornerShape(12.dp)
             )
             .clickable {
-                viewModel.updateSelectedItem3(address)
-                focusManager.clearFocus()
+                onSelect(address)
+                onClick(false)
             },
         verticalArrangement = Arrangement.Center
     ){

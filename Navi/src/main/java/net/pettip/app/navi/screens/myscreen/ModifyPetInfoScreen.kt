@@ -112,19 +112,9 @@ fun ModifyPetInfoScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: UserCreateViewModel,
-    sharedViewModel: SharedViewModel,
-    index: String? = null
+    sharedViewModel: SharedViewModel
 ){
-    val originPetInfo by sharedViewModel.petInfo.collectAsState()
-    val petInfo = originPetInfo.sortedBy {
-        when (it.mngrType) {
-            "M" -> 1
-            "I" -> 2
-            "C" -> 3
-            else -> 4
-        }
-    }
-    val selectPet = petInfo[index?.toInt() ?: 0]
+    val selectPet by sharedViewModel.profilePet.collectAsState()
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -159,6 +149,9 @@ fun ModifyPetInfoScreen(
     val petWght by viewModel.petWght.collectAsState()
     val petGender by viewModel.petGender.collectAsState()
     val petNtr by viewModel.petNtr.collectAsState()
+    val scd by viewModel.selectedItem1.collectAsState()
+    val sgg by viewModel.selectedItem2.collectAsState()
+    val umd by viewModel.selectedItem3.collectAsState()
 
     var showDialog by remember{ mutableStateOf(false) }
     var init by rememberSaveable { mutableStateOf(true) }
@@ -181,9 +174,9 @@ fun ModifyPetInfoScreen(
             viewModel.updatePetWght(selectPet.wghtVl.toString())
             viewModel.updatePetGender(selectPet.sexTypNm?:"남아")
             viewModel.updatePetNtr(selectPet.ntrTypNm?:"했어요")
-            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = selectPet.stdgCtpvCd, upCdId = ""))
-            viewModel.updateSelectedItem2(SggList(sggCd = selectPet.stdgSggCd, sggNm = ""))
-            viewModel.updateSelectedItem3(UmdList(umdCd = selectPet.stdgUmdCd, umdNm = ""))
+            viewModel.updateSelectedItem1(SCD(cdNm = selectPet.stdgCtpvNm , cdld = selectPet.stdgCtpvCd, upCdId = ""))
+            viewModel.updateSelectedItem2(SggList(sggCd = selectPet.stdgSggCd, sggNm = selectPet.stdgSggNm))
+            viewModel.updateSelectedItem3(UmdList(umdCd = selectPet.stdgUmdCd, umdNm = selectPet.stdgUmdNm?:""))
             viewModel.updateAddress(
                 "${selectPet.stdgCtpvNm} " +
                         "${selectPet.stdgSggNm} " +
@@ -468,7 +461,9 @@ fun ModifyPetInfoScreen(
                 border = BorderStroke(1.dp, color = design_btn_border)
             ) {
                 Row(modifier= Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
-                    Text(text = address, color = design_login_text,
+                    Text(
+                        text = if(scd.cdld == "") "주소 선택" else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
+                        color = design_login_text,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular))
                     )
 

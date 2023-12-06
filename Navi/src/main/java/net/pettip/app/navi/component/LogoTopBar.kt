@@ -49,6 +49,7 @@ import coil.request.ImageRequest
 import net.pettip.app.navi.R
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_white
+import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.pet.CurrentPetData
 
@@ -60,10 +61,12 @@ fun LogoTopBar(
     openBottomSheet:(Boolean) -> Unit,
     backBtnOn:Boolean,
     backBtnOnChange:(Boolean) -> Unit,
-    walkViewModel: WalkViewModel
+    walkViewModel: WalkViewModel,
+    sharedViewModel: SharedViewModel
 ) {
 
     val petList by walkViewModel.petInfo.collectAsState()
+    val currentPetData by sharedViewModel.currentPetInfo.collectAsState()
 
     TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
@@ -117,7 +120,7 @@ fun LogoTopBar(
                         .fillMaxHeight()
                         .wrapContentWidth()
                         .clickable(
-                            enabled = petList.isNotEmpty(),
+                            enabled = currentPetData.isNotEmpty(),
                             onClick = { openBottomSheet(true) }
                         ) ,
                     verticalAlignment = Alignment.CenterVertically
@@ -176,7 +179,3 @@ fun CircleImageTopBar(size: Int, imageUri:String?){
     }
 }
 
-private fun openBottomSheet(){
-    Log.d("LOG","openBottomSheet 진입")
-    // BottomSheet 구현
-}

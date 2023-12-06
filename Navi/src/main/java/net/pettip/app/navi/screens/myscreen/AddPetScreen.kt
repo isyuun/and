@@ -2,9 +2,12 @@ package net.pettip.app.navi.screens.myscreen
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -39,12 +42,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -82,6 +87,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -109,6 +115,10 @@ import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.UserCreateViewModel
+import net.pettip.data.SCD
+import net.pettip.data.SggList
+import net.pettip.data.UmdList
+import net.pettip.data.pet.PetListData
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -156,13 +166,97 @@ fun AddPetScreen(
     val petWght by viewModel.petWght.collectAsState()
     val petGender by viewModel.petGender.collectAsState()
     val petNtr by viewModel.petNtr.collectAsState()
+    val scd by viewModel.selectedItem1.collectAsState()
+    val sgg by viewModel.selectedItem2.collectAsState()
+    val umd by viewModel.selectedItem3.collectAsState()
 
-    val address by viewModel.address.collectAsState()
+    BackHandler {
+        scope.launch {
+            navController.popBackStack()
+
+            viewModel.updatePetName("")
+            viewModel.updatePetKind(
+                PetListData(
+                    petDogSzCd = "",
+                    petNm = "사이즈/품종 선택",
+                    petEnNm = "",
+                    petInfoUnqNo = 0,
+                    petTypCd = ""
+                )
+            )
+            viewModel.updatePetWght("")
+            viewModel.updatePetGender("남아")
+            viewModel.updatePetNtr("했어요")
+            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+            viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
+            viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
+            viewModel.updatePetBirth("")
+            viewModel.updateYear(net.pettip.app.navi.viewmodel.PickerState())
+            viewModel.setImageUri(null,context)
+        }
+    }
 
     Scaffold (
         modifier = modifier.fillMaxSize(),
         topBar = {
-            BackTopBar(title = "반려동물 등록", navController = navController)
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
+                modifier = Modifier.height(60.dp),
+                title = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clip(shape = CircleShape)
+                                .clickable {
+                                    scope.launch {
+                                        navController.popBackStack()
+
+                                        viewModel.updatePetName("")
+                                        viewModel.updatePetKind(
+                                            PetListData(
+                                                petDogSzCd = "",
+                                                petNm = "사이즈/품종 선택",
+                                                petEnNm = "",
+                                                petInfoUnqNo = 0,
+                                                petTypCd = ""
+                                            )
+                                        )
+                                        viewModel.updatePetWght("")
+                                        viewModel.updatePetGender("남아")
+                                        viewModel.updatePetNtr("했어요")
+                                        viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+                                        viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
+                                        viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
+                                        viewModel.updatePetBirth("")
+                                        viewModel.updateYear(net.pettip.app.navi.viewmodel.PickerState())
+                                        viewModel.setImageUri(null,context)
+                                    }
+                                }
+                                .align(Alignment.CenterStart),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Icon(painter = painterResource(id = R.drawable.arrow_back),
+                                contentDescription = "",
+                                tint = Color.Unspecified
+                            )
+                        }
+
+                        Text(
+                            text = "반려동물 등록",
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            letterSpacing = (-1.0).sp,
+                            color = design_login_text,
+                            modifier = Modifier.align(Alignment.Center),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            )
         }
     ){ paddingValues ->
 
@@ -314,7 +408,9 @@ fun AddPetScreen(
                 border = BorderStroke(1.dp, color = design_btn_border)
             ) {
                 Row(modifier= Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
-                    Text(text = address, color = design_login_text,
+                    Text(
+                        text = if(scd.cdld == "") "주소 선택" else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
+                        color = design_login_text,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular))
                     )
 

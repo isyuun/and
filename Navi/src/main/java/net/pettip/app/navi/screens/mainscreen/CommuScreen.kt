@@ -509,7 +509,7 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
     LaunchedEffect(key1 = refreshing) {
         if (refreshing) {
 
-            viewModel.updateEventListClear()
+            viewModel.updateEndEventListClear()
             viewModel.getEndEventList(1)
 
             delay(300)

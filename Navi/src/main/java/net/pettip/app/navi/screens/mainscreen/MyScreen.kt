@@ -121,15 +121,7 @@ import java.util.Date
 @Composable
 fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, sharedViewModel: SharedViewModel){
 
-    val originPetInfo by sharedViewModel.petInfo.collectAsState()
-    val petInfo = originPetInfo.sortedBy {
-        when (it.mngrType) {
-            "M" -> 1
-            "I" -> 2
-            "C" -> 3
-            else -> 4
-        }
-    }
+    val petInfo by sharedViewModel.petInfo.collectAsState()
 
     val bottomSheetState =
         androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -506,7 +498,10 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                 shape = RoundedCornerShape(12.dp)
             )
             .clip(shape = RoundedCornerShape(12.dp))
-            .clickable { navController.navigate("petProfileScreen/${index.toString()}") }
+            .clickable {
+                sharedViewModel.updateProfilePet(petDetailData)
+                navController.navigate("petProfileScreen")
+            }
     ){
         Spacer(modifier = Modifier.padding(top = 12.dp))
         
@@ -707,10 +702,7 @@ fun MyBottomSheet(
                     MyBottomSheetItem(viewModel = sharedViewModel, settingViewModel= settingViewModel, petList = petList)
                 }
             }
-        }else{
-
         }
-
 
         Row (modifier = Modifier
             .padding(end = 20.dp)
@@ -779,11 +771,13 @@ fun MyBottomSheet(
                 if (selectedPet.isNotEmpty()){
                     if (!endCheck){
                         if (settingViewModel.updateSelectedPetSave(selectedPet)) {
-                            scope.launch {
-                                if (settingViewModel.getInviteCode()){
-                                    openBottomSheet(false)
-                                    navController.navigate(Screen.InviteScreen.route)
-                                } }
+                            //scope.launch {
+                            //    if (settingViewModel.getInviteCode()){
+                            //        openBottomSheet(false)
+                            //        navController.navigate(Screen.InviteScreen.route)
+                            //    } }
+                            openBottomSheet(false)
+                            navController.navigate(Screen.InviteScreen.route)
                         }
                     }else if(dateState.selectedDateMillis != null && selectedTime !=""){
                         val calendar = Calendar.getInstance()
@@ -801,11 +795,8 @@ fun MyBottomSheet(
                             Toast.makeText(context, context.getString(R.string.already_end_date), Toast.LENGTH_SHORT).show()
                         }else{
                             if (settingViewModel.updateSelectedPetSave(selectedPet)) {
-                                scope.launch {
-                                    if (settingViewModel.getInviteCode()){
-                                        openBottomSheet(false)
-                                        navController.navigate(Screen.InviteScreen.route)
-                                    } }
+                                openBottomSheet(false)
+                                navController.navigate(Screen.InviteScreen.route)
                             }
                         }
                     }else{

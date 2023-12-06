@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, true)
+        //WindowCompat.setDecorFitsSystemWindows(window, true)
 
         val data = intent.extras;
         setContent {
@@ -137,14 +137,14 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
 
     var count by remember { mutableIntStateOf(3) }
 
-    LaunchedEffect(key1 = G.dupleLogin){
-        if (G.dupleLogin){
+    LaunchedEffect(key1 = G.dupleLogin) {
+        if (G.dupleLogin) {
+            sharedViewModel.updateDupleLogin(true)
             while (count > 0) {
                 delay(1000) // 1초 딜레이
                 count--
             }
-            // 카운트다운이 끝나면 콜백 실행
-            navController.navigate(Screen.Login.route){
+            navController.navigate(Screen.Login.route) {
                 popUpTo(0)
             }
             G.dupleLogin = false
@@ -353,8 +353,8 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
         composable("userInfoScreen"){
             UserInfoScreen(navController = navController, settingViewModel = settingViewModel)
         }
-        composable("petProfileScreen/{index}"){ backStackEntry ->
-            PetProfileScreen(navController = navController, sharedViewModel = sharedViewModel, settingViewModel,backStackEntry.arguments?.getString("index"))
+        composable("petProfileScreen"){ backStackEntry ->
+            PetProfileScreen(navController = navController, sharedViewModel = sharedViewModel, settingViewModel)
         }
         composable("inviteScreen"){
             InviteScreen(navController = navController, settingViewModel = settingViewModel)
@@ -365,10 +365,8 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
         composable("addPetScreen"){
             AddPetScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)
         }
-        composable("modifyPetInfoScreen/{index}"){ backStackEntry ->
-            ModifyPetInfoScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel,
-                index = backStackEntry.arguments?.getString("index")
-            )
+        composable("modifyPetInfoScreen"){
+            ModifyPetInfoScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)
         }
         composable(
             "walkDetailContent",

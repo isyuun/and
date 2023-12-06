@@ -137,7 +137,7 @@ import java.util.Date
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedViewModel, settingViewModel: SettingViewModel,index: String?){
+fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedViewModel, settingViewModel: SettingViewModel){
 
     DisposableEffect(Unit){
         onDispose {
@@ -145,27 +145,10 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
         }
     }
 
-    val originPetInfo by sharedViewModel.petInfo.collectAsState()
-    val petInfo = originPetInfo.sortedBy {
-        when (it.mngrType) {
-            "M" -> 1
-            "I" -> 2
-            "C" -> 3
-            else -> 4
-        }
-    }
+    val petInfo by sharedViewModel.petInfo.collectAsState()
+    val selectedPet by sharedViewModel.profilePet.collectAsState()
 
-    val indexInt = index?.toInt() ?: 0
-
-    val originMemberList by settingViewModel.memberList.collectAsState()
-    val memberList = originMemberList?.sortedBy {
-        when (it.mngrType) {
-            "M" -> 1
-            "I" -> 2
-            "C" -> 3
-            else -> 4
-        }
-    }
+    val memberList by settingViewModel.memberList.collectAsState()
 
     var weightRgstDialog by remember{ mutableStateOf(false) }
     var weightCNDDialog by remember{ mutableStateOf(false) }
@@ -211,7 +194,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 sharedViewModel.loadPetInfo()
                 sharedViewModel.loadCurrentPetInfo()
             }
-            val result = settingViewModel.getPetWgt(petInfo[indexInt].ownrPetUnqNo)
+            val result = settingViewModel.getPetWgt(selectedPet.ownrPetUnqNo)
             if (result){
                 datasetForModel.clear()
                 var xPos = 0f
@@ -230,8 +213,10 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
     }
 
     LaunchedEffect(Unit){
-        settingViewModel.getPetInfoDetail(petInfo[indexInt])
-        settingViewModel.getPetWgt(petInfo[indexInt].ownrPetUnqNo)
+        settingViewModel.getPetInfoDetail(selectedPet)
+        settingViewModel.getPetWgt(selectedPet.ownrPetUnqNo)
+
+        Log.d("LOG",selectedPet.toString())
 
         datasetForModel.clear()
         datasetLineSpec.clear()
@@ -263,7 +248,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = "${petInfo[indexInt].petNm} 프로필", navController = navController) }
+        topBar = { BackTopBar(title = "${selectedPet.petNm} 프로필", navController = navController) }
     ) { paddingValues ->
 
         if (weightRgstDialog){
@@ -272,7 +257,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 viewModel = settingViewModel,
                 confirm = "등록",
                 dismiss = "취소",
-                ownrPetUnqNo = petInfo[indexInt].ownrPetUnqNo,
+                ownrPetUnqNo = selectedPet.ownrPetUnqNo,
                 refresh = {newValue -> updatePetWgt = newValue}
             )
         }
@@ -296,7 +281,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "${petInfo[indexInt].stdgCtpvNm} ${petInfo[indexInt].stdgSggNm} ${petInfo[indexInt].stdgUmdNm ?: ""}",
+                text = "${selectedPet.stdgCtpvNm} ${selectedPet.stdgSggNm} ${selectedPet.stdgUmdNm ?: ""}",
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
@@ -307,13 +292,13 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
             CircleImage(
                 size = 180,
-                imageUri = petInfo[indexInt].petRprsImgAddr
+                imageUri = selectedPet.petRprsImgAddr
             )
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
             Text(
-                text = petInfo[indexInt].petKindNm,
+                text = selectedPet.petKindNm,
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
@@ -321,7 +306,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             )
 
             Text(
-                text = petInfo[indexInt].petNm,
+                text = selectedPet.petNm,
                 fontSize = 30.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 letterSpacing = (-0.7).sp,
@@ -351,10 +336,10 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                     }
 
                     Text(
-                        text = if (petInfo[indexInt].petBrthYmd=="미상"){
+                        text = if (selectedPet.petBrthYmd=="미상"){
                             "미상"
                         }else{
-                            sharedViewModel.changeBirth(petInfo[indexInt].petBrthYmd)
+                            sharedViewModel.changeBirth(selectedPet.petBrthYmd)
                         },
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -376,7 +361,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                     }
 
                     Text(
-                        text = petInfo[indexInt].sexTypNm?:"",
+                        text = selectedPet.sexTypNm?:"",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -397,7 +382,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                     }
 
                     Text(
-                        text = "${formatWghtVl(petInfo[indexInt].wghtVl)}kg",
+                        text = "${formatWghtVl(selectedPet.wghtVl)}kg",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -416,7 +401,9 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                         .fillMaxWidth()
                         .background(design_white)
                         .combinedClickable(
-                            onLongClick = { weightCNDDialog = true },
+                            onLongClick = {
+                                weightCNDDialog = true
+                            },
                             onClick = {}
                         ),
                     chart = lineChart,
@@ -469,8 +456,8 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Button(
-                    enabled = petInfo[indexInt].mngrType == "M",
-                    onClick = { navController.navigate("modifyPetInfoScreen/${indexInt}") },
+                    enabled = selectedPet.mngrType == "M",
+                    onClick = { navController.navigate("modifyPetInfoScreen") },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = design_select_btn_text,
@@ -484,7 +471,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                         .height(48.dp)
                 ) {
                     Text(
-                        text = if(petInfo[indexInt].mngrType == "M"){"정보 수정하기"}else{"관리자만 수정가능"},
+                        text = if(selectedPet.mngrType == "M"){"정보 수정하기"}else{"관리자만 수정가능"},
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                         color = design_white
@@ -494,7 +481,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
                 
                 Button(
-                    enabled = petInfo[indexInt].mngrType != "C",
+                    enabled = selectedPet.mngrType != "C",
                     onClick = { weightRgstDialog = true },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -510,7 +497,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                         .height(48.dp)
                 ) {
                     Text(
-                        text = if(petInfo[indexInt].mngrType != "C"){"몸무게 등록"}else{"참여자만 등록가능"},
+                        text = if(selectedPet.mngrType != "C"){"몸무게 등록"}else{"참여자만 등록가능"},
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                         color = design_login_text
@@ -521,7 +508,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
             AnimatedVisibility(
-                visible = petInfo[indexInt].mngrType != "C" && memberList?.isNotEmpty()==true,
+                visible = selectedPet.mngrType != "C" && memberList?.isNotEmpty()==true,
                 enter = fadeIn(tween(durationMillis = 700, delayMillis = 200)).plus(expandVertically()),
                 exit = fadeOut(tween(durationMillis = 700, delayMillis = 200)).plus(shrinkVertically())
             ) {
@@ -546,7 +533,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                         modifier = Modifier.heightIn(max = 300.dp)
                     ){
                         items(memberList?: emptyList()){ item ->
-                            GroupItem(item = item, petInfo[indexInt], settingViewModel)
+                            GroupItem(item = item, selectedPet, settingViewModel)
                         }
                     }
 

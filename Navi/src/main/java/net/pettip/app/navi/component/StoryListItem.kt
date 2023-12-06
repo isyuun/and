@@ -1,5 +1,9 @@
 package net.pettip.app.navi.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +23,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -41,7 +47,11 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
@@ -49,6 +59,7 @@ import net.pettip.app.navi.ui.theme.design_grad_end
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.data.daily.Story
+import net.pettip.util.Log
 
 @Composable
 fun StoryListItem(data: Story, navController:NavHostController, viewModel:CommunityViewModel){
@@ -83,11 +94,18 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
                 }
             }
     ){
-        val painter = rememberAsyncImagePainter(
-            model = data.storyFile?:R.drawable.img_blank,
-            filterQuality = FilterQuality.Low,
-        )
+        //val painter = rememberAsyncImagePainter(
+        //    model = data.storyFile?:R.drawable.img_blank,
+        //    filterQuality = FilterQuality.Low
+        //)
 
+        val painter = rememberAsyncImagePainter(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(data.storyFile?:R.drawable.img_blank)
+                .crossfade(400)
+                .size(Size.ORIGINAL) // Set the target size to load the image at.
+                .build()
+        )
         Image(
             painter = painter,
             modifier = Modifier.fillMaxSize(),

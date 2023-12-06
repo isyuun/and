@@ -155,6 +155,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                 // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
                 if (loginResult){
                     sharedViewModel.updateInit(true)
+                    sharedViewModel.updateDupleLogin(false)
                     navController.navigate(Screen.MainScreen.route){
                         popUpTo(0)
                     }
@@ -313,8 +314,8 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                 isLoading = false
                                 MySharedPreference.setUserEmail(id)
                                 sharedViewModel.updateInit(true)
+                                sharedViewModel.updateDupleLogin(false)
                                 navController.navigate(Screen.MainScreen.route){
-                                    Log.d("NAV","nav진입")
                                     popUpTo(0)
                                 }
 
@@ -401,6 +402,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                             val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "KAKAO")
                             if (loginResult){
                                 sharedViewModel.updateInit(true)
+                                sharedViewModel.updateDupleLogin(false)
                                 navController.navigate(Screen.MainScreen.route){
                                     popUpTo(0)
                                 }
@@ -440,6 +442,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                             // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
                             if (loginResult){
                                 sharedViewModel.updateInit(true)
+                                sharedViewModel.updateDupleLogin(false)
                                 navController.navigate(Screen.MainScreen.route){
                                     popUpTo(0)
                                 }

@@ -22,6 +22,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -59,6 +61,16 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
     val inviteCode by settingViewModel.inviteCode.collectAsState()
     val selectPet by settingViewModel.selectedPetSave.collectAsState()
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+    LaunchedEffect(Unit){
+        settingViewModel.getInviteCode()
+    }
+
+    DisposableEffect(Unit){
+        onDispose {
+            settingViewModel.updateInviteCode("")
+        }
+    }
 
     Scaffold (
         topBar = { BackTopBar(title = "초대하기", navController = navController) }
@@ -113,7 +125,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                         .height(60.dp)
                 ){
                     Text(
-                        text = inviteCode,
+                        text = if (inviteCode=="") "초대키 생성중입니다" else inviteCode,
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 24.sp, color = design_select_btn_text,
                         modifier = Modifier.align(Alignment.Center)

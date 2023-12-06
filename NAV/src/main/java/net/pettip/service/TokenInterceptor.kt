@@ -33,7 +33,9 @@ class TokenInterceptor() : Interceptor {
 
         val responseBodyString = response.body
 
-        if (response.code == 401) {
+        if (response.code == 403){
+            G.dupleLogin = true
+        }else if (response.code == 401) {
             Log.d("LOG", "if 실행")
             val gson = Gson()
             val tokenResponse = gson.fromJson(responseBodyString.string(), RefreshRes::class.java)
@@ -53,9 +55,6 @@ class TokenInterceptor() : Interceptor {
             }
         }
 
-        if (response.code == 403){
-            G.dupleLogin = true
-        }
 
         return response
     }

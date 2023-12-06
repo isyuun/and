@@ -2,6 +2,7 @@ package net.pettip.app.navi.screens.commuscreen
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -987,7 +988,7 @@ fun PagerImage(showImage: (Boolean) -> Unit, pagerState: PagerState, viewModel: 
                                                 story?.data?.dailyLifeFileList?.get(page)?.filePathNm +
                                                 (story?.data?.dailyLifeFileList?.get(page)?.atchFileNm )
                                     )
-                                    .crossfade(true)
+                                    .crossfade(400)
                                     .build(),
                                 contentDescription = "",
                                 //placeholder = painterResource(id = R.drawable.profile_default),

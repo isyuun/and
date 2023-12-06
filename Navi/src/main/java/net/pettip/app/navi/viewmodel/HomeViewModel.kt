@@ -33,6 +33,10 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
         sharedViewModel.updateCurrentPetInfo(newData)
     }
 
+    fun updateProfilePet(newData : PetDetailData){
+        sharedViewModel.updateProfilePet(newData)
+    }
+
     fun updateSeletedPet(newData: CurrentPetData){
         sharedViewModel.updateSelectPet(newData)
     }
@@ -67,11 +71,13 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
     private val _rtStoryList = MutableStateFlow<RTStoryListRes?>(null)
     val rtStoryList: StateFlow<RTStoryListRes?> = _rtStoryList.asStateFlow()
 
-    private val _repPet = MutableStateFlow<List<PetDetailData>>(emptyList())
-    val repPet: StateFlow<List<PetDetailData>> = _repPet.asStateFlow()
+    private val _currentPetLoading = MutableStateFlow<Boolean>(false)
+    val currentPetLoading: StateFlow<Boolean> = _currentPetLoading.asStateFlow()
+    fun updateCurrentPetLoading(newValue: Boolean){ _currentPetLoading.value = newValue }
 
-    val isLoading = MutableStateFlow<Boolean>(true)
-    fun updateIsLoading(newValue: Boolean){isLoading.value = newValue}
+    private val _petLoading = MutableStateFlow<Boolean>(false)
+    val petLoading: StateFlow<Boolean> = _petLoading.asStateFlow()
+    fun updatePetLoading(newValue: Boolean){ _petLoading.value = newValue }
 
     private val _selectPetManage = MutableStateFlow<PetDetailData?>(null)
     val selectPetManage: StateFlow<PetDetailData?> = _selectPetManage.asStateFlow()
