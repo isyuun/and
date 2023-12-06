@@ -16,7 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider.*
 import net.pettip.gps.app.GPSApplication
 import net.pettip.gps.app.ICameraContentListener
-import net.pettip.gpx.GPX_SIMPLE_TICK_FORMAT
+import net.pettip.gpx.GPX_TICK_FORMAT
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
@@ -42,7 +42,7 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
     private fun File(): File {
         // Create an image file name
         val time = System.currentTimeMillis()
-        val name = GPX_SIMPLE_TICK_FORMAT.format(Date(time))
+        val name = GPX_TICK_FORMAT.format(Date(time))
         //val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
         val path = GPSApplication.instance.pics?.let { File(it) }
         path?.mkdirs()

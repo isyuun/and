@@ -17,7 +17,7 @@ import android.net.Uri
 import android.os.Handler
 import android.provider.MediaStore
 import androidx.exifinterface.media.ExifInterface
-import net.pettip.gpx.GPX_SIMPLE_TICK_FORMAT
+import net.pettip.gpx.GPX_TICK_FORMAT
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
@@ -181,7 +181,7 @@ class CameraContentObserver(
             if (this.file == file) return
             val rotate = rotate(uri)
             val orient = orient(uri)
-            Log.wtf(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_SIMPLE_TICK_FORMAT.format(it) }}]")
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_TICK_FORMAT.format(it) }}]")
             listener.onCamera(file, uri)
             this.file = file
         }
