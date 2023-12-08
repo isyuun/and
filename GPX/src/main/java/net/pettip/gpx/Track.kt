@@ -23,14 +23,35 @@ import android.net.Uri
 const val TRACK_ZERO_NUM = "P00000000000000"
 val TRACK_ZERO_URI = Uri.parse("")!!
 
+fun MutableList<Track>._duration(): Long {
+    if (this.isEmpty()) {
+        return 0L
+    }
+    val startTime = this.first().time
+    val endTime = this.last().time
+    return endTime - startTime
+}
+
+fun MutableList<Track>._distance(): Float {
+    if (this.isEmpty()) {
+        return 0.0f
+    }
+    var totalDistance = 0.0f
+    this.let {
+        for (i in 1 until it.size) {
+            val prevLocation = it[i - 1]
+            val currentLocation = it[i]
+            val distance = prevLocation.location.distanceTo(currentLocation.location)
+            totalDistance += distance
+        }
+    }
+    return totalDistance
+}
+
 data class Track(
     private val loc: Location,
     val no: String = TRACK_ZERO_NUM,
     val event: EVENT = EVENT.NNN,
-    //val img: Int = TRACK_ZERO_IMG,
-    //val pee: Int = TRACK_ZERO_PEE,
-    //val poo: Int = TRACK_ZERO_POO,
-    //val mrk: Int = TRACK_ZERO_MRK,
     val uri: Uri = TRACK_ZERO_URI,
 ) {
     companion object {

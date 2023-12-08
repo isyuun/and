@@ -138,6 +138,7 @@ import net.pettip.gpx.GPX_LATITUDE_ZERO
 import net.pettip.gpx.GPX_LONGITUDE_ZERO
 import net.pettip.gpx.TRACK_ZERO_URI
 import net.pettip.gpx.Track
+import net.pettip.gpx._distance
 import net.pettip.map.app.LoadingDialog
 import net.pettip.singleton.G
 import net.pettip.util.Log
@@ -357,6 +358,40 @@ fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track
     markers.forEach { it.map = naverMap }
 }
 
+fun naverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, padding: Dp = 52.0.dp) {
+    val application = GPSApplication.instance
+    if (tracks.isNotEmpty()) {
+        var lat1 = tracks.first().latitude
+        var lon1 = tracks.first().longitude
+        var lat2 = tracks.last().latitude
+        var lon2 = tracks.last().longitude
+        tracks.forEach {
+            val lat = it.latitude
+            val lon = it.longitude
+            if (lat < lat1) lat1 = lat
+            if (lon < lon1) lon1 = lon
+            if (lat > lat2) lat2 = lat
+            if (lon > lon2) lon2 = lon
+        }
+        val latLng1 = LatLng(lat1, lon1)
+        val latLng2 = LatLng(lat2, lon2)
+        val bounds = LatLngBounds(latLng1, latLng2)
+        val update = CameraUpdate.fitBounds(bounds, padding.toPx(context).toInt())
+        naverMap.moveCamera(update)
+        if (tracks._distance() < 200.0f) {
+            val center = bounds.center
+            val position = CameraPosition(center, GPX_CAMERA_ZOOM_ZERO)
+            val update2 = CameraUpdate.toCameraPosition(position)
+            naverMap.moveCamera(update2)
+        }
+    }
+}
+
+fun naverMapView(context: Context, naverMap: NaverMap, tracks: MutableList<Track>) {
+    naverMapPath(context = context, naverMap = naverMap, tracks = tracks, finished = true)
+    naverMapPreview(context = context, naverMap = naverMap, tracks = tracks, 52.0.dp)
+}
+
 @Composable
 fun rememberMapViewWithLifecycle(
     context: Context,
@@ -399,37 +434,6 @@ fun rememberMapViewWithLifecycle(
     }
 
     return mapView
-}
-
-fun naverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, padding: Dp = 52.0.dp) {
-    val application = GPSApplication.instance
-    if (tracks.isNotEmpty()) {
-        var lat1 = tracks.first().latitude
-        var lon1 = tracks.first().longitude
-        var lat2 = tracks.last().latitude
-        var lon2 = tracks.last().longitude
-        tracks.forEach {
-            val lat = it.latitude
-            val lon = it.longitude
-            if (lat < lat1) lat1 = lat
-            if (lon < lon1) lon1 = lon
-            if (lat > lat2) lat2 = lat
-            if (lon > lon2) lon2 = lon
-        }
-        val latLng1 = LatLng(lat1, lon1)
-        val latLng2 = LatLng(lat2, lon2)
-        val bounds = LatLngBounds(latLng1, latLng2)
-        val update = CameraUpdate.fitBounds(bounds, padding.toPx(context).toInt())
-        naverMap.moveCamera(update)
-        application._distance?.let {
-            if (it < 200.0f) {
-                val center = bounds.center
-                val position = CameraPosition(center, GPX_CAMERA_ZOOM_ZERO)
-                val update2 = CameraUpdate.toCameraPosition(position)
-                naverMap.moveCamera(update2)
-            }
-        }
-    }
 }
 
 @Composable

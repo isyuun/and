@@ -43,7 +43,7 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
     }
 
     protected open fun setContent() {
-        setContent { NaverMapApp() }
+        setContent { MapApp() }
     }
 
     @Composable

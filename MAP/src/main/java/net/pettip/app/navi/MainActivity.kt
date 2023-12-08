@@ -30,24 +30,29 @@ class MainActivity : ComponentActivity() {
         startActivity(intent)
     }
 
+    private fun openGpx(context: Context) {
+        val intent = Intent(context, GpxActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun setContent() {
         setContent {
             val context = LocalContext.current
             AppTheme(dynamicColor = true) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Surface {
+                Surface {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
                         Button(onClick = { openMap(context) }) {
                             //OutlinedTextField(value = "good", onValueChange = {})
                             Text(text = stringResource(id = R.string.start))
                         }
-                    }
-                    Button(onClick = { openMap(context) }) {
-                        //OutlinedTextField(value = "bad", onValueChange = {})
-                        Text(text = stringResource(id = R.string.start))
+                        Button(onClick = { openGpx(context) }) {
+                            //OutlinedTextField(value = "bad", onValueChange = {})
+                            Text(text = stringResource(id = R.string.start))
+                        }
                     }
                 }
             }
@@ -68,9 +73,9 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.start}]")
         super.onResume()
-        if (!application.start) {
-            openMap(this)
-        }
+        //if (!application.start) {
+        //    openMap(this)
+        //}
     }
 
     override fun onNewIntent(intent: Intent?) {

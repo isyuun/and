@@ -26,17 +26,27 @@ import java.io.File
  */
 open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
     override fun onCreate() {
         super.onCreate()
-        read()  //test
-        last()
+        //read()  //test
     }
 
-    private fun last() {
-        //TODO("Not yet implemented")
+    internal fun last(): File? {
+        val path = File(this.path)
+        var file: File? = null
+        var last = 0L
+        //Log.v(__CLASSNAME__, "${getMethodName()}[${path.listFiles()}][${path}]")
+        path.listFiles()?.forEach {
+            //println(it)
+            if (last < it.lastModified()) file = it
+            last = it.lastModified()
+        }
+        Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
+        return file
     }
 
-    private fun read() {
+    private fun read(): File? {
         val path = File(this.path)
         var file: File? = null
         var last = 0L
@@ -48,6 +58,7 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
         }
         Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
         file?.let { read(it) }
+        return file
     }
 
     private fun read(file: File) {
@@ -59,4 +70,18 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
         //}
     }
 
+    override fun stop() {
+        super.stop()
+        Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")
+    }
+
+    override fun write() {
+        super.write()
+        Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")
+    }
+
+    override fun start() {
+        super.start()
+        Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")
+    }
 }

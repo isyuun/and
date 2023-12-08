@@ -39,7 +39,7 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
     var uri: Uri? = null
 
     @Throws(IOException::class)
-    private fun File(): File {
+    private fun Image(): File {
         // Create an image file name
         val time = System.currentTimeMillis()
         val name = GPX_TICK_FORMAT.format(Date(time))
@@ -62,7 +62,7 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
 
     override fun camera() {
         try {
-            file = File()
+            file = Image()
             file?.let { file -> uri = getUriForFile(this, "${packageName}.provider", file) }
         } catch (e: Exception) {
             e.printStackTrace()

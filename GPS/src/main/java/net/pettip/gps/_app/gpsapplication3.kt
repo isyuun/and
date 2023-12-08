@@ -190,4 +190,6 @@ open class gpsapplication3 : gpsapplication2() {
     fun orient(context: Context, uri: Uri) = this.service?.orient(context, uri)
 
     var preview: Bitmap? = null
+
+    fun last() = this.service?.last()
 }

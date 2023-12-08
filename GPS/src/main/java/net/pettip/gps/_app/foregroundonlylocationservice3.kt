@@ -21,6 +21,8 @@ import net.pettip.gpx.GPX_DATE_FORMAT
 import net.pettip.gpx.GPX_INTERVAL_UPDATE_METERS
 import net.pettip.gpx.GPX_TICK_FORMAT
 import net.pettip.gpx.Track
+import net.pettip.gpx._distance
+import net.pettip.gpx._duration
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
@@ -125,12 +127,12 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         this.write()
     }
 
-    protected fun write() {
+    protected open fun write() {
         if (_tracks.isEmpty()) return
         val file = this.file
-        file.parentFile?.mkdirs()
+        file?.parentFile?.mkdirs()
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${GPX_DATE_FORMAT.format(_tracks.first().time)}]$file")
-        GPXWriter().write(_tracks, file)
+        file?.let { GPXWriter().write(_tracks, it) }
     }
 
     protected val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
@@ -145,8 +147,14 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     internal val path
         get() = path()
 
+
+    private fun File(): File? {
+        if (_tracks.isEmpty()) return null
+        return File("${path}/${GPX_TICK_FORMAT.format(_tracks.first().time)}.gpx")
+    }
+
     internal val file
-        get() = File("${path}/${GPX_TICK_FORMAT.format(_tracks.first().time)}.gpx")
+        get() = File()
 
     private var _no = ""
     internal var no: String
@@ -185,7 +193,6 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     }
 
     val __duration: String
-        //get() = _GPXWriter.calculateDuration(_tracks)
         get() {
             if (_tracks.isEmpty()) {
                 return "00:00:00"
@@ -200,17 +207,9 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         }
 
     val _duration: Long
-        get() {
-            if (_tracks.isEmpty()) {
-                return 0L
-            }
-            val startTime = _tracks.first()?.time ?: System.currentTimeMillis()
-            val endTime = _tracks.last()?.time ?: System.currentTimeMillis()
-            return endTime - startTime
-        }
+        get() = _tracks._duration()
 
     val duration: String
-        //get() = _GPXWriter.calculateDuration(_tracks)
         get() {
             if (_tracks.isEmpty()) {
                 return "00:00:00"
@@ -225,24 +224,9 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         }
 
     val _distance: Float
-        get() {
-            if (_tracks.isEmpty()) {
-                return 0.0f
-            }
-            var totalDistance = 0.0f
-            _tracks.let {
-                for (i in 1 until it.size) {
-                    val prevLocation = it[i - 1]
-                    val currentLocation = it[i]
-                    val distance = prevLocation.location.distanceTo(currentLocation.location)
-                    totalDistance += distance
-                }
-            }
-            return totalDistance
-        }
+        get() = _tracks._distance()
 
     val distance: String
-        //get() = _GPXWriter.calculateTotalDistance(_tracks)
         get() {
             if (_tracks.isEmpty()) {
                 return "0.00 km"
