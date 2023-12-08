@@ -189,7 +189,6 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
             foregroundOnlyLocationServiceBound = false
         }
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-        //super.onStop()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
