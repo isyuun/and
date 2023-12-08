@@ -131,6 +131,7 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
         Log.d(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate()
         init()
+        bind()
     }
 
     protected open fun init() {
@@ -139,6 +140,31 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
         Log.w(__CLASSNAME__, "${getMethodName()}${foregroundOnlyBroadcastReceiver}")
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_FILE_KEY, MODE_PRIVATE)
         Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences")
+    }
+
+    private fun bind() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
+        updateButtonState(
+            sharedPreferences.getBoolean(SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
+        )
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        val serviceIntent = Intent(this, ForegroundOnlyLocationService::class.java)
+        bindService(serviceIntent, foregroundOnlyServiceConnection, BIND_AUTO_CREATE)
+    }
+
+    override fun onTerminate() {
+        Log.d(__CLASSNAME__, "${getMethodName()}...")
+        unbind()
+        super.onTerminate()
+    }
+
+    private fun unbind() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
+        if (foregroundOnlyLocationServiceBound) {
+            unbindService(foregroundOnlyServiceConnection)
+            foregroundOnlyLocationServiceBound = false
+        }
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     val start
@@ -158,37 +184,6 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     open fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()},${foregroundOnlyLocationService}")
         foregroundOnlyLocationService?.stop()
-    }
-
-    internal fun onStart() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
-        updateButtonState(
-            sharedPreferences.getBoolean(SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
-        )
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-        val serviceIntent = Intent(this, ForegroundOnlyLocationService::class.java)
-        bindService(serviceIntent, foregroundOnlyServiceConnection, BIND_AUTO_CREATE)
-    }
-
-    /**
-     * @see gpsapplication2.onResume
-     *
-     * IY: deprecate*/
-    internal open fun onResume() {}
-
-    /**
-     * @see gpsapplication2.onPause
-     *
-     * IY: deprecate*/
-    internal open fun onPause() {}
-
-    internal fun onStop() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
-        if (foregroundOnlyLocationServiceBound) {
-            unbindService(foregroundOnlyServiceConnection)
-            foregroundOnlyLocationServiceBound = false
-        }
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {

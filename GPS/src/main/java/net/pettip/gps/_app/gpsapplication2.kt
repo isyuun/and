@@ -59,14 +59,16 @@ open class gpsapplication2 : gpsapplication(), IForegroundOnlyBroadcastReceiver 
         unregisterReceiver2(receiver)
     }
 
-    override fun onResume() {
+    override fun onCreate() {
+        super.onCreate()
         Log.w(__CLASSNAME__, "${getMethodName()}$receiver")
         registerReceiver()
     }
 
-    override fun onPause() {
+    override fun onTerminate() {
         Log.w(__CLASSNAME__, "${getMethodName()}$receiver")
         unregisterReceiver()
+        super.onTerminate()
     }
 
     // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver2.
