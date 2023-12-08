@@ -70,7 +70,7 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
         }
         val camera = (file != null && file?.exists() == true && uri != null)
         if (camera) {
-            Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[exists:${file?.exists()}][length:${file?.length()}][name:${file?.name}][$file]")
+            Log.w(__CLASSNAME__, "${getMethodName()}::onCamera()[exists:${file?.exists()}][length:${file?.length()}][name:${file?.name}][$file]")
             cameraLauncher.launch(uri)
         }
         Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera}][$file][$uri]")
