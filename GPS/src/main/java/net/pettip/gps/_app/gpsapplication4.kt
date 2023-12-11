@@ -30,8 +30,6 @@ open class gpsapplication4 : gpsapplication3(), ICameraContentListener {
 
     override fun camera() {
         Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()")
-        //var intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        //activity?.startActivity(intent/*.addFlags(FLAG_ACTIVITY_NEW_TASK)*/)
         if (activity is ICameraContentListener) (activity as ICameraContentListener).camera()
     }
 
