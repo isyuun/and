@@ -144,9 +144,7 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
 
     private fun bind() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
-        updateButtonState(
-            sharedPreferences.getBoolean(SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
-        )
+        sharedPreferences.getBoolean(SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         val serviceIntent = Intent(this, ForegroundOnlyLocationService::class.java)
         bindService(serviceIntent, foregroundOnlyServiceConnection, BIND_AUTO_CREATE)
@@ -172,12 +170,6 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
 
     open fun start() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()}, $foregroundOnlyLocationService")
-        // TODO: Step 1.0, Review Permissions: Checks and requests if needed.
-        //if (foregroundPermissionApproved()) {
-        //    foregroundOnlyLocationService?.start() ?: Log.w(__CLASSNAME__, "${getMethodName()}Service Not Bound")
-        //} else {
-        //    requestForegroundPermissions()
-        //}
         foregroundOnlyLocationService?.start() ?: Log.w(__CLASSNAME__, "${getMethodName()}Service Not Bound")
     }
 
@@ -188,16 +180,6 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         Log.i(__CLASSNAME__, "${getMethodName()}$sharedPreferences,$key")
-        // Updates button states if new while in use location is added to SharedPreferences.
-        if (key == SharedPreferenceUtil.KEY_FOREGROUND_ENABLED) {
-            sharedPreferences?.let {
-                updateButtonState(
-                    it.getBoolean(
-                        SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false
-                    )
-                )
-            }
-        }
     }
 
     // TODO: Step 1.0, Review Permissions: Method checks if permissions approved.
@@ -207,105 +189,6 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
         return ret
     }
 
-    // TODO: Step 1.0, Review Permissions: Method requests permissions.
-    private fun requestForegroundPermissions() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}$sharedPreferences")
-        //val provideRationale = foregroundPermissionApproved()
-        //
-        //// If the user denied a previous request, but didn't check "Don't ask again", provide
-        //// additional rationale.
-        //if (provideRationale) {
-        //    Snackbar.make(
-        //        findViewById(R.id.activity_main),
-        //        R.string.permission_rationale,
-        //        Snackbar.LENGTH_LONG
-        //    )
-        //        .setAction(R.string.ok) {
-        //            // Request permission
-        //            ActivityCompat.requestPermissions(
-        //                this@MainActivity,
-        //                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-        //                REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
-        //            )
-        //        }
-        //        .show()
-        //} else {
-        //    Log.d(__CLASSNAME__, "Request foreground only permission")
-        //    ActivityCompat.requestPermissions(
-        //        this@MainActivity,
-        //        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-        //        REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
-        //    )
-        //}
-        //getActivity()?.let {
-        //    ActivityCompat.requestPermissions(
-        //        it,
-        //        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-        //        REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
-        //    )
-        //}
-    }
-
-    // TODO: Step 1.0, Review Permissions: Handles permission result.
-    fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        Log.d(__CLASSNAME__, "${getMethodName()}$requestCode, $permissions, $grantResults")
-
-        when (requestCode) {
-            REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE -> when {
-                grantResults.isEmpty() ->
-                    // If user interaction was interrupted, the permission request
-                    // is cancelled and you receive empty arrays.
-                    Log.d(__CLASSNAME__, "User interaction was cancelled.")
-
-                grantResults[0] == PackageManager.PERMISSION_GRANTED ->
-                    // Permission was granted.
-                    foregroundOnlyLocationService?.start()
-
-                else -> {
-                    // Permission denied.
-                    updateButtonState(false)
-
-                    //Snackbar.make(
-                    //    findViewById(R.id.activity_main),
-                    //    R.string.permission_denied_explanation,
-                    //    Snackbar.LENGTH_LONG
-                    //)
-                    //.setAction(R.string.settings) {
-                    //    // Build intent that displays the App settings screen.
-                    //    val intent = Intent()
-                    //    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    //    val uri = Uri.fromParts(
-                    //        "package",
-                    //        BuildConfig.APPLICATION_ID,
-                    //        null
-                    //    )
-                    //    intent.data = uri
-                    //    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    //    startActivity(intent)
-                    //}
-                    //.show()
-                }
-            }
-        }
-    }
-
-    private fun updateButtonState(trackingLocation: Boolean) {
-        if (trackingLocation) {
-            //foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
-        } else {
-            //foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
-        }
-    }
-
-    protected fun logResultsToScreen(output: String) {
-        Log.v(__CLASSNAME__, "${getMethodName()}$output")
-        //val outputWithPreviousLogs = "$output\n${outputTextView.text}"
-        //outputTextView.text = outputWithPreviousLogs
-    }
 
     /**
      * Receiver for location broadcasts from [ForegroundOnlyLocationService].
@@ -325,12 +208,6 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
                 } else {
                     intent.getParcelableExtra(EXTRA_LOCATION)
                 }
-
-            if (location != null) {
-                //val tick = SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSZ", resources.configuration.locales[0]).format(Date(System.currentTimeMillis()))
-                val tick = ""
-                logResultsToScreen("${tick} - ${location.toText()}, $location")
-            }
         }
     }
 }
