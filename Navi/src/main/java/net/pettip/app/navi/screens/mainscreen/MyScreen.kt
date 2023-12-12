@@ -46,6 +46,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
@@ -158,13 +159,13 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
             modifier= Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(design_white)
+                .background(MaterialTheme.colorScheme.primary)
                 .verticalScroll(rememberScrollState())
         ){
 
             Row (
                 modifier = Modifier
-                    .background(color = design_login_bg)
+                    .background(color = MaterialTheme.colorScheme.onPrimaryContainer)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -180,7 +181,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         text = G.userNickName,
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 20.sp, letterSpacing = (-1.0).sp,
-                        color = design_login_text, modifier = Modifier.padding(start = 12.dp)
+                        color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(start = 12.dp)
                     )
 
                     Icon(painter = painterResource(id = R.drawable.icon_modify),
@@ -239,7 +240,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                     text = stringResource(R.string.management_pet),
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 20.sp, letterSpacing = (-1.0).sp,
-                    color = design_login_text, modifier = Modifier.padding(start = 20.dp)
+                    color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(start = 20.dp)
                 )
 
                 Row {
@@ -250,7 +251,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                             } },
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = design_btn_border
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
                         ),
                         contentPadding = PaddingValues(0.dp),
                         elevation = ButtonDefaults.buttonElevation(
@@ -262,7 +263,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                             text = stringResource(R.string.invite),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                            color = design_white,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
                             modifier = Modifier.padding(vertical = 7.dp, horizontal = 17.dp)
                         )
                     }
@@ -273,9 +274,9 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         },
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = design_white
+                            containerColor = MaterialTheme.colorScheme.primary
                         ),
-                        border = BorderStroke(width = 1.dp, color = design_btn_border),
+                        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant),
                         contentPadding = PaddingValues(0.dp),
                         elevation = ButtonDefaults.buttonElevation(
                             defaultElevation = 4.dp
@@ -286,7 +287,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                             text = stringResource(R.string.ivt_code_reg),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                            color = design_login_text,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.padding(vertical = 7.dp, horizontal = 17.dp)
                         )
                     }
@@ -304,14 +305,14 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         .height(80.dp)
                         .border(
                             1.dp,
-                            color = design_textFieldOutLine,
+                            color = MaterialTheme.colorScheme.outline,
                             shape = RoundedCornerShape(12.dp)
                         ), contentAlignment = Alignment.Center
                 ){
                     Text(
                         text = stringResource(R.string.no_manage_pet),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 14.sp, color = design_login_text
+                        fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }else{
@@ -460,7 +461,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                     }
                 },
                 colors = DatePickerDefaults.colors(
-                    containerColor = design_white
+                    containerColor = MaterialTheme.colorScheme.primary
 
                 )
             ) {
@@ -470,7 +471,16 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         selectedDayContainerColor = design_intro_bg,
                         selectedDayContentColor = design_white,
                         todayDateBorderColor = design_intro_bg,
-                        todayContentColor = design_intro_bg
+                        todayContentColor = design_intro_bg,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        headlineContentColor = MaterialTheme.colorScheme.onPrimary,
+                        weekdayContentColor = MaterialTheme.colorScheme.onPrimary,
+                        subheadContentColor = MaterialTheme.colorScheme.onPrimary,
+                        navigationContentColor = MaterialTheme.colorScheme.onPrimary,
+                        yearContentColor = MaterialTheme.colorScheme.onPrimary,
+                        dayContentColor = MaterialTheme.colorScheme.onPrimary,
+                        currentYearContentColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
                 )
             }
@@ -494,7 +504,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
             .padding(horizontal = 20.dp)
             .border(
                 width = 1.dp,
-                color = design_textFieldOutLine,
+                color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(12.dp)
             )
             .clip(shape = RoundedCornerShape(12.dp))
@@ -522,14 +532,14 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                         text = petDetailData.petNm,
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 16.sp, letterSpacing = (-0.8).sp,
-                        color = design_login_text
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
 
                     Text(
                         text = petDetailData.petKindNm,
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                        color = design_skip
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -551,7 +561,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                         color =
                         when (petDetailData.mngrType) {
                             "M" -> design_button_bg
-                            "I" -> design_white
+                            "I" -> Color.Transparent
                             "G" -> design_DDDDDD
                             else -> design_DDDDDD
                         },
@@ -586,7 +596,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
             .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 12.dp)
             .fillMaxWidth()
             .height(1.dp)
-            .background(design_textFieldOutLine)
+            .background(MaterialTheme.colorScheme.outline)
         )
 
         Row (
@@ -601,40 +611,40 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                 },
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                color = design_skip
+                color = MaterialTheme.colorScheme.secondary
             )
             
             Spacer(modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .size(2.dp, 8.dp)
-                .background(design_skip)
+                .background(MaterialTheme.colorScheme.secondary)
             )
 
             Text(
                 text = "${formatWghtVl(petDetailData.wghtVl)}kg",
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                color = design_skip
+                color = MaterialTheme.colorScheme.secondary
             )
 
             Spacer(modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .size(2.dp, 8.dp)
-                .background(design_skip)
+                .background(MaterialTheme.colorScheme.secondary)
             )
 
             Text(
                 text = petDetailData.sexTypNm?:"",
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                color = design_skip,modifier = Modifier.alignByBaseline()
+                color = MaterialTheme.colorScheme.secondary,modifier = Modifier.alignByBaseline()
             )
             if (petDetailData.ntrTypCd=="001"){
                 Text(
                     text = stringResource(R.string.neutering_comp),
                     fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                     fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                    color = design_skip, modifier = Modifier.alignByBaseline()
+                    color = MaterialTheme.colorScheme.secondary, modifier = Modifier.alignByBaseline()
                 )
             }
         }
@@ -676,7 +686,7 @@ fun MyBottomSheet(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .background(design_white)
+            .background(MaterialTheme.colorScheme.primary)
     ) {
         Spacer(modifier = Modifier.padding(top = 20.dp))
 
@@ -685,7 +695,7 @@ fun MyBottomSheet(
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 20.sp,
             letterSpacing = (-1.0).sp,
-            color = design_login_text,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(start = 20.dp)
         )
 
@@ -719,7 +729,7 @@ fun MyBottomSheet(
             )
 
             Text(text = stringResource(R.string.end_cmt), fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                color = design_login_text, modifier=Modifier.offset(x = (-8).dp), letterSpacing = (-0.7).sp
+                color = MaterialTheme.colorScheme.onPrimary, modifier=Modifier.offset(x = (-8).dp), letterSpacing = (-0.7).sp
             )
         }
 
@@ -733,7 +743,7 @@ fun MyBottomSheet(
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
-                        .background(color = design_select_btn_bg)
+                        .background(color = MaterialTheme.colorScheme.onPrimaryContainer)
                         .clickable { openDatePicker(true) },
                     verticalAlignment = Alignment.CenterVertically
                 ){
@@ -745,7 +755,7 @@ fun MyBottomSheet(
                         text = stringResource(R.string.end_date),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                        color = design_skip, modifier = Modifier.padding(start = 4.dp)
+                        color = MaterialTheme.colorScheme.secondary, modifier = Modifier.padding(start = 4.dp)
                     )
 
                     Text(
@@ -755,7 +765,7 @@ fun MyBottomSheet(
                                }else{""},
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                        color = design_login_text, modifier = Modifier.padding(start = 12.dp)
+                        color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(start = 12.dp)
                     )
 
 
@@ -844,18 +854,18 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .size(width = screenWidth / 3, height = screenWidth / 3 - 9.dp)
-            .shadow(ambientColor = design_shadow, elevation = 0.dp)
+            .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp)
         ,
         shape = RoundedCornerShape(12.dp),
         colors = if(isSeleted) {
             ButtonDefaults.buttonColors(design_select_btn_bg)
         } else {
-            ButtonDefaults.buttonColors(design_white)
+            ButtonDefaults.buttonColors(Color.Transparent)
         },
         border = if(isSeleted) {
             BorderStroke(1.dp, color = design_select_btn_text)
         } else {
-            BorderStroke(1.dp, color = design_textFieldOutLine)
+            BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
         },
         contentPadding = PaddingValues(start = 14.dp,end=14.dp),
         elevation = if(isSeleted){
@@ -874,9 +884,9 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
             Box(
                 modifier = Modifier
                     .size(46.dp)
-                    .border(shape = CircleShape, border = BorderStroke(3.dp, color = design_white))
+                    .border(shape = CircleShape, border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.tertiary))
                     .shadow(
-                        color = design_shadow,
+                        color = MaterialTheme.colorScheme.onSurface,
                         offsetY = 10.dp,
                         offsetX = 10.dp,
                         spread = 4.dp,
@@ -906,7 +916,7 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,
-                color = design_login_text
+                color = if (isSeleted) design_login_text else MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -935,9 +945,9 @@ fun TimePickerDialog(
                 .height(IntrinsicSize.Min)
                 .background(
                     shape = RoundedCornerShape(20.dp),
-                    color = design_white
+                    color = MaterialTheme.colorScheme.primary
                 ),
-            color = design_white
+            color = MaterialTheme.colorScheme.primary
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -950,20 +960,26 @@ fun TimePickerDialog(
                     text = title,
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 16.sp, letterSpacing = (-0.8).sp,
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 TimePicker(
                     state = state,
                     colors = TimePickerDefaults.colors(
-                        containerColor = design_white,
-                        timeSelectorSelectedContainerColor = design_intro_bg,
-                        timeSelectorSelectedContentColor = design_white,
+                        clockDialColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        clockDialSelectedContentColor = design_white,
+                        clockDialUnselectedContentColor = MaterialTheme.colorScheme.onPrimary,
                         selectorColor = design_intro_bg,
-                        clockDialColor = design_textFieldOutLine,
-                        timeSelectorUnselectedContainerColor = design_textFieldOutLine,
-                        timeSelectorUnselectedContentColor = design_login_text,
+                        containerColor = Color.Unspecified,
+                        timeSelectorSelectedContainerColor = design_intro_bg,
+                        timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        timeSelectorSelectedContentColor = design_white,
+                        timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                        periodSelectorBorderColor = MaterialTheme.colorScheme.outline,
                         periodSelectorSelectedContainerColor = design_intro_bg,
-                        periodSelectorSelectedContentColor = design_white
+                        periodSelectorSelectedContentColor = design_white,
+                        periodSelectorUnselectedContainerColor = design_white,
+                        periodSelectorUnselectedContentColor = design_login_text
+
                     )
                 )
                 Row(
@@ -979,7 +995,7 @@ fun TimePickerDialog(
                         Text(
                             text = stringResource(id = R.string.cancel),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 16.sp,color = design_login_text
+                            fontSize = 16.sp,color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     TextButton(
@@ -998,7 +1014,7 @@ fun TimePickerDialog(
                         Text(
                             text = stringResource(id = R.string.ok),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 16.sp,color = design_login_text
+                            fontSize = 16.sp,color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }

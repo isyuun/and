@@ -68,6 +68,11 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
     val scope = rememberCoroutineScope()
     var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
+    val context = LocalContext.current
+    val density = context.resources.displayMetrics.density
+    val width = (200 * density).toInt()
+    val height = (280 * density).toInt()
+
     val gradient = Brush.verticalGradient(
         colors = listOf(Color.Transparent, design_grad_end),
         startY = sizeImage.height.toFloat()/5*3,
@@ -103,8 +108,9 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
             model = ImageRequest.Builder(LocalContext.current)
                 .data(data.storyFile?:R.drawable.img_blank)
                 .crossfade(400)
-                .size(Size.ORIGINAL) // Set the target size to load the image at.
-                .build()
+                .size(width,height) // Set the target size to load the image at.
+                .build(),
+            filterQuality = FilterQuality.Low
         )
         Image(
             painter = painter,

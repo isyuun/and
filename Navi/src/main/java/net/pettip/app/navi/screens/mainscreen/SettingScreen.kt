@@ -34,6 +34,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
@@ -51,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -108,17 +110,18 @@ fun SettingScreen(navController: NavHostController, viewModel:CommunityViewModel
     ) { paddingValues ->
         Column(modifier= Modifier
             .padding(paddingValues)
+            .background(MaterialTheme.colorScheme.primary)
             .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             TabRow(
                 modifier = Modifier.alpha(tabVisible),
                 selectedTabIndex = pagerState.currentPage,
-                indicator = { tabPositions -> TabRowDefaults.Indicator(Modifier.pagerTabIndicatorOffset(pagerState, tabPositions), color = design_login_text, height = 2.dp) },
-                backgroundColor = design_white,
-                contentColor = design_login_text
+                indicator = { tabPositions -> TabRowDefaults.Indicator(Modifier.pagerTabIndicatorOffset(pagerState, tabPositions), color = MaterialTheme.colorScheme.onPrimary, height = 2.dp) },
+                backgroundColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 MyScreenTabItems.forEachIndexed { index, item ->
                     Tab(
-                        text = { Text(text = item.title, fontSize = 16.sp, color = design_login_text,
+                        text = { Text(text = item.title, fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary,
                             fontFamily =
                             if(index == pagerState.currentPage) FontFamily(Font(R.font.pretendard_bold))
                             else FontFamily(Font(R.font.pretendard_regular))
@@ -174,7 +177,7 @@ fun NotiScreen(navController: NavHostController, viewModel: CommunityViewModel){
     Box (
         Modifier
             .fillMaxSize()
-            .background(color = design_white)
+            .background(color = MaterialTheme.colorScheme.primary)
     ){
 
         Crossfade(
@@ -230,7 +233,7 @@ fun FAQScreen(navController: NavHostController, viewModel: CommunityViewModel){
     Box (
         modifier = Modifier
             .fillMaxSize()
-            .background(design_white)
+            .background(MaterialTheme.colorScheme.primary)
     ){
         LazyColumn(
             modifier = Modifier
@@ -257,7 +260,7 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
     Column (
         modifier = Modifier
             .fillMaxSize()
-            .background(color = design_white)
+            .background(color = MaterialTheme.colorScheme.primary)
     ){
         Button(
             onClick = { navController.navigate(Screen.OneNOneScreen.route) },
@@ -282,14 +285,14 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .height(8.dp)
-            .background(color = design_f1f1f1))
+            .background(color = MaterialTheme.colorScheme.onSurfaceVariant))
 
         Text(
             text = "나의 문의 내역",
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 20.sp,
             letterSpacing = (-1.0).sp,
-            color = design_login_text,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 16.dp)
         )
 
@@ -308,7 +311,7 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
                     text = "나의 문의 내역이 없습니다",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 16.sp, letterSpacing = (-0.8).sp,
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }else{
@@ -339,8 +342,8 @@ fun NotiItem(notiItemData: BbsNtc, navController: NavHostController, viewModel: 
                 if (currentTime - lastClickTime >= 500) {
                     lastClickTime = currentTime
                     scope.launch {
-                        viewModel.getNctDetail(notiItemData.pstSn)
                         navController.navigate(Screen.NotiDetail.route)
+                        viewModel.getNctDetail(notiItemData.pstSn)
                     }
                 }
             }
@@ -350,7 +353,7 @@ fun NotiItem(notiItemData: BbsNtc, navController: NavHostController, viewModel: 
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
-            color = design_login_text,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(top = 20.dp)
         )
 
@@ -359,7 +362,7 @@ fun NotiItem(notiItemData: BbsNtc, navController: NavHostController, viewModel: 
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp,
             letterSpacing = (-0.7).sp,
-            color = design_skip,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(top = 8.dp, bottom = 20.dp)
         )
 
@@ -385,7 +388,7 @@ fun FAQItem(faqItemData: BbsFaq){
                 if (expanded) {
                     design_login_bg
                 } else {
-                    design_white
+                    MaterialTheme.colorScheme.primary
                 }
             )
     ){
@@ -405,7 +408,7 @@ fun FAQItem(faqItemData: BbsFaq){
                 color = if (expanded){
                     design_intro_bg
                 }else{
-                    design_login_text
+                    MaterialTheme.colorScheme.onPrimary
                 },
                 modifier = Modifier.padding(start = 20.dp)
             )
@@ -414,7 +417,8 @@ fun FAQItem(faqItemData: BbsFaq){
                 modifier = Modifier
                     .padding(end = 20.dp)
                     .clip(CircleShape)
-                    .border(width = 1.dp, color = design_skip, shape = CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = CircleShape)
                     .clickable { expanded = !expanded },
                 contentAlignment = Alignment.Center
             ){
@@ -427,7 +431,7 @@ fun FAQItem(faqItemData: BbsFaq){
                     }
                     ,
                     contentDescription = "",
-                    tint = design_login_text)
+                    tint = MaterialTheme.colorScheme.onPrimary)
             }
 
         }
@@ -487,14 +491,14 @@ fun InquiryItem(inquiryItemData: BbsQna, navController: NavHostController, viewM
                     } else {
                         1.dp
                     },
-                    color = design_btn_border,
+                    color = MaterialTheme.colorScheme.outlineVariant,
                     shape = RoundedCornerShape(10.dp)
                 )
                 .background(
                     color = if (inquiryItemData.pstAnw != 0) {
                         design_button_bg
                     } else {
-                        design_white
+                        Color.Transparent
                     }, shape = RoundedCornerShape(10.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -511,7 +515,7 @@ fun InquiryItem(inquiryItemData: BbsQna, navController: NavHostController, viewM
                 color = if(inquiryItemData.pstAnw!=0){
                     design_white
                 }else{
-                    design_login_text
+                    MaterialTheme.colorScheme.onPrimary
                 },
                 modifier = Modifier.padding(horizontal = 9.dp, vertical = 2.dp)
             )
@@ -522,14 +526,14 @@ fun InquiryItem(inquiryItemData: BbsQna, navController: NavHostController, viewM
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
-            color = design_login_text,
+            color = MaterialTheme.colorScheme.onPrimary,
         )
 
         Spacer(modifier = Modifier
             .padding(top = 20.dp)
             .fillMaxWidth()
             .height(1.dp)
-            .background(color = design_textFieldOutLine)
+            .background(color = MaterialTheme.colorScheme.outline)
         )
     }
 }

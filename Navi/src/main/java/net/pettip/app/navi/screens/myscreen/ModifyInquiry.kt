@@ -44,6 +44,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -66,6 +67,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -169,7 +171,7 @@ fun ModifyInquiryScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
+                colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.height(60.dp),
                 title = {
                     Box(
@@ -188,7 +190,7 @@ fun ModifyInquiryScreen(
                         ){
                             Icon(painter = painterResource(id = R.drawable.arrow_back),
                                 contentDescription = "",
-                                tint = Color.Unspecified
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
 
@@ -197,7 +199,7 @@ fun ModifyInquiryScreen(
                             fontSize = 20.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = (-1.0).sp,
-                            color = design_login_text,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.align(Alignment.Center),
                             textAlign = TextAlign.Center
                         )
@@ -216,12 +218,12 @@ fun ModifyInquiryScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(color = design_white)
+                .background(color = MaterialTheme.colorScheme.primary)
                 .verticalScroll(rememberScrollState())
         ) {
 
             Text(text = "문의유형", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
             Row (
@@ -231,7 +233,7 @@ fun ModifyInquiryScreen(
                     .height(48.dp)
                     .border(
                         width = 1.dp,
-                        color = design_textFieldOutLine,
+                        color = if (expanded) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(4.dp)
                     )
                     .clip(RoundedCornerShape(4.dp))
@@ -243,7 +245,7 @@ fun ModifyInquiryScreen(
                     text = inquiryKind?.cdNm ?: "문의유형을 선택해주세요",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 16.dp)
                 )
 
@@ -253,7 +255,7 @@ fun ModifyInquiryScreen(
                     }else{
                         Icons.Default.KeyboardArrowDown
                     },
-                    contentDescription = "", tint = design_login_text,
+                    contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(end = 16.dp))
             }
 
@@ -274,7 +276,7 @@ fun ModifyInquiryScreen(
             }
 
             Text(text = "제목", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
             CustomTFInInquiry(
@@ -285,7 +287,7 @@ fun ModifyInquiryScreen(
             )
 
             Text(text = "문의내용", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
             CustomTextField(
@@ -303,21 +305,28 @@ fun ModifyInquiryScreen(
                     text = "문의 내용을 상세히 기재해주시면 문의 확인에 도움이 됩니다.\n\n-핸드폰기종 정보 \n-문의 상세 내용 \n-오류화면 캡쳐 첨부",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text),
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(16.dp)
             )
 
 
             Text(text = "사진 등록(최대 5장)", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+                modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
             Spacer(modifier = Modifier.padding(top = 20.dp))
@@ -341,40 +350,40 @@ fun ModifyInquiryScreen(
                     .padding(top = 20.dp, bottom = 20.dp)
                     .fillMaxWidth()
                     .height(40.dp)
-                    .background(color = design_f1f1f1),
+                    .background(color = MaterialTheme.colorScheme.onSurfaceVariant),
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
                     text = "폰기종 : ${Build.MODEL}",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 20.dp)
                 )
 
                 Spacer(modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .size(width = 2.dp, height = 8.dp)
-                    .background(design_skip)
+                    .background(MaterialTheme.colorScheme.secondary)
                 )
                 Text(
                     text = "OS : ${Build.VERSION.RELEASE}",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
                 Spacer(modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .size(width = 2.dp, height = 8.dp)
-                    .background(design_skip)
+                    .background(MaterialTheme.colorScheme.secondary)
                 )
 
                 Text(
                     text = "AppVersion : ",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
             }
@@ -396,7 +405,7 @@ fun ModifyInquiryScreen(
 
                 Text(text = "문의 내용 해결 및 답변을 위해 아이디/연락처/이메일 등의 정보 수집에 동의합니다. \n(이외의 용도에는 사용되지 않습니다.)",
                     fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_login_text, modifier=Modifier.offset(x = (-8).dp), letterSpacing = (-0.7).sp
+                    color = MaterialTheme.colorScheme.onPrimary, modifier=Modifier.offset(x = (-8).dp), letterSpacing = (-0.7).sp
                 )
             }
 

@@ -1,4 +1,5 @@
 package net.pettip.app.navi.ui.theme
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF6750A4)
@@ -65,7 +66,6 @@ val md_theme_dark_scrim = Color(0xFF000000)
 
 //---------------------------------------------------------------------------//
 // 디자인팀 색상
-
 val design_intro_bg = Color(0xFF4783F5)
 val design_login_bg = Color(0xFFF6F8FC)
 val design_placeHolder = Color(0xFFB5B9BE)
@@ -74,7 +74,6 @@ val design_button_bg = Color(0xFF4783F5)
 val design_login_text = Color(0xFF222222)
 val design_login_kakaobtn = Color(0xFFF6E24B)
 val design_login_naverbtn = Color(0xFF03CF5D)
-val design_login_facebookbtn = Color(0xFF1877F2)
 val design_btn_border = Color(0xFF333333)
 val design_sharp = Color(0xFFF54F68)
 val design_shadow = Color(0x264E6085)
@@ -108,8 +107,9 @@ val design_EEEEEE = Color(0xFFEEEEEE)
 val design_999999 = Color(0xFF999999)
 val design_FCE9B3 = Color(0xFFFCE9B3)
 val design_CBE8F3 = Color(0xFFCBE8F3)
-val design_dark = Color(0xFF000000)
-val design_ = Color(0x00000000)
+val design_main_pattern = Color(0xFFf3f3f3)
+// 디자인 다크 색상
+val design_dark = Color(0xFF2D3034)
 
 
 //---------------------------------------------------------------------------//

@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -35,7 +36,7 @@ import net.pettip.app.navi.ui.theme.design_white
 fun BackTopBar(title: String, navController: NavHostController, backVisible:Boolean=true){
 
     CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
+        colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
         modifier = Modifier.height(60.dp),
         title = {
             Box(
@@ -60,7 +61,7 @@ fun BackTopBar(title: String, navController: NavHostController, backVisible:Bool
                     ){
                         Icon(painter = painterResource(id = R.drawable.arrow_back),
                             contentDescription = "",
-                            tint = Color.Unspecified
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -71,7 +72,7 @@ fun BackTopBar(title: String, navController: NavHostController, backVisible:Bool
                     fontSize = 20.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     letterSpacing = (-1.0).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.align(Alignment.Center),
                     textAlign = TextAlign.Center
                 )

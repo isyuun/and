@@ -40,6 +40,7 @@ import net.pettip.data.daily.DailyMonthRes
 import net.pettip.data.daily.DailyRcmdtn
 import net.pettip.data.daily.DailyRlsYnReq
 import net.pettip.data.daily.DailyUpdateReq
+import net.pettip.data.daily.DclrCreateReq
 import net.pettip.data.daily.PhotoRes
 import net.pettip.data.daily.RTStoryListRes
 import net.pettip.data.daily.RlsDailyReq
@@ -221,6 +222,9 @@ interface ApiService {
 
     @POST("api/v1/daily-life/rls/update")
     fun dailyRlsUpdate(@Body data: DailyRlsYnReq): Call<DailyDetailRes>
+
+    @POST("api/v1/daily-life/dclr/create")
+    fun dclrCreate(@Body data:DclrCreateReq): Call<commonRes>
 
     // --------------------- 일상생활 ----------------------- //
 

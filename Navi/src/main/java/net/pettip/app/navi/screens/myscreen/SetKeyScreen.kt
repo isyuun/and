@@ -24,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -76,13 +77,13 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(design_white)
+                .background(MaterialTheme.colorScheme.primary)
         ) {
             Text(
                 text = "초대 코드 입력",
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp, letterSpacing = (-1.0).sp,
-                lineHeight = 20.sp, color = design_login_text,
+                lineHeight = 20.sp, color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp, top = 20.dp)
             )
 
@@ -90,7 +91,7 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
                 text = "전달받은 코드를 입력후 [등록하기]버튼을 클릭해 주세요.",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                lineHeight = 14.sp, color = design_login_text,
+                lineHeight = 14.sp, color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp, top = 16.dp)
             )
 
@@ -99,7 +100,7 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
             Column (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = design_login_bg),
+                    .background(color = MaterialTheme.colorScheme.onPrimaryContainer),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Spacer(modifier = Modifier.padding(top = 20.dp))
@@ -204,10 +205,10 @@ fun SetKeyTemp(settingViewModel: SettingViewModel){
                             .height(60.dp)
                             .border(
                                 if (isFocused) 2.dp else 1.dp,
-                                if (isFocused) design_login_text else design_textFieldOutLine,
+                                if (isFocused) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
                                 RoundedCornerShape(8.dp)
                             )
-                            .background(color = design_white, shape = RoundedCornerShape(8.dp))
+                            .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp))
                             .combinedClickable(
                                 onClick = {
                                     focusRequester.requestFocus()
@@ -235,7 +236,7 @@ fun SetKeyTemp(settingViewModel: SettingViewModel){
                         Text(
                             text = char.uppercase(),
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                            fontSize = 24.sp, color = design_login_text,
+                            fontSize = 24.sp, color = MaterialTheme.colorScheme.onPrimary,
                             lineHeight = 24.sp,
                             textAlign = TextAlign.Center
                         )

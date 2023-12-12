@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -33,12 +34,14 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
@@ -151,13 +154,13 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
             TabRow(
                 modifier = Modifier.alpha(tabVisible),
                 selectedTabIndex = pagerState.currentPage,
-                indicator = { tabPositions -> TabRowDefaults.Indicator(Modifier.pagerTabIndicatorOffset(pagerState, tabPositions), color = design_login_text, height = 2.dp) },
-                backgroundColor = design_white,
-                contentColor = design_login_text
+                indicator = { tabPositions -> TabRowDefaults.Indicator(Modifier.pagerTabIndicatorOffset(pagerState, tabPositions), color = MaterialTheme.colorScheme.onPrimary, height = 2.dp) },
+                backgroundColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 CommunityTabItems.forEachIndexed { index, commuTabItem ->
                     Tab(
-                        text = { Text(text = commuTabItem.title, fontSize = 16.sp,color = design_login_text,
+                        text = { Text(text = commuTabItem.title, fontSize = 16.sp,color = MaterialTheme.colorScheme.onPrimary,
                             fontFamily =
                             if(index == pagerState.currentPage) FontFamily(Font(R.font.pretendard_bold))
                             else FontFamily(Font(R.font.pretendard_regular))
@@ -200,7 +203,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
     val orderType by viewModel.orderType.collectAsState()
     val viewType by viewModel.viewType.collectAsState()
     val currentTab by viewModel.currentTab.collectAsState()
-
+    val toErrorPage by viewModel.toErrorPage.collectAsState()
 
 
     var refreshing by remember{ mutableStateOf(false) }
@@ -248,7 +251,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
     }
 
     LaunchedEffect(key1 = lazyGridState.canScrollForward){
-        Log.d("LOG","여기실행")
+        Log.d("LOG",page.toString())
         if (!lazyGridState.canScrollForward && !refreshing && currentTab=="스토리"){
             if (storyListRes?.data?.paginate?.existNextPage == true){
                 if (!isLoading){
@@ -278,7 +281,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = design_white)
+            .background(color = MaterialTheme.colorScheme.primary)
     ){
         Column {
             Box{
@@ -294,12 +297,12 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp,
                             letterSpacing = (-0.7).sp,
-                            color = design_login_text
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = "",
-                            tint = design_login_text
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
 
@@ -316,12 +319,12 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp,
                             letterSpacing = (-0.7).sp,
-                            color = design_login_text
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = "",
-                            tint = design_login_text
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -387,10 +390,17 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
             ) { storyList.isEmpty()
                 when(it){
                     true ->
-                        Box(modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ){
-                            LoadingAnimation1()
+                        if (toErrorPage){
+                            ErrorPage(
+                                isLoading = refreshing,
+                                onClick = {newValue -> refreshing = newValue}
+                            )
+                        }else{
+                            Box(modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ){
+                                LoadingAnimation1()
+                            }
                         }
                     false ->
                         LazyVerticalGrid(
@@ -447,7 +457,7 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
     Box (
         Modifier
             .fillMaxSize()
-            .background(color = design_white)
+            .background(color = MaterialTheme.colorScheme.primary)
     ){
 
         Crossfade(
@@ -521,7 +531,7 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
     Box (
         Modifier
             .fillMaxSize()
-            .background(color = design_white)
+            .background(color = MaterialTheme.colorScheme.primary)
     ){
 
         Crossfade(
@@ -631,9 +641,9 @@ fun EventItem(eventItemData: BbsEvnt, navController: NavHostController, viewMode
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
             color = if(compareTimes(eventItemData.pstgEndDt?: "")){
-                design_B5B9BE
+                MaterialTheme.colorScheme.primaryContainer
             }else{
-                design_login_text
+                MaterialTheme.colorScheme.onPrimary
                  },
             modifier = Modifier.padding(top = 12.dp, bottom = 8.dp)
         )
@@ -644,9 +654,9 @@ fun EventItem(eventItemData: BbsEvnt, navController: NavHostController, viewMode
             fontSize = 14.sp,
             letterSpacing = (-0.7).sp,
             color = if(compareTimes(eventItemData.pstgEndDt?: "")){
-                design_B5B9BE
+                MaterialTheme.colorScheme.primaryContainer
             }else{
-                design_skip
+                MaterialTheme.colorScheme.secondary
             }
         )
     }
@@ -715,7 +725,7 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
-            color = design_login_text,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(top = 12.dp, bottom = 8.dp)
         )
 
@@ -724,7 +734,7 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp,
             letterSpacing = (-0.7).sp,
-            color = design_login_text
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
