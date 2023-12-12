@@ -111,7 +111,7 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
         val lat = parser.getAttributeValue(namespace, TAG_LAT).toDouble()
         val lon = parser.getAttributeValue(namespace, TAG_LON).toDouble()
         val no = parser.getAttributeValue(namespace, "no")
-        val event = Track.EVENT.valueOf(parser.getAttributeValue(namespace, "event"))
+        val event = Track.EVENT.valueOf(parser.getAttributeValue(namespace, "event").uppercase())
         var time = 0L
         var speed = 0.0f
         var ele = 0.0
@@ -141,12 +141,12 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
 
     private fun parseDateTime(text: String): Long {
         if (text.isEmpty()) return 0L
-        try {
-            return GPX_DATE_FORMAT.parse(text).time
+        return try {
+            GPX_DATE_FORMAT.parse(text)?.time ?: 0L
         } catch (e: Exception) {
             //println(e.message)
             val time = ISODateTimeFormat.dateTimeParser().parseDateTime(text)
-            return (time.millis - 9 * 3600 * 1000)
+            (time.millis - 9 * 3600 * 1000)
         }
     }
 

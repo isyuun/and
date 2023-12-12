@@ -180,7 +180,7 @@ fun withClick(context: Context, onClick: () -> Unit): () -> Unit {
 
 fun withDoubleTap(context: Context, onDoubleTap: () -> Unit): (Offset) -> Unit {
     return {
-        Log.v(__CLASSNAME__, "::withClick${getMethodName()}[$context][$onDoubleTap]")
+        Log.v(__CLASSNAME__, "::withDoubleTap${getMethodName()}[$context][$onDoubleTap]")
         //(context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
         onDoubleTap()
     }
@@ -188,7 +188,7 @@ fun withDoubleTap(context: Context, onDoubleTap: () -> Unit): (Offset) -> Unit {
 
 fun withLongPress(context: Context, onLongPress: () -> Unit): (Offset) -> Unit {
     return {
-        Log.v(__CLASSNAME__, "::withClick${getMethodName()}[$context][$onLongPress]")
+        Log.v(__CLASSNAME__, "::withLongPress${getMethodName()}[$context][$onLongPress]")
         (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
         onLongPress()
     }
@@ -196,7 +196,7 @@ fun withLongPress(context: Context, onLongPress: () -> Unit): (Offset) -> Unit {
 
 fun withPress(context: Context, onPress: () -> Unit): PressGestureScope.(Offset) -> Unit {
     return {
-        Log.v(__CLASSNAME__, "::withClick${getMethodName()}[$context][$onPress]")
+        Log.v(__CLASSNAME__, "::withPress${getMethodName()}[$context][$onPress]")
         (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
         onPress()
     }
@@ -204,7 +204,7 @@ fun withPress(context: Context, onPress: () -> Unit): PressGestureScope.(Offset)
 
 fun withTap(context: Context, onTap: () -> Unit): (Offset) -> Unit {
     return {
-        Log.v(__CLASSNAME__, "::withClick${getMethodName()}[$context][$onTap]")
+        Log.v(__CLASSNAME__, "::withTap${getMethodName()}[$context][$onTap]")
         //(context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
         onTap()
     }

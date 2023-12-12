@@ -35,12 +35,11 @@ open class gpsapplication3 : gpsapplication2() {
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
         Log.w(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ServiceConnection)}]")
         super.onServiceConnected(name, service)
-        this.service?.onServiceConnected(name, service)
-        if (this.activity is ServiceConnection) (this.activity as ServiceConnection).onServiceConnected(name, service)
         Log.v(__CLASSNAME__, "${getMethodName()}[${activity?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
-        super.onServiceConnected(name, service)
         this.service?.launchActivityIntent = activity?.intent
         Log.v(__CLASSNAME__, "${getMethodName()}[${activity?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
+        if (this.activity is ServiceConnection) (this.activity as ServiceConnection).onServiceConnected(name, service)
+        this.service?.onServiceConnected(name, service)
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
@@ -190,4 +189,6 @@ open class gpsapplication3 : gpsapplication2() {
     fun orient(context: Context, uri: Uri) = this.service?.orient(context, uri)
 
     var preview: Bitmap? = null
+
+    fun last() = this.service?.last()
 }

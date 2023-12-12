@@ -56,26 +56,22 @@ open class gpscomponentactivity : ComponentActivity(), IForegroundOnlyBroadcastR
     override fun onStart() {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onStart()
-        application.onStart()
     }
 
     override fun onResume() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$receiver")
         super.onResume()
-        application.onResume()
         application.registerReceiver2(receiver)
     }
 
     override fun onPause() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$receiver")
         super.onPause()
-        application.onPause()
         application.unregisterReceiver2(receiver)
     }
 
     override fun onStop() {
         Log.w(__CLASSNAME__, "${getMethodName()}...")
         super.onStop()
-        application.onStop()
     }
 }

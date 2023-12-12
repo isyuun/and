@@ -36,14 +36,14 @@ import java.io.File
 open class NaverMapComponentActivity : GPSComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    val application = GPSApplication.instance
+    private val application = GPSApplication.instance
 
     private val fusedLocationSource: FusedLocationSource by lazy {
         FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
     }
 
     protected open fun setContent() {
-        setContent { NaverMapApp() }
+        setContent { MapApp() }
     }
 
     @Composable
