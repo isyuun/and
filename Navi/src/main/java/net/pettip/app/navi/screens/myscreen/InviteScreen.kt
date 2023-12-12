@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -79,13 +80,13 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(design_white)
+                .background(MaterialTheme.colorScheme.primary)
         ) {
             Text(
                 text = "회원 초대",
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp, letterSpacing = (-1.0).sp,
-                lineHeight = 20.sp, color = design_login_text,
+                lineHeight = 20.sp, color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp, top = 20.dp)
             )
 
@@ -93,7 +94,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                 text = "코드를 직접 말해주거나 메시지로 전송하세요.",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                lineHeight = 14.sp, color = design_login_text,
+                lineHeight = 14.sp, color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp, top = 16.dp)
             )
 
@@ -102,7 +103,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
             Column (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = design_login_bg),
+                    .background(color = MaterialTheme.colorScheme.onPrimaryContainer),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Spacer(modifier = Modifier.padding(top = 20.dp))
@@ -132,7 +133,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                     )
                     
                     Icon(painter = painterResource(id = R.drawable.icon_copy),
-                        contentDescription = "", tint = Color.Unspecified,
+                        contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier
                             .padding(end = 12.dp)
                             .align(Alignment.CenterEnd)
@@ -145,7 +146,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                     Spacer(modifier = Modifier
                         .fillMaxWidth()
                         .height(1.dp)
-                        .background(design_skip)
+                        .background(MaterialTheme.colorScheme.secondary)
                         .align(Alignment.BottomCenter)
                     )
                 }
@@ -167,7 +168,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                     },
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                    color = design_skip,
+                    color = MaterialTheme.colorScheme.secondary,
                 )
 
                 Spacer(modifier = Modifier.padding(top = 40.dp))

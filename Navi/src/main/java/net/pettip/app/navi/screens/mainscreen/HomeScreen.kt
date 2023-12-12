@@ -23,6 +23,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,11 +57,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -68,6 +72,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -124,6 +129,7 @@ import net.pettip.app.navi.ui.theme.design_icon_distance_bg
 import net.pettip.app.navi.ui.theme.design_icon_time_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
+import net.pettip.app.navi.ui.theme.design_main_pattern
 import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_shadow
@@ -241,7 +247,7 @@ fun HomeScreen(
             .fillMaxSize()
             .pullRefresh(pullRefreshState)
             .verticalScroll(rememberScrollState())
-            .background(color = design_select_btn_bg),
+            .background(color = MaterialTheme.colorScheme.onPrimaryContainer),
         contentAlignment = Alignment.TopCenter
     ){
         Column (modifier = Modifier
@@ -268,7 +274,9 @@ fun HomeScreen(
                         .height(48.dp),
                     shape = RoundedCornerShape(100.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = design_btn_border),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onPrimary
+                    ),
                     onClick = {
                         sharedViewModel.updateToStory(true)
                         bottomNavController.navigate("commu") {
@@ -285,7 +293,7 @@ fun HomeScreen(
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
-                        color = design_white
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -319,7 +327,7 @@ fun HomeScreen(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileContent(
     viewModel: HomeViewModel,
@@ -390,7 +398,7 @@ fun ProfileContent(
     Column (modifier = Modifier
         .fillMaxWidth()
         .shadow(
-            color = design_shadow,
+            color = MaterialTheme.colorScheme.surface,
             offsetX = 0.dp,
             offsetY = 10.dp,
             spread = 3.dp,
@@ -398,12 +406,15 @@ fun ProfileContent(
             borderRadius = 50.dp
         )
         .clip(shape = RoundedCornerShape(bottomStart = 50.dp, bottomEnd = 50.dp))
-        .background(design_white, RoundedCornerShape(bottomStart = 50.dp, bottomEnd = 50.dp)),
+        .background(
+            color = MaterialTheme.colorScheme.primary,
+            shape = RoundedCornerShape(bottomStart = 50.dp, bottomEnd = 50.dp)
+        ),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Box {
             Image(
-                painter = painterResource(id = R.drawable.main_pattern),
+                painter = painterResource(id = if(!isSystemInDarkTheme()) R.drawable.main_pattern else R.drawable.main_pattern_dark),
                 contentDescription = "", modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillBounds)
 
@@ -411,12 +422,13 @@ fun ProfileContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
+                Spacer(modifier = Modifier.padding(top = 20.dp))
+
                 Row (modifier = Modifier
                     .clickable(
                         enabled = (!weatherRefresh && sky == null),
                         onClick = { viewModel.updateWeatherRefresh(true) }
                     )
-                    .padding(top = 20.dp)
                     .wrapContentWidth()
                     .height(30.dp)
                     .animateContentSize()
@@ -451,18 +463,18 @@ fun ProfileContent(
                                 painterResource(id =
                                 if (pty == "0"){
                                     when(sky){
-                                        "1" -> if (currentTime.isAfter(afternoon6) || currentTime.isBefore(morning6)) R.drawable.night else R.drawable.sunny
-                                        "3" -> if (currentTime.isAfter(afternoon6) || currentTime.isBefore(morning6)) R.drawable.cloudy_night else R.drawable.cloudy_day
-                                        "4" -> R.drawable.fog
-                                        else -> R.drawable.sunny
+                                        "1" -> if (currentTime.isAfter(afternoon6) || currentTime.isBefore(morning6)) R.drawable.night_ver2 else R.drawable.sunny_ver2
+                                        "3" -> if (currentTime.isAfter(afternoon6) || currentTime.isBefore(morning6)) R.drawable.cloudy_night_ver2 else R.drawable.cloudy_day_ver2
+                                        "4" -> R.drawable.fog_ver2
+                                        else -> R.drawable.sunny_ver2
                                     }
                                 }else{
                                     when(pty){
-                                        "1" -> R.drawable.rainy
-                                        "2" -> R.drawable.rainyandsnowy
-                                        "3" -> R.drawable.snowy
-                                        "4" -> R.drawable.shower
-                                        else -> R.drawable.rainy
+                                        "1" -> R.drawable.rainy_ver2
+                                        "2" -> R.drawable.rainyandsnowy_ver2
+                                        "3" -> R.drawable.snowy_ver2
+                                        "4" -> R.drawable.shower_ver2
+                                        else -> R.drawable.rainy_ver2
                                     }
                                 }
                                 ),
@@ -566,7 +578,7 @@ fun ProfileContent(
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
-                    color = design_skip
+                    color = MaterialTheme.colorScheme.secondary
                 )
 
                 Text(
@@ -574,7 +586,7 @@ fun ProfileContent(
                     fontSize = 30.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     letterSpacing = (-0.7).sp,
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
                 Spacer(modifier = Modifier.padding(top = 16.dp))
@@ -586,7 +598,7 @@ fun ProfileContent(
                         modifier= Modifier
                             .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(color = design_icon_bg),
+                            .background(color = MaterialTheme.colorScheme.onTertiary),
                         contentAlignment = Alignment.Center
                     ){
                         Icon(painter = painterResource(id = R.drawable.icon_age), contentDescription = "", tint = Color.Unspecified)
@@ -601,7 +613,7 @@ fun ProfileContent(
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 8.dp)
                     )
 
@@ -611,7 +623,7 @@ fun ProfileContent(
                         modifier= Modifier
                             .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(color = design_icon_bg),
+                            .background(color = MaterialTheme.colorScheme.onTertiary),
                         contentAlignment = Alignment.Center
                     ){
                         Icon(painter = painterResource(id = R.drawable.icon_gender), contentDescription = "", tint = Color.Unspecified)
@@ -626,7 +638,7 @@ fun ProfileContent(
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 8.dp)
                     )
 
@@ -636,7 +648,7 @@ fun ProfileContent(
                         modifier= Modifier
                             .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(color = design_icon_bg),
+                            .background(color = MaterialTheme.colorScheme.onTertiary),
                         contentAlignment = Alignment.Center
                     ){
                         Icon(painter = painterResource(id = R.drawable.icon_weight), contentDescription = "", tint = Color.Unspecified)
@@ -647,7 +659,7 @@ fun ProfileContent(
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 8.dp)
                     )
 
@@ -660,7 +672,7 @@ fun ProfileContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 40.dp, end = 40.dp, top = 16.dp, bottom = 18.dp),
-            thickness = 1.dp, color = design_textFieldOutLine
+            thickness = 1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer
         )
 
 
@@ -679,8 +691,15 @@ fun ProfileContent(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .border(shape = CircleShape, border = BorderStroke(2.dp, color = design_white))
-                    .shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
+                    .border(shape = CircleShape, border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.tertiary))
+                    .shadow(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        offsetY = 2.dp,
+                        offsetX = 2.dp,
+                        spread = 2.dp,
+                        blurRadius = 3.dp,
+                        borderRadius = 40.dp
+                    )
                     .clip(CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -700,7 +719,7 @@ fun ProfileContent(
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 12.sp, letterSpacing = (-0.6).sp,
                 textDecoration = TextDecoration.Underline,
-                color = design_skip,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .padding(start = 10.dp)
                     .clickable(
@@ -728,7 +747,7 @@ fun ProfileContent(
                 Spacer(modifier = Modifier
                     .height(navigationBarHeight)
                     .fillMaxWidth()
-                    .background(color = design_white))
+                    .background(color = MaterialTheme.colorScheme.primary))
             }
         }
     }
@@ -764,21 +783,21 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 20.sp,
                     letterSpacing = (-1.0).sp,
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                     )
                 Text(
                     text = stringResource(R.string.with_walk),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 20.sp,
                     letterSpacing = (-1.0).sp,
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
 
             Row (modifier = Modifier
                 .padding(top = 16.dp)
                 .shadow(
-                    color = design_shadow,
+                    color = MaterialTheme.colorScheme.surface,
                     borderRadius = 20.dp,
                     offsetX = 8.dp,
                     offsetY = 8.dp,
@@ -788,7 +807,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                 .fillMaxWidth()
                 .height(150.dp)
                 .clip(shape = RoundedCornerShape(20.dp))
-                .background(color = design_white, shape = RoundedCornerShape(20.dp))
+                .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(20.dp))
                 , horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
             ){
                 Column (
@@ -812,7 +831,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
                         modifier = Modifier.padding(top = 20.dp),
-                        color = design_login_text
+                        color = MaterialTheme.colorScheme.secondary
                     )
 
                     Text(
@@ -821,7 +840,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         letterSpacing = 0.sp,
                         modifier = Modifier.padding(top = 4.dp),
-                        color = design_login_text
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
@@ -850,7 +869,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
                         modifier = Modifier.padding(top = 20.dp),
-                        color = design_login_text
+                        color = MaterialTheme.colorScheme.secondary
                     )
 
                     Row (modifier=Modifier.fillMaxWidth()){
@@ -862,7 +881,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                             modifier = Modifier
                                 .padding(top = 4.dp)
                                 .alignByBaseline(),
-                            color = design_login_text
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                         Text(
                             text = "km",
@@ -872,7 +891,7 @@ fun WalkInfoContent(viewModel: HomeViewModel, pagerState: PagerState){
                             modifier = Modifier
                                 .padding(top = 4.dp)
                                 .alignByBaseline(),
-                            color = design_login_text
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
 
@@ -907,7 +926,7 @@ fun StoryContent(viewModel: HomeViewModel, navController: NavHostController, com
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 20.sp,
                     letterSpacing = (-1.0).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 20.dp)
                 )
                 Text(
@@ -915,7 +934,7 @@ fun StoryContent(viewModel: HomeViewModel, navController: NavHostController, com
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 20.sp,
                     letterSpacing = (-1.0).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
@@ -944,6 +963,7 @@ fun StoryItem(data: RTStoryData, navController: NavHostController, communityView
     val scope = rememberCoroutineScope()
 
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
+    var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     val gradient = Brush.verticalGradient(
         colors = listOf(Color.Transparent, design_grad_end),
@@ -957,18 +977,13 @@ fun StoryItem(data: RTStoryData, navController: NavHostController, communityView
             .clip(shape = RoundedCornerShape(20.dp))
             .onGloballyPositioned { sizeImage = it.size }
             .clickable {
-                //sharedViewModel.updateToStory(true)
-                //sharedViewModel.updateMoreStoryClick(data.schUnqNo)
-                //bottomNavController.navigate("commu") {
-                //    bottomNavController.graph.startDestinationRoute?.let {
-                //        popUpTo(it) { saveState = true }
-                //    }
-                //    launchSingleTop = true
-                //    restoreState = true
-                //}
-                scope.launch {
-                    communityViewModel.getStoryDetail(data.schUnqNo)
-                    navController.navigate(Screen.StoryDetail.route)
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastClickTime >= 500) {
+                    lastClickTime = currentTime
+                    scope.launch {
+                        navController.navigate(Screen.StoryDetail.route)
+                        communityViewModel.getStoryDetail(data.schUnqNo)
+                    }
                 }
             }
     ){
@@ -1072,7 +1087,7 @@ fun BottomSheetContent(
     Column (
         modifier = Modifier
             .fillMaxWidth()
-            .background(design_white)
+            .background(MaterialTheme.colorScheme.primary)
     ){
         Spacer(modifier = Modifier.padding(top = 20.dp))
 
@@ -1081,7 +1096,7 @@ fun BottomSheetContent(
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 20.sp,
             letterSpacing = (-1.0).sp,
-            color = design_login_text,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -1127,7 +1142,7 @@ fun BottomSheetContent(
                     .height(48.dp),
                 shape = RoundedCornerShape(100.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_btn_border),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
                 onClick = {
                     onDisMiss(false)
                     navController.navigate(Screen.AddPetScreen.route)
@@ -1138,7 +1153,7 @@ fun BottomSheetContent(
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_white
+                    color = MaterialTheme.colorScheme.onTertiaryContainer
                 )
             }
             
@@ -1151,10 +1166,10 @@ fun BottomSheetContent(
                 shape = RoundedCornerShape(100.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = design_white,
-                    disabledContainerColor = design_white
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = MaterialTheme.colorScheme.primary
                 ),
-                border = BorderStroke(1.dp, design_btn_border),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                 onClick = {
                     onDisMiss(false)
                     navController.navigate("petProfileScreen")
@@ -1166,7 +1181,7 @@ fun BottomSheetContent(
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -1206,12 +1221,12 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
         colors = if(petList == selectPet) {
             ButtonDefaults.buttonColors(design_select_btn_bg)
         } else {
-            ButtonDefaults.buttonColors(design_white)
+            ButtonDefaults.buttonColors(Color.Transparent)
         },
         border = if(petList == selectPet) {
             BorderStroke(1.dp, color = design_select_btn_text)
         } else {
-            BorderStroke(1.dp, color = design_textFieldOutLine)
+            BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer)
         },
         contentPadding = PaddingValues(start = 14.dp,end=14.dp),
         elevation = if(petList == selectPet){
@@ -1230,9 +1245,13 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
             Box(
                 modifier = Modifier
                     .size(46.dp)
-                    .border(shape = CircleShape, border = BorderStroke(3.dp, color = design_white))
+                    .border(shape = CircleShape,
+                        border =
+                        BorderStroke(2.dp,
+                            color = if(petList == selectPet) MaterialTheme.colorScheme.tertiary else design_white)
+                    )
                     .shadow(
-                        color = design_shadow,
+                        color = MaterialTheme.colorScheme.onSurface,
                         offsetY = 10.dp,
                         offsetX = 10.dp,
                         spread = 4.dp,
@@ -1265,7 +1284,7 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
                     fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                     fontSize = 16.sp,
                     letterSpacing = (-0.8).sp,
-                    color = design_login_text
+                    color = if (petList == selectPet) design_login_text else MaterialTheme.colorScheme.onPrimary
                 )
 
                 Row (
@@ -1278,14 +1297,14 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 12.sp,
                         letterSpacing = (-0.8).sp,
-                        color = design_skip
+                        color = MaterialTheme.colorScheme.secondary
                     )
 
                     Spacer(
                         modifier = Modifier
                             .padding(horizontal = 4.dp)
                             .size(2.dp, 8.dp)
-                            .background(color = design_skip)
+                            .background(color = MaterialTheme.colorScheme.secondary)
                     )
 
                     Text(
@@ -1293,14 +1312,14 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 12.sp,
                         letterSpacing = (-0.8).sp,
-                        color = design_skip
+                        color = MaterialTheme.colorScheme.secondary
                     )
 
                     Spacer(
                         modifier = Modifier
                             .padding(horizontal = 4.dp)
                             .size(2.dp, 8.dp)
-                            .background(color = design_skip)
+                            .background(color = MaterialTheme.colorScheme.secondary)
                     )
 
                     Text(
@@ -1308,7 +1327,7 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 12.sp,
                         letterSpacing = (-0.8).sp,
-                        color = design_skip
+                        color = MaterialTheme.colorScheme.secondary
                     )
 
                 }
@@ -1336,7 +1355,7 @@ fun BottomInfo(){
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.6).sp,
-                color = design_skip
+                color = MaterialTheme.colorScheme.secondary
             )
 
             Spacer(
@@ -1351,7 +1370,7 @@ fun BottomInfo(){
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 letterSpacing = (-0.6).sp,
-                color = design_skip
+                color = MaterialTheme.colorScheme.secondary
             )
 
             Spacer(
@@ -1366,7 +1385,7 @@ fun BottomInfo(){
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.6).sp,
-                color = design_skip
+                color = MaterialTheme.colorScheme.secondary
             )
         }
         
@@ -1378,7 +1397,7 @@ fun BottomInfo(){
             lineHeight = 16.sp,
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             letterSpacing = (-0.6).sp,
-            color = design_skip
+            color = MaterialTheme.colorScheme.secondary
         )
     }
 }
@@ -1390,7 +1409,7 @@ fun CircleImage(size: Int, imageUri: String?){
     Box(
         modifier = Modifier
             .size(size.dp)
-            .border(shape = CircleShape, border = BorderStroke(5.dp, color = design_white))
+            .border(shape = CircleShape, border = BorderStroke(5.dp, color = MaterialTheme.colorScheme.tertiary))
             .shadow(
                 color = design_shadow,
                 offsetY = 10.dp,
@@ -1426,9 +1445,9 @@ fun CircleImageHome(size: Int, imageUri: String?, page: Int, pagerState: PagerSt
     Box(
         modifier = Modifier
             .size(size.dp)
-            .border(shape = CircleShape, border = BorderStroke(5.dp, color = design_white))
+            .border(shape = CircleShape, border = BorderStroke(5.dp, color = MaterialTheme.colorScheme.tertiary))
             .shadow(
-                color = design_shadow,
+                color = MaterialTheme.colorScheme.onSurface,
                 offsetY = 10.dp,
                 offsetX = 10.dp,
                 spread = 4.dp,
@@ -1467,8 +1486,15 @@ fun CircleImageOffset(imageUri: String?, index: Int){
         modifier = Modifier
             .offset(10 * (index + 1).dp)
             .size(40.dp)
-            .border(shape = CircleShape, border = BorderStroke(2.dp, color = design_white))
-            .shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
+            .border(shape = CircleShape, border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.tertiary))
+            .shadow(
+                color = MaterialTheme.colorScheme.onSurface,
+                offsetY = 2.dp,
+                offsetX = 2.dp,
+                spread = 2.dp,
+                blurRadius = 3.dp,
+                borderRadius = 40.dp
+            )
             .clip(CircleShape)
     ) {
         AsyncImage(

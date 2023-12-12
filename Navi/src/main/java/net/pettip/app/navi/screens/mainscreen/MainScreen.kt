@@ -31,6 +31,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -94,7 +95,7 @@ fun MainScreen(
     settingViewModel: SettingViewModel) {
 
     val systemUiController = rememberSystemUiController()
-    systemUiController.setSystemBarsColor(color = design_white)
+    systemUiController.setSystemBarsColor(color = MaterialTheme.colorScheme.primary)
 
     val bottomNavController = rememberNavController()
 
@@ -378,7 +379,7 @@ fun BottomNavigationComponent(
     val selectedIndex = items.indexOfFirst { screen -> currentDestination?.hierarchy?.any { it.route == screen.route } == true }
 
     BottomNavigation(
-        backgroundColor = design_white,
+        backgroundColor = MaterialTheme.colorScheme.tertiary,
         elevation = 8.dp,
         modifier = Modifier.height(60.dp)
     ) {
@@ -424,7 +425,7 @@ fun BottomNavigationComponent(
                         painter = painterResource(id = iconPainter),
                         contentDescription = "Navigation Icon",
                         modifier = Modifier.padding(top = 10.dp),
-                        tint = Color.Unspecified
+                        tint = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else design_bottomnav_text
                     )
 
                     // 레이블
@@ -432,7 +433,7 @@ fun BottomNavigationComponent(
                         text = screen.title,
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        color = if(isSelected){design_select_btn_border}else{
+                        color = if(isSelected){MaterialTheme.colorScheme.secondaryContainer}else{
                             design_bottomnav_text}
                     )
                 }

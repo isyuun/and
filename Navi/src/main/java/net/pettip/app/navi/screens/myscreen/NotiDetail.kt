@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -36,6 +38,12 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
 
     val notiDetail by viewModel.bbsDetail.collectAsState()
 
+    DisposableEffect(Unit){
+        onDispose {
+            viewModel.updateBbsDetail(null)
+        }
+    }
+
     Scaffold (
         topBar = { BackTopBar(title = "공지사항", navController = navController) }
     ) { paddingValues ->
@@ -43,7 +51,7 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(color = design_white)
+                .background(color = MaterialTheme.colorScheme.primary)
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
@@ -51,7 +59,7 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 24.sp,
                 letterSpacing = (-1.2).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)
             )
 
@@ -60,7 +68,7 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,
-                color = design_skip,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(start = 20.dp, top = 8.dp)
             )
 
@@ -68,7 +76,7 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
                 .padding(20.dp)
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(color = design_textFieldOutLine)
+                .background(color = MaterialTheme.colorScheme.outline)
             )
 
             HtmlText(htmlString = notiDetail?.data?.pstCn?:"", modifier = Modifier.padding(horizontal = 20.dp))

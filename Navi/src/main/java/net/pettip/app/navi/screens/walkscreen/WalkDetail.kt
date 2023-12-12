@@ -49,6 +49,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -162,13 +163,13 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
         Box(modifier = Modifier
             .fillMaxSize()
-            .background(design_white)){
+            .background(MaterialTheme.colorScheme.primary)){
             Column (
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
                     .padding(paddingValues = paddingValue)
                     .fillMaxSize()
-                    .background(color = design_white)
+                    .background(color = MaterialTheme.colorScheme.primary)
             ){
                 Row (
                     modifier= Modifier
@@ -182,7 +183,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 4.dp)
                     )
                 }
@@ -298,7 +299,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
-                            color = design_skip,
+                            color = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.padding(start = 20.dp)
                         )
 
@@ -308,13 +309,13 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = 0.sp,
                             modifier = Modifier.padding(top = 4.dp, start = 20.dp),
-                            color = design_login_text
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
 
                     Spacer(modifier = Modifier
                         .size(1.dp, 40.dp)
-                        .background(color = design_textFieldOutLine))
+                        .background(color = MaterialTheme.colorScheme.onSecondaryContainer))
 
                     Column (
                         modifier= Modifier
@@ -326,7 +327,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
-                            color = design_skip,
+                            color = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.padding(start = 20.dp)
                         )
 
@@ -337,14 +338,14 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             letterSpacing = 0.sp,
                             modifier = Modifier
                                 .padding(top = 4.dp, start = 20.dp),
-                            color = design_login_text
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
 
                     }
 
                     Spacer(modifier = Modifier
                         .size(1.dp, 40.dp)
-                        .background(color = design_textFieldOutLine))
+                        .background(color = MaterialTheme.colorScheme.onSecondaryContainer))
 
                     Column (
                         modifier= Modifier
@@ -356,7 +357,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
-                            color = design_skip,
+                            color = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.padding(start = 20.dp)
                         )
 
@@ -367,7 +368,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             letterSpacing = 0.sp,
                             modifier = Modifier
                                 .padding(top = 4.dp, start = 20.dp),
-                            color = design_login_text
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
 
                     }
@@ -402,7 +403,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
-                        .background(color = design_login_bg, shape = RoundedCornerShape(12.dp))
+                        .background(color = MaterialTheme.colorScheme.onPrimaryContainer, shape = RoundedCornerShape(12.dp))
                         .clip(RoundedCornerShape(12.dp))
                 ){
                     if ( !(dailyDetail?.schCn == " " || dailyDetail?.schCn =="") ){
@@ -415,7 +416,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
-                            color = design_login_text
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
 
@@ -462,10 +463,10 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .fillMaxWidth()
-            .background(color = design_white, shape = RoundedCornerShape(12.dp))
+            .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
             .border(
                 width = 1.dp,
-                color = design_textFieldOutLine,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 shape = RoundedCornerShape(12.dp)
             )
     ){
@@ -482,7 +483,7 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 10.dp, top = 22.dp, bottom = 22.dp)
             )
         }
@@ -503,7 +504,7 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_skip,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(start = 4.dp, end = 8.dp)
                 )
 
@@ -516,7 +517,7 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
-                        color = design_login_text
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -532,7 +533,7 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_skip,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(start = 4.dp, end = 8.dp)
                 )
 
@@ -545,7 +546,7 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
-                        color = design_login_text
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -561,7 +562,7 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_skip,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(start = 4.dp, end = 8.dp)
                 )
 
@@ -574,7 +575,7 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
-                        color = design_login_text
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }

@@ -29,6 +29,7 @@ import net.pettip.data.bbs.QnaListRes
 import net.pettip.data.cmm.CdDetail
 import net.pettip.data.cmm.CmmRes
 import net.pettip.data.cmm.CommonData
+import net.pettip.data.cmm.commonRes
 import net.pettip.data.daily.BbsCmntDeleteReq
 import net.pettip.data.daily.Cmnt
 import net.pettip.data.daily.CmntCreateReq
@@ -47,6 +48,7 @@ import net.pettip.data.daily.DailyLifeUpdatePet
 import net.pettip.data.daily.DailyRcmdtn
 import net.pettip.data.daily.DailyRlsYnReq
 import net.pettip.data.daily.DailyUpdateReq
+import net.pettip.data.daily.DclrCreateReq
 import net.pettip.data.daily.Pet
 import net.pettip.data.daily.PhotoData
 import net.pettip.data.daily.PhotoRes
@@ -106,6 +108,9 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     fun updateStoryListClear(){
         _storyList.value = emptyList()
     }
+
+    private val _toErrorPage = MutableStateFlow<Boolean>(false)
+    val toErrorPage: StateFlow<Boolean> = _toErrorPage.asStateFlow()
 
     private val _storyPage = MutableStateFlow<Int>(1)
     val storyPage:StateFlow<Int> = _storyPage.asStateFlow()
@@ -214,8 +219,6 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
 
     private val _dm = MutableStateFlow<String>("")
     val dm: StateFlow<String> = _dm.asStateFlow()
-
-
 
     private val _comment = MutableStateFlow<String>("")
     val comment: StateFlow<String> = _comment.asStateFlow()
@@ -440,6 +443,84 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _dclrCn.value = newValue
     }
 
+    private val _selectCmnt = MutableStateFlow<Cmnt?>(null)
+    val selectCmnt: StateFlow<Cmnt?> = _selectCmnt.asStateFlow()
+    fun updateSelectCmnt(newValue: Cmnt?) {
+        _selectCmnt.value = newValue
+    }
+
+    private val _selectDclr = MutableStateFlow<CdDetail?>(null)
+    val selectDclr: StateFlow<CdDetail?> = _selectDclr.asStateFlow()
+    fun updateSelectDclr(newValue: CdDetail?) {
+        _selectDclr.value = newValue
+    }
+
+    private val _dclrList = MutableStateFlow<CmmRes?>(null)
+    val dclrList: StateFlow<CmmRes?> = _dclrList.asStateFlow()
+    fun updateDclrList(newValue: CmmRes?) {
+        _dclrList.value = newValue
+    }
+    suspend fun getDclrList():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.getCmmList(CommonCodeModel("RSN"))
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<CmmRes>{
+                override fun onResponse(call: Call<CmmRes>, response: Response<CmmRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _dclrList.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<CmmRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun dclrCreate():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = DclrCreateReq(
+            cmntNo = _selectCmnt.value?.cmntNo ?: 0,
+            dclrCn = _dclrCn.value,
+            dclrRsnCd = _selectDclr.value?.cdId?: "001",
+            dclrSeCd = if (_selectCmnt.value==null) "001" else "002",
+            schUnqNo = _storyDetail.value?.data?.schUnqNo ?: 0
+        )
+
+        val call = apiService.dclrCreate(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            Log.d("LOG","1")
+                            continuation.resume(true)
+                        }
+                    }else{
+                        Log.d("LOG","2")
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    Log.d("LOG",t.message.toString())
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
     // ---------------------------신고------------------------------
 
     suspend fun bbsRcmdtn(pstSn:Int, rcmdtnSeCd: String):Boolean{
@@ -475,6 +556,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun getStoryList(page: Int):Boolean{
         val apiService = RetrofitClientServer.instance
 
+        _toErrorPage.value = false
         val order = if (_orderType.value == "최신순") "001" else "002"
         val view = if (_viewType.value == "전체") "001" else "002"
 
@@ -497,6 +579,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
                 override fun onFailure(call: Call<StoryRes>, t: Throwable) {
+                    _toErrorPage.value = true
                     continuation.resume(false)
                 }
             })
@@ -551,7 +634,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         val apiService = RetrofitClientServer.instance
 
         val data = BbsReq(bbsSn = 9, page = page, pageSize = 10, recordSize = 20)
-
+        _toErrorPage.value = false
         val call = apiService.getEventList(data)
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<EventListRes>{
@@ -572,6 +655,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
                 override fun onFailure(call: Call<EventListRes>, t: Throwable) {
+                    _toErrorPage.value = true
                     continuation.resume(false)
                 }
             })
@@ -612,6 +696,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
 
         val data = BbsReq(bbsSn = 11, page = page, pageSize = 10, recordSize = 20)
 
+        _toErrorPage.value = false
         val call = apiService.getEndEventList(data)
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<EndEventListRes>{
@@ -632,6 +717,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
                 override fun onFailure(call: Call<EndEventListRes>, t: Throwable) {
+                    _toErrorPage.value = true
                     continuation.resume(false)
                 }
             })

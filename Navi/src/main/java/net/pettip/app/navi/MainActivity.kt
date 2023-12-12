@@ -4,6 +4,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
@@ -14,6 +17,8 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -21,6 +26,7 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -28,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.core.view.WindowCompat
@@ -46,6 +53,7 @@ import net.pettip.app.navi.screens.IdPwSearchScreen
 import net.pettip.app.navi.screens.IntroScreen
 import net.pettip.app.navi.screens.LocationPickContent
 import net.pettip.app.navi.screens.LoginScreen
+import net.pettip.app.navi.screens.PermissionScreen
 import net.pettip.app.navi.screens.PetCreateScreen
 import net.pettip.app.navi.screens.PetKindContent
 import net.pettip.app.navi.screens.PwFindScreen
@@ -245,9 +253,9 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
                 animationSpec = tween(
                     300, easing = LinearEasing
                 )
-            ) + slideIntoContainer(
-                animationSpec = tween(300, easing = EaseIn),
-                towards = AnimatedContentTransitionScope.SlideDirection.Start
+            )+ slideInHorizontally(
+                tween(300, easing = LinearEasing),
+                initialOffsetX = { it/3*2}
             )
         },
             exitTransition = {
@@ -255,9 +263,9 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
                     animationSpec = tween(
                         300, easing = LinearEasing
                     )
-                ) + slideOutOfContainer(
-                    animationSpec = tween(300, easing = EaseOut),
-                    towards = AnimatedContentTransitionScope.SlideDirection.End
+                ) + slideOutHorizontally(
+                    tween(300, easing = LinearEasing),
+                    targetOffsetX = { it/3*2}
                 )
             }
         ){
@@ -458,3 +466,24 @@ sealed class BottomNav(val route: String, val title: String, val unSelectedIcon:
     object MyScreen : BottomNav("my", "MY", R.drawable.mypage, R.drawable.mypage_active)
 }
 
+@Composable
+fun DisableSystemBarsAnimation(
+    onBackPressedDispatcher: OnBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
+) {
+    val context = LocalContext.current
+
+    DisposableEffect(context) {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Do nothing when back button is pressed
+            }
+        }
+
+        onBackPressedDispatcher.addCallback(callback)
+
+        // Ensure that we clean up if the effect leaves the composition
+        onDispose {
+            callback.remove()
+        }
+    }
+}

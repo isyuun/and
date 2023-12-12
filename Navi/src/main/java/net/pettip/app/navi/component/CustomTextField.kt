@@ -8,17 +8,23 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -52,52 +58,58 @@ fun CustomTextField(
     val textColor = textStyle.color.takeOrElse {
         Color.Black
     }
-    val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
-    val isFocused = interactionSource.collectIsFocusedAsState()
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    BasicTextField(
-        value = value,
-        modifier = modifier,
-        onValueChange = onValueChange,
-        enabled = enabled,
-        readOnly = readOnly,
-        textStyle = mergedTextStyle,
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        interactionSource = interactionSource,
-        singleLine = singleLine,
-        maxLines = maxLines,
-        decorationBox = @Composable { innerTextField ->
-            // places leading icon, text field with label and placeholder, trailing icon
-            OutlinedTextFieldDefaults.DecorationBox(
-                value = value,
-                visualTransformation = visualTransformation,
-                innerTextField = innerTextField,
-                placeholder = placeholder,
-                label = label,
-                leadingIcon = leadingIcon,
-                trailingIcon = trailingIcon,
-                supportingText = supportingText,
-                singleLine = singleLine,
-                enabled = enabled,
-                isError = isError,
-                interactionSource = interactionSource,
-                colors = colors,
-                contentPadding = innerPadding,
-                container = {
-                    OutlinedTextFieldDefaults.ContainerBox(
-                        enabled,
-                        isError,
-                        interactionSource,
-                        colors,
-                        shape
-                    )
-                }
-            )
-        }
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = colors.cursorColor,
+        backgroundColor = colors.cursorColor,
     )
+    val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
+
+    CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors){
+        @OptIn(ExperimentalMaterial3Api::class)
+        BasicTextField(
+            value = value,
+            modifier = modifier,
+            onValueChange = onValueChange,
+            enabled = enabled,
+            readOnly = readOnly,
+            textStyle = mergedTextStyle,
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            interactionSource = interactionSource,
+            cursorBrush = SolidColor(colors.cursorColor),
+            singleLine = singleLine,
+            maxLines = maxLines,
+            decorationBox = @Composable { innerTextField ->
+                // places leading icon, text field with label and placeholder, trailing icon
+                OutlinedTextFieldDefaults.DecorationBox(
+                    value = value,
+                    visualTransformation = visualTransformation,
+                    innerTextField = innerTextField,
+                    placeholder = placeholder,
+                    label = label,
+                    leadingIcon = leadingIcon,
+                    trailingIcon = trailingIcon,
+                    supportingText = supportingText,
+                    singleLine = singleLine,
+                    enabled = enabled,
+                    isError = isError,
+                    interactionSource = interactionSource,
+                    colors = colors,
+                    contentPadding = innerPadding,
+                    container = {
+                        OutlinedTextFieldDefaults.ContainerBox(
+                            enabled,
+                            isError,
+                            interactionSource,
+                            colors,
+                            shape
+                        )
+                    }
+                )
+            }
+        )
+    }
 }
 
 

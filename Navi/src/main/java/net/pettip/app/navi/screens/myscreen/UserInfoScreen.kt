@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -153,13 +155,13 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(design_white)
+                .background(MaterialTheme.colorScheme.primary)
         ){
             Spacer(modifier = Modifier.padding(top = 20.dp))
             
             Row (Modifier.fillMaxWidth()){
                 Text(text = "닉네임", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier=Modifier.padding(start = 20.dp), color = design_login_text)
+                    modifier=Modifier.padding(start = 20.dp), color = MaterialTheme.colorScheme.onPrimary)
                 Text(
                     text = "*",
                     fontSize = 16.sp,
@@ -180,12 +182,21 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     .height(48.dp),
                 placeholder = { Text(text = "닉네임을 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white),
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start=16.dp),
                 trailingIcon = {
@@ -218,10 +229,10 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                     }
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = design_white),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                             elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 0.dp),
                             shape = RoundedCornerShape(10.dp),
-                            border = BorderStroke(1.dp, color = design_login_text),
+                            border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.onPrimary),
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .size(60.dp, 32.dp),
@@ -231,7 +242,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                 text = "중복확인",
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                                color = design_login_text
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -242,7 +253,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
             Row (Modifier.fillMaxWidth()){
                 Text(text = "휴대폰 번호", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier=Modifier.padding(start = 20.dp), color = design_login_text)
+                    modifier=Modifier.padding(start = 20.dp), color = MaterialTheme.colorScheme.onPrimary)
                 Text(
                     text = "*",
                     fontSize = 16.sp,
@@ -263,12 +274,21 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     .height(48.dp),
                 placeholder = { Text(text = "휴대폰 번호를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white),
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start=16.dp)
             )
@@ -280,7 +300,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     modifier= Modifier
                         .padding(start = 20.dp)
                         .alignByBaseline(),
-                    color = design_login_text)
+                    color = MaterialTheme.colorScheme.onPrimary)
 
                 if (loginMethod!="EMAIL"){
 
@@ -290,7 +310,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                         modifier= Modifier
                             .padding(start = 8.dp)
                             .alignByBaseline(),
-                        color = design_skip
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -310,12 +330,21 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     .height(48.dp),
                 placeholder = { Text(text = "8~16자 영문/숫자 조합", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white),
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start=16.dp)
             )
@@ -335,12 +364,21 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     .height(48.dp),
                 placeholder = { Text(text = "비밀번호 확인", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white),
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start=16.dp)
             )
@@ -452,24 +490,24 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 }
             }
 
-            Button(
-                onClick = {
-                    val clipData = ClipData.newPlainText("Text", fcmToken)
-                    clipboardManager.setPrimaryClip(clipData)
-                },
-                modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp, top = 30.dp)
-                    .fillMaxWidth()
-                    .height(48.dp)
-                ,
-                contentPadding = PaddingValues(0.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_sharp)
-            ) {
-                Text(text = "토큰복사",
-                    color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    letterSpacing = (-0.7).sp)
-            }
+            //Button(
+            //    onClick = {
+            //        val clipData = ClipData.newPlainText("Text", fcmToken)
+            //        clipboardManager.setPrimaryClip(clipData)
+            //    },
+            //    modifier = Modifier
+            //        .padding(start = 20.dp, end = 20.dp, top = 30.dp)
+            //        .fillMaxWidth()
+            //        .height(48.dp)
+            //    ,
+            //    contentPadding = PaddingValues(0.dp),
+            //    shape = RoundedCornerShape(10.dp),
+            //    colors = ButtonDefaults.buttonColors(containerColor = design_sharp)
+            //) {
+            //    Text(text = "토큰복사",
+            //        color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //        letterSpacing = (-0.7).sp)
+            //}
         }//col
     }
 }

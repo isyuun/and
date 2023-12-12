@@ -47,6 +47,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -917,8 +918,8 @@ fun CircleImageCreate(viewModel: UserCreateViewModel){
     Box(
         modifier = Modifier
             .size(148.dp)
-            .border(shape = CircleShape, border = BorderStroke(5.dp, color = design_white))
-            .shadow(elevation = 10.dp, shape = CircleShape, spotColor = design_shadow)
+            .border(shape = CircleShape, border = BorderStroke(5.dp, color = MaterialTheme.colorScheme.tertiary))
+            .shadow(elevation = 10.dp, shape = CircleShape, spotColor = MaterialTheme.colorScheme.onSurface)
             .clip(CircleShape)
     ) {
         AsyncImage(
@@ -1038,7 +1039,7 @@ fun integrityCheck(viewModel: UserCreateViewModel, context: Context): Boolean {
     if (viewModel.petKind.value.petNm == "사이즈/품종 선택") {
         Toast.makeText(context, "펫 종류를 선택해주세요", Toast.LENGTH_SHORT).show()
         return false
-    } else if (viewModel.address.value == "주소 선택") {
+    } else if (!viewModel.addressPass.value) {
         Toast.makeText(context, "주소를 입력해주세요", Toast.LENGTH_SHORT).show()
         return false
     } else if (viewModel.petName.value == "") {

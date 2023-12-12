@@ -52,6 +52,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -155,7 +156,6 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
 
         onDispose {
             viewModel.updateBbsDetail(null)
-            viewModel.updateLastPstSn(null)
         }
     }
 
@@ -194,7 +194,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
+                colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.height(60.dp),
                 title = {
                     Box(
@@ -213,7 +213,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                         ){
                             Icon(painter = painterResource(id = R.drawable.arrow_back),
                                 contentDescription = "",
-                                tint = Color.Unspecified
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
 
@@ -222,7 +222,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                             fontSize = 20.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = (-1.0).sp,
-                            color = design_login_text,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.align(Alignment.Center),
                             textAlign = TextAlign.Center
                         )
@@ -248,7 +248,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                         modifier = Modifier
                             .padding(paddingValues)
                             .fillMaxSize()
-                            .background(color = design_white)
+                            .background(color = MaterialTheme.colorScheme.primary)
                             .verticalScroll(rememberScrollState())
                     ) {
                         AsyncImage(
@@ -271,7 +271,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             fontSize = 24.sp,
                             letterSpacing = (-1.2).sp,
-                            color = design_login_text,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)
                         )
 
@@ -280,7 +280,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                 .padding(top = 20.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
                                 .fillMaxWidth()
                                 .height(1.dp)
-                                .background(design_textFieldOutLine)
+                                .background(MaterialTheme.colorScheme.outline)
                         )
 
                         HtmlText(htmlString = detailData?.data?.pstCn?:"", modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth())
@@ -289,7 +289,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                             modifier = Modifier
                                 .padding(top = 40.dp)
                                 .fillMaxWidth()
-                                .background(design_login_bg)
+                                .background(MaterialTheme.colorScheme.onPrimaryContainer)
                                 .height(36.dp)
                                 .clickable { cmntExpanded = !cmntExpanded }
                             ,
@@ -306,7 +306,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp,
                                 letterSpacing = (-0.6).sp,
-                                color = design_skip,
+                                color = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.padding(start = 4.dp)
                             )
                         }
@@ -331,7 +331,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                             .padding(vertical = 16.dp, horizontal = 20.dp)
                                             .fillMaxWidth()
                                             .height(1.dp)
-                                            .background(color = design_textFieldOutLine))
+                                            .background(color = MaterialTheme.colorScheme.outline))
                                     }
                                 }
                             }
@@ -376,13 +376,13 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                             Spacer(modifier = Modifier
                                 .fillMaxWidth()
                                 .height(1.dp)
-                                .background(design_login_text))
+                                .background(MaterialTheme.colorScheme.onPrimary))
                         }
 
                         Spacer(modifier = Modifier
                             .fillMaxWidth()
                             .height(1.dp)
-                            .background(design_login_text))
+                            .background(MaterialTheme.colorScheme.onPrimary))
 
                         Row (
                             modifier = Modifier.fillMaxWidth(),
@@ -398,7 +398,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                     }
                                 },
                                 textStyle = TextStyle(
-                                    color = design_login_text,
+                                    color = MaterialTheme.colorScheme.onPrimary,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     fontSize = 14.sp,
                                     letterSpacing = (-0.7).sp
@@ -417,21 +417,23 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                     .focusRequester(focusRequester)
                                 ,
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedPlaceholderColor = design_placeHolder,
-                                    focusedPlaceholderColor = design_placeHolder,
-                                    unfocusedBorderColor = design_textFieldOutLine,
-                                    focusedBorderColor = design_login_text,
-                                    unfocusedContainerColor = design_white,
-                                    focusedContainerColor = design_white,
-                                    unfocusedLeadingIconColor = design_placeHolder,
-                                    focusedLeadingIconColor = design_login_text)
+                                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                                )
                             )
 
                             Box(
                                 modifier = Modifier
                                     .padding(end = 8.dp)
                                     .size(width = 56.dp, height = 40.dp)
-                                    .background(color = design_btn_border, shape = RoundedCornerShape(12.dp))
+                                    .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(12.dp))
                                     .clip(shape = RoundedCornerShape(12.dp))
                                     .clickable(
                                         enabled = if (onReply) replyText != "" && !isLoading else comment != "" && !isLoading,
@@ -470,12 +472,12 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                             ){
                                 if (isLoading){
                                     LoadingAnimation3(
-                                        circleColor = design_white,
+                                        circleColor = MaterialTheme.colorScheme.onTertiaryContainer,
                                         circleSize = 4.dp
                                     )
                                 }else{
                                     Text(text = stringResource(R.string.comment_apply), style = TextStyle(
-                                        color = design_white,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer,
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 14.sp,
                                         letterSpacing = (-0.7).sp),
@@ -488,9 +490,9 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                 modifier = Modifier
                                     .padding(end = 4.dp)
                                     .size(40.dp)
-                                    .background(color = design_white, shape = RoundedCornerShape(12.dp))
+                                    .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
                                     .clip(shape = RoundedCornerShape(12.dp))
-                                    .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
+                                    .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                                     .clickable(
                                         enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
                                     ) {
@@ -518,9 +520,9 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                 modifier = Modifier
                                     .padding(end = 8.dp)
                                     .size(40.dp)
-                                    .background(color = design_white, shape = RoundedCornerShape(12.dp))
+                                    .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
                                     .clip(shape = RoundedCornerShape(12.dp))
-                                    .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
+                                    .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                                     .clickable(
                                         enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
                                     ) {
@@ -555,6 +557,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
 fun HtmlText(htmlString: String, modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
+    val textColor = MaterialTheme.colorScheme.onPrimary
 
     AndroidView(
         modifier = modifier,
@@ -565,7 +568,7 @@ fun HtmlText(htmlString: String, modifier: Modifier = Modifier) {
                 htmlString, HtmlCompat.FROM_HTML_MODE_COMPACT,
                 CoilImageGetter(textView),null
             )
-            textView.setTextColor(design_login_text.toArgb())
+            textView.setTextColor(textColor.toArgb())
             textView.typeface = typeface
         }
     )
@@ -902,7 +905,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
-                            color = if (G.userId == comment.userId) design_intro_bg else design_skip
+                            color = if (G.userId == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
                         )
 
                         Text(
@@ -910,7 +913,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                             fontSize = 10.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
-                            color = design_skip.copy(alpha = 0.7f),
+                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                             modifier = Modifier.padding(start = 5.dp)
                         )
                     }
@@ -960,7 +963,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
 
                                         Text(text = "${comment.rcmdtnCnt}",
                                             style = TextStyle(
-                                                color = design_skip,
+                                                color = MaterialTheme.colorScheme.secondary,
                                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                                 fontSize = 12.sp,
                                                 letterSpacing = (-0.6).sp),
@@ -1002,7 +1005,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                             text = "수정",
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                                            color = design_skip,
+                                            color = MaterialTheme.colorScheme.secondary,
                                             textDecoration = if (comment.delYn == "Y" || comment.bldYn == "Y") TextDecoration.LineThrough else TextDecoration.None,
                                             modifier = Modifier
                                                 .padding(start = 12.dp)
@@ -1017,7 +1020,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                             text = "삭제",
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                                            color = design_skip,
+                                            color = MaterialTheme.colorScheme.secondary,
                                             textDecoration = if (comment.delYn == "Y" || comment.bldYn == "Y") TextDecoration.LineThrough else TextDecoration.None,
                                             modifier = Modifier
                                                 .padding(start = 12.dp)
@@ -1063,7 +1066,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
 
                                             Text(text = "${comment.nrcmdtnCnt}",
                                                 style = TextStyle(
-                                                    color = design_skip,
+                                                    color = MaterialTheme.colorScheme.secondary,
                                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                                     fontSize = 12.sp,
                                                     letterSpacing = (-0.6).sp),
@@ -1104,7 +1107,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                     indication = rememberRipple(
                                         bounded = true,
                                         radius = 8.dp,
-                                        color = design_login_text
+                                        color = MaterialTheme.colorScheme.secondary
                                     ),
                                     interactionSource = remember { MutableInteractionSource() }
                                 )
@@ -1118,13 +1121,13 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(end = 10.dp)
                 )
 
                 if (step2CmntList.isNotEmpty()){
                     Text(text = if(!step2Expand) "└ 답글 ${step2CmntList.size}개" else "└ 답글접기",
-                        style = TextStyle(color = design_skip,fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        style = TextStyle(color = MaterialTheme.colorScheme.secondary,fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 12.sp,
                             letterSpacing = (-0.6).sp),
                         textAlign = TextAlign.Center,
@@ -1406,7 +1409,7 @@ fun BbsCommentListItem2(
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
-                        color = if (G.userId == comment.userId) design_intro_bg else design_skip
+                        color = if (G.userId == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
                     )
 
                     Text(
@@ -1414,7 +1417,7 @@ fun BbsCommentListItem2(
                         fontSize = 10.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
-                        color = design_skip.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                         modifier = Modifier.padding(start = 5.dp)
                     )
                 }
@@ -1460,16 +1463,16 @@ fun BbsCommentListItem2(
                                             interactionSource = remember { MutableInteractionSource() }
                                         )
                                 )
-                                //Text(text = "${comment.rcmdtnCnt}",
-                                //    style = TextStyle(
-                                //        color = design_skip,
-                                //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                //        fontSize = 12.sp,
-                                //        letterSpacing = (-0.6).sp),
-                                //    textAlign = TextAlign.Center,
-                                //    lineHeight = 12.sp,
-                                //    modifier = Modifier.padding(start = 4.dp)
-                                //)
+                                Text(text = "${comment.rcmdtnCnt}",
+                                    style = TextStyle(
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 12.sp,
+                                        letterSpacing = (-0.6).sp),
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = 12.sp,
+                                    modifier = Modifier.padding(start = 4.dp)
+                                )
                             }
                         }
 
@@ -1484,7 +1487,7 @@ fun BbsCommentListItem2(
                                         text = "수정",
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                                        color = design_skip,
+                                        color = MaterialTheme.colorScheme.secondary,
                                         modifier = Modifier
                                             .padding(start = 12.dp)
                                             .clickable {
@@ -1496,7 +1499,7 @@ fun BbsCommentListItem2(
                                         text = "삭제",
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                                        color = design_skip,
+                                        color = MaterialTheme.colorScheme.secondary,
                                         modifier = Modifier
                                             .padding(start = 12.dp)
                                             .clickable { deleteDialog = true }
@@ -1536,16 +1539,16 @@ fun BbsCommentListItem2(
                                                     interactionSource = remember { MutableInteractionSource() }
                                                 )
                                         )
-                                        //Text(text = "${comment.nrcmdtnCnt}",
-                                        //    style = TextStyle(
-                                        //        color = design_skip,
-                                        //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                        //        fontSize = 12.sp,
-                                        //        letterSpacing = (-0.6).sp),
-                                        //    textAlign = TextAlign.Center,
-                                        //    lineHeight = 12.sp,
-                                        //    modifier = Modifier.padding(start = 4.dp)
-                                        //)
+                                        Text(text = "${comment.nrcmdtnCnt}",
+                                            style = TextStyle(
+                                                color = MaterialTheme.colorScheme.secondary,
+                                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                                fontSize = 12.sp,
+                                                letterSpacing = (-0.6).sp),
+                                            textAlign = TextAlign.Center,
+                                            lineHeight = 12.sp,
+                                            modifier = Modifier.padding(start = 4.dp)
+                                        )
                                     }
 
                                     Icon(
@@ -1593,7 +1596,7 @@ fun BbsCommentListItem2(
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,
-                color = design_login_text
+                color = MaterialTheme.colorScheme.onPrimary
             )
 
         }

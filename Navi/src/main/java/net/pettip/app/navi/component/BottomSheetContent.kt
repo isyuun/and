@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -67,7 +69,7 @@ fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel, 
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .background(design_white)
+            .background(MaterialTheme.colorScheme.primary)
     ) {
         Spacer(modifier = Modifier.padding(top = 20.dp))
 
@@ -76,7 +78,7 @@ fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel, 
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 20.sp,
             letterSpacing = (-1.0).sp,
-            color = design_login_text,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(start = 20.dp)
         )
 
@@ -150,12 +152,12 @@ fun BottomSheetItem(viewModel: SharedViewModel, petList : CurrentPetData){
         colors = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) {
             ButtonDefaults.buttonColors(design_select_btn_bg)
         } else {
-            ButtonDefaults.buttonColors(design_white)
+            ButtonDefaults.buttonColors(Color.Transparent)
         },
         border = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) {
             BorderStroke(1.dp, color = design_select_btn_text)
         } else {
-            BorderStroke(1.dp, color = design_textFieldOutLine)
+            BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer)
         },
         contentPadding = PaddingValues(start = 14.dp,end=14.dp),
         elevation = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo){
@@ -174,10 +176,12 @@ fun BottomSheetItem(viewModel: SharedViewModel, petList : CurrentPetData){
             Box(
                 modifier = Modifier
                     .size(46.dp)
-                    .border(shape = CircleShape, border = BorderStroke(3.dp, color = design_white))
+                    .border(shape = CircleShape, border = BorderStroke(2.dp,
+                        color = if (petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) MaterialTheme.colorScheme.primary else design_white
+                    ))
                     //.shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
                     .shadow(
-                        color = design_shadow,
+                        color = MaterialTheme.colorScheme.onSurface,
                         offsetY = 10.dp,
                         offsetX = 10.dp,
                         spread = 4.dp,
@@ -207,7 +211,7 @@ fun BottomSheetItem(viewModel: SharedViewModel, petList : CurrentPetData){
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,
-                color = design_login_text
+                color = if (petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) design_login_text else MaterialTheme.colorScheme.onPrimary
             )
         }
     }

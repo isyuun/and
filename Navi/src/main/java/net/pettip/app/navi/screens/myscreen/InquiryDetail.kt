@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -122,7 +123,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(color = design_white)
+                .background(color = MaterialTheme.colorScheme.primary)
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
@@ -130,7 +131,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 24.sp,
                 letterSpacing = (-1.2).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)
             )
 
@@ -144,7 +145,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_skip,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(start = 20.dp, top = 8.dp)
                 )
 
@@ -161,7 +162,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                         ){
                             Icon(
                                 painter = painterResource(id = R.drawable.icon_daily),
-                                contentDescription = "", tint = design_skip,
+                                contentDescription = "", tint = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier
                                     .padding(start = 12.dp)
                                     .size(14.dp))
@@ -171,7 +172,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp,
                                 letterSpacing = (-0.6).sp,
-                                color = design_skip,
+                                color = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.padding(start = 4.dp)
                             )
                         }
@@ -183,7 +184,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                         ){
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "", tint = design_skip,
+                                contentDescription = "", tint = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier
                                     .padding(start = 12.dp)
                                     .size(14.dp))
@@ -193,7 +194,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp,
                                 letterSpacing = (-0.6).sp,
-                                color = design_skip,
+                                color = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier
                                     .padding(start = 4.dp)
                             )
@@ -206,14 +207,14 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                 .padding(20.dp)
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(color = design_textFieldOutLine)
+                .background(color = MaterialTheme.colorScheme.outline)
             )
 
             Text(
                 text = qnaDetail?.data?.get(0)?.pstCn?: "",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp)
             )
 
@@ -223,7 +224,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                     text = "첨부파일",
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 8.dp)
                 )
 
@@ -260,7 +261,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                 .padding(top = 40.dp)
                 .fillMaxWidth()
                 .height(8.dp)
-                .background(color = design_f1f1f1)
+                .background(color = MaterialTheme.colorScheme.onSurfaceVariant)
             )
 
             if (qnaDetail?.data?.size == 2){
@@ -300,7 +301,7 @@ fun InquiryDetailNoAnswer(){
             text = "조금만 기다려 주세요.\n답변 준비 중입니다.",
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp, letterSpacing = (-0.7).sp,
-            color = design_skip,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(top = 12.dp),
             textAlign = TextAlign.Center
         )
@@ -346,7 +347,7 @@ fun InquiryDetailAnswer(answer: QnaDetailData?) {
             text = answer?.pstTtl?: "",
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp, letterSpacing = (-0.8).sp,
-            color = design_login_text,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(start = 40.dp, end = 20.dp)
         )
         //

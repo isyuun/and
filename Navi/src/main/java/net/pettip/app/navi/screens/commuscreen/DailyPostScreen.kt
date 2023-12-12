@@ -51,6 +51,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -726,9 +727,9 @@ fun PlusBox(galleyLauncher: ManagedActivityResultLauncher<String, List<@JvmSuppr
             modifier = Modifier
                 .align(Alignment.Center)
                 .size(100.dp)
-                .background(color = design_select_btn_bg, shape = RoundedCornerShape(12.dp))
+                .background(color = MaterialTheme.colorScheme.onPrimaryContainer, shape = RoundedCornerShape(12.dp))
                 .clip(shape = RoundedCornerShape(12.dp))
-                .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
+                .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                 .clickable { galleyLauncher.launch("image/*") }
         ) {
             Icon(
@@ -843,8 +844,10 @@ fun CustomDialogInPost(
                     color = design_white
                 )
             } },
-        title = { Text(text = title) },
-        text = { Text(text = text, color = design_skip) },
+        title = { Text(text = title, fontFamily = FontFamily(Font(R.font.pretendard_bold)), fontSize = 20.sp,
+            color = design_login_text ) },
+        text = { Text(text = text, color = design_skip, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            fontSize = 14.sp) },
         dismissButton = {
             Button(
                 onClick = {

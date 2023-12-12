@@ -44,6 +44,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
@@ -68,6 +69,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -271,276 +273,276 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             )
         }
 
-
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .fillMaxSize()
-                .background(design_white),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "${selectedPet.stdgCtpvNm} ${selectedPet.stdgSggNm} ${selectedPet.stdgUmdNm ?: ""}",
-                fontSize = 14.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                letterSpacing = (-0.7).sp,
-                color = design_skip
-            )
-
-            Spacer(modifier = Modifier.padding(top = 20.dp))
-
-            CircleImage(
-                size = 180,
-                imageUri = selectedPet.petRprsImgAddr
-            )
-
-            Spacer(modifier = Modifier.padding(top = 16.dp))
-
-            Text(
-                text = selectedPet.petKindNm,
-                fontSize = 14.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                letterSpacing = (-0.7).sp,
-                color = design_skip
-            )
-
-            Text(
-                text = selectedPet.petNm,
-                fontSize = 30.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                letterSpacing = (-0.7).sp,
-                color = design_login_text
-            )
-
-            Spacer(modifier = Modifier.padding(top = 16.dp))
-
-            Box (
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)){
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-            ){
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "${selectedPet.stdgCtpvNm} ${selectedPet.stdgSggNm} ${selectedPet.stdgUmdNm ?: ""}",
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    letterSpacing = (-0.7).sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                Spacer(modifier = Modifier.padding(top = 20.dp))
+
+                CircleImage(
+                    size = 180,
+                    imageUri = selectedPet.petRprsImgAddr
+                )
+
+                Spacer(modifier = Modifier.padding(top = 16.dp))
+
+                Text(
+                    text = selectedPet.petKindNm,
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    letterSpacing = (-0.7).sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                Text(
+                    text = selectedPet.petNm,
+                    fontSize = 30.sp,
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    letterSpacing = (-0.7).sp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+
+                Spacer(modifier = Modifier.padding(top = 16.dp))
+
+                Box (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ){
+                    Row (
+                        modifier=Modifier.align(Alignment.Center),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+
+                        Box (
+                            modifier= Modifier
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(color = design_icon_bg),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Icon(painter = painterResource(id = R.drawable.icon_age), contentDescription = "", tint = Color.Unspecified)
+                        }
+
+                        Text(
+                            text = if (selectedPet.petBrthYmd=="미상"){
+                                "미상"
+                            }else{
+                                sharedViewModel.changeBirth(selectedPet.petBrthYmd)
+                            },
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            letterSpacing = (-0.7).sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+
+                        Spacer(modifier = Modifier.padding(start = 20.dp))
+
+                        Box (
+                            modifier= Modifier
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(color = design_icon_bg),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Icon(painter = painterResource(id = R.drawable.icon_gender), contentDescription = "", tint = Color.Unspecified)
+                        }
+
+                        Text(
+                            text = selectedPet.sexTypNm?:"",
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            letterSpacing = (-0.7).sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+
+                        Spacer(modifier = Modifier.padding(start = 20.dp))
+
+                        Box (
+                            modifier= Modifier
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(color = design_icon_bg),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Icon(painter = painterResource(id = R.drawable.icon_weight), contentDescription = "", tint = Color.Unspecified)
+                        }
+
+                        Text(
+                            text = "${formatWghtVl(selectedPet.wghtVl)}kg",
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            letterSpacing = (-0.7).sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    } // Row
+                }
+
+                if (datasetForModel.isNotEmpty()){
+                    val marker = rememberMarker()
+
+                    Chart(
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primary)
+                            .combinedClickable(
+                                onLongClick = {
+                                    weightCNDDialog = true
+                                },
+                                onClick = {}
+                            ),
+                        chart = lineChart,
+                        chartModelProducer = modelProducer,
+                        startAxis = rememberStartAxis(
+                            label = textComponent(
+                                color = MaterialTheme.colorScheme.secondary,
+                                textSize = 12.sp,
+                                margins = MutableDimensions(10f, 0f),
+                            ),
+                            tickLength = 0.dp,
+                            valueFormatter = { value,_ ->
+                                String.format("%.1f", value)
+                            },
+                            itemPlacer = AxisItemPlacer.Vertical.default(
+                                maxItemCount = 6
+                            ),
+                            axis = null
+                        ),
+                        bottomAxis = rememberBottomAxis(
+                            label = textComponent(
+                                color = MaterialTheme.colorScheme.secondary,
+                                textSize = 12.sp,
+                                margins = MutableDimensions(0f, 10f),
+                            ),
+                            axis = lineComponent(color = design_textFieldOutLine, thickness = 1.dp),
+                            tickLength = 0.dp,
+                            valueFormatter = { value,_ ->
+                                if (petwgtList != null && value.toInt() in 0 until petwgtList!!.size) {
+                                    petwgtList?.getOrNull(value.toInt())?.crtrYmd ?: ""
+                                } else {
+                                    ""
+                                }
+                            },
+                            itemPlacer = AxisItemPlacer.Horizontal.default(
+
+                            ),
+                            guideline = null,
+                        ),
+                        marker = marker,
+                        chartScrollState = scrollState,
+                        markerVisibilityChangeListener = markerVisibilityChangeListener,
+                        isZoomEnabled = true,
+                        autoScaleUp = AutoScaleUp.None
+                    )
+                }
+
                 Row (
-                    modifier=Modifier.align(Alignment.Center),
-                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ){
-
-                    Box (
-                        modifier= Modifier
-                            .size(32.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(color = design_icon_bg),
-                        contentAlignment = Alignment.Center
-                    ){
-                        Icon(painter = painterResource(id = R.drawable.icon_age), contentDescription = "", tint = Color.Unspecified)
+                    Button(
+                        enabled = selectedPet.mngrType == "M",
+                        onClick = { navController.navigate("modifyPetInfoScreen") },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = design_select_btn_text,
+                            disabledContainerColor = design_select_btn_text
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp, pressedElevation = 0.dp),
+                        contentPadding = PaddingValues(0.dp),
+                        modifier = Modifier
+                            .padding(start = 20.dp)
+                            .weight(1f)
+                            .height(48.dp)
+                    ) {
+                        Text(
+                            text = if(selectedPet.mngrType == "M"){"정보 수정하기"}else{"관리자만 수정가능"},
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = design_white
+                        )
                     }
 
-                    Text(
-                        text = if (selectedPet.petBrthYmd=="미상"){
-                            "미상"
-                        }else{
-                            sharedViewModel.changeBirth(selectedPet.petBrthYmd)
-                        },
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        letterSpacing = (-0.7).sp,
-                        color = design_login_text,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
+                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
-                    Spacer(modifier = Modifier.padding(start = 20.dp))
-
-                    Box (
-                        modifier= Modifier
-                            .size(32.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(color = design_icon_bg),
-                        contentAlignment = Alignment.Center
-                    ){
-                        Icon(painter = painterResource(id = R.drawable.icon_gender), contentDescription = "", tint = Color.Unspecified)
+                    Button(
+                        enabled = selectedPet.mngrType != "C",
+                        onClick = { weightRgstDialog = true },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp, pressedElevation = 0.dp),
+                        contentPadding = PaddingValues(0.dp),
+                        modifier = Modifier
+                            .padding(end = 20.dp)
+                            .weight(1f)
+                            .height(48.dp)
+                    ) {
+                        Text(
+                            text = if(selectedPet.mngrType != "C"){"몸무게 등록"}else{"참여자만 등록가능"},
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
+                }
 
-                    Text(
-                        text = selectedPet.sexTypNm?:"",
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        letterSpacing = (-0.7).sp,
-                        color = design_login_text,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
+                Spacer(modifier = Modifier.padding(top = 40.dp))
 
-                    Spacer(modifier = Modifier.padding(start = 20.dp))
-
-                    Box (
-                        modifier= Modifier
-                            .size(32.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(color = design_icon_bg),
-                        contentAlignment = Alignment.Center
+                AnimatedVisibility(
+                    visible = selectedPet.mngrType != "C" && memberList?.isNotEmpty()==true,
+                    enter = fadeIn(tween(durationMillis = 700, delayMillis = 200)).plus(expandVertically()),
+                    exit = fadeOut(tween(durationMillis = 700, delayMillis = 200)).plus(shrinkVertically())
+                ) {
+                    Column (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = MaterialTheme.colorScheme.onPrimaryContainer)
                     ){
-                        Icon(painter = painterResource(id = R.drawable.icon_weight), contentDescription = "", tint = Color.Unspecified)
-                    }
+                        Text(
+                            text = "참여중인 그룹",
+                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            fontSize = 20.sp, letterSpacing = (-1.0).sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(start = 20.dp, top = 20.dp)
+                        )
 
-                    Text(
-                        text = "${formatWghtVl(selectedPet.wghtVl)}kg",
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        letterSpacing = (-0.7).sp,
-                        color = design_login_text,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                } // Row
-            }
+                        Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
-            if (datasetForModel.isNotEmpty()){
-                val marker = rememberMarker()
-
-                Chart(
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .fillMaxWidth()
-                        .background(design_white)
-                        .combinedClickable(
-                            onLongClick = {
-                                weightCNDDialog = true
-                            },
-                            onClick = {}
-                        ),
-                    chart = lineChart,
-                    chartModelProducer = modelProducer,
-                    startAxis = rememberStartAxis(
-                        label = textComponent(
-                            color = design_skip,
-                            textSize = 12.sp,
-                            margins = MutableDimensions(10f, 0f),
-                        ),
-                        tickLength = 0.dp,
-                        valueFormatter = { value,_ ->
-                            String.format("%.1f", value)
-                        },
-                        itemPlacer = AxisItemPlacer.Vertical.default(
-                            maxItemCount = 6
-                        ),
-                        axis = null
-                    ),
-                    bottomAxis = rememberBottomAxis(
-                        label = textComponent(
-                            color = design_skip,
-                            textSize = 12.sp,
-                            margins = MutableDimensions(0f, 10f),
-                        ),
-                        axis = lineComponent(color = design_textFieldOutLine, thickness = 1.dp),
-                        tickLength = 0.dp,
-                        valueFormatter = { value,_ ->
-                            if (petwgtList != null && value.toInt() in 0 until petwgtList!!.size) {
-                                petwgtList?.getOrNull(value.toInt())?.crtrYmd ?: ""
-                            } else {
-                                ""
+                        LazyColumn(
+                            state = rememberLazyListState(),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.heightIn(max = 300.dp)
+                        ){
+                            items(memberList?: emptyList()){ item ->
+                                GroupItem(item = item, selectedPet, settingViewModel)
                             }
-                        },
-                        itemPlacer = AxisItemPlacer.Horizontal.default(
-
-                        ),
-                        guideline = null,
-                    ),
-                    marker = marker,
-                    chartScrollState = scrollState,
-                    markerVisibilityChangeListener = markerVisibilityChangeListener,
-                    isZoomEnabled = true,
-                    autoScaleUp = AutoScaleUp.None
-                )
-            }
-
-            Row (
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Button(
-                    enabled = selectedPet.mngrType == "M",
-                    onClick = { navController.navigate("modifyPetInfoScreen") },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = design_select_btn_text,
-                        disabledContainerColor = design_select_btn_text
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp, pressedElevation = 0.dp),
-                    contentPadding = PaddingValues(0.dp),
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-                        .weight(1f)
-                        .height(48.dp)
-                ) {
-                    Text(
-                        text = if(selectedPet.mngrType == "M"){"정보 수정하기"}else{"관리자만 수정가능"},
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                        color = design_white
-                    )
-                }
-
-                Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                
-                Button(
-                    enabled = selectedPet.mngrType != "C",
-                    onClick = { weightRgstDialog = true },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = design_white,
-                        disabledContainerColor = design_white
-                    ),
-                    border = BorderStroke(width = 1.dp, color = design_btn_border),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp, pressedElevation = 0.dp),
-                    contentPadding = PaddingValues(0.dp),
-                    modifier = Modifier
-                        .padding(end = 20.dp)
-                        .weight(1f)
-                        .height(48.dp)
-                ) {
-                    Text(
-                        text = if(selectedPet.mngrType != "C"){"몸무게 등록"}else{"참여자만 등록가능"},
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                        color = design_login_text
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.padding(top = 40.dp))
-
-            AnimatedVisibility(
-                visible = selectedPet.mngrType != "C" && memberList?.isNotEmpty()==true,
-                enter = fadeIn(tween(durationMillis = 700, delayMillis = 200)).plus(expandVertically()),
-                exit = fadeOut(tween(durationMillis = 700, delayMillis = 200)).plus(shrinkVertically())
-            ) {
-                Column (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = design_login_bg)
-                ){
-                    Text(
-                        text = "참여중인 그룹",
-                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                        fontSize = 20.sp, letterSpacing = (-1.0).sp,
-                        color = design_login_text,
-                        modifier = Modifier.padding(start = 20.dp, top = 20.dp)
-                    )
-
-                    Spacer(modifier = Modifier.padding(bottom = 16.dp))
-
-                    LazyColumn(
-                        state = rememberLazyListState(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.heightIn(max = 300.dp)
-                    ){
-                        items(memberList?: emptyList()){ item ->
-                            GroupItem(item = item, selectedPet, settingViewModel)
                         }
-                    }
 
-                    Spacer(modifier = Modifier.padding(bottom = 20.dp))
+                        Spacer(modifier = Modifier.padding(bottom = 20.dp))
+                    }
                 }
-            }
-        }// Col
+            }// Col
+        }
     }
 }
 
@@ -593,7 +595,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
             text = item.nckNm,
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp, letterSpacing = (-0.8).sp,
-            color = design_login_text,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
 
@@ -613,7 +615,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                     color =
                     when (item.mngrType) {
                         "M" -> design_button_bg
-                        "I" -> design_white
+                        "I" -> Color.Transparent
                         "C" -> design_DDDDDD
                         else -> design_DDDDDD
                     },
@@ -667,7 +669,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                 text = item.endDt,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                color = design_skip
+                color = MaterialTheme.colorScheme.secondary
             )
         }
 
@@ -747,7 +749,7 @@ fun WeightCNDDialog(
             modifier = Modifier
                 .padding(horizontal = 40.dp)
                 .fillMaxWidth()
-                .background(color = design_white, shape = RoundedCornerShape(20.dp))
+                .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(20.dp))
         ){
             Column (
                 modifier = Modifier.fillMaxWidth()
@@ -756,7 +758,7 @@ fun WeightCNDDialog(
                     text = "등록일자",
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 16.sp, letterSpacing = (-0.8).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 8.dp)
                 )
 
@@ -767,12 +769,12 @@ fun WeightCNDDialog(
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
                         .height(48.dp),
-                    border = BorderStroke(width = 1.dp, color = design_textFieldOutLine),
+                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline),
                     shape = RoundedCornerShape(4.dp),
                     contentPadding = PaddingValues(0.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = design_white,
-                        disabledContainerColor = design_white
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart){
@@ -780,7 +782,7 @@ fun WeightCNDDialog(
                             text = runCatching<String?> { petWeightList?.get(index)?.crtrYmd }.getOrElse { "" } ?: "",
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                            color = design_login_text,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }
@@ -790,7 +792,7 @@ fun WeightCNDDialog(
                     text = "몸무게",
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 16.sp, letterSpacing = (-0.8).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 8.dp)
                 )
 
@@ -811,14 +813,21 @@ fun WeightCNDDialog(
                             .height(48.dp),
                         placeholder = { Text(text = "몸무게를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedPlaceholderColor = design_placeHolder,
-                            focusedPlaceholderColor = design_placeHolder,
-                            unfocusedBorderColor = design_textFieldOutLine,
-                            focusedBorderColor = design_login_text,
-                            unfocusedContainerColor = design_white,
-                            focusedContainerColor = design_white,
-                            unfocusedLeadingIconColor = design_placeHolder,
-                            focusedLeadingIconColor = design_login_text),
+                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                            focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                            focusedContainerColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                            focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                            cursorColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        textStyle = TextStyle(
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 16.sp, letterSpacing = (-0.4).sp
+                        ),
                         shape = RoundedCornerShape(4.dp),
                         innerPadding = PaddingValues(start = 8.dp)
                     )
@@ -827,7 +836,7 @@ fun WeightCNDDialog(
                         text = "kg",
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 8.dp,end = 20.dp)
                     )
                 }
@@ -842,22 +851,28 @@ fun WeightCNDDialog(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .background(design_DDDDDD)
+                            .background(MaterialTheme.colorScheme.onSecondary)
                             .clickable {
-                                scope.launch {
-                                    val petDtlUnqNo = petWeightList?.get(index)?.petDtlUnqNo ?: 0
+                                if (petWeightList?.size == 1) {
+                                    Toast
+                                        .makeText(context, "삭제 할 수 없습니다", Toast.LENGTH_SHORT)
+                                        .show()
+                                } else {
+                                    scope.launch {
+                                        val petDtlUnqNo = petWeightList?.get(index)?.petDtlUnqNo ?: 0
 
-                                    val result = viewModel.deletePetWgt(petDtlUnqNo)
-                                    if (result) {
-                                        onDismiss(false)
-                                        refresh(true)
-                                        Toast
-                                            .makeText(context, "삭제되었습니다", Toast.LENGTH_SHORT)
-                                            .show()
-                                    } else {
-                                        Toast
-                                            .makeText(context, dm, Toast.LENGTH_SHORT)
-                                            .show()
+                                        val result = viewModel.deletePetWgt(petDtlUnqNo)
+                                        if (result) {
+                                            onDismiss(false)
+                                            refresh(true)
+                                            Toast
+                                                .makeText(context, "삭제되었습니다", Toast.LENGTH_SHORT)
+                                                .show()
+                                        } else {
+                                            Toast
+                                                .makeText(context, dm, Toast.LENGTH_SHORT)
+                                                .show()
+                                        }
                                     }
                                 }
                             },
@@ -867,7 +882,7 @@ fun WeightCNDDialog(
                             text = "삭제",
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                            color = design_login_text,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.padding(vertical = 16.dp)
                         )
                     }
@@ -962,7 +977,7 @@ fun WeightDialog(
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
-                    .background(color = design_white, shape = RoundedCornerShape(20.dp))
+                    .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(20.dp))
             ) {
                 Column {
                     DatePicker(
@@ -971,7 +986,16 @@ fun WeightDialog(
                             selectedDayContainerColor = design_intro_bg,
                             selectedDayContentColor = design_white,
                             todayDateBorderColor = design_intro_bg,
-                            todayContentColor = design_intro_bg
+                            todayContentColor = design_intro_bg,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                            headlineContentColor = MaterialTheme.colorScheme.onPrimary,
+                            weekdayContentColor = MaterialTheme.colorScheme.onPrimary,
+                            subheadContentColor = MaterialTheme.colorScheme.onPrimary,
+                            navigationContentColor = MaterialTheme.colorScheme.onPrimary,
+                            yearContentColor = MaterialTheme.colorScheme.onPrimary,
+                            dayContentColor = MaterialTheme.colorScheme.onPrimary,
+                            currentYearContentColor = MaterialTheme.colorScheme.onPrimary,
+                            containerColor = MaterialTheme.colorScheme.primary
                         )
                     )
 
@@ -984,7 +1008,7 @@ fun WeightDialog(
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .background(design_DDDDDD)
+                                .background(MaterialTheme.colorScheme.onSecondary)
                                 .clickable { showDatePicker = false },
                             contentAlignment = Alignment.Center
                         ){
@@ -992,7 +1016,7 @@ fun WeightDialog(
                                 text = "취소",
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                                color = design_login_text,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.padding(vertical = 16.dp)
                             )
                         }
@@ -1036,7 +1060,7 @@ fun WeightDialog(
                 modifier = Modifier
                     .padding(horizontal = 40.dp)
                     .fillMaxWidth()
-                    .background(color = design_white, shape = RoundedCornerShape(20.dp))
+                    .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(20.dp))
             ){
                 Column (
                     modifier = Modifier.fillMaxWidth()
@@ -1045,7 +1069,7 @@ fun WeightDialog(
                         text = "등록일자",
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 16.sp, letterSpacing = (-0.8).sp,
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 8.dp)
                     )
 
@@ -1059,7 +1083,7 @@ fun WeightDialog(
                         shape = RoundedCornerShape(4.dp),
                         contentPadding = PaddingValues(0.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = design_white
+                            containerColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart){
@@ -1068,7 +1092,7 @@ fun WeightDialog(
                                 if(pickDate ==""){ "등록일자를 입력해주세요" } else { pickDate },
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                                color = if(pickDate ==""){ design_placeHolder } else { design_login_text },
+                                color = if(pickDate ==""){ MaterialTheme.colorScheme.primaryContainer } else { MaterialTheme.colorScheme.onPrimary },
                                 modifier = Modifier.padding(start = 8.dp)
                             )
                         }
@@ -1078,7 +1102,7 @@ fun WeightDialog(
                         text = "몸무게",
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 16.sp, letterSpacing = (-0.8).sp,
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 8.dp)
                     )
 
@@ -1099,14 +1123,21 @@ fun WeightDialog(
                                 .height(48.dp),
                             placeholder = { Text(text = "몸무게를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                             colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedPlaceholderColor = design_placeHolder,
-                                focusedPlaceholderColor = design_placeHolder,
-                                unfocusedBorderColor = design_textFieldOutLine,
-                                focusedBorderColor = design_login_text,
-                                unfocusedContainerColor = design_white,
-                                focusedContainerColor = design_white,
-                                unfocusedLeadingIconColor = design_placeHolder,
-                                focusedLeadingIconColor = design_login_text),
+                                unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                                focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                                focusedContainerColor = MaterialTheme.colorScheme.primary,
+                                unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                                focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                                cursorColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            textStyle = TextStyle(
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 16.sp, letterSpacing = (-0.4).sp
+                            ),
                             shape = RoundedCornerShape(4.dp),
                             innerPadding = PaddingValues(start = 8.dp)
                         )
@@ -1115,7 +1146,7 @@ fun WeightDialog(
                             text = "kg",
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                            color = design_login_text,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.padding(start = 8.dp,end = 20.dp)
                         )
                     }
@@ -1130,7 +1161,7 @@ fun WeightDialog(
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .background(design_DDDDDD)
+                                .background(MaterialTheme.colorScheme.onSecondary)
                                 .clickable { onDismiss(false) },
                             contentAlignment = Alignment.Center
                         ){
@@ -1138,7 +1169,7 @@ fun WeightDialog(
                                 text = dismiss,
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                                color = design_login_text,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.padding(vertical = 16.dp)
                             )
                         }
@@ -1148,15 +1179,15 @@ fun WeightDialog(
                                 .weight(1f)
                                 .background(design_intro_bg)
                                 .clickable {
-                                    if (pickDate == ""){
+                                    if (pickDate == "") {
                                         Toast
                                             .makeText(context, "날짜를 입력해주세요", Toast.LENGTH_SHORT)
                                             .show()
-                                    }else if ( !isValidFloat(petWeight) ){
+                                    } else if (!isValidFloat(petWeight)) {
                                         Toast
                                             .makeText(context, "올바른 체중을 입력해주세요", Toast.LENGTH_SHORT)
                                             .show()
-                                    }else{
+                                    } else {
                                         scope.launch {
                                             val result = viewModel.regPetWgt(ownrPetUnqNo)
                                             if (result) {

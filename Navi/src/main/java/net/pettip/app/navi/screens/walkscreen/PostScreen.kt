@@ -19,6 +19,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +54,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -85,6 +87,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -105,16 +108,14 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.component.CircleImageTopBar
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
+import net.pettip.app.navi.screens.commuscreen.CustomDialogInPost
 import net.pettip.app.navi.screens.mainscreen.getFormattedDate
 import net.pettip.app.navi.ui.theme.design_alpha50_black
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
 import net.pettip.app.navi.ui.theme.design_icon_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_bg
 import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_placeHolder
-import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
@@ -130,6 +131,8 @@ import net.pettip.map.app.naver.naverMapPreview
 import net.pettip.map.app.naver.rememberMapViewWithLifecycle
 import net.pettip.singleton.G
 import net.pettip.util.Log
+import java.security.AccessController.getContext
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,7 +140,11 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
     val application = GPSApplication.instance
 
     var expanded by remember { mutableStateOf(false) }
-    val items = listOf("Option 1", "Option 2", "Option 3")
+    val items = listOf(
+        "댕댕이와 함께하는 행복한 산책",
+        "댕댕이와 걷기 완료",
+        "댕댕이 응아를 위한 산책"
+    )
 
     val focusManager = LocalFocusManager.current
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
@@ -168,7 +175,13 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
     val scrollState = rememberScrollState()
 
     if (showDiagLog) {
-        OnDialog(navController = navController, onDismiss = { showDiagLog = false })
+        CustomDialogInPost(
+            onDismiss = { showDiagLog = false},
+            navController = navController,
+            title =  "글 작성을 그만하시겠습니까?",
+            text = "작성중인 글은 삭제됩니다",
+            dismiss = "나가기", confirm = "더 작성할래요"
+        )
     }
 
     DisposableEffect(Unit) {
@@ -261,7 +274,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                 .padding(paddingValues)
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .background(color = design_white)
+                .background(color = MaterialTheme.colorScheme.primary)
         ) {
             Row(
                 modifier = Modifier
@@ -279,7 +292,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
@@ -289,7 +302,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 24.sp,
                 letterSpacing = (-1.2).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp, top = 8.dp)
             )
 
@@ -335,7 +348,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -365,7 +378,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -400,26 +413,32 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     if (expanded) {
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowUp,
-                            contentDescription = "", tint = design_login_text,
+                            contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.clickable { expanded = false }
                         )
                     } else {
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "", tint = design_login_text,
+                            contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.clickable { expanded = true }
                         )
                     }
                 },
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
                 ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
@@ -435,13 +454,13 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
                         .heightIn(max = 150.dp)
-                        .background(color = design_white),
+                        .background(color = Color.Transparent),
                     contentPadding = PaddingValues(vertical = 8.dp)
                 ) {
                     itemsIndexed(items) { index, item ->
                         Text(
                             text = item,
-                            color = design_login_text.copy(alpha = 0.8f),
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp,
                             letterSpacing = (-0.7).sp,
@@ -459,7 +478,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                                     .padding(horizontal = 8.dp, vertical = 6.dp)
                                     .fillMaxWidth()
                                     .height(1.dp)
-                                    .background(design_textFieldOutLine)
+                                    .background(MaterialTheme.colorScheme.onSecondaryContainer)
                             )
                         }
                     }
@@ -473,7 +492,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -498,14 +517,20 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     )
                 },
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
                 ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(16.dp)
@@ -518,7 +543,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -542,16 +567,22 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                         fontSize = 14.sp
                     )
                 },
-                visualTransformation = HashTagTransformation(),
+                visualTransformation = if (isSystemInDarkTheme()) HashTagTransformationForDark() else HashTagTransformation(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
                 ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
@@ -564,7 +595,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -590,7 +621,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     text = "산책기록과 사진이 스토리에 공유됩니다.",
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.offset(x = (-8).dp),
                     letterSpacing = (-0.7).sp
                 )
@@ -689,7 +720,7 @@ fun BwlMvmNmtmContent(walkViewModel: WalkViewModel, pet: List<Pet>, selectPet: L
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 20.sp,
             letterSpacing = (-1.0).sp,
-            color = design_login_text
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
@@ -718,10 +749,13 @@ fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: Pet, selectPet:
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = design_white, shape = RoundedCornerShape(12.dp))
+            .background(
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(12.dp)
+            )
             .border(
                 width = 1.dp,
-                color = design_textFieldOutLine,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 shape = RoundedCornerShape(12.dp)
             )
     ) {
@@ -738,7 +772,7 @@ fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: Pet, selectPet:
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 10.dp, top = 22.dp, bottom = 22.dp)
             )
         }
@@ -798,7 +832,7 @@ fun PlusMinusItem(
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp,
             letterSpacing = (-0.7).sp,
-            color = design_skip,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(start = 4.dp, end = 8.dp)
         )
 
@@ -834,7 +868,7 @@ fun PlusMinusItem(
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,
-                color = design_login_text
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 
@@ -935,9 +969,9 @@ fun PlusBox(galleyLauncher: ManagedActivityResultLauncher<String, List<@JvmSuppr
             modifier = Modifier
                 .align(Alignment.Center)
                 .size(100.dp)
-                .background(color = design_select_btn_bg, shape = RoundedCornerShape(12.dp))
+                .background(color = MaterialTheme.colorScheme.onPrimaryContainer, shape = RoundedCornerShape(12.dp))
                 .clip(shape = RoundedCornerShape(12.dp))
-                .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
+                .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                 .clickable { galleyLauncher.launch("image/*") }
         ) {
             Icon(
@@ -1015,7 +1049,10 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
             .padding(top = 16.dp, start = 20.dp, end = 20.dp)
             .fillMaxWidth()
             .clip(shape = RoundedCornerShape(20.dp))
-            .background(color = design_login_bg, shape = RoundedCornerShape(20.dp)), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
+            .background(
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                shape = RoundedCornerShape(20.dp)
+            ), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             modifier = Modifier
@@ -1027,7 +1064,7 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
-                color = design_skip
+                color = MaterialTheme.colorScheme.secondary
             )
 
             Text(
@@ -1036,14 +1073,14 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 letterSpacing = 0.sp,
                 modifier = Modifier.padding(top = 4.dp),
-                color = design_login_text
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 
         Spacer(
             modifier = Modifier
                 .size(1.dp, 46.dp)
-                .background(color = design_textFieldOutLine)
+                .background(color = MaterialTheme.colorScheme.onSecondaryContainer)
         )
 
         Column(
@@ -1057,7 +1094,7 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
-                color = design_skip
+                color = MaterialTheme.colorScheme.secondary
             )
 
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -1069,7 +1106,7 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
                     modifier = Modifier
                         .padding(top = 4.dp)
                         .alignByBaseline(),
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
                     text = "km",
@@ -1079,7 +1116,7 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
                     modifier = Modifier
                         .padding(top = 4.dp)
                         .alignByBaseline(),
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
 
@@ -1088,6 +1125,7 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
 }
 
 class HashTagTransformation() : VisualTransformation {
+
     override fun filter(text: AnnotatedString): TransformedText {
         return TransformedText(
             buildAnnotatedStringWithColors(text.toString()),
@@ -1127,6 +1165,53 @@ fun buildAnnotatedStringWithColors(text: String): AnnotatedString {
 
         // Add the text after the last hashtag
         withStyle(style = SpanStyle(color = design_login_text)) {
+            append(text.substring(lastIndex))
+        }
+    }
+
+    return annotatedText
+}
+
+class HashTagTransformationForDark() : VisualTransformation {
+
+    override fun filter(text: AnnotatedString): TransformedText {
+        return TransformedText(
+            buildAnnotatedStringWithColorsForDark(text.toString()),
+            OffsetMapping.Identity
+        )
+    }
+}
+fun buildAnnotatedStringWithColorsForDark(text: String): AnnotatedString {
+
+    val pattern = "#\\S+".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
+    val matches = pattern.findAll(text)
+
+    val annotatedText = buildAnnotatedString {
+        var lastIndex = 0
+        val highlightedTextList = mutableListOf<String>()
+
+        matches.forEach { result ->
+            val hashtag = result.value
+            val startIndex = result.range.first
+            val endIndex = result.range.last + 1
+
+            // Add the text before the hashtag
+            withStyle(style = SpanStyle(color = design_white)) {
+                append(text.substring(lastIndex, startIndex))
+            }
+
+            // Add the hashtag with a different color
+            withStyle(style = SpanStyle(color = design_intro_bg)) {
+                append(hashtag)
+            }
+
+            highlightedTextList.add(hashtag)
+
+            lastIndex = endIndex
+        }
+
+        // Add the text after the last hashtag
+        withStyle(style = SpanStyle(color = design_white)) {
             append(text.substring(lastIndex))
         }
     }

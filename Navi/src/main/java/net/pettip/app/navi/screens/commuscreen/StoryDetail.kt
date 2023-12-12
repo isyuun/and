@@ -22,15 +22,20 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.IndicationInstance
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -64,6 +69,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -71,6 +77,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -82,9 +89,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -112,6 +121,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.pettip.app.navi.DisableSystemBarsAnimation
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
@@ -178,6 +188,9 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     var cmntExpanded by remember{ mutableStateOf(true) }
     var onReply by remember{ mutableStateOf(false) }
     var isModify by remember{ mutableStateOf(false) }
+    var dclrDialogOpen by remember{ mutableStateOf(false) }
+    var expanded by remember{ mutableStateOf(false) }
+
     var replyText by remember{ mutableStateOf("") }
     val context = LocalContext.current
     val focusRequester = remember { FocusRequester() }
@@ -222,16 +235,26 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     Scaffold (
         topBar = {BackTopBar(title = stringResource(R.string.title_story), navController = navController)}
     ){ paddingValues ->
+
+        if (dclrDialogOpen){
+            DclrDialog(
+                viewModel = viewModel,
+                expanded = expanded,
+                expandChange = {newValue -> expanded = newValue},
+                onDismiss ={newValue -> dclrDialogOpen = newValue}
+            )
+        }
+
         Column (
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(color = design_white)
+                .background(color = MaterialTheme.colorScheme.primary)
                 .verticalScroll(rememberScrollState())
         ){
             Spacer(modifier = Modifier.padding(top = 20.dp))
             
-            StoryDetailTopContent(story,viewModel,navController, modifyChange = {newValue -> isModify = newValue})
+            StoryDetailTopContent(story,viewModel,navController, modifyChange = {newValue -> isModify = newValue}, dclrDialogOpen = {newValue -> dclrDialogOpen = newValue})
 
             Spacer(
                 modifier = Modifier
@@ -243,7 +266,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                     )
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(color = design_textFieldOutLine)
+                    .background(color = MaterialTheme.colorScheme.outline)
             )
 
             Crossfade(
@@ -275,7 +298,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     fontSize = 14.sp,
                                     letterSpacing = (-0.7).sp,
-                                    color = design_login_text,
+                                    color = MaterialTheme.colorScheme.onPrimary,
                                     modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
                                 )
                             }
@@ -309,7 +332,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
             Row (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(design_login_bg)
+                    .background(MaterialTheme.colorScheme.onPrimaryContainer)
                     .height(36.dp)
                     .clickable { cmntExpanded = !cmntExpanded }
                 ,
@@ -326,7 +349,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,
-                    color = design_skip,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
@@ -344,14 +367,18 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                     contentPadding = PaddingValues(top = 18.dp, bottom = 20.dp)
                 ){
                     itemsIndexed(upCmntNo0){ index, item ->
-                        CommentListItem(comment = item, viewModel = viewModel, onReply, onReplyChange = {newValue -> onReply = newValue})
+                        CommentListItem(
+                            comment = item,
+                            viewModel = viewModel, onReply,
+                            onReplyChange = {newValue -> onReply = newValue},
+                            dclrDialogOpen = {newValue -> dclrDialogOpen = newValue })
 
                         if(index != (upCmntNo0?.size?.minus(1) ?: 0)){
                             Spacer(modifier = Modifier
                                 .padding(vertical = 16.dp, horizontal = 20.dp)
                                 .fillMaxWidth()
                                 .height(1.dp)
-                                .background(color = design_textFieldOutLine))
+                                .background(color = MaterialTheme.colorScheme.outline))
                         }
                     }
                 }
@@ -396,13 +423,13 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                 Spacer(modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(design_login_text))
+                    .background(MaterialTheme.colorScheme.onPrimary))
             }
 
             Spacer(modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(design_login_text))
+                .background(MaterialTheme.colorScheme.onPrimary))
 
             Row (
                 modifier = Modifier.fillMaxWidth(),
@@ -418,7 +445,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                         }
                                     },
                     textStyle = TextStyle(
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp
@@ -439,21 +466,23 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                         .weight(1f)
                         .focusRequester(focusRequester),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text)
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                        focusedContainerColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                        cursorColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 )
                 
                 Box(
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .size(width = 56.dp, height = 40.dp)
-                        .background(color = design_btn_border, shape = RoundedCornerShape(12.dp))
+                        .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(12.dp))
                         .clip(shape = RoundedCornerShape(12.dp))
                         .clickable(
                             enabled = if (onReply) replyText != "" && !isLoading else comment != "" && !isLoading,
@@ -492,12 +521,12 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                 ){
                     if (isLoading){
                         LoadingAnimation3(
-                            circleColor = design_white,
+                            circleColor = MaterialTheme.colorScheme.onTertiaryContainer,
                             circleSize = 4.dp
                         )
                     }else{
                         Text(text = stringResource(R.string.comment_apply), style = TextStyle(
-                            color = design_white,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp,
                             letterSpacing = (-0.7).sp),
@@ -510,9 +539,9 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                     modifier = Modifier
                         .padding(end = 4.dp)
                         .size(40.dp)
-                        .background(color = design_white, shape = RoundedCornerShape(12.dp))
+                        .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
                         .clip(shape = RoundedCornerShape(12.dp))
-                        .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
+                        .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                         .clickable(
                             enabled = story?.myRcmdtn == null && !rcmdtnLoading
                         ) {
@@ -541,9 +570,9 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .size(40.dp)
-                        .background(color = design_white, shape = RoundedCornerShape(12.dp))
+                        .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
                         .clip(shape = RoundedCornerShape(12.dp))
-                        .border(1.dp, color = design_textFieldOutLine, shape = RoundedCornerShape(12.dp))
+                        .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                         .clickable(
                             enabled = story?.myRcmdtn == null && !rcmdtnLoading
                         ) {
@@ -593,10 +622,14 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel, navcontroller:NavHostController,modifyChange:(Boolean) ->Unit) {
+fun StoryDetailTopContent(
+    story: DailyDetailData?,
+    viewModel: CommunityViewModel,
+    navcontroller:NavHostController,
+    modifyChange:(Boolean) ->Unit,
+    dclrDialogOpen:(Boolean) ->Unit
+) {
 
-    var expanded by remember{ mutableStateOf(false) }
-    var dclrDialogOpen by remember{ mutableStateOf(false) }
     var deleteDialog by remember { mutableStateOf(false) }
     var storyDelete by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
@@ -667,15 +700,6 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
         storyDelete = false
     }
 
-    if (dclrDialogOpen){
-        DclrDialog(
-            viewModel = viewModel,
-            expanded = expanded,
-            expandChange = {newValue -> expanded = newValue},
-            onDismiss ={newValue -> dclrDialogOpen = newValue}
-        )
-    }
-
     Column (
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -686,7 +710,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 24.sp,
             letterSpacing = (-1.2).sp,
-            color = design_login_text
+            color = MaterialTheme.colorScheme.onPrimary
         )
 
         Row (
@@ -708,7 +732,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
                 Text(
@@ -716,7 +740,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp, lineHeight = 12.sp,
-                    color = design_skip
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
         }
@@ -738,7 +762,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,
-                    color = design_skip,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(start = 4.dp)
                 )
 
@@ -752,7 +776,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,
-                    color = design_skip,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(start = 4.dp)
                 )
 
@@ -767,7 +791,12 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                                     .padding(start = 12.dp)
                                     .clip(shape = RoundedCornerShape(2.dp))
                                     .clickable(
-                                        enabled = !rlsUpdateLoading && booleanValue
+                                        enabled = !rlsUpdateLoading && booleanValue,
+                                        interactionSource = remember{ MutableInteractionSource() },
+                                        indication = CustomIndication(
+                                            alpha = 0.3f,
+                                            pressColor = design_textFieldOutLine
+                                        )
                                     ) {
                                         rlsUpdateLoading = true
                                         viewModel.viewModelScope.launch {
@@ -797,7 +826,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     fontSize = 12.sp,
                                     letterSpacing = (-0.6).sp,
-                                    color = design_skip,
+                                    color = MaterialTheme.colorScheme.secondary,
                                     modifier = Modifier.padding(start = 4.dp)
                                 )
                             }
@@ -813,7 +842,12 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                             modifier = Modifier
                                 .padding(start = 12.dp)
                                 .clickable(
-                                    enabled = !rlsUpdateLoading && !booleanValue
+                                    enabled = !rlsUpdateLoading && !booleanValue,
+                                    interactionSource = remember{ MutableInteractionSource() },
+                                    indication = CustomIndication(
+                                        alpha = 0.3f,
+                                        pressColor = design_textFieldOutLine
+                                    )
                                 ) {
                                     rlsUpdateLoading = true
                                     viewModel.viewModelScope.launch {
@@ -842,7 +876,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp,
                                 letterSpacing = (-0.6).sp,
-                                color = design_skip,
+                                color = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.padding(start = 4.dp)
                             )
                         }
@@ -855,14 +889,20 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Row (
-                        modifier = Modifier.clickable {
-                                                      modifyChange(true)
-                        },
+                        modifier = Modifier
+
+                            .clickable (
+                                interactionSource = remember{ MutableInteractionSource() },
+                                indication = CustomIndication(
+                                    alpha = 0.3f,
+                                    pressColor = design_textFieldOutLine
+                                )
+                            ){ modifyChange(true) },
                         verticalAlignment = Alignment.CenterVertically
                     ){
                         Icon(
                             painter = painterResource(id = R.drawable.icon_daily),
-                            contentDescription = "", tint = design_skip,
+                            contentDescription = "", tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier
                                 .padding(start = 12.dp)
                                 .size(14.dp))
@@ -872,7 +912,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 12.sp,
                             letterSpacing = (-0.6).sp,
-                            color = design_skip,
+                            color = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.padding(start = 4.dp)
                         )
                     }
@@ -885,7 +925,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                     ){
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "", tint = design_skip,
+                            contentDescription = "", tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier
                                 .padding(start = 12.dp)
                                 .size(14.dp))
@@ -895,7 +935,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 12.sp,
                             letterSpacing = (-0.6).sp,
-                            color = design_skip,
+                            color = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier
                                 .padding(start = 4.dp)
                         )
@@ -904,9 +944,16 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
             }else{
                 Row (
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        dclrDialogOpen = true
-                    }
+                    modifier = Modifier
+                        .clickable (
+                            interactionSource = remember{ MutableInteractionSource() },
+                            indication = CustomIndication(
+                                alpha = 0.3f,
+                                pressColor = design_textFieldOutLine
+                            )
+                        ){
+                            dclrDialogOpen(true)
+                        }
                 ){
                     Icon(
                         painter = painterResource(id = R.drawable.icon_report),
@@ -918,7 +965,7 @@ fun StoryDetailTopContent(story: DailyDetailData?,viewModel: CommunityViewModel,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 12.sp,
                         letterSpacing = (-0.6).sp,
-                        color = design_skip,
+                        color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.padding(start = 4.dp)
                     )
                 }
@@ -1043,7 +1090,7 @@ fun StoryDetailTime(story: DailyDetailData?) {
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
-                color = design_skip,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -1053,13 +1100,13 @@ fun StoryDetailTime(story: DailyDetailData?) {
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 letterSpacing = 0.sp,
                 modifier = Modifier.padding(top = 4.dp, start = 20.dp),
-                color = design_login_text
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 
         Spacer(modifier = Modifier
             .size(1.dp, 40.dp)
-            .background(color = design_textFieldOutLine))
+            .background(color = MaterialTheme.colorScheme.outline))
 
         Column (
             modifier= Modifier
@@ -1071,7 +1118,7 @@ fun StoryDetailTime(story: DailyDetailData?) {
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
-                color = design_skip,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -1082,14 +1129,14 @@ fun StoryDetailTime(story: DailyDetailData?) {
                 letterSpacing = 0.sp,
                 modifier = Modifier
                     .padding(top = 4.dp, start = 20.dp),
-                color = design_login_text
+                color = MaterialTheme.colorScheme.onPrimary
             )
 
         }
 
         Spacer(modifier = Modifier
             .size(1.dp, 40.dp)
-            .background(color = design_textFieldOutLine))
+            .background(color = MaterialTheme.colorScheme.outline))
 
         Column (
             modifier= Modifier
@@ -1101,7 +1148,7 @@ fun StoryDetailTime(story: DailyDetailData?) {
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
-                color = design_skip,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -1112,7 +1159,7 @@ fun StoryDetailTime(story: DailyDetailData?) {
                 letterSpacing = 0.sp,
                 modifier = Modifier
                     .padding(top = 4.dp, start = 20.dp),
-                color = design_login_text
+                color = MaterialTheme.colorScheme.onPrimary
             )
 
         }
@@ -1121,7 +1168,13 @@ fun StoryDetailTime(story: DailyDetailData?) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boolean, onReplyChange: (Boolean)->Unit){
+fun CommentListItem(
+    comment: Cmnt,
+    viewModel: CommunityViewModel,
+    onReply: Boolean,
+    onReplyChange: (Boolean)->Unit,
+    dclrDialogOpen:(Boolean) ->Unit
+){
 
     val cmntList by viewModel.cmntList.collectAsState()
     val step2CmntList:List<Cmnt> = cmntList?.filter { cmnt ->
@@ -1174,7 +1227,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
-                    .background(design_white, RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp))
                     .clip(RoundedCornerShape(20.dp))
             ) {
                 Spacer(modifier = Modifier.padding(top = 20.dp))
@@ -1189,7 +1242,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 20.sp,
                         letterSpacing = (-1.0).sp,
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)
                     )
 
@@ -1198,7 +1251,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
-                        color = design_skip,
+                        color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier
                             .padding(end = 30.dp, bottom = 20.dp)
                             .clickable { openBottomSheet = false }
@@ -1213,7 +1266,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     elevation = CardDefaults.cardElevation(3.dp),
-                    colors = CardDefaults.cardColors(containerColor = design_white)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
                 ){
                     Row (
                         modifier = Modifier
@@ -1243,7 +1296,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                     fontSize = 10.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
-                                    color = design_skip.copy(alpha = 0.7f),
+                                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                                     modifier = Modifier.padding(start = 5.dp)
                                 )
                             }
@@ -1253,7 +1306,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp,
-                                color = design_login_text
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -1274,7 +1327,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                         value = updateComment,
                         onValueChange = { updateComment = it},
                         textStyle = TextStyle(
-                            color = design_login_text,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp,
                             letterSpacing = (-0.7).sp
@@ -1291,14 +1344,16 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                         modifier = Modifier
                             .weight(1f),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedPlaceholderColor = design_placeHolder,
-                            focusedPlaceholderColor = design_placeHolder,
-                            unfocusedBorderColor = design_textFieldOutLine,
-                            focusedBorderColor = design_login_text,
-                            unfocusedContainerColor = design_white,
-                            focusedContainerColor = design_white,
-                            unfocusedLeadingIconColor = design_placeHolder,
-                            focusedLeadingIconColor = design_login_text),
+                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                            focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                            focusedContainerColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                            focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Delete,
@@ -1314,7 +1369,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .size(width = 56.dp, height = 40.dp)
-                            .background(color = design_btn_border, shape = RoundedCornerShape(12.dp))
+                            .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(12.dp))
                             .clip(shape = RoundedCornerShape(12.dp))
                             .clickable(
                                 enabled = updateComment != "" && !updateLoading,
@@ -1342,12 +1397,12 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                     ){
                         if (updateLoading){
                             LoadingAnimation3(
-                                circleColor = design_white,
+                                circleColor = MaterialTheme.colorScheme.primary,
                                 circleSize = 4.dp
                             )
                         }else{
                             Text(text = "수정", style = TextStyle(
-                                color = design_white,
+                                color = MaterialTheme.colorScheme.primary,
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp),
@@ -1397,7 +1452,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
-                            color = if (G.userId == comment.userId) design_intro_bg else design_skip
+                            color = if (G.userId == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
                         )
 
                         Text(
@@ -1405,7 +1460,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                             fontSize = 10.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
-                            color = design_skip.copy(alpha = 0.7f),
+                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                             modifier = Modifier.padding(start = 5.dp)
                         )
                     }
@@ -1455,7 +1510,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
 
                                         Text(text = "${comment.rcmdtnCnt}",
                                             style = TextStyle(
-                                                color = design_skip,
+                                                color = MaterialTheme.colorScheme.secondary,
                                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                                 fontSize = 12.sp,
                                                 letterSpacing = (-0.6).sp),
@@ -1497,7 +1552,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                             text = "수정",
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                                            color = design_skip,
+                                            color = MaterialTheme.colorScheme.secondary,
                                             textDecoration = if (comment.delYn == "Y" || comment.bldYn == "Y") TextDecoration.LineThrough else TextDecoration.None,
                                             modifier = Modifier
                                                 .padding(start = 12.dp)
@@ -1512,7 +1567,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                             text = "삭제",
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                                            color = design_skip,
+                                            color = MaterialTheme.colorScheme.secondary,
                                             textDecoration = if (comment.delYn == "Y" || comment.bldYn == "Y") TextDecoration.LineThrough else TextDecoration.None,
                                             modifier = Modifier
                                                 .padding(start = 12.dp)
@@ -1558,7 +1613,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
 
                                             Text(text = "${comment.nrcmdtnCnt}",
                                                 style = TextStyle(
-                                                    color = design_skip,
+                                                    color = MaterialTheme.colorScheme.secondary,
                                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                                     fontSize = 12.sp,
                                                     letterSpacing = (-0.6).sp),
@@ -1574,7 +1629,10 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                             modifier = Modifier
                                                 .padding(start = 12.dp)
                                                 .clickable(
-                                                    onClick = { },
+                                                    onClick = {
+                                                        viewModel.updateSelectCmnt(comment)
+                                                        dclrDialogOpen(true)
+                                                    },
                                                     indication = rememberRipple(
                                                         bounded = true,
                                                         radius = 8.dp,
@@ -1599,7 +1657,7 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                                     indication = rememberRipple(
                                         bounded = true,
                                         radius = 8.dp,
-                                        color = design_login_text
+                                        color = MaterialTheme.colorScheme.secondary
                                     ),
                                     interactionSource = remember { MutableInteractionSource() }
                                 )
@@ -1613,13 +1671,13 @@ fun CommentListItem(comment: Cmnt, viewModel: CommunityViewModel, onReply: Boole
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(end = 10.dp)
                 )
 
                 if (step2CmntList.isNotEmpty()){
                     Text(text = if(!step2Expand) "└ 답글 ${step2CmntList.size}개" else "└ 답글접기",
-                        style = TextStyle(color = design_skip,fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        style = TextStyle(color = MaterialTheme.colorScheme.secondary,fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 12.sp,
                         letterSpacing = (-0.6).sp),
                         textAlign = TextAlign.Center,
@@ -1910,7 +1968,7 @@ fun CommentListItem2(
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
-                        color = if (G.userId == comment.userId) design_intro_bg else design_skip
+                        color = if (G.userId == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
                     )
 
                     Text(
@@ -1918,7 +1976,7 @@ fun CommentListItem2(
                         fontSize = 10.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
-                        color = design_skip.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                         modifier = Modifier.padding(start = 5.dp)
                     )
                 }
@@ -1966,7 +2024,7 @@ fun CommentListItem2(
                                 )
                                 Text(text = "${comment.rcmdtnCnt}",
                                     style = TextStyle(
-                                        color = design_skip,
+                                        color = MaterialTheme.colorScheme.secondary,
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 12.sp,
                                         letterSpacing = (-0.6).sp),
@@ -1988,7 +2046,7 @@ fun CommentListItem2(
                                         text = "수정",
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                                        color = design_skip,
+                                        color = MaterialTheme.colorScheme.secondary,
                                         modifier = Modifier
                                             .padding(start = 12.dp)
                                             .clickable {
@@ -2000,7 +2058,7 @@ fun CommentListItem2(
                                         text = "삭제",
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                                        color = design_skip,
+                                        color = MaterialTheme.colorScheme.secondary,
                                         modifier = Modifier
                                             .padding(start = 12.dp)
                                             .clickable { deleteDialog = true }
@@ -2042,7 +2100,7 @@ fun CommentListItem2(
                                         )
                                         Text(text = "${comment.nrcmdtnCnt}",
                                             style = TextStyle(
-                                                color = design_skip,
+                                                color = MaterialTheme.colorScheme.secondary,
                                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                                 fontSize = 12.sp,
                                                 letterSpacing = (-0.6).sp),
@@ -2074,7 +2132,7 @@ fun CommentListItem2(
 
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "", tint = design_skip,
+                        contentDescription = "", tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier
                             .padding(start = 12.dp)
                             .size(14.dp)
@@ -2097,9 +2155,55 @@ fun CommentListItem2(
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,
-                color = design_login_text
+                color = MaterialTheme.colorScheme.onPrimary
             )
 
+        }
+    }
+}
+
+private class CustomIndication(
+    val pressColor: Color = Color.Red,
+    val cornerRadius: CornerRadius = CornerRadius(16f, 16f),
+    val alpha: Float = 0.5f,
+    val drawRoundedShape: Boolean = true
+) : Indication {
+
+    private inner class DefaultIndicationInstance(
+        private val isPressed: State<Boolean>,
+    ) : IndicationInstance {
+
+        override fun ContentDrawScope.drawIndication() {
+
+            drawContent()
+            when {
+                isPressed.value -> {
+                    if (drawRoundedShape) {
+                        drawRoundRect(
+                            cornerRadius = cornerRadius,
+                            color = pressColor.copy(
+                                alpha = alpha
+                            ), size = size
+                        )
+                    } else {
+
+                        drawCircle(
+                            radius = size.width,
+                            color = pressColor.copy(
+                                alpha = alpha
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    override fun rememberUpdatedInstance(interactionSource: InteractionSource): IndicationInstance {
+        val isPressed = interactionSource.collectIsPressedAsState()
+        return remember(interactionSource) {
+            DefaultIndicationInstance(isPressed)
         }
     }
 }

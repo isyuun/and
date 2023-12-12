@@ -61,6 +61,9 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
 
     val scdList : List<SCD> = scdLocalData.scd
 
+    private val _dm = MutableStateFlow<String>("")
+    val dm = _dm.asStateFlow()
+
     private val _sggList = MutableStateFlow<List<SggList>>(emptyList()) // 시군구
     val sggList: StateFlow<List<SggList>> = _sggList.asStateFlow()
     fun updateSggList(newValue: List<SggList>) { _sggList.value = newValue }
@@ -202,9 +205,9 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     val day: StateFlow<PickerState> = _day.asStateFlow()
     fun updateDay(newValue: PickerState) { _day.value = newValue }
 
-    private val _address = MutableStateFlow<String>("주소 선택")
-    val address: StateFlow<String> = _address.asStateFlow()
-    fun updateAddress(newValue: String) { _address.value = newValue }
+    private val _addressPass = MutableStateFlow<Boolean>(false)
+    val addressPass: StateFlow<Boolean> = _addressPass.asStateFlow()
+    fun updateAddressPass(newValue: Boolean) { _addressPass.value = newValue }
 
 
     private val _userResponse = MutableStateFlow<UserDataResponse>(
@@ -381,6 +384,8 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                             }
                         }
                     }else{
+                        val errorBodyString = response.errorBody()!!.string()
+                        _dm.value = errorBodyParse(errorBodyString)
                         continuation.resume(false)
                     }
                 }
@@ -532,7 +537,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                                 _selectedItem3.value = UmdList("", "") // 읍면동
                                 _sggList.value = emptyList()
                                 _umdList.value = emptyList()
-                                _address.value = "주소 선택"
+                                _addressPass.value = false
                                 _petName.value = ""
                                 _year.value =PickerState()
                                 _petBirth.value = ""
@@ -624,7 +629,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                                 _selectedItem3.value = UmdList("", "") // 읍면동
                                 _sggList.value = emptyList()
                                 _umdList.value = emptyList()
-                                _address.value = "주소 선택"
+                                _addressPass.value = false
                                 _petName.value = ""
                                 _year.value =PickerState()
                                 _petBirth.value = ""

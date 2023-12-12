@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -69,7 +70,7 @@ fun LogoTopBar(
     val currentPetData by sharedViewModel.currentPetInfo.collectAsState()
 
     TopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = design_white),
+        colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
         modifier = Modifier.height(60.dp),
         title = { 
             Box(modifier = modifier
@@ -140,13 +141,13 @@ fun LogoTopBar(
                             overflow = TextOverflow.Ellipsis,
                             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                             fontSize = 14.sp,
-                            color = design_login_text
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                         Icon(painter = painterResource(id = R.drawable.arrow_select), contentDescription = "",
                             modifier= Modifier
                                 .padding(start = 4.dp)
                             ,
-                            tint = design_login_text
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -160,7 +161,7 @@ fun CircleImageTopBar(size: Int, imageUri:String?){
     Box(
         modifier = Modifier
             .size(size.dp)
-            .border(shape = CircleShape, border = BorderStroke(3.dp, color = design_white))
+            .border(shape = CircleShape, border = BorderStroke(3.dp, color = MaterialTheme.colorScheme.tertiary))
             .shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
             .clip(CircleShape)
     ) {

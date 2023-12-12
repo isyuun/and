@@ -55,6 +55,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -124,6 +125,7 @@ import java.time.temporal.WeekFields
 import java.util.Locale
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WalkScreen(
     navController: NavHostController,
@@ -258,7 +260,7 @@ fun WalkListContent(walkViewModel: WalkViewModel, navController: NavHostControll
     Box (
         modifier = Modifier
             .fillMaxSize()
-            .background(color = design_home_bg)
+            .background(color = MaterialTheme.colorScheme.onPrimaryContainer)
     ){
         LazyColumn(
             state = rememberLazyListState(),
@@ -281,10 +283,10 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .fillMaxWidth()
-            .background(color = design_white, shape = RoundedCornerShape(12.dp))
+            .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(12.dp))
             .border(
                 width = 1.dp,
-                color = design_textFieldOutLine,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 shape = RoundedCornerShape(12.dp)
             )
             .clip(RoundedCornerShape(12.dp))
@@ -306,7 +308,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                     letterSpacing = (-0.8).sp,
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
                 Box (
@@ -344,7 +346,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                     },
                 contentAlignment = Alignment.Center
             ){
-                Icon(painter = painterResource(id = R.drawable.arrow_next), contentDescription = "", tint = Color.Unspecified)
+                Icon(painter = painterResource(id = R.drawable.arrow_next), contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary)
             }
         }
 
@@ -362,7 +364,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
-                    color = design_skip
+                    color = MaterialTheme.colorScheme.secondary
                 )
 
                 Text(
@@ -371,13 +373,13 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     letterSpacing = 0.sp,
                     modifier = Modifier.padding(top = 4.dp),
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
 
             Spacer(modifier = Modifier
                 .size(1.dp, 40.dp)
-                .background(color = design_textFieldOutLine))
+                .background(color = MaterialTheme.colorScheme.onSecondaryContainer))
 
             Column (
                 modifier= Modifier
@@ -389,7 +391,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
-                    color = design_skip,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(start = 20.dp)
                 )
 
@@ -400,14 +402,14 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                     letterSpacing = 0.sp,
                     modifier = Modifier
                         .padding(top = 4.dp, start = 20.dp),
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
             }
 
             Spacer(modifier = Modifier
                 .size(1.dp, 40.dp)
-                .background(color = design_textFieldOutLine))
+                .background(color = MaterialTheme.colorScheme.onSecondaryContainer))
 
             Column (
                 modifier= Modifier
@@ -419,7 +421,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
-                    color = design_skip,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(start = 20.dp)
                 )
 
@@ -431,7 +433,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                         letterSpacing = 0.sp,
                         modifier = Modifier
                             .padding(top = 4.dp, start = 20.dp),
-                        color = design_login_text
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 

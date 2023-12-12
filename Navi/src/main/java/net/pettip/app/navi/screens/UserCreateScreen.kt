@@ -24,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -43,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -75,14 +77,12 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
     val scope = rememberCoroutineScope()
 
     val systemUiController = rememberSystemUiController()
-    systemUiController.setSystemBarsColor(color = design_white)
+    systemUiController.setSystemBarsColor(color = MaterialTheme.colorScheme.primary)
 
     val id by viewModel.userID.collectAsState()
     val pw by viewModel.userPW.collectAsState()
     val pwCheck by viewModel.userPWCheck.collectAsState()
     val nickName by viewModel.userNickName.collectAsState()
-    val phoneNum by viewModel.userPhone.collectAsState()
-    val certiNum by viewModel.certiNum.collectAsState()
     val nickNamePass by viewModel.userNickNamePass.collectAsState()
 
     var snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
@@ -117,13 +117,15 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
             modifier= modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(design_white)
+                .background(MaterialTheme.colorScheme.primary)
         ) {
             Spacer(modifier = Modifier.padding(vertical = 10.dp))
 
             Row (Modifier.fillMaxWidth()){
                 Text(text = "아이디", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier=Modifier.padding(start = 20.dp), color = design_login_text)
+                    modifier=Modifier.padding(start = 20.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
                 Text(
                     text = "*",
                     fontSize = 16.sp,
@@ -144,14 +146,21 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                     .height(48.dp),
                 placeholder = { Text(text = "이메일 주소를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text),
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start=16.dp)
             )
@@ -160,7 +169,8 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
             
             Row (Modifier.fillMaxWidth()){
                 Text(text = "비밀번호", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier=Modifier.padding(start = 20.dp), color = design_login_text)
+                    modifier=Modifier.padding(start = 20.dp),
+                    color = MaterialTheme.colorScheme.onPrimary)
                 Text(
                     text = "*",
                     fontSize = 16.sp,
@@ -182,14 +192,21 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                 visualTransformation = PasswordVisualTransformation(),
                 placeholder = { Text(text = "8~16자 영문/숫자 조합", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text),
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start=16.dp)
             )
@@ -208,14 +225,21 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                 visualTransformation = PasswordVisualTransformation(),
                 placeholder = { Text(text = "비밀번호 확인", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text),
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start=16.dp)
             )
@@ -224,7 +248,9 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
 
             Row (Modifier.fillMaxWidth()){
                 Text(text = "닉네임", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier=Modifier.padding(start = 20.dp), color = design_login_text)
+                    modifier=Modifier.padding(start = 20.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
                 Text(
                     text = "*",
                     fontSize = 16.sp,
@@ -245,14 +271,21 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                     .height(48.dp),
                 placeholder = { Text(text = "닉네임을 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text),
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start=16.dp),
                 trailingIcon = {
@@ -285,10 +318,10 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                                     }
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = design_white),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                             elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 0.dp),
                             shape = RoundedCornerShape(10.dp),
-                            border = BorderStroke(1.dp, color = design_login_text),
+                            border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.onPrimary),
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .size(60.dp, 32.dp),
@@ -298,7 +331,7 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                                 text = "중복확인",
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp, letterSpacing = (-0.6).sp,
-                                color = design_login_text
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }

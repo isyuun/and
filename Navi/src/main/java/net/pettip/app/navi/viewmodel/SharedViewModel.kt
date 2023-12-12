@@ -233,7 +233,6 @@ class SharedViewModel:ViewModel(){
         }
     }
 
-    //refresh token 던지고, 결과 Boolean으로 반환
     suspend fun sendRFToken():Boolean{
         val apiService = RetrofitClientServer.instance
 

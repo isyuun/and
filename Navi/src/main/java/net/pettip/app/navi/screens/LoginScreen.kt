@@ -14,7 +14,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,6 +53,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -68,6 +76,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -80,10 +89,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -119,7 +125,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(color = design_intro_bg)
-    systemUiController.setNavigationBarColor(color= design_login_bg)
+    systemUiController.setNavigationBarColor(color= MaterialTheme.colorScheme.tertiary)
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -127,6 +133,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
     var id by remember { mutableStateOf(MySharedPreference.getUserEmail()) }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var requirePermission by remember { mutableStateOf(false) }
 
     val snsEmail by viewModel.email.collectAsState()
     val snsUnqId by viewModel.unqId.collectAsState()
@@ -202,9 +209,10 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
         }
     )
 
-
-    SideEffect {
-        permissionState.launchMultiplePermissionRequest()
+    LaunchedEffect(Unit){
+        if (!permissionState.allPermissionsGranted){
+            requirePermission = true
+        }
     }
 
     LaunchedEffect(Unit){
@@ -228,7 +236,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
             .background(color = design_intro_bg)
             , horizontalAlignment = Alignment.CenterHorizontally) {
 
-            Image(painter = painterResource(id = R.drawable.logo_login), contentDescription = "logo", modifier = Modifier
+            Image(painter = painterResource(id = R.drawable.logo_login_pettip), contentDescription = "logo", modifier = Modifier
                 .padding(top = 40.dp, bottom = 40.dp)
                 .width(100.dp))
 
@@ -236,7 +244,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .background(
-                    color = design_login_bg,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
                 )
                 ,
@@ -245,7 +253,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                     .padding(top = 40.dp, bottom = 20.dp)
                     , textAlign = TextAlign.Center,
                     fontSize = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
 
@@ -263,14 +271,21 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                     placeholder = { Text(text = "Email", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                     leadingIcon = { Icon(painter = painterResource(id = R.drawable.icon_email), contentDescription = "")},
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text),
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                        focusedContainerColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                        cursorColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    textStyle = TextStyle(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 16.sp, letterSpacing = (-0.4).sp
+                    ),
                     shape = RoundedCornerShape(4.dp)
                 )
 
@@ -294,14 +309,21 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                     placeholder = { Text(text = "PassWord",fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                     leadingIcon = { Icon(painter = painterResource(id = R.drawable.icon_password), contentDescription = "")},
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text),
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                        focusedContainerColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                        cursorColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    textStyle = TextStyle(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 16.sp, letterSpacing = (-0.4).sp
+                    ),
                     shape = RoundedCornerShape(4.dp)
                 )
 
@@ -351,7 +373,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         text = "아이디 찾기",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.clickable { navController.navigate(route = Screen.IdPwSearch.route+"/0") })
 
                     Spacer(modifier = Modifier
@@ -363,7 +385,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         text = "비밀번호 찾기",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.clickable {  navController.navigate(route = Screen.IdPwSearch.route+"/1") })
 
                     Spacer(modifier = Modifier
@@ -375,7 +397,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         text = "회원가입",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.clickable {
                             navController.navigate(Screen.UserCreate.route)
                         })
@@ -386,7 +408,8 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                     .padding(top = 40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
                     Divider(modifier=Modifier.size(92.dp,1.dp), color = design_textFieldOutLine)
                     Text(text = " SNS 계정으로 로그인 ", modifier = Modifier.padding(horizontal = 14.dp),
-                        fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_login_text)
+                        fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        color = MaterialTheme.colorScheme.onPrimary)
                     Divider(modifier=Modifier.size(92.dp,1.dp), color = design_textFieldOutLine)
                 }
 
@@ -524,6 +547,14 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
         }
     }
 
+    AnimatedVisibility(
+        visible = requirePermission ,
+        enter = slideInVertically(initialOffsetY = {it/2}) + fadeIn(),
+        exit = slideOutVertically(targetOffsetY = {it/2}) + fadeOut()
+    ) {
+        PermissionScreen(permissionState = permissionState, onCheck = {newValue -> requirePermission = newValue})
+    }
+
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -540,19 +571,24 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel,sharedVi
 fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, userCreateViewModel: UserCreateViewModel){
 
     val systemUiController = rememberSystemUiController()
-    systemUiController.setSystemBarsColor(color = design_white)
+    systemUiController.setSystemBarsColor(color = MaterialTheme.colorScheme.primary)
 
     val allCheck by viewModel.allCheck.collectAsState()
     val memberCheck by viewModel.memberCheck.collectAsState()
     val personCheck by viewModel.personCheck.collectAsState()
     val marketingCheck by viewModel.marketingCheck.collectAsState()
-    val nickname by viewModel.nickName.collectAsState()
     val snsLogin by viewModel.loginMethod.collectAsState()
     val unqId by viewModel.unqId.collectAsState()
     val email by viewModel.email.collectAsState()
     val context = LocalContext.current
 
-    val countTrue = listOf(memberCheck, personCheck, marketingCheck).count { true }
+    //val nickName by viewModel.nickName.collectAsState()
+    val nickName by userCreateViewModel.userNickName.collectAsState()
+    val nickNamePass by userCreateViewModel.userNickNamePass.collectAsState()
+
+    val focusManager = LocalFocusManager.current
+    val snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = memberCheck, key2 = personCheck, key3 = marketingCheck){
         if (memberCheck && personCheck && marketingCheck){
@@ -567,12 +603,12 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
         topBar = {
             BackTopBar(title = "회원가입", navController = navController)
         },
-        //snackbarHost =
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
     ) { paddingValues ->
 
         Box (modifier = Modifier
             .padding(paddingValues)
-            .background(color = design_white)
+            .background(color = MaterialTheme.colorScheme.primary)
         ){
             Column (
                 modifier = Modifier.fillMaxSize()
@@ -590,7 +626,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                             if (allCheck) {
                                 design_intro_bg
                             } else {
-                                design_login_text
+                                MaterialTheme.colorScheme.onPrimary
                             },
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -599,7 +635,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                             if (allCheck) {
                                 design_login_bg
                             } else {
-                                design_white
+                                Color.Transparent
                             },
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -629,7 +665,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                     Text(text = "전체 약관에 동의합니다.",
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                        color = design_login_text, modifier=Modifier.offset(x = (-8).dp),
+                        color = if (allCheck) design_intro_bg else MaterialTheme.colorScheme.onPrimary, modifier=Modifier.offset(x = (-8).dp),
                         letterSpacing = (-0.7).sp,
                     )
                 }
@@ -658,7 +694,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
 
                 Row (Modifier.fillMaxWidth()){
                     Text(text = "닉네임", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                        modifier=Modifier.padding(start = 20.dp), color = design_login_text)
+                        modifier=Modifier.padding(start = 20.dp), color = MaterialTheme.colorScheme.onPrimary)
                     Text(
                         text = "*",
                         fontSize = 16.sp,
@@ -668,8 +704,8 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                 }
 
                 CustomTextField(
-                    value = nickname,
-                    onValueChange = {viewModel.updateNickName(it)},
+                    value = nickName,
+                    onValueChange = {userCreateViewModel.updateUserNickName(it)},
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -680,30 +716,104 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                         .height(48.dp),
                     placeholder = { Text(text = "닉네임을 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = design_placeHolder,
-                        focusedPlaceholderColor = design_placeHolder,
-                        unfocusedBorderColor = design_textFieldOutLine,
-                        focusedBorderColor = design_login_text,
-                        unfocusedContainerColor = design_white,
-                        focusedContainerColor = design_white,
-                        unfocusedLeadingIconColor = design_placeHolder,
-                        focusedLeadingIconColor = design_login_text),
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                        focusedContainerColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                        cursorColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    textStyle = TextStyle(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 16.sp, letterSpacing = (-0.4).sp
+                    ),
                     shape = RoundedCornerShape(4.dp),
-                    innerPadding = PaddingValues(start=16.dp)
+                    innerPadding = PaddingValues(start=16.dp),
+                    trailingIcon = {
+                        AnimatedVisibility(
+                            visible = nickName.isNotEmpty(),
+                            enter = scaleIn(),
+                            exit = scaleOut()
+                        ) {
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        val result = userCreateViewModel.nickNameCheck()
+                                        if (result){
+                                            focusManager.clearFocus()
+                                            userCreateViewModel.updateUserNickNamePass(nickName)
+                                            snackbarHostState.showSnackbar(
+                                                message = "사용하실 수 있는 닉네임입니다",
+                                                actionLabel = "확인",
+                                                duration = SnackbarDuration.Short,
+                                                withDismissAction = false
+                                            )
+                                        }else{
+                                            focusManager.clearFocus()
+                                            snackbarHostState.showSnackbar(
+                                                message = "이미 사용중인 닉네임입니다",
+                                                actionLabel = "확인",
+                                                duration = SnackbarDuration.Short,
+                                                withDismissAction = false
+                                            )
+                                        }
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 0.dp),
+                                shape = RoundedCornerShape(10.dp),
+                                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.onPrimary),
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .size(60.dp, 32.dp),
+                                contentPadding = PaddingValues(horizontal = 0.dp)
+                            ) {
+                                Text(
+                                    text = "중복확인",
+                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                    fontSize = 12.sp, letterSpacing = (-0.6).sp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                        }
+                    }
                 )
 
                 Button(
                     onClick = {
-                        if(allCheck){
-                            userCreateViewModel.updateUserNickName(nickname)
-                            userCreateViewModel.updateUserID(email)
-                            userCreateViewModel.updateUserName(nickname)
-                            userCreateViewModel.updateSnsLogin(snsLogin)
-                            userCreateViewModel.updateUserPW(unqId)
-                            navController.navigate(Screen.PetCreateScreen.route)
-                        }else{
-                            Toast.makeText(context, "약관에 동의해주세요", Toast.LENGTH_SHORT).show()
+                        scope.launch {
+                            if(allCheck){
+                                if (nickName.isEmpty()) {
+                                    snackbarHostState.showSnackbar(
+                                        message = "닉네임을 입력해주세요",
+                                        actionLabel = "확인",
+                                        duration = SnackbarDuration.Short,
+                                        withDismissAction = true
+                                    )
+                                } else if ( nickName != nickNamePass ) {
+                                    snackbarHostState.showSnackbar(
+                                        message = "닉네임 중복확인을 해주세요",
+                                        actionLabel = "확인",
+                                        duration = SnackbarDuration.Short,
+                                        withDismissAction = true
+                                    )
+                                }else{
+                                    userCreateViewModel.updateUserNickName(nickName)
+                                    userCreateViewModel.updateUserID(email)
+                                    userCreateViewModel.updateUserName(nickName)
+                                    userCreateViewModel.updateSnsLogin(snsLogin)
+                                    userCreateViewModel.updateUserPW(unqId)
+                                    navController.navigate(Screen.PetCreateScreen.route)
+                                }
+                            }else{
+                                Toast.makeText(context, "약관에 동의해주세요", Toast.LENGTH_SHORT).show()
+                            }
                         }
+
                               },
                     modifier = Modifier
                         .padding(top = 16.dp)
@@ -760,7 +870,7 @@ fun AgreeComponent(
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
@@ -772,7 +882,7 @@ fun AgreeComponent(
                 }else{
                     Icons.Default.KeyboardArrowDown
                 },
-                contentDescription = "",  tint = design_login_text,
+                contentDescription = "",  tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .padding(end = 20.dp)
                     .align(Alignment.CenterEnd)
@@ -790,7 +900,7 @@ fun AgreeComponent(
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 12.sp,
                 letterSpacing = (-0.6).sp,
-                color = design_skip,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(start = 38.dp, end = 16.dp, top = 8.dp)
             )
         }
@@ -800,7 +910,7 @@ fun AgreeComponent(
             .padding(top = 20.dp, bottom = 8.dp)
             .fillMaxWidth()
             .height(1.dp)
-            .background(design_textFieldOutLine))
+            .background(MaterialTheme.colorScheme.outline))
     }
 }
 
