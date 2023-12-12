@@ -66,15 +66,6 @@ data class Track(
         NNN, IMG, PEE, POO, MRK
     }
 
-    //val event: EVENT
-    //    get() {
-    //        return if (img > TRACK_ZERO_IMG) EVENT.IMG
-    //        else if (pee > TRACK_ZERO_PEE) EVENT.PEE
-    //        else if (poo > TRACK_ZERO_POO) EVENT.POO
-    //        else if (mrk > TRACK_ZERO_MRK) EVENT.MRK
-    //        else EVENT.NNN
-    //    }
-
     val location: Location
         get() = loc
 

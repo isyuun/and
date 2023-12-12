@@ -111,7 +111,7 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
         val lat = parser.getAttributeValue(namespace, TAG_LAT).toDouble()
         val lon = parser.getAttributeValue(namespace, TAG_LON).toDouble()
         val no = parser.getAttributeValue(namespace, "no")
-        val event = Track.EVENT.valueOf(parser.getAttributeValue(namespace, "event"))
+        val event = Track.EVENT.valueOf(parser.getAttributeValue(namespace, "event").uppercase())
         var time = 0L
         var speed = 0.0f
         var ele = 0.0

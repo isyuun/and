@@ -43,15 +43,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -263,17 +264,6 @@ private fun ender(context: Context, position: LatLng?): Marker {
     return marker(context, position, context.resources.getString(R.string.arrival), 3)
 }
 
-private fun marker(context: Context, position: LatLng, id: Int, back: Color = Color.White, size: Int = 32): Marker? {
-    if (id == -1) return null
-    val marker = Marker()
-    marker.position = position
-    marker.width = (size * 0.9f).dp.toPx(context).toInt()
-    marker.height = (size * 0.9f).dp.toPx(context).toInt()
-    getRounded(context, id, back)?.let { marker.icon = OverlayImage.fromBitmap(it) }
-    marker.zIndex = 2
-    return marker
-}
-
 private fun marker(context: Context, position: LatLng, uri: Uri, back: Color = Color.White, size: Int = 64): Marker? {
     if (uri == TRACK_ZERO_URI) return null
     val marker = Marker()
@@ -281,6 +271,17 @@ private fun marker(context: Context, position: LatLng, uri: Uri, back: Color = C
     marker.width = (size * 0.9f).dp.toPx(context).toInt()
     marker.height = (size * 0.9f).dp.toPx(context).toInt()
     getRounded(context, uri, back)?.let { marker.icon = OverlayImage.fromBitmap(it) }
+    marker.zIndex = 2
+    return marker
+}
+
+private fun marker(context: Context, position: LatLng, id: Int, back: Color = Color.White, size: Int = 32): Marker? {
+    if (id == -1) return null
+    val marker = Marker()
+    marker.position = position
+    marker.width = (size * 0.9f).dp.toPx(context).toInt()
+    marker.height = (size * 0.9f).dp.toPx(context).toInt()
+    getRounded(context, id, back)?.let { marker.icon = OverlayImage.fromBitmap(it) }
     marker.zIndex = 2
     return marker
 }
@@ -359,7 +360,6 @@ fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track
 }
 
 fun naverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, padding: Dp = 52.0.dp) {
-    val application = GPSApplication.instance
     if (tracks.isNotEmpty()) {
         var lat1 = tracks.first().latitude
         var lon1 = tracks.first().longitude
@@ -437,7 +437,7 @@ fun rememberMapViewWithLifecycle(
 }
 
 @Composable
-private fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+private fun WalkPetRow(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     val petNm: String = pet.petNm
     val petRprsImgAddr: String = pet.petRprsImgAddr
 
@@ -503,6 +503,50 @@ private fun WalkPetButton(pet: CurrentPetData, checked: Boolean, onCheckedChange
                     },
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun WalkPetCol(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    val petNm: String = pet.petNm
+    val petRprsImgAddr: String = pet.petRprsImgAddr
+
+    var check by rememberSaveable { mutableStateOf(checked) }; check = checked
+
+    Log.w(__CLASSNAME__, "${getMethodName()}[$check][$checked]$pet, $checked, $onCheckedChange")
+
+    val context = LocalContext.current
+    Box(
+        modifier = Modifier
+            .clickable(onClick = withClick(context) {
+                check = !check
+                onCheckedChange(check)
+            })
+            .padding(start = 12.0.dp, end = 24.dp)
+            .fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(top = 16.0.dp, bottom = 16.dp)
+                .fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CircleImageUrl(size = 60, imageUri = petRprsImgAddr)
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = petNm,
+                fontSize = 16.sp,
+                color = Color.Gray
+            )
+            Checkbox(
+                checked = check,
+                onCheckedChange = {
+                    check = it
+                    onCheckedChange(check)
+                },
+            )
         }
     }
 }
@@ -800,16 +844,18 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
     val mapView = rememberMapViewWithLifecycle(context, mapOptions)
 
+    var refresh by remember { mutableStateOf(false) }
     val markers = remember { mutableListOf<Marker>() }
     if (start) {
+        val size = markers.size
         markers.clear()
         tracks?.forEach { track ->
             marker(LatLng(track.latitude, track.longitude), track)?.let { markers.add(it) }
         }
+        if (markers.size != size) refresh = !refresh
     }
 
     val scope = rememberCoroutineScope()
-    var refresh by remember { mutableStateOf(false) }
     Log.w(__CLASSNAME__, "${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
     LaunchedEffect(refresh, position) {
         scope.launch {
@@ -832,7 +878,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val activity = LocalContext.current as Activity
 
     var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var checkedAll by rememberSaveable { mutableStateOf(false) }
     checkedAll = (application.pets == pets)
     var checkedSel by rememberSaveable { mutableStateOf(false) }
@@ -1140,6 +1186,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     Log.i(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
     Log.d(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[${stringResource(id = R.string.departure)}][${stringResource(id = R.string.arrival)}]")
     if (showBottomSheet) {
+        //modifier = if (!start) modifier.sizeIn(maxHeight = maxHeight) else modifier.wrapContentHeight()
         ModalBottomSheet(
             onDismissRequest = {
                 showBottomSheet = false
@@ -1155,8 +1202,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .wrapContentHeight()
+                    .fillMaxWidth()
                     .padding(
                         horizontal = horizontal,
                         //vertical = vertical,
@@ -1197,15 +1244,17 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             letterSpacing = (-0.7).sp
                         )
                     }
-                    LazyRow(
+                    LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .sizeIn(maxHeight = 360.0.dp)
                             .padding(bottom = 10.0.dp)
                     ) {
                         items(pets) { pet ->
                             Log.i(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[${application.contains(pet)}][${pet}]")
+                            Divider()
                             Box {
-                                WalkPetButton(
+                                WalkPetCol(
                                     pet = pet,
                                     checked = application.contains(pet),
                                     onCheckedChange = { checked ->

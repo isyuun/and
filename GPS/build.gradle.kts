@@ -53,6 +53,7 @@ dependencies {
     implementation(project(mapOf("path" to ":GPX")))
     implementation(project(mapOf("path" to ":NAV")))
 
+    //implementation("androidx.compose.material:material-android:1.5.4")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.naver.maps:map-sdk:3.17.0")
     implementation("io.coil-kt:coil-compose:2.4.0")
