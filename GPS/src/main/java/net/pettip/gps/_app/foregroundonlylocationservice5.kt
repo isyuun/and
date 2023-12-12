@@ -48,8 +48,9 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
         Log.i(__CLASSNAME__, "${getMethodName()}...")
     }
 
+    private val handler: Handler = Handler(Looper.getMainLooper())
     private var observer: CameraContentObserver? = null
-    private fun observer() {
+    private fun register() {
         observer = CameraContentObserver(handler, contentResolver, this)
         observer?.let { observer ->
             val contentResolver: ContentResolver = contentResolver
@@ -62,21 +63,23 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
         }
     }
 
-    //@RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
-    override fun onCreate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}$observer")
-        super.onCreate()
-        //observer()
-    }
-
-    override fun onDestroy() {
-        Log.i(__CLASSNAME__, "${getMethodName()}$observer")
-        super.onDestroy()
+    private fun unregister() {
         observer?.let { observer -> contentResolver.unregisterContentObserver(observer) }
     }
 
+    ////@RequiresPermission(anyOf = [Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_EXTERNAL_STORAGE])
+    //override fun onCreate() {
+    //    Log.i(__CLASSNAME__, "${getMethodName()}$observer")
+    //    super.onCreate()
+    //    //register()
+    //}
+    //
+    //override fun onDestroy() {
+    //    Log.i(__CLASSNAME__, "${getMethodName()}$observer")
+    //    super.onDestroy()
+    //    //unregister()
+    //}
 
-    private val handler: Handler = Handler(Looper.getMainLooper())
 
     private val _imgs = Collections.synchronizedList(ArrayList<Uri>()) // The list of Tracks
     internal val images
@@ -98,6 +101,23 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
         write()
     }
 
+    fun path(uri: Uri): String? {
+        var path: String? = null
+        try {
+            val projection = arrayOf(MediaStore.Images.Media.DATA)
+            val cursor = contentResolver.query(uri, projection, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val columnIndex = it.getColumnIndex(projection[0])
+                    path = it.getString(columnIndex)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return path
+    }
+
     enum class ROTATE {
         ROTATE_NG,
         ROTATE_0,
@@ -110,7 +130,7 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
      * 카메라 이미지 회전방향: ExifInterface사용
      */
     internal fun rotate(context: Context, uri: Uri): ROTATE {
-        val path = observer?.path(uri) ?: return ROTATE.ROTATE_NG
+        val path = path(uri) ?: return ROTATE.ROTATE_NG
         val file = File(path)
         var rotate = ROTATE.ROTATE_NG
         val orientation: Int
@@ -136,7 +156,7 @@ open class foregroundonlylocationservice5() : foregroundonlylocationservice4(), 
      * 카메라 이미지 회전방향: 컨텐츠리졸버(DB)사용
      */
     internal fun orient(context: Context, uri: Uri): ROTATE {
-        val path = observer?.path(uri) ?: return ROTATE.ROTATE_NG
+        val path = path(uri) ?: return ROTATE.ROTATE_NG
         val file = File(path)
         var rotate = ROTATE.ROTATE_NG
         var orientation: Int = -1
