@@ -11,12 +11,16 @@
 
 package net.pettip.gps._app
 
+import android.content.ContentResolver
 import android.content.ContentValues
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
+import net.pettip.gps.app.CameraContentObserver
 import net.pettip.gps.app.GPSApplication
 import net.pettip.gps.app.ICameraContentListener
 import net.pettip.gpx.GPX_TICK_FORMAT
@@ -64,15 +68,9 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
         if (size != null) {
             if (success && size > 0) {
                 Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[success:$success][size:$size][uri:${this.uri}][file:${this.file}]")
-                this.uri?.let { application.img(it) }
+                this.file?.let { this.uri?.let { it1 -> onCamera(it, it1) } }
             }
         }
-    }
-
-    override fun camera() {
-        ///**버전.38*/
-        this.uri = createImageUri()
-        cameraLauncher.launch(this.uri)
     }
 
     private fun createImageUri(): Uri? {
@@ -96,6 +94,52 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
             Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[Q:${(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)}][ret:$ret]")
             return ret
         }
+    }
+
+    var camera = false
+    override fun camera() {
+        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera]")
+        this.uri = createImageUri()
+        cameraLauncher.launch(this.uri)
+        camera = true
+    }
+
+    override fun onResume() {
+        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera]")
+        super.onResume()
+        camera = false
+    }
+
+    override fun onStart() {
+        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera]")
+        super.onStart()
+        camera = false
+        unregister()
+    }
+
+    override fun onStop() {
+        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera]")
+        super.onStop()
+        if (!camera) register()
+    }
+
+    private val handler: Handler = Handler(Looper.getMainLooper())
+    private var observer: CameraContentObserver? = null
+    private fun register() {
+        observer = CameraContentObserver(handler, contentResolver, this)
+        observer?.let { observer ->
+            val contentResolver: ContentResolver = contentResolver
+            val cameraImageUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            contentResolver.registerContentObserver(
+                cameraImageUri,
+                true,
+                observer
+            )
+        }
+    }
+
+    private fun unregister() {
+        observer?.let { observer -> contentResolver.unregisterContentObserver(observer) }
     }
 
     override fun onCamera(file: File, uri: Uri) {
