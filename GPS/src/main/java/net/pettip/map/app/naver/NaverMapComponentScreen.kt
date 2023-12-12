@@ -1186,7 +1186,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     Log.i(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
     Log.d(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[${stringResource(id = R.string.departure)}][${stringResource(id = R.string.arrival)}]")
     if (showBottomSheet) {
-        //modifier = if (!start) modifier.sizeIn(maxHeight = maxHeight) else modifier.wrapContentHeight()
         ModalBottomSheet(
             onDismissRequest = {
                 showBottomSheet = false
