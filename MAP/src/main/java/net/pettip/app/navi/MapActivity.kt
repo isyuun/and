@@ -12,7 +12,7 @@ package net.pettip.app.navi
 
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
-import net.pettip.ui.theme.MapTheme
+import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
@@ -30,7 +30,7 @@ open class MapActivity : net.pettip.map.app.MapActivity() {
         Log.v(__CLASSNAME__, "${getMethodName()}...")
         //super.setContent()
         setContent {
-            MapTheme {
+            APPTheme {
                 Surface {
                     MapApp()
                 }

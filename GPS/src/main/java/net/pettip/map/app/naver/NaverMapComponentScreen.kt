@@ -188,6 +188,7 @@ private fun IconButton2(
     back: Color = MaterialTheme.colorScheme.background,
     shape: Shape = CircleShape,
     enabled: Boolean = true,
+    color: Color = Color.White,
     colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit,
@@ -204,8 +205,7 @@ private fun IconButton2(
             Text(
                 text = text,
                 fontWeight = FontWeight.Bold,
-                //color = MaterialTheme.colorScheme.onPrimary,
-                color = Color.White,
+                color = color,
                 modifier = Modifier.background(Color.Transparent),
             )
         IconButton(

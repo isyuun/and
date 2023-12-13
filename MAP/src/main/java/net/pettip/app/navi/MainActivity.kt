@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import net.pettip.gps.R
 import net.pettip.gps.app.GPSApplication
-import net.pettip.ui.theme.MapTheme
+import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
     private fun setContent() {
         setContent {
             val context = LocalContext.current
-            MapTheme {
+            APPTheme {
                 Surface {
                     Column(
                         modifier = Modifier.fillMaxSize(),

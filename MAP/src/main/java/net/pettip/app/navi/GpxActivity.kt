@@ -14,7 +14,7 @@ package net.pettip.app.navi
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
 import net.pettip.map.app.naver.GpxApp
-import net.pettip.ui.theme.MapTheme
+import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
@@ -33,7 +33,7 @@ class GpxActivity : net.pettip.map.app.GpxActivity() {
         Log.v(__CLASSNAME__, "${getMethodName()}...")
         //super.setContent()
         setContent {
-            MapTheme {
+            APPTheme {
                 Surface {
                     GpxApp()
                 }
