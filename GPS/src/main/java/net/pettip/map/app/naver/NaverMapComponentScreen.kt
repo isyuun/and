@@ -127,8 +127,6 @@ import net.pettip.app.getRounded
 import net.pettip.app.navigationBarHeight
 import net.pettip.app.toPx
 import net.pettip.app.withClick
-import net.pettip.app.withDoubleTap
-import net.pettip.app.withLongPress
 import net.pettip.app.withPress
 import net.pettip.app.withTap
 import net.pettip.data.pet.CurrentPetData
@@ -449,7 +447,7 @@ private fun WalkPetRow(pet: CurrentPetData, checked: Boolean, onCheckedChange: (
 
     val context = LocalContext.current
     Button(
-        onClick = withClick(context) {
+        onClick = withClick {
             check = !check
             onCheckedChange(check)
         },
@@ -984,7 +982,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         ) {
             ///** NOTE */
             //IconButton2(
-            //    onClick = withClick(context) {
+            //    onClick = withClick {
             //        Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
             //        if (!start) return@withClick
             //    },
@@ -999,7 +997,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             //}
             /** CAMERA */
             IconButton2(
-                onClick = withClick(context) {
+                onClick = withClick {
                     Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     application.camera()
@@ -1024,7 +1022,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         ) {
             /** pee */
             IconButton2(
-                onClick = withClick(context) {
+                onClick = withClick {
                     Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.PEE
@@ -1042,7 +1040,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
             /** poo */
             IconButton2(
-                onClick = withClick(context) {
+                onClick = withClick {
                     Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.POO
@@ -1060,7 +1058,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
             /** mrk */
             IconButton2(
-                onClick = withClick(context) {
+                onClick = withClick {
                     Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.MRK
@@ -1079,7 +1077,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         }
         /** WALK */
         Button(
-            onClick = withClick(context) {
+            onClick = withClick {
                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                 if (start)
                     mapView.getMapAsync { naverMap ->
@@ -1160,7 +1158,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 ) {
                     items(application.pets) { pet ->
                         IconButton2(
-                            onClick = withClick(context) {
+                            onClick = withClick {
                                 Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 if (!start) return@withClick
                                 showPetsSheet = false
@@ -1285,7 +1283,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     }
                     /** walk */
                     Button(
-                        onClick = withClick(context) {
+                        onClick = withClick {
                             Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 if (!sheetState.isVisible) {
@@ -1335,7 +1333,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     ) {
                         R.string.walk_button_finish
                         Button(
-                            onClick = withClick(context) {
+                            onClick = withClick {
                                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
@@ -1363,7 +1361,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         }
                         R.string.walk_button_resume
                         Button(
-                            onClick = withClick(context) {
+                            onClick = withClick {
                                 Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
@@ -1404,40 +1402,39 @@ fun version(context: Context, height: Dp) {
     val pi = context.packageManager.getPackageInfo(context.packageName, 0)
     val vs = "[${pi.versionName}(${if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode else pi.versionCode})][${if (RELEASE) "REL" else "DEB"}][$bt]"
     var version by remember { mutableStateOf(false) }
-    var doublet by remember { mutableStateOf(false) }
-    LaunchedEffect(doublet) {
+    var timer by remember { mutableStateOf(false) }
+    LaunchedEffect(timer) {
         delay(1000)
-        doublet = false
-        Log.w(__CLASSNAME__, "${getMethodName()}[$context][doublet:$doublet][version:$version][$vs]")
+        timer = false
     }
-    Log.v(__CLASSNAME__, "${getMethodName()}[$context][doublet:$doublet][version:$version][$vs]")
+    if (version) Log.v(__CLASSNAME__, "${getMethodName()}[timer:$timer][version:$version][$vs]")
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .pointerInput(Unit) {
                     detectTapGestures(
-                        onDoubleTap = withDoubleTap(context) {
+                        onDoubleTap = /*withTap(context)*/ {
                             /** Called on Double Tap */
-                            doublet = true
+                            timer = true
                             version = false
                         },
-                        onLongPress = withLongPress(context) {
+                        onLongPress = withTap(context) {
                             /** Called on Long Press */
-                            if (doublet) version = !version
-                            doublet = false
+                            if (timer) version = !version
+                            timer = false
                         },
                         onPress = withPress(context) {
                             /** Called when the gesture starts */
                             version = false
                         },
-                        onTap = withTap(context) {
+                        onTap = /*withTap(context)*/ {
                             /** Called on Tap */
                             version = false
                         },
                     )
                 }
                 //.clickable(
-                //    onClick = withClick(context) {}
+                //    onClick = withClick {}
                 //)
                 .align(Alignment.BottomEnd)
                 //.fillMaxWidth()

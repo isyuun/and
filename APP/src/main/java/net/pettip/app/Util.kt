@@ -35,8 +35,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
-import net.pettip.util.Log
-import net.pettip.util.getMethodName
 
 /**
  * @Project     : carepet-android
@@ -46,7 +44,7 @@ import net.pettip.util.getMethodName
  * @description :
  */
 
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+//private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
     val bitmap = Bitmap.createBitmap(
@@ -179,42 +177,36 @@ fun getDeviceDensityString(context: Context): String {
  * How to play the platform CLICK sound in Jetpack Compose Button click
  * @see <a href="https://stackoverflow.com/questions/66080018/how-to-play-the-platform-click-sound-in-jetpack-compose-button-click">How to play the platform CLICK sound in Jetpack Compose Button click</a>
  */
-fun withClick(context: Context, onClick: () -> Unit): () -> Unit {
+@Composable
+fun withClick(onClick: () -> Unit): () -> Unit {
+    val context = LocalContext.current
     return {
-        Log.v(__CLASSNAME__, "::withClick${getMethodName()}[$context][$onClick]")
         (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
         onClick()
     }
 }
 
-fun withDoubleTap(context: Context, onDoubleTap: () -> Unit): (Offset) -> Unit {
+/**
+ * How to play the platform CLICK sound in Jetpack Compose Button click
+ * @see <a href="https://stackoverflow.com/questions/66080018/how-to-play-the-platform-click-sound-in-jetpack-compose-button-click">How to play the platform CLICK sound in Jetpack Compose Button click</a>
+ */
+fun withClick(context: Context, onClick: () -> Unit): () -> Unit {
     return {
-        Log.v(__CLASSNAME__, "::withDoubleTap${getMethodName()}[$context][$onDoubleTap]")
-        //(context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
-        onDoubleTap()
-    }
-}
-
-fun withLongPress(context: Context, onLongPress: () -> Unit): (Offset) -> Unit {
-    return {
-        Log.v(__CLASSNAME__, "::withLongPress${getMethodName()}[$context][$onLongPress]")
         (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
-        onLongPress()
-    }
-}
-
-fun withPress(context: Context, onPress: () -> Unit): PressGestureScope.(Offset) -> Unit {
-    return {
-        Log.v(__CLASSNAME__, "::withPress${getMethodName()}[$context][$onPress]")
-        (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
-        onPress()
+        onClick()
     }
 }
 
 fun withTap(context: Context, onTap: () -> Unit): (Offset) -> Unit {
     return {
-        Log.v(__CLASSNAME__, "::withTap${getMethodName()}[$context][$onTap]")
-        //(context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
+        (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
         onTap()
+    }
+}
+
+fun withPress(context: Context, onPress: () -> Unit): PressGestureScope.(Offset) -> Unit {
+    return {
+        (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
+        onPress()
     }
 }
