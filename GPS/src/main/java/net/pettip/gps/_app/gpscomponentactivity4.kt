@@ -11,13 +11,10 @@
 
 package net.pettip.gps._app
 
-import android.content.ContentResolver
 import android.content.ContentValues
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
 import net.pettip.gps.app.CameraContentObserver
@@ -45,6 +42,11 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
     private var file: File? = null
     private var uri: Uri? = null
 
+    private fun clear() {
+        this.file = null
+        this.uri = null
+    }
+
     fun path(uri: Uri): String? {
         var path: String? = null
         try {
@@ -62,18 +64,7 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
         return path
     }
 
-    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        this.file = this.uri?.let { path(it) }?.let { File(it) }
-        val size = file?.length()
-        if (size != null) {
-            if (success && size > 0) {
-                Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[success:$success][size:$size][uri:${this.uri}][file:${this.file}]")
-                this.file?.let { this.uri?.let { it1 -> onCamera(it, it1) } }
-            }
-        }
-    }
-
-    private fun createImageUri(): Uri? {
+    private fun uri(): Uri? {
         val time = System.currentTimeMillis()
         val name = GPX_TICK_FORMAT.format(Date(time))
         ContentValues().apply {
@@ -98,61 +89,56 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
 
     var camera = false
     override fun camera() {
-        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera]")
-        this.uri = createImageUri()
-        cameraLauncher.launch(this.uri)
+        this.uri = uri()
+        this.file = this.uri?.let { path(it) }?.let { File(it) }
         camera = true
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][file:$file][uri:$uri]")
+        cameraLauncher.launch(this.uri)
     }
 
-    override fun onResume() {
-        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera]")
-        super.onResume()
-        camera = false
-    }
-
-    override fun onStart() {
-        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera]")
-        super.onStart()
-        camera = false
-        unregister()
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        //Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[length:${file?.length()}][file:$file][uri:$uri]")
+        if (success) {
+            Log.w(__CLASSNAME__, "${getMethodName()}::onCamera()[length:${file?.length()}][file:$file][uri:$uri]")
+            file?.length()?.let { size -> if (size > 0) this.file?.let { file -> this.uri?.let { uri -> onCamera(file, uri) } } }
+        }
     }
 
     override fun onStop() {
-        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera]")
-        super.onStop()
         if (!camera) register()
+        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][file:$file][uri:$uri]")
+        super.onStop()
     }
 
-    private val handler: Handler = Handler(Looper.getMainLooper())
+    override fun onStart() {
+        unregister()
+        camera = false
+        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][file:$file][uri:$uri]")
+        super.onStart()
+    }
+
     private var observer: CameraContentObserver? = null
     private fun register() {
-        observer = CameraContentObserver(handler, contentResolver, this)
-        observer?.let { observer ->
-            val contentResolver: ContentResolver = contentResolver
-            val cameraImageUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            contentResolver.registerContentObserver(
-                cameraImageUri,
-                true,
-                observer
-            )
-        }
+        Log.i(__CLASSNAME__, "${getMethodName()}$observer")
+        observer = CameraContentObserver(contentResolver, this)
     }
-
     private fun unregister() {
-        observer?.let { observer -> contentResolver.unregisterContentObserver(observer) }
+        observer?.unregister()
+        observer = null
     }
 
     override fun onCamera(file: File, uri: Uri) {
+        val exist = (this.file != null && this.file != file)
+        Log.i(__CLASSNAME__, "${getMethodName()}[exist:$exist][length:${file.length()}][file:$file][uri:$uri]")
         if (file.length() < 1) return
-        if (this.file != null && this.file != file) {
+        if (exist) {
             val delete = this.file?.delete()
-            Log.w(__CLASSNAME__, "${getMethodName()}::onCamera()[delete:$delete][file:$file][this.file:${this.file}]")
+            Log.e(__CLASSNAME__, "${getMethodName()}[exist:$exist][delete:$delete][file:$file][this.file:${this.file}]")
         }
         if (file.exists() && file.length() > 0) {
-            Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[exists:${file.exists()}][length:${file.length()}][name:${file.name}][$file]")
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[exist:$exist][length:${file.length()}][file:$file][uri:$uri]")
             application.img(uri)
-            return
         }
-        Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[exists:${file.exists()}][length:${file.length()}][name:${file.name}][$file]")
+        clear()
     }
 }

@@ -12,6 +12,8 @@
 package net.pettip.gps._app
 
 import android.net.Uri
+import net.pettip.gps.app.GPSAppCompatActivity
+import net.pettip.gps.app.GPSComponentActivity
 import net.pettip.gps.app.ICameraContentListener
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
@@ -35,7 +37,8 @@ open class gpsapplication4 : gpsapplication3(), ICameraContentListener {
 
     override fun onCamera(file: File, uri: Uri) {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ICameraContentListener)}][file:$file][uri:$uri]")
-        if (this.activity is ICameraContentListener) (this.activity as ICameraContentListener).onCamera(file, uri)
+        (this.activity as? GPSComponentActivity)?.onCamera(file, uri)
+        (this.activity as? GPSAppCompatActivity)?.onCamera(file, uri)
     }
 
     fun img(uri: Uri) {

@@ -15,6 +15,7 @@ import android.content.ContentResolver
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import androidx.exifinterface.media.ExifInterface
 import net.pettip.gpx.GPX_TICK_FORMAT
@@ -34,11 +35,28 @@ interface ICameraContentListener {
     fun onCamera(file: File, uri: Uri)
 }
 
-class CameraContentObserver(
-    handler: Handler,
-    private val resolver: ContentResolver,
-    private val listener: ICameraContentListener,
-) : ContentObserver(handler) {
+class CameraContentObserver() : ContentObserver(Handler(Looper.getMainLooper())) {
+
+    private lateinit var contentResolver: ContentResolver
+    private lateinit var listener: ICameraContentListener
+
+    constructor(
+        contentResolver: ContentResolver,
+        listener: ICameraContentListener,
+    ) : this() {
+        this.contentResolver = contentResolver
+        this.listener = listener
+        this.contentResolver.registerContentObserver(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            true,
+            this
+        )
+    }
+
+    fun unregister() {
+        this.contentResolver.unregisterContentObserver(this)
+    }
+
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun deliverSelfNotifications(): Boolean {
@@ -51,7 +69,7 @@ class CameraContentObserver(
         var path: String? = null
         try {
             val projection = arrayOf(MediaStore.Images.Media.DATA)
-            val cursor = resolver.query(uri, projection, null, null, null)
+            val cursor = contentResolver.query(uri, projection, null, null, null)
             cursor?.use {
                 if (it.moveToFirst()) {
                     val columnIndex = it.getColumnIndex(projection[0])
@@ -68,7 +86,7 @@ class CameraContentObserver(
         var time: Long? = null
         try {
             val projection = arrayOf(MediaStore.Images.Media.DATE_MODIFIED)
-            val cursor = resolver.query(uri, projection, null, null, null)
+            val cursor = contentResolver.query(uri, projection, null, null, null)
             cursor?.use {
                 if (it.moveToFirst()) {
                     val columnIndex = it.getColumnIndex(projection[0])
@@ -84,7 +102,7 @@ class CameraContentObserver(
     fun camera(uri: Uri): Boolean {
         val projection = arrayOf(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
 
-        val cursor = resolver.query(uri, projection, null, null, null)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
 
         cursor?.use {
             if (it.moveToFirst()) {
@@ -98,7 +116,7 @@ class CameraContentObserver(
     }
 
     fun mime(imageUri: Uri): Boolean {
-        val mimeType = resolver.getType(imageUri)
+        val mimeType = contentResolver.getType(imageUri)
         return mimeType?.startsWith("image/") == true
     }
 
@@ -120,7 +138,7 @@ class CameraContentObserver(
         var rotate = ROTATE.ROTATE_NG
         var orientation: Int? = null
         try {
-            resolver.notifyChange(uri, null)
+            contentResolver.notifyChange(uri, null)
             val exif = file?.let { ExifInterface(it.absolutePath) }
             if (exif != null) {
                 orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
@@ -147,7 +165,7 @@ class CameraContentObserver(
         var rotate = ROTATE.ROTATE_NG
         var orientation: Int = -1
         try {
-            val cursor = resolver.query(uri, arrayOf(MediaStore.Images.ImageColumns.ORIENTATION), null, null, null)
+            val cursor = contentResolver.query(uri, arrayOf(MediaStore.Images.ImageColumns.ORIENTATION), null, null, null)
             cursor?.let {
                 if (it.count == 1) {
                     it.moveToFirst()
@@ -178,11 +196,12 @@ class CameraContentObserver(
         val exists = (file.exists() && file.length() > 0)
         val camera = exists && camera(uri) && !name.startsWith(".")
         if (camera) {
-            if (this.file == file) return
+            val exist = (this.file == file)
+            if (exist) return
             val rotate = rotate(uri)
             val orient = orient(uri)
-            Log.wtf(__CLASSNAME__, "${getMethodName()}[${(this.file == file)}][rotate:$rotate][orient:$orient][$name][file:$file][time:$time.${time.let { GPX_TICK_FORMAT.format(it) }}]")
-            listener.onCamera(file, uri)
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[exist:$exist][rotate:$rotate][orient:$orient][$name][file:$file][time:$time:${time.let { GPX_TICK_FORMAT.format(it) }}]")
+            this.listener.onCamera(file, uri)
             this.file = file
         }
     }
