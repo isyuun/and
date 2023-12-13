@@ -18,13 +18,12 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "and"
+include(":TEST")
 //include ":lvl_sample"
 //include ":lvl_library"
-//include(":TEST")
 include(":_APP")
 include(":APP")
 include(":NAV")
-//include(":GPL")
 include(":GPS")
 include(":GPX")
 include(":MAP")
