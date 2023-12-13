@@ -65,7 +65,7 @@ class DownloadWorker(context: Context, parameters: WorkerParameters) :
         //val cancel = applicationContext.getString(R.string.cancel_download)
         val id = NOTIFICATION_CHANNEL_ID
         val title = applicationContext.getString(R.string.app_name)
-        val cancel = applicationContext.getString(R.string.cancel)
+        val cancel = applicationContext.getString(android.R.string.cancel)
         // This PendingIntent can be used to cancel the worker
         val intent = WorkManager.getInstance(applicationContext)
             .createCancelPendingIntent(getId())

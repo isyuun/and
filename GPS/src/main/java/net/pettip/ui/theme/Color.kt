@@ -1,4 +1,4 @@
-package net.pettip.app.navi.ui.theme
+package net.pettip.ui.theme
 
 //import androidx.compose.ui.graphics.Color
 //

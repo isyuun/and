@@ -1,14 +1,15 @@
 /*
  * Copyright (c) 2023. PetTip All right reserved.
- * This software is the proprietary information of Care Pet.
+ * This software is the proprietary information of Care Biz.
  *
- *  Revision History
- *  Author                         Date          Description
- *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-biz.co.kr             2023. 9. 20.   description...
+ * Revision History
+ *   Author                         Date          Description
+ *   --------------------------     ----------    ----------------------------------------
+ *   isyuun                         2023.12.13
+ *
  */
 
-package net.pettip.app.navi.ui.theme
+package net.pettip.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -53,10 +54,10 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun AppTheme(
+fun MapTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

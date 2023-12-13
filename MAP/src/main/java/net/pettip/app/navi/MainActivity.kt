@@ -15,9 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import net.pettip.app.navi.ui.theme.AppTheme
 import net.pettip.gps.R
 import net.pettip.gps.app.GPSApplication
+import net.pettip.ui.theme.MapTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
     private fun setContent() {
         setContent {
             val context = LocalContext.current
-            AppTheme(dynamicColor = true) {
+            MapTheme {
                 Surface {
                     Column(
                         modifier = Modifier.fillMaxSize(),
@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
                         }
                         Button(onClick = { openGpx(context) }) {
                             //OutlinedTextField(value = "bad", onValueChange = {})
-                            Text(text = stringResource(id = R.string.start))
+                            Text(text = stringResource(id = android.R.string.ok))
                         }
                     }
                 }

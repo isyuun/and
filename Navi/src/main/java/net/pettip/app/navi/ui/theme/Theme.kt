@@ -3,7 +3,6 @@ package net.pettip.app.navi.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.lightColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -16,28 +15,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-
-
-private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFFFFFFFF),
-    onPrimary = Color(0xFF222222),
-    secondary = Color(0xFF737980),
-    onSecondary = Color(0xFFDDDDDD),
-    outline = Color(0xFFE3E9F2),
-    outlineVariant = Color(0xFF333333),
-    primaryContainer = Color(0xFFB5B9BE),
-    onPrimaryContainer = Color(0xFFF6F8FC),
-    tertiary = Color(0xFFFFFFFF),
-    onTertiary = Color(0xFFF1F4FB),
-    surface = Color(0x264E6085),
-    onSurface = Color(0x334E6085),
-    onSecondaryContainer = Color(0xFFE3E9F2),
-    secondaryContainer = Color(0xFF4783F5),
-    tertiaryContainer = Color(0xFF333333),
-    onTertiaryContainer = Color(0xFFFFFFFF),
-    surfaceVariant = Color(0xFFE3E9F2),
-    onSurfaceVariant = Color(0xFFF1F1F1)
-)
 
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF2D3034),
@@ -60,11 +37,32 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = Color(0xFF232323)
 )
 
+private val LightColorScheme = lightColorScheme(
+    primary = Color(0xFFFFFFFF),
+    onPrimary = Color(0xFF222222),
+    secondary = Color(0xFF737980),
+    onSecondary = Color(0xFFDDDDDD),
+    outline = Color(0xFFE3E9F2),
+    outlineVariant = Color(0xFF333333),
+    primaryContainer = Color(0xFFB5B9BE),
+    onPrimaryContainer = Color(0xFFF6F8FC),
+    tertiary = Color(0xFFFFFFFF),
+    onTertiary = Color(0xFFF1F4FB),
+    surface = Color(0x264E6085),
+    onSurface = Color(0x334E6085),
+    onSecondaryContainer = Color(0xFFE3E9F2),
+    secondaryContainer = Color(0xFF4783F5),
+    tertiaryContainer = Color(0xFF333333),
+    onTertiaryContainer = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0xFFE3E9F2),
+    onSurfaceVariant = Color(0xFFF1F1F1)
+)
+
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

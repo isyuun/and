@@ -9,8 +9,8 @@
     <string name="end">종료</string>
     <string name="departure">출발</string>
     <string name="arrival">도착</string>
-    <string name="ok">확인</string>
-    <string name="cancel">취소</string>
+    <!--<string name="ok">확인</string>-->
+    <!--<string name="cancel">취소</string>-->
 
     <string name="nnn">N/A</string>
     <string name="pee">쉬야</string>

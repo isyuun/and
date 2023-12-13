@@ -1,4 +1,4 @@
-package net.pettip.app.navi.ui.theme
+package net.pettip.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
