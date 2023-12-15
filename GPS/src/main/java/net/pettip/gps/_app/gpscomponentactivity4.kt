@@ -122,6 +122,7 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
         Log.i(__CLASSNAME__, "${getMethodName()}$observer")
         observer = CameraContentObserver(contentResolver, this)
     }
+
     private fun unregister() {
         observer?.unregister()
         observer = null

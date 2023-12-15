@@ -11,6 +11,8 @@
 
 package net.pettip.app.navi
 
+import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
 import net.pettip.map.app.naver.GpxApp
@@ -28,6 +30,11 @@ import net.pettip.util.getMethodName
  */
 class GpxActivity : net.pettip.map.app.GpxActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
 
     override fun setContent() {
         Log.v(__CLASSNAME__, "${getMethodName()}...")

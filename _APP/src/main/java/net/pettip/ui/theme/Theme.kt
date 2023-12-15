@@ -5,11 +5,11 @@
  * Revision History
  *   Author                         Date          Description
  *   --------------------------     ----------    ----------------------------------------
- *   isyuun                         2023.12.13
+ *   isyuun                         2023.12.15
  *
  */
 
-package com.example.test.ui.theme
+package net.pettip.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -27,33 +27,67 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+/** 테마.테마.테마...테마~~~아 */
+private val _DarkColorScheme = darkColorScheme(
+    //primary = Color.Red,      //test
+    //secondary = Color.Blue,   //test
+    primary = Color(0xFFD0BCFF),
+    secondary = Color(0xFFCCC2DC),
+    tertiary = Color(0xFFEFB8C8),
+)
+
+/** 테마.테마.테마...테마~~~아 */
+private val _LightColorScheme = lightColorScheme(
+    //primary = Color.Blue,       //test
+    //secondary = Color.Red,      //test
+    primary = Color(0xFF6650a4),
+    secondary = Color(0xFF625b71),
+    tertiary = Color(0xFF7D5260),
+
+    /** Other default colors to override */
+    //background = Color(0xFFFFFBFE),
+    //surface = Color(0xFFFFFBFE),
+    //onPrimary = Color(0xFFFFFFFF),
+    //onSecondary = Color(0xFFFFFFFF),
+    //onTertiary = Color(0xFFFFFFFF),
+    //onBackground = Color(0xFF1C1B1F),
+    //onSurface = Color(0xFF1C1B1F),
+)
+
 private val DarkColorScheme = darkColorScheme(
-    primary = Color.Red,
-    secondary = Color.Blue,
-    //primary = Purple80,
-    //secondary = PurpleGrey80,
-    //tertiary = Pink80
+    //primary = Color.Red,      //test
+    //secondary = Color.Blue,   //test
+    primary = Color(0xFF4783F5),
+    //secondary = Color(0xFFF54F68),
+    //tertiary = Color(0xFFEFB8C8),
+
+    background = Color(0xFF1E2124),
+    surface = Color(0xFF2D3034),
+    onPrimary = Color(0xFFFFFFFF),
+    //onSecondary = Color(0xFFFFFFFF),
+    //onTertiary = Color(0xFFFFFFFF),
+    onBackground = Color(0xFFFFFFFF),
+    onSurface = Color(0xFFFFFFFF),
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color.Blue,
-    secondary = Color.Red,
-    //primary = Purple40,
-    //secondary = PurpleGrey40,
-    //tertiary = Pink40
+    //primary = Color.Blue,       //test
+    //secondary = Color.Red,      //test
+    primary = Color(0xFF4783F5),
+    //secondary = Color(0xFFF54F68),
+    //tertiary = Color(0xFF7D5260),
 
-    /* Other default colors to override */
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
+    background = Color(0xFFF6F8FC),
+    surface = Color(0xFFFFFFFF),
+    onPrimary = Color(0xFFFFFFFF),
+    //onSecondary = Color(0xFFFFFFFF),
+    //onTertiary = Color(0xFFFFFFFF),
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
 )
 
 @Composable
-fun AndTheme(
+fun APPTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,

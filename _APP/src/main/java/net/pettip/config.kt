@@ -21,5 +21,6 @@ package net.pettip
  */
 //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 val DEBUG = BuildConfig.DEBUG
+
 //val DEBUG = false
 val RELEASE = true and !BuildConfig.DEBUG

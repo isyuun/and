@@ -44,6 +44,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -555,22 +556,28 @@ private fun WalkInfoSheet() {
     val duration = remember { application.duration }
     val distance = remember { application.distance }
     Log.d(__CLASSNAME__, "${getMethodName()}[${System.currentTimeMillis()}][$duration][$distance]")
+    val shape = RoundedCornerShape(20.0.dp)
     Row(
         modifier = Modifier
             .padding(top = 16.0.dp, bottom = 16.0.dp)
-            .fillMaxWidth()
-            .clip(shape = RoundedCornerShape(20.0.dp))
+            .clip(shape = shape)
             .background(
-                color = MaterialTheme.colorScheme.onPrimary,
-                shape = RoundedCornerShape(20.0.dp),
-            ),
+                color = MaterialTheme.colorScheme.surface,
+                shape = shape,
+            )
+            .border(
+                width = 0.1.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = shape
+            )
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         R.string.walk_title_duration
         Column(
             modifier = Modifier
-                .padding(start = 24.0.dp, top = 16.0.dp, bottom = 16.0.dp)
+                .padding(start = 24.0.dp, top = 24.0.dp, bottom = 24.0.dp)
                 .weight(1f)
         ) {
             Text(
@@ -584,10 +591,17 @@ private fun WalkInfoSheet() {
                 fontWeight = FontWeight.Bold,
             )
         }
+        Divider(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .height(50.dp)
+                .width(2.dp),
+            color = Color.Red
+        )
         R.string.walk_title_distance
         Column(
             modifier = Modifier
-                .padding(start = 24.0.dp, top = 16.0.dp, bottom = 16.0.dp)
+                .padding(start = 24.0.dp, top = 24.0.dp, bottom = 24.0.dp)
                 .weight(1f)
         ) {
             Text(
@@ -1149,7 +1163,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 Text(
                     text = text,
                     fontWeight = FontWeight.Bold,
-                    //color = MaterialTheme.colorScheme.onPrimary,
                     color = Color.White,
                 )
                 LazyColumn(

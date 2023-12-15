@@ -6,7 +6,6 @@
  *   Author                         Date          Description
  *   --------------------------     ----------    ----------------------------------------
  *   isyuun                         2023.12.13
- *
  */
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
@@ -42,6 +41,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        //buildConfig = true
+    }
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -59,6 +61,7 @@ android {
 }
 
 dependencies {
+    implementation(project(mapOf("path" to ":_APP")))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)

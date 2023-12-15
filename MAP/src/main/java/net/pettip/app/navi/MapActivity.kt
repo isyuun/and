@@ -10,6 +10,8 @@
 
 package net.pettip.app.navi
 
+import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
 import net.pettip.ui.theme.APPTheme
@@ -25,6 +27,11 @@ import net.pettip.util.getMethodName
  */
 open class MapActivity : net.pettip.map.app.MapActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
 
     override fun setContent() {
         Log.v(__CLASSNAME__, "${getMethodName()}...")
