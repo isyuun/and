@@ -7,12 +7,10 @@ package net.pettip.app.navi.screens.mainscreen
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,7 +27,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -37,22 +34,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -65,16 +50,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -85,31 +66,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.google.accompanist.pager.ExperimentalPagerApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
-import net.pettip.app.navi.component.CircleImageTopBar
 import net.pettip.app.navi.component.CustomBottomSheet
+import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.component.MonthCalendar
-import net.pettip.app.navi.component.WalkTimeNDis
-import net.pettip.app.navi.component.addOneMonth
 import net.pettip.app.navi.ui.theme.design_76A1EF
 import net.pettip.app.navi.ui.theme.design_C3D3EC
-import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_home_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_border
-import net.pettip.app.navi.ui.theme.design_select_btn_text
-import net.pettip.app.navi.ui.theme.design_shadow
-import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.HomeViewModel
@@ -117,7 +87,6 @@ import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.DailyLifeWalk
 import net.pettip.data.daily.Day
-import net.pettip.data.pet.PetDetailData
 import net.pettip.util.Log
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -134,13 +103,16 @@ fun WalkScreen(
     homeViewModel: HomeViewModel,
     backBtnOn: (Boolean) -> Unit,
     openBottomSheet: Boolean,
-    onDissMiss:(Boolean) -> Unit
+    onDissMiss: (Boolean) -> Unit,
+    modeChange: (Boolean) -> Unit
 ){
 
     val toDetail by walkViewModel.toDetail.collectAsState()
     val toMonthCalendar by walkViewModel.toMonthCalendar.collectAsState()
     val selectPet by sharedViewModel.selectPet.collectAsState()
-    var isLoading by remember{ mutableStateOf(false) }
+    var isLoading by rememberSaveable{ mutableStateOf(false) }
+    var isError by rememberSaveable{ mutableStateOf(false) }
+    val refresh by walkViewModel.weekRecordRefresh.collectAsState()
 
 
     val bottomSheetState =
@@ -156,20 +128,44 @@ fun WalkScreen(
         0.dp
     }
 
-    var selectPetPre:String? by rememberSaveable { mutableStateOf(null) }
+    var selectPetPre:String? by remember { mutableStateOf(null) }
+    var selectDayPre:String? by remember { mutableStateOf(null) }
     val selectDay by walkViewModel.selectDay.collectAsState()
 
+    LaunchedEffect(key1 = refresh){
+        if (refresh){
+            isLoading = true
+            homeViewModel.viewModelScope.launch {
+                val result = homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  selectDay)
+                isLoading = false
+                isError = !result
+                walkViewModel.updateWeekRecordRefresh(false)
+            }
+        }
+    }
+
     LaunchedEffect(key1 = selectDay){
-        homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  selectDay)
+        if (selectDay != selectDayPre && selectDayPre != null && !refresh){
+            isLoading = true
+            homeViewModel.viewModelScope.launch {
+                val result = homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  selectDay)
+                isLoading = false
+                isError = !result
+            }
+        }
+        selectDayPre = selectDay
     }
 
     LaunchedEffect(key1 = selectPet){
-        if (selectPet?.ownrPetUnqNo != selectPetPre){
+        if (selectPet?.ownrPetUnqNo != selectPetPre && selectPetPre != null && !refresh){
             isLoading = true
-            selectPetPre = selectPet?.ownrPetUnqNo
-            val result = homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  selectDay)
-            isLoading = !result
+            homeViewModel.viewModelScope.launch {
+                val result = homeViewModel.getWeekRecord(selectPet?.ownrPetUnqNo ?: "",  selectDay)
+                isLoading = false
+                isError = !result
+            }
         }
+        selectPetPre = selectPet?.ownrPetUnqNo
     }
 
     LaunchedEffect(key1 = toMonthCalendar){
@@ -191,63 +187,73 @@ fun WalkScreen(
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ){
-        Column(modifier = Modifier
-            .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            WeekContent(walkViewModel,navController,backBtnOn)
+    Crossfade(
+        targetState = !isLoading && isError,
+        label = ""
+    ) {
+        when(it){
+            true ->
+                ErrorScreen(onClick = { walkViewModel.updateWeekRecordRefresh(true) })
+            false ->
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ){
+                    Column(modifier = Modifier
+                        .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
+                        WeekContent(walkViewModel,navController,backBtnOn,modeChange)
 
-            Crossfade(
-                targetState = isLoading,
-                label = "",
-            ) { isLoading ->
-                when(isLoading){
-                    true ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(design_home_bg),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ){
-                            Spacer(modifier = Modifier.padding(top = 60.dp))
-                            LoadingAnimation1(circleColor = design_intro_bg)
+                        Crossfade(
+                            targetState = isLoading,
+                            label = "",
+                        ) { isLoading ->
+                            when(isLoading){
+                                true ->
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(design_home_bg),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ){
+                                        Spacer(modifier = Modifier.padding(top = 60.dp))
+                                        LoadingAnimation1(circleColor = design_intro_bg)
+                                    }
+
+                                else -> WalkListContent(walkViewModel, navController)
+                            }
                         }
+                    }
 
-                    else -> WalkListContent(walkViewModel, navController)
+                    AnimatedVisibility(
+                        visible =  toMonthCalendar,
+                        enter = slideInVertically(
+                            initialOffsetY = {-it}
+                        ),
+                        exit = slideOutVertically(
+                            targetOffsetY = {-it}
+                        )
+                    ) {
+                        MonthCalendar(walkViewModel = walkViewModel, sharedViewModel = sharedViewModel)
+                    }
+
+                    if (openBottomSheet){
+                        ModalBottomSheet(
+                            onDismissRequest = { onDissMiss(false) },
+                            sheetState = bottomSheetState,
+                            containerColor = Color.Transparent,
+                            dragHandle = {}
+                        ) {
+                            Column {
+                                CustomBottomSheet(viewModel = sharedViewModel,  title = "나의 반려동물을 선택하여 주세요.", btnText = "확인", onDismiss = { newValue -> onDissMiss(newValue)})
+                                Spacer(modifier = Modifier
+                                    .height(navigationBarHeight)
+                                    .fillMaxWidth()
+                                    .background(color = design_white))
+                            }
+                        }
+                    }
                 }
-            }
-        }
-
-        AnimatedVisibility(
-            visible =  toMonthCalendar,
-            enter = slideInVertically(
-                initialOffsetY = {-it}
-            ),
-            exit = slideOutVertically(
-                targetOffsetY = {-it}
-            )
-        ) {
-            MonthCalendar(walkViewModel = walkViewModel, sharedViewModel = sharedViewModel)
-        }
-
-        if (openBottomSheet){
-            ModalBottomSheet(
-                onDismissRequest = { onDissMiss(false) },
-                sheetState = bottomSheetState,
-                containerColor = Color.Transparent,
-                dragHandle = {}
-            ) {
-                Column {
-                    CustomBottomSheet(viewModel = sharedViewModel,  title = "나의 반려동물을 선택하여 주세요.", btnText = "확인", onDismiss = { newValue -> onDissMiss(newValue)})
-                    Spacer(modifier = Modifier
-                        .height(navigationBarHeight)
-                        .fillMaxWidth()
-                        .background(color = design_white))
-                }
-            }
         }
     }
 }
@@ -340,6 +346,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                             lastClickTime = currentTime
                             walkViewModel.viewModelScope.launch {
                                 walkViewModel.getDailyDetail(walk.schUnqNo)
+                                walkViewModel.updateLastDaily(walk.schUnqNo)
                             }
                             navController.navigate(Screen.WalkDetailContent.route)
                         }
@@ -446,7 +453,8 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
 fun WeekContent(
     viewModel: WalkViewModel,
     navController: NavHostController,
-    backBtnOn: (Boolean) -> Unit
+    backBtnOn: (Boolean) -> Unit,
+    modeChange: (Boolean) -> Unit
 ){
 
     val data = arrayListOf(
@@ -477,40 +485,64 @@ fun WeekContent(
             exit = shrinkVertically()
         ) {
 
-            Column {
+            Column (Modifier.fillMaxWidth()){
                 Row (
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 20.dp, start = 20.dp)
+                    modifier = Modifier
+                        .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+                        .fillMaxWidth()
                 ){
-                    Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = "", tint = design_white,
-                        modifier = Modifier
-                            .clickable {
-                                viewModel.updateSelectDay(subtract7Days(selectDay))
-                            }
-                    )
+                    Row (
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = "", tint = design_white,
+                            modifier = Modifier
+                                .clickable {
+                                    viewModel.updateSelectDay(subtract7Days(selectDay))
+                                }
+                        )
 
-                    Text(
-                        text = if (!isThisWeek){
-                            "${month}월 ${week}주차 산책기록"
-                        } else {
-                            "이번주 산책기록"
-                        },
-                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                        fontSize = 20.sp,
-                        letterSpacing = (-1.0).sp,
-                        color = design_white,
-                        //modifier = Modifier.padding(top = 20.dp, start = 20.dp)
-                    )
+                        Text(
+                            text = if (!isThisWeek){
+                                "${month}월 ${week}주차 산책기록"
+                            } else {
+                                "이번주 산책기록"
+                            },
+                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            fontSize = 20.sp,
+                            letterSpacing = (-1.0).sp,
+                            color = design_white,
+                            //modifier = Modifier.padding(top = 20.dp, start = 20.dp)
+                        )
 
-                    Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "", tint = design_white,
-                        modifier = Modifier
-                            .clickable {
-                                viewModel.updateSelectDay(add7Days(selectDay))
-                            }
-                    )
+                        Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = "", tint = design_white,
+                            modifier = Modifier
+                                .clickable {
+                                    viewModel.updateSelectDay(add7Days(selectDay))
+                                }
+                        )
+                    }
+
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable {
+                            modeChange(false)
+                        }
+                    ){
+                        Icon(painter = painterResource(id = R.drawable.icon_sort_down),
+                            contentDescription = "", tint = design_white
+                        )
+
+                        Text(
+                            text = "타임라인", fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp, color = design_white,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
                 }
 
 
@@ -650,7 +682,7 @@ fun WeekItem(day : Day, isThisWeek:Boolean){
                 .size(16.dp)
                 .clip(CircleShape)
                 .background(
-                    color = if ( (day.dayNm == currentDate) && isThisWeek) {
+                    color = if ((day.dayNm == currentDate) && isThisWeek) {
                         design_white
                     } else {
                         Color.Transparent

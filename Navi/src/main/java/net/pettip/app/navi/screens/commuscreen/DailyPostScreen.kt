@@ -18,6 +18,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -83,6 +84,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -104,6 +106,8 @@ import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.screens.mainscreen.getFormattedDate
 import net.pettip.app.navi.screens.mainscreen.shadow
+import net.pettip.app.navi.screens.walkscreen.HashTagTransformation
+import net.pettip.app.navi.screens.walkscreen.HashTagTransformationForDark
 import net.pettip.app.navi.ui.theme.design_alpha50_black
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
@@ -218,7 +222,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 .padding(paddingValues)
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .background(color = design_white)
+                .background(color = MaterialTheme.colorScheme.primary)
         ) {
             Row(
                 modifier = Modifier
@@ -236,7 +240,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
@@ -257,7 +261,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -278,7 +282,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -306,7 +310,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -333,7 +337,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -371,26 +375,32 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                     if (expanded){
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowUp,
-                            contentDescription = "", tint = design_login_text,
+                            contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.clickable { expanded = false }
                         )
                     } else{
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "", tint = design_login_text,
+                            contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.clickable { expanded = true }
                         )
                     }
                 } ,
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
                 ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
@@ -406,7 +416,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
                         .heightIn(max = 150.dp)
-                        .background(color = design_white),
+                        .background(color = Color.Transparent),
                     contentPadding = PaddingValues(vertical = 8.dp)
                 ){
                     itemsIndexed(items){ index, item ->
@@ -421,7 +431,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                         ){
                             Text(
                                 text = item,
-                                color = design_login_text.copy(alpha = 0.8f),
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp,
@@ -435,7 +445,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                 .padding(horizontal = 8.dp)
                                 .fillMaxWidth()
                                 .height(1.dp)
-                                .background(design_textFieldOutLine))
+                                .background(MaterialTheme.colorScheme.outline))
                         }
                     }
                 }
@@ -448,7 +458,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -473,14 +483,20 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                     )
                 },
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
                 ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(16.dp)
@@ -493,7 +509,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -517,16 +533,22 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                         fontSize = 14.sp
                     )
                 },
-                visualTransformation = HashTagTransformation(),
+                visualTransformation = if (isSystemInDarkTheme()) HashTagTransformationForDark() else HashTagTransformation(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = design_placeHolder,
-                    focusedPlaceholderColor = design_placeHolder,
-                    unfocusedBorderColor = design_textFieldOutLine,
-                    focusedBorderColor = design_login_text,
-                    unfocusedContainerColor = design_white,
-                    focusedContainerColor = design_white,
-                    unfocusedLeadingIconColor = design_placeHolder,
-                    focusedLeadingIconColor = design_login_text
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
+                ),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp
                 ),
                 shape = RoundedCornerShape(4.dp),
                 innerPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
@@ -539,7 +561,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -565,7 +587,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                     text = "사진이 스토리에 공유됩니다.",
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_login_text,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.offset(x = (-8).dp),
                     letterSpacing = (-0.7).sp
                 )
@@ -845,8 +867,8 @@ fun CustomDialogInPost(
                 )
             } },
         title = { Text(text = title, fontFamily = FontFamily(Font(R.font.pretendard_bold)), fontSize = 20.sp,
-            color = design_login_text ) },
-        text = { Text(text = text, color = design_skip, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            color = MaterialTheme.colorScheme.onPrimary ) },
+        text = { Text(text = text, color = MaterialTheme.colorScheme.secondary, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp) },
         dismissButton = {
             Button(
@@ -856,18 +878,18 @@ fun CustomDialogInPost(
                 },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = design_white
+                    containerColor = MaterialTheme.colorScheme.onSecondary
                 ),
                 border = BorderStroke(1.dp, color = design_login_text)
             ) {
                 Text(
                     text = dismiss,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_login_text
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         },
-        containerColor = design_white
+        containerColor = MaterialTheme.colorScheme.primary
     )
 }
 
@@ -899,12 +921,12 @@ fun SelectedPetMultiItem(viewModel: CommunityViewModel, petList : CurrentPetData
         colors = if(isSelected) {
             ButtonDefaults.buttonColors(design_select_btn_bg)
         } else {
-            ButtonDefaults.buttonColors(design_white)
+            ButtonDefaults.buttonColors(Color.Transparent)
         },
         border = if(isSelected) {
             BorderStroke(1.dp, color = design_select_btn_text)
         } else {
-            BorderStroke(1.dp, color = design_textFieldOutLine)
+            BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
         },
         contentPadding = PaddingValues(start = 14.dp,end=14.dp),
         elevation = if(isSelected){
@@ -923,10 +945,10 @@ fun SelectedPetMultiItem(viewModel: CommunityViewModel, petList : CurrentPetData
             Box(
                 modifier = Modifier
                     .size(46.dp)
-                    .border(shape = CircleShape, border = BorderStroke(3.dp, color = design_white))
+                    .border(shape = CircleShape, border = BorderStroke(3.dp, color = MaterialTheme.colorScheme.tertiary))
                     //.shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
                     .shadow(
-                        color = design_shadow,
+                        color = MaterialTheme.colorScheme.onSurface,
                         offsetY = 10.dp,
                         offsetX = 10.dp,
                         spread = 4.dp,
@@ -956,7 +978,7 @@ fun SelectedPetMultiItem(viewModel: CommunityViewModel, petList : CurrentPetData
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,
-                color = design_login_text,
+                color = if (isSelected) design_login_text else MaterialTheme.colorScheme.onPrimary,
                 overflow = TextOverflow.Ellipsis
             )
         }
@@ -977,18 +999,18 @@ fun CategoryBox(viewModel: CommunityViewModel, item: CdDetail){
                 viewModel.subSelectCategory(item)
             } },
         modifier = Modifier
-            .shadow(ambientColor = design_shadow, elevation = 0.dp)
+            .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp)
         ,
         shape = RoundedCornerShape(12.dp),
         colors = if(isSelected) {
             ButtonDefaults.buttonColors(design_select_btn_bg)
         } else {
-            ButtonDefaults.buttonColors(design_white)
+            ButtonDefaults.buttonColors(Color.Transparent)
         },
         border = if(isSelected) {
             BorderStroke(1.dp, color = design_select_btn_text)
         } else {
-            BorderStroke(1.dp, color = design_textFieldOutLine)
+            BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
         },
         contentPadding = PaddingValues(start = 14.dp,end=14.dp),
         elevation = if(isSelected){
@@ -1003,7 +1025,7 @@ fun CategoryBox(viewModel: CommunityViewModel, item: CdDetail){
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
-            color = design_login_text,
+            color = if (isSelected) design_login_text else MaterialTheme.colorScheme.onPrimary,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
         )

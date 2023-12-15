@@ -61,6 +61,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.ui.theme.design_DDDDDD
+import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_sharp
@@ -210,7 +211,7 @@ fun DclrDialog(
                         focusedContainerColor = MaterialTheme.colorScheme.primary,
                         unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                         focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                        cursorColor = MaterialTheme.colorScheme.onPrimary
+                        cursorColor = design_intro_bg.copy(alpha = 0.5f)
                     ),
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.onPrimary,

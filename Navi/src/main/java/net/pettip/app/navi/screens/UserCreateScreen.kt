@@ -62,6 +62,7 @@ import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
+import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_sharp
@@ -154,7 +155,7 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -200,7 +201,7 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -233,7 +234,7 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -279,7 +280,7 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,

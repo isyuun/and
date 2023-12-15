@@ -86,6 +86,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
+import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.screens.mainscreen.calculateCurrentOffsetForPage
 import net.pettip.app.navi.ui.theme.design_DDDDDD
@@ -113,24 +114,14 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
         }
     }
 
-    LaunchedEffect(Unit){
-        MySharedPreference.setFcmDataPage("")
-        MySharedPreference.setFcmDataSchUnqNo("")
-    }
-
-    //LaunchedEffect(Unit){
-    //    if (walkViewModel.pushData?.getString("schUnqNo") != null){
-    //        walkViewModel.pushData.getString("schUnqNo")?.toInt()?.let { walkViewModel.getDailyDetail(it) }
-    //        walkViewModel.clearPushData()
-    //    }
-    //}
-
     val isLoading by walkViewModel.isLoading.collectAsState()
     val dailyDetail by walkViewModel.dailyDetail.collectAsState()
+    val lastDaily by walkViewModel.lastDaily.collectAsState()
 
 
     var imageLoading by remember{ mutableStateOf(false) }
     var showImage by remember{ mutableStateOf(false) }
+    var refresh by remember{ mutableStateOf(false) }
 
     val pagerState = rememberPagerState( pageCount = {dailyDetail?.dailyLifeFileList?.size ?: 0 })
 
@@ -157,288 +148,289 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
         }
     }
 
+    LaunchedEffect(refresh){
+        if (refresh){
+            val result = lastDaily?.let { walkViewModel.getDailyDetail(it) }
+            refresh = if (result == true){
+                false
+            }else{
+                false
+            }
+        }
+    }
+
+
     Scaffold(
         topBar = {BackTopBar(title = dailyDetail?.schTtl ?:"" , navController = navController )}
     ) { paddingValue ->
 
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary)){
-            Column (
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(paddingValues = paddingValue)
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.primary)
-            ){
-                Row (
-                    modifier= Modifier
-                        .padding(start = 20.dp, top = 20.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Icon(painter = painterResource(id = R.drawable.icon_calendar), contentDescription = "", tint = Color.Unspecified)
-                    Text(
-                        text = dailyDetail?.walkDptreDt ?: "",
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 14.sp,
-                        letterSpacing = (-0.7).sp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                }
+        Crossfade(
+            targetState = !isLoading && dailyDetail == null,
+            label = ""
+        ) {
+            when(it){
+                true -> ErrorScreen(onClick = { refresh = true })
+                false ->
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.primary)
+                    ){
+                        Column (
+                            modifier = Modifier
+                                .verticalScroll(rememberScrollState())
+                                .padding(paddingValues = paddingValue)
+                                .fillMaxSize()
+                                .background(color = MaterialTheme.colorScheme.primary)
+                        ){
+                            Row (
+                                modifier= Modifier
+                                    .padding(start = 20.dp, top = 20.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                Icon(painter = painterResource(id = R.drawable.icon_calendar), contentDescription = "", tint = Color.Unspecified)
+                                Text(
+                                    text = dailyDetail?.walkDptreDt ?: "",
+                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                    fontSize = 14.sp,
+                                    letterSpacing = (-0.7).sp,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.padding(start = 4.dp)
+                                )
+                            }
 
-                if(dailyDetail?.dailyLifeFileList != null){
-                    Crossfade(
-                        targetState = isLoading,
-                        label = "",
-                        animationSpec = tween(700),
-                        modifier = Modifier.animateContentSize()
-                    ) { isLoading ->
-                        when(isLoading){
-                            true ->
-                                Box (modifier = Modifier
-                                    .padding(top = 20.dp)
-                                    .fillMaxWidth()
-                                    .height(258.dp),
-                                    contentAlignment = Alignment.Center
+                            Column {
+                                Spacer(modifier = Modifier.padding(top= 20.dp))
+
+                                HorizontalPager(
+                                    modifier = Modifier
+                                        .padding(horizontal = 10.dp)
+                                        .fillMaxWidth()
+                                        .heightIn(max = 240.dp),
+                                    state = pagerState,
+                                    beyondBoundsPageCount = 1,
+                                    flingBehavior = PagerDefaults.flingBehavior(
+                                        state = pagerState, snapVelocityThreshold = 100.dp)
+                                ) { page ->
+                                    val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
+
+                                    // 선택된 아이템의 Z-index를 높게 설정
+                                    val zIndexModifier = if (isSelected) Modifier.zIndex(1f) else Modifier
+
+                                    Box(Modifier
+                                        .then(zIndexModifier)
+                                        .graphicsLayer {
+                                            val pageOffset = pagerState.calculateCurrentOffsetForPage(page)
+                                            // translate the contents by the size of the page, to prevent the pages from sliding in from left or right and stays in the center
+                                            //translationX = pageOffset * size.width/4
+                                            // apply an alpha to fade the current page in and the old page out
+                                            alpha = 1 - pageOffset.absoluteValue / 3 * 2
+                                            scaleX = 1 - pageOffset.absoluteValue / 3
+                                            scaleY = 1 - pageOffset.absoluteValue / 3
+                                        }
+                                        .fillMaxSize()
+                                        , contentAlignment = Alignment.Center) {
+
+                                        AsyncImage(
+                                            onLoading = { imageLoading = true },
+                                            onError = {Log.d("LOG", "onError")},
+                                            onSuccess = { imageLoading = false},
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(
+                                                    "http://carepet.hopto.org/img/"+
+                                                            (dailyDetail!!.dailyLifeFileList?.get(page)?.filePathNm ?: "") +
+                                                            (dailyDetail!!.dailyLifeFileList?.get(page)?.atchFileNm ?: "")
+                                                )
+                                                .crossfade(true)
+                                                .build(),
+                                            contentDescription = "",
+                                            //placeholder = painterResource(id = R.drawable.profile_default),
+                                            //error= painterResource(id = R.drawable.profile_default),
+                                            modifier= Modifier
+                                                .fillMaxSize()
+                                                .clickable { showImage = true },
+                                            contentScale = ContentScale.Fit
+                                        )
+                                    }
+                                }
+
+                                Row(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    repeat(dailyDetail?.dailyLifeFileList?.size ?: 0 ) { iteration ->
+                                        val color = if (pagerState.currentPage == iteration) design_intro_bg else design_DDDDDD
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(horizontal = 4.dp)
+                                                .clip(CircleShape)
+                                                .background(color)
+                                                .size(10.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.padding(top = 20.dp))
+
+                            Row (modifier = Modifier
+                                .padding(start = 20.dp, end = 20.dp)
+                                .fillMaxWidth()
+                                , horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
+                            ){
+                                Column (
+                                    modifier= Modifier
+                                        .weight(1f)
                                 ){
-                                    LoadingAnimation1(circleColor = design_intro_bg)
-                                }
-                            false ->
-                                Column {
-                                    Spacer(modifier = Modifier.padding(top= 20.dp))
+                                    Text(
+                                        text = "산책자",
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        letterSpacing = (-0.7).sp,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        modifier = Modifier.padding(start = 20.dp)
+                                    )
 
-                                    HorizontalPager(
+                                    Text(
+                                        text = dailyDetail?.runNcknm ?: "",
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                                        letterSpacing = 0.sp,
+                                        modifier = Modifier.padding(top = 4.dp, start = 20.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier
+                                    .size(1.dp, 40.dp)
+                                    .background(color = MaterialTheme.colorScheme.onSecondaryContainer))
+
+                                Column (
+                                    modifier= Modifier
+                                        .weight(1f)
+                                ){
+
+                                    Text(
+                                        text = "산책 시간",
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        letterSpacing = (-0.7).sp,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        modifier = Modifier.padding(start = 20.dp)
+                                    )
+
+                                    Text(
+                                        text = dailyDetail?.runTime ?: "",
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                                        letterSpacing = 0.sp,
                                         modifier = Modifier
-                                            .padding(horizontal = 10.dp)
-                                            .fillMaxWidth()
-                                            .heightIn(max = 240.dp),
-                                        state = pagerState,
-                                        beyondBoundsPageCount = 1,
-                                        flingBehavior = PagerDefaults.flingBehavior(
-                                            state = pagerState, snapVelocityThreshold = 100.dp)
-                                    ) { page ->
-                                        val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
+                                            .padding(top = 4.dp, start = 20.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
 
-                                        // 선택된 아이템의 Z-index를 높게 설정
-                                        val zIndexModifier = if (isSelected) Modifier.zIndex(1f) else Modifier
+                                }
 
-                                        Box(Modifier
-                                            .then(zIndexModifier)
-                                            .graphicsLayer {
-                                                val pageOffset = pagerState.calculateCurrentOffsetForPage(page)
-                                                // translate the contents by the size of the page, to prevent the pages from sliding in from left or right and stays in the center
-                                                //translationX = pageOffset * size.width/4
-                                                // apply an alpha to fade the current page in and the old page out
-                                                alpha = 1 - pageOffset.absoluteValue / 3 * 2
-                                                scaleX = 1 - pageOffset.absoluteValue / 3
-                                                scaleY = 1 - pageOffset.absoluteValue / 3
-                                            }
-                                            .fillMaxSize()
-                                            , contentAlignment = Alignment.Center) {
+                                Spacer(modifier = Modifier
+                                    .size(1.dp, 40.dp)
+                                    .background(color = MaterialTheme.colorScheme.onSecondaryContainer))
 
-                                            AsyncImage(
-                                                onLoading = { imageLoading = true },
-                                                onError = {Log.d("LOG", "onError")},
-                                                onSuccess = { imageLoading = false},
-                                                model = ImageRequest.Builder(LocalContext.current)
-                                                    .data(
-                                                        "http://carepet.hopto.org/img/"+
-                                                                (dailyDetail!!.dailyLifeFileList?.get(page)?.filePathNm ?: "") +
-                                                                (dailyDetail!!.dailyLifeFileList?.get(page)?.atchFileNm ?: "")
-                                                    )
-                                                    .crossfade(true)
-                                                    .build(),
-                                                contentDescription = "",
-                                                //placeholder = painterResource(id = R.drawable.profile_default),
-                                                //error= painterResource(id = R.drawable.profile_default),
-                                                modifier= Modifier
-                                                    .fillMaxSize()
-                                                    .clickable { showImage = true },
-                                                contentScale = ContentScale.Fit
-                                            )
-                                        }
-                                    }
+                                Column (
+                                    modifier= Modifier
+                                        .weight(1f)
+                                ){
 
-                                    Row(
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 8.dp),
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        repeat(dailyDetail?.dailyLifeFileList?.size ?: 0 ) { iteration ->
-                                            val color = if (pagerState.currentPage == iteration) design_intro_bg else design_DDDDDD
-                                            Box(
-                                                modifier = Modifier
-                                                    .padding(horizontal = 4.dp)
-                                                    .clip(CircleShape)
-                                                    .background(color)
-                                                    .size(10.dp)
-                                            )
-                                        }
+                                    Text(
+                                        text = "산책 거리",
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        letterSpacing = (-0.7).sp,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        modifier = Modifier.padding(start = 20.dp)
+                                    )
+
+                                    Text(
+                                        text = (dailyDetail?.runDstnc ?: 0).toString() + "m",
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                                        letterSpacing = 0.sp,
+                                        modifier = Modifier
+                                            .padding(top = 4.dp, start = 20.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.padding(top = 20.dp))
+
+                            AnimatedVisibility(
+                                visible = !isLoading && dailyDetail?.dailyLifePetList?.isNotEmpty() == true,
+                                enter = fadeIn(tween(durationMillis = 700, delayMillis = 200)).plus(expandVertically()),
+                                exit = fadeOut(tween(durationMillis = 700, delayMillis = 200)).plus(shrinkVertically())
+                            ) {
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(max = 500.dp),
+                                    state = rememberLazyListState(),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ){
+                                    items(dailyDetail?.dailyLifePetList ?: emptyList()){ item ->
+                                        DetailLazyColItem(item)
                                     }
                                 }
-                        }
+                            }
+
+
+
+                            Spacer(modifier = Modifier.padding(top = 20.dp))
+
+
+                            Box (
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp)
+                                    .fillMaxWidth()
+                                    .background(color = MaterialTheme.colorScheme.onPrimaryContainer, shape = RoundedCornerShape(12.dp))
+                                    .clip(RoundedCornerShape(12.dp))
+                            ){
+                                if ( !(dailyDetail?.schCn == " " || dailyDetail?.schCn =="") ){
+                                    Text(
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .fillMaxWidth()
+                                            .align(Alignment.TopStart),
+                                        text = dailyDetail?.schCn ?: "",
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        letterSpacing = (-0.7).sp,
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+
+                                if (dailyDetail?.dailyLifeSchHashTagList?.isNotEmpty() == true){
+                                    Text(
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .fillMaxWidth()
+                                            .align(Alignment.BottomStart),
+                                        text = annotatedString,
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        letterSpacing = (-0.7).sp,
+                                        color = design_intro_bg
+                                    )
+                                }
+                            }
+
+
+
+                            Spacer(modifier = Modifier.padding(top = 16.dp))
+                        }// column
                     }
-                }
-
-                Spacer(modifier = Modifier.padding(top = 20.dp))
-
-                Row (modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp)
-                    .fillMaxWidth()
-                    , horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
-                ){
-                    Column (
-                        modifier= Modifier
-                            .weight(1f)
-                    ){
-                        Text(
-                            text = "산책자",
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            letterSpacing = (-0.7).sp,
-                            color = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.padding(start = 20.dp)
-                        )
-
-                        Text(
-                            text = dailyDetail?.runNcknm ?: "",
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                            letterSpacing = 0.sp,
-                            modifier = Modifier.padding(top = 4.dp, start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-
-                    Spacer(modifier = Modifier
-                        .size(1.dp, 40.dp)
-                        .background(color = MaterialTheme.colorScheme.onSecondaryContainer))
-
-                    Column (
-                        modifier= Modifier
-                            .weight(1f)
-                    ){
-
-                        Text(
-                            text = "산책 시간",
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            letterSpacing = (-0.7).sp,
-                            color = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.padding(start = 20.dp)
-                        )
-
-                        Text(
-                            text = dailyDetail?.runTime ?: "",
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                            letterSpacing = 0.sp,
-                            modifier = Modifier
-                                .padding(top = 4.dp, start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-
-                    }
-
-                    Spacer(modifier = Modifier
-                        .size(1.dp, 40.dp)
-                        .background(color = MaterialTheme.colorScheme.onSecondaryContainer))
-
-                    Column (
-                        modifier= Modifier
-                            .weight(1f)
-                    ){
-
-                        Text(
-                            text = "산책 거리",
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            letterSpacing = (-0.7).sp,
-                            color = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.padding(start = 20.dp)
-                        )
-
-                        Text(
-                            text = (dailyDetail?.runDstnc ?: 0).toString() + "m",
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                            letterSpacing = 0.sp,
-                            modifier = Modifier
-                                .padding(top = 4.dp, start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-
-                    }
-                }
-
-                Spacer(modifier = Modifier.padding(top = 20.dp))
-
-                AnimatedVisibility(
-                    visible = !isLoading && dailyDetail?.dailyLifePetList?.isNotEmpty() == true,
-                    enter = fadeIn(tween(durationMillis = 700, delayMillis = 200)).plus(expandVertically()),
-                    exit = fadeOut(tween(durationMillis = 700, delayMillis = 200)).plus(shrinkVertically())
-                ) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 500.dp),
-                        state = rememberLazyListState(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ){
-                        items(dailyDetail?.dailyLifePetList ?: emptyList()){ item ->
-                            DetailLazyColItem(item)
-                        }
-                    }
-                }
-
-
-
-                Spacer(modifier = Modifier.padding(top = 20.dp))
-
-
-                Box (
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .fillMaxWidth()
-                        .background(color = MaterialTheme.colorScheme.onPrimaryContainer, shape = RoundedCornerShape(12.dp))
-                        .clip(RoundedCornerShape(12.dp))
-                ){
-                    if ( !(dailyDetail?.schCn == " " || dailyDetail?.schCn =="") ){
-                        Text(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth()
-                                .align(Alignment.TopStart),
-                            text = dailyDetail?.schCn ?: "",
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            letterSpacing = (-0.7).sp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-
-                    if (dailyDetail?.dailyLifeSchHashTagList?.isNotEmpty() == true){
-                        Text(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth()
-                                .align(Alignment.BottomStart),
-                            text = annotatedString,
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            letterSpacing = (-0.7).sp,
-                            color = design_intro_bg
-                        )
-                    }
-                }
-
-
-
-                Spacer(modifier = Modifier.padding(top = 16.dp))
-            }// column
+            }
         }
     }
 
@@ -613,6 +605,7 @@ fun FullScreenImage(
     onDismiss: (Boolean) -> Unit
 ){
     var systemBarColor by remember{ mutableStateOf(Color.Black) }
+    val color = MaterialTheme.colorScheme.primary
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(color = systemBarColor)
@@ -632,7 +625,7 @@ fun FullScreenImage(
     }
 
     BackHandler {
-        systemBarColor = design_white
+        systemBarColor = color
         onDismiss(false)
     }
 
@@ -644,7 +637,7 @@ fun FullScreenImage(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = {
-                    systemBarColor = design_white
+                    systemBarColor = color
                     onDismiss(false)
                 }
             )

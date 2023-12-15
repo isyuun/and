@@ -38,6 +38,7 @@ import net.pettip.data.cmm.commonRes
 import net.pettip.data.pet.DeletePetReq
 import net.pettip.data.pet.MyPetResModel
 import net.pettip.data.pet.PetListData
+import net.pettip.data.pet.PetListModel
 import net.pettip.data.pet.PetListResModel
 import net.pettip.data.user.NickNameCheckRes
 import net.pettip.data.user.UserDataResponse
@@ -273,46 +274,80 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
         _searchText.value = text // 검색어를 업데이트
     }
 
-    fun onKindClick(){
+    //fun onKindClick(){
+    //    val apiService = RetrofitClientServer.instance
+    //
+    //    fun callPetListApi(petSize:String){
+    //        val petData = net.pettip.data.pet.PetListModel(petSize, "001")
+    //
+    //        val call=apiService.petList(petData)
+    //        call.enqueue(object : Callback<PetListResModel>{
+    //            override fun onResponse(
+    //                call: Call<PetListResModel>,
+    //                response: Response<PetListResModel>
+    //            ) {
+    //                if(response.isSuccessful){
+    //                    var petListBody = response.body()
+    //                    petListBody?.let {
+    //                        // 각 통신에 대한 처리, 받아온 리스트 처리하기
+    //                        when(petSize){
+    //                            "001" -> _sDog.value = petListBody.data
+    //                            "002" -> _mDog.value = petListBody.data
+    //                            "003" -> _lDog.value = petListBody.data
+    //
+    //                            else -> return
+    //                        }
+    //                        _pets.value = (_sDog.value + _mDog.value + _lDog.value).sortedBy { it.petNm }
+    //                        Log.d("LOG", petSize+"통신완료")
+    //                    }
+    //                }
+    //            }
+    //
+    //            override fun onFailure(call: Call<PetListResModel>, t: Throwable) {
+    //                Log.d("LOG", "통신실패")
+    //            }
+    //
+    //        })
+    //    }
+    //
+    //    // 소,중,대 통신 모두 진행
+    //    callPetListApi("001")
+    //    callPetListApi("002")
+    //    callPetListApi("003")
+    //}
+
+    suspend fun getPetType():Boolean{
         val apiService = RetrofitClientServer.instance
 
-        fun callPetListApi(petSize:String){
-            val petData = net.pettip.data.pet.PetListModel(petSize, "001")
-
-            val call=apiService.petList(petData)
+        val data = PetListModel(
+            petDogSzCd = "",
+            petTypCd = if (_petDorC.value == "강아지") "001" else "002"
+        )
+        val call = apiService.petList(data)
+        return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<PetListResModel>{
-                override fun onResponse(
-                    call: Call<PetListResModel>,
-                    response: Response<PetListResModel>
-                ) {
-                    if(response.isSuccessful){
-                        var petListBody = response.body()
-                        petListBody?.let {
-                            // 각 통신에 대한 처리, 받아온 리스트 처리하기
-                            when(petSize){
-                                "001" -> _sDog.value = petListBody.data
-                                "002" -> _mDog.value = petListBody.data
-                                "003" -> _lDog.value = petListBody.data
-
-                                else -> return
+                override fun onResponse(call: Call<PetListResModel>, response: Response<PetListResModel>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (it.statusCode == 200){
+                                _pets.value = it.data
+                                continuation.resume(true)
+                            }else{
+                                continuation.resume(false)
                             }
-                            _pets.value = (_sDog.value + _mDog.value + _lDog.value).sortedBy { it.petNm }
-                            Log.d("LOG", petSize+"통신완료")
                         }
+                    }else{
+                        continuation.resume(false)
                     }
                 }
 
                 override fun onFailure(call: Call<PetListResModel>, t: Throwable) {
-                    Log.d("LOG", "통신실패")
+                    continuation.resume(false)
                 }
 
             })
         }
-
-        // 소,중,대 통신 모두 진행
-        callPetListApi("001")
-        callPetListApi("002")
-        callPetListApi("003")
     }
 
     fun updatePetKind(newPetKind: PetListData){

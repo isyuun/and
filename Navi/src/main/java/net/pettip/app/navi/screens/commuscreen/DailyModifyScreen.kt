@@ -101,6 +101,7 @@ import net.pettip.app.navi.screens.walkscreen.HashTagTransformationForDark
 import net.pettip.app.navi.ui.theme.design_alpha50_black
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
+import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_select_btn_bg
@@ -324,7 +325,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
-                color = design_login_text,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
@@ -439,7 +440,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -535,7 +536,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -587,7 +588,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,

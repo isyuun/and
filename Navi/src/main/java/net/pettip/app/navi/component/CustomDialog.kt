@@ -5,11 +5,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
@@ -46,8 +48,10 @@ fun CustomDialog(
                     color = design_white
                 )
             } },
-        title = { Text(text = title) },
-        text = { Text(text = text, color = design_skip) },
+        title = { Text(text = title, fontFamily = FontFamily(Font(R.font.pretendard_bold)), fontSize = 20.sp,
+            color = MaterialTheme.colorScheme.onPrimary ) },
+        text = { Text(text = text, color = MaterialTheme.colorScheme.secondary, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            fontSize = 14.sp) },
         dismissButton = {
             Button(
                 onClick = {
@@ -66,6 +70,6 @@ fun CustomDialog(
                 )
             }
         },
-        containerColor = design_white
+        containerColor = MaterialTheme.colorScheme.primary
     )
 }

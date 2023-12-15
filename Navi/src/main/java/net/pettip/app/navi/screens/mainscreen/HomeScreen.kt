@@ -316,7 +316,7 @@ fun HomeScreen(
                         Spacer(modifier = Modifier
                             .height(navigationBarHeight)
                             .fillMaxWidth()
-                            .background(color = design_white))
+                            .background(color = MaterialTheme.colorScheme.primary))
                     }
                 }
             }
@@ -983,6 +983,7 @@ fun StoryItem(data: RTStoryData, navController: NavHostController, communityView
                     scope.launch {
                         navController.navigate(Screen.StoryDetail.route)
                         communityViewModel.getStoryDetail(data.schUnqNo)
+                        communityViewModel.updateLastPstSn(data.schUnqNo)
                     }
                 }
             }

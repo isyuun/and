@@ -66,7 +66,6 @@ fun LogoTopBar(
     sharedViewModel: SharedViewModel
 ) {
 
-    val petList by walkViewModel.petInfo.collectAsState()
     val currentPetData by sharedViewModel.currentPetInfo.collectAsState()
 
     TopAppBar(
@@ -110,7 +109,7 @@ fun LogoTopBar(
                     ){
                         Icon(painter = painterResource(id = R.drawable.arrow_back),
                             contentDescription = "",
-                            tint = Color.Unspecified)
+                            tint = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
 
@@ -161,8 +160,8 @@ fun CircleImageTopBar(size: Int, imageUri:String?){
     Box(
         modifier = Modifier
             .size(size.dp)
-            .border(shape = CircleShape, border = BorderStroke(3.dp, color = MaterialTheme.colorScheme.tertiary))
-            .shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
+            .border(shape = CircleShape, border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.tertiary))
+            .shadow(elevation = 4.dp, shape = CircleShape, spotColor = Color.Gray)
             .clip(CircleShape)
     ) {
         AsyncImage(
