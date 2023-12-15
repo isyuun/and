@@ -554,7 +554,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                             "G" -> 0.dp
                             else -> 0.dp
                         },
-                        color = design_btn_border,
+                        color = design_button_bg,
                         shape = RoundedCornerShape(10.dp)
                     )
                     .background(
@@ -583,7 +583,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                     color =
                     when(petDetailData.mngrType){
                         "M" -> design_white
-                        "I" -> design_btn_border
+                        "I" -> design_button_bg
                         "C" -> design_999999
                         else -> design_DDDDDD
                     },

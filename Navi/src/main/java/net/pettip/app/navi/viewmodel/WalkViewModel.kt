@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.exifinterface.media.ExifInterface
@@ -29,6 +30,8 @@ import net.pettip.data.daily.Paginate
 import net.pettip.data.daily.Pet
 import net.pettip.data.daily.PhotoData
 import net.pettip.data.daily.PhotoRes
+import net.pettip.data.daily.TimeLineReq
+import net.pettip.data.daily.TimeLineRes
 import net.pettip.data.daily.WalkListRes
 import net.pettip.data.daily.WeekData
 import net.pettip.data.pet.PetDetailData
@@ -38,6 +41,7 @@ import net.pettip.util.Log
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import org.apache.commons.lang3.mutable.Mutable
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -65,6 +69,44 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
     fun updatePetInfo(newData: List<PetDetailData>) {
         sharedViewModel.updatePetInfo(newData)
     }
+
+    private val _timeLineRefresh = MutableStateFlow<Boolean>(true)
+    val timeLineRefresh:StateFlow<Boolean> = _timeLineRefresh.asStateFlow()
+    fun updateTimeLineRefresh(newValue: Boolean){
+        _timeLineRefresh.value = newValue
+    }
+
+    private val _timeLinePage = MutableStateFlow<Int>(1)
+    val timeLinePage : StateFlow<Int> = _timeLinePage.asStateFlow()
+    fun addTimeLinePage(){ _timeLinePage.value++}
+    fun subTimeLinePage(){ _timeLinePage.value--}
+
+    private val _sortType = MutableStateFlow<String>("오름차순")
+    val sortType : StateFlow<String> = _sortType.asStateFlow()
+    fun updateSortType(newValue: String){
+        _sortType.value = newValue
+    }
+
+    private val _searchText = MutableStateFlow<String>("")
+    val searchText : StateFlow<String> = _searchText.asStateFlow()
+    fun updateSearchText(newValue: String){
+        _searchText.value = newValue
+    }
+
+    private val _selectedPets = MutableStateFlow<MutableList<PetDetailData>>(mutableListOf())
+    val selectedPet: StateFlow<MutableList<PetDetailData>> = _selectedPets.asStateFlow()
+    fun addSelectedPet(pet: PetDetailData) {
+        _selectedPets.value = _selectedPets.value.toMutableList().apply { add(pet) }
+    }
+    fun removeSelectedPet(pet: PetDetailData) {
+        _selectedPets.value = _selectedPets.value.toMutableList().apply { remove(pet) }
+    }
+    fun addAllSelectedPet(petList: List<PetDetailData>) {
+        _selectedPets.value = _selectedPets.value.toMutableList().apply { addAll(petList) }
+    }
+
+    private val _timeLineList = MutableStateFlow<TimeLineRes?>(null)
+    val timeLineList:StateFlow<TimeLineRes?> = _timeLineList.asStateFlow()
 
     suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String):Boolean {
         return sharedViewModel.getWeekRecord(ownrPetUnqNo, searchDay)
@@ -114,9 +156,20 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
     private val _page = MutableStateFlow<Paginate?>(null)
     val page: StateFlow<Paginate?> = _page.asStateFlow()
 
+    private val _weekRecordRefresh = MutableStateFlow(true)
+    // 검색 중인지 여부를 StateFlow로 노출
+    val weekRecordRefresh = _weekRecordRefresh.asStateFlow()
+    fun updateWeekRecordRefresh(newValue: Boolean) {
+        _weekRecordRefresh.value = newValue
+    }
+
     private val _dailyDetail = MutableStateFlow<DailyDetailData?>(null)
     val dailyDetail: StateFlow<DailyDetailData?> = _dailyDetail.asStateFlow()
     fun updateDailyDetail(newValue : DailyDetailData?){ _dailyDetail.value = newValue }
+
+    private val _lastDaily = MutableStateFlow<Int?>(null)
+    val lastDaily: StateFlow<Int?> = _lastDaily.asStateFlow()
+    fun updateLastDaily(newValue : Int?){ _lastDaily.value = newValue }
 
     private val _selectPet = MutableStateFlow<List<PetDetailData>>(emptyList())
     val selectPet: StateFlow<List<PetDetailData>> = _selectPet.asStateFlow()
@@ -125,8 +178,6 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
     }
 
     private val _isLoading = MutableStateFlow(false)
-
-    // 검색 중인지 여부를 StateFlow로 노출
     val isLoading = _isLoading.asStateFlow()
     fun updateIsLoading(newValue: Boolean) {
         _isLoading.value = newValue
@@ -157,7 +208,6 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
     }
 
     //------------------------------------------------------------------------------//
-
     private val _walkMemo = MutableStateFlow<String>("")
     val walkMemo: StateFlow<String> = _walkMemo.asStateFlow()
     fun updateWalkMemo(newValue: String) {
@@ -219,6 +269,44 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         state = state.copy(listOfSelectedImages = emptyList())
     }
 
+
+    suspend fun getTimeLineList():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val ownrPetUnqNoList = _selectedPets.value.map { it.ownrPetUnqNo }
+
+        val data = TimeLineReq(
+            ownrPetUnqNo = ownrPetUnqNoList,
+            page = _timeLinePage.value,
+            pageSize = 10,
+            recordSize = 20,
+            searchSort = if (_sortType.value=="오름차순") "001" else "002",
+            searchWord = _searchText.value
+        )
+
+        val call = apiService.getTimeList(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<TimeLineRes>{
+                override fun onResponse(call: Call<TimeLineRes>, response: Response<TimeLineRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _timeLineList.value = it
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<TimeLineRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
     suspend fun getWalkList(page: Int, petUnqNo: String): Boolean {
         val apiService = RetrofitClientServer.instance
 
@@ -252,6 +340,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
 
     suspend fun getDailyDetail(schUnqNo: Int): Boolean {
         val apiService = RetrofitClientServer.instance
+
         _isLoading.value = true
 
         val data = net.pettip.data.daily.DailyDetailReq(schUnqNo = schUnqNo, cmntYn = "N")

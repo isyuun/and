@@ -1,5 +1,6 @@
 package net.pettip.app.navi.screens.myscreen
 
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -31,6 +32,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -76,6 +78,7 @@ import net.pettip.app.navi.screens.walkscreen.PhotoItem
 import net.pettip.app.navi.screens.walkscreen.PlusBox
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_f1f1f1
+import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_select_btn_text
@@ -249,7 +252,7 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -465,7 +468,7 @@ fun CustomTFInInquiry(
             focusedContainerColor = MaterialTheme.colorScheme.primary,
             unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
             focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-            cursorColor = MaterialTheme.colorScheme.onPrimary
+            cursorColor = design_intro_bg.copy(alpha = 0.5f)
         ),
         textStyle = TextStyle(
             color = MaterialTheme.colorScheme.onPrimary,

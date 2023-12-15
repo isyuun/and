@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -116,11 +117,13 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomTextField
+import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.screens.myscreen.integrityCheck
 import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_camera_bg
+import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_select_btn_bg
@@ -429,7 +432,7 @@ fun PetCreateScreen(
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -480,7 +483,7 @@ fun PetCreateScreen(
                         focusedContainerColor = MaterialTheme.colorScheme.primary,
                         unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                         focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                        cursorColor = MaterialTheme.colorScheme.onPrimary,
+                        cursorColor = design_intro_bg.copy(alpha = 0.5f),
                         disabledBorderColor = MaterialTheme.colorScheme.outline
                     ),
                     textStyle = TextStyle(
@@ -610,7 +613,7 @@ fun PetCreateScreen(
                         focusedContainerColor = MaterialTheme.colorScheme.primary,
                         unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                         focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                        cursorColor = MaterialTheme.colorScheme.onPrimary
+                        cursorColor = design_intro_bg.copy(alpha = 0.5f)
                     ),
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -951,10 +954,6 @@ fun PetKindContent(
     navController: NavHostController
 ){
 
-    LaunchedEffect(Unit){
-        viewModel.onKindClick()
-    }
-
     val context = LocalContext.current
     val searchText by viewModel.searchText.collectAsState()
     val pets by viewModel.pets.collectAsState()
@@ -963,6 +962,10 @@ fun PetKindContent(
     var expanded by remember { mutableStateOf (false) }
 
     var selectPet by remember{ mutableStateOf<PetListData?>(null) }
+
+    LaunchedEffect(Unit){
+        viewModel.getPetType()
+    }
 
     Scaffold (
         modifier = Modifier.fillMaxSize(),
@@ -980,7 +983,7 @@ fun PetKindContent(
                 .fillMaxSize()
             ){
 
-                Text(text = "견종", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                Text(text = "펫종", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
                 )
 
@@ -999,7 +1002,7 @@ fun PetKindContent(
                         .onFocusChanged { focusState ->
                             expanded = focusState.isFocused
                         },
-                    placeholder = { Text(text = "견종을 선택해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                    placeholder = { Text(text = "펫종을 선택해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                         focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -1009,7 +1012,7 @@ fun PetKindContent(
                         focusedContainerColor = MaterialTheme.colorScheme.primary,
                         unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                         focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                        cursorColor = MaterialTheme.colorScheme.onPrimary
+                        cursorColor = design_intro_bg.copy(alpha = 0.5f)
                     ),
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -1063,7 +1066,7 @@ fun PetKindContent(
                         viewModel.updatePetKind(selectPet!!)
                         navController.popBackStack()
                     }
-                          },
+                },
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 40.dp)
                     .align(Alignment.BottomCenter)
@@ -1077,7 +1080,6 @@ fun PetKindContent(
                 Text(text = "선택완료", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
             }
         }
-
     }
 }
 

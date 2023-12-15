@@ -94,16 +94,12 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
                     scope.launch {
 
                         navController.navigate(Screen.StoryDetail.route)
+                        viewModel.updateLastPstSn(data.schUnqNo)
                         viewModel.getStoryDetail(data.schUnqNo)
                     }
                 }
             }
     ){
-        //val painter = rememberAsyncImagePainter(
-        //    model = data.storyFile?:R.drawable.img_blank,
-        //    filterQuality = FilterQuality.Low
-        //)
-
         val painter = rememberAsyncImagePainter(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(data.storyFile?:R.drawable.img_blank)

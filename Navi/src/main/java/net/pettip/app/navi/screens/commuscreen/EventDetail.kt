@@ -40,6 +40,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -57,6 +58,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -102,7 +104,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.CircleImageTopBar
-import net.pettip.app.navi.component.ErrorPage
+import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation3
 import net.pettip.app.navi.screens.myscreen.CustomDialogDelete
 import net.pettip.app.navi.ui.theme.design_btn_border
@@ -116,6 +118,7 @@ import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.data.bbs.BbsCmnt
+import net.pettip.map.app.LoadingAnimation1
 import net.pettip.singleton.G
 import net.pettip.util.Log
 
@@ -128,6 +131,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
     val comment by viewModel.bbsComment.collectAsState()
     val replyCmnt by viewModel.eventReplyCmnt.collectAsState()
     val lastPstsn by viewModel.lastPstSn.collectAsState()
+    val detailLoading by viewModel.eventLoading.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -156,6 +160,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
 
         onDispose {
             viewModel.updateBbsDetail(null)
+            viewModel.updateLastPstSn(null)
         }
     }
 
@@ -170,10 +175,10 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
     LaunchedEffect(key1 = refresh){
         if (refresh){
             val result = lastPstsn?.let { viewModel.getEventDetail(it) }
-            if (result == true){
-                refresh =false
+            refresh = if (result == true){
+                false
             }else{
-                refresh = false
+                false
             }
         }
     }
@@ -233,320 +238,332 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
     ) { paddingValues ->
 
         Crossfade(
-            targetState = detailData?.data,
+            targetState = detailLoading,
             label = "",
         ) {
             when(it){
-                null ->
-                    ErrorPage(
-                        isLoading = refresh,
-                        onClick = {newValue -> refresh = newValue}
-                    )
-
-                else ->
-                    Column(
-                        modifier = Modifier
-                            .padding(paddingValues)
-                            .fillMaxSize()
-                            .background(color = MaterialTheme.colorScheme.primary)
-                            .verticalScroll(rememberScrollState())
+                true ->
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        AsyncImage(
-                            onLoading = { },
-                            onError = { Log.d("LOG", "onError") },
-                            onSuccess = { Log.d("LOG", "onSuccess") },
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(detailData?.data?.rprsImgUrl)
-                                .crossfade(true)
-                                .build(),
-                            contentDescription = "",
-                            placeholder = null,
-                            error = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.FillWidth
-                        )
-
-                        Text(
-                            text = detailData?.data?.pstTtl ?: "",
-                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                            fontSize = 24.sp,
-                            letterSpacing = (-1.2).sp,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)
-                        )
-
-                        Spacer(
+                        LoadingAnimation1(circleColor = design_intro_bg)
+                    }
+                false ->
+                    if (detailData == null){
+                        ErrorScreen(onClick = { refresh = true })
+                    }else{
+                        Column(
                             modifier = Modifier
-                                .padding(top = 20.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(MaterialTheme.colorScheme.outline)
-                        )
-
-                        HtmlText(htmlString = detailData?.data?.pstCn?:"", modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth())
-
-                        Row (
-                            modifier = Modifier
-                                .padding(top = 40.dp)
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.onPrimaryContainer)
-                                .height(36.dp)
-                                .clickable { cmntExpanded = !cmntExpanded }
-                            ,
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-
-                            Icon(
-                                painter = painterResource(id = R.drawable.icon_comment_line),
-                                contentDescription = "", tint = Color.Unspecified,
-                                modifier = Modifier.padding(start = 20.dp))
+                                .padding(paddingValues)
+                                .fillMaxSize()
+                                .background(color = MaterialTheme.colorScheme.primary)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            AsyncImage(
+                                onLoading = { },
+                                onError = { Log.d("LOG", "onError") },
+                                onSuccess = { Log.d("LOG", "onSuccess") },
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(detailData?.data?.rprsImgUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "",
+                                placeholder = null,
+                                error = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.FillWidth
+                            )
 
                             Text(
-                                text = "댓글 ${cmntList?.size ?: 0}",
-                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                fontSize = 12.sp,
-                                letterSpacing = (-0.6).sp,
-                                color = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.padding(start = 4.dp)
+                                text = detailData?.data?.pstTtl ?: "",
+                                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                                fontSize = 24.sp,
+                                letterSpacing = (-1.2).sp,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)
                             )
-                        }
 
-                        AnimatedVisibility(
-                            visible = cmntExpanded && upCmntNo0.isNotEmpty(),
-                            enter = expandVertically(tween(durationMillis = 300)).plus(fadeIn()),
-                            exit = shrinkVertically(tween(durationMillis = 300)).plus(fadeOut())
-                        ) {
-                            LazyColumn(
-                                state = rememberLazyListState(),
+                            Spacer(
                                 modifier = Modifier
+                                    .padding(top = 20.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
                                     .fillMaxWidth()
-                                    .heightIn(max = 1000.dp),
-                                contentPadding = PaddingValues(top = 18.dp, bottom = 20.dp)
-                            ){
-                                itemsIndexed(upCmntNo0){ index, item ->
-                                    EventCommentListItem(comment = item, viewModel = viewModel, onReply, onReplyChange = {newValue -> onReply = newValue})
+                                    .height(1.dp)
+                                    .background(MaterialTheme.colorScheme.outline)
+                            )
 
-                                    if(index != (upCmntNo0?.size?.minus(1) ?: 0)){
-                                        Spacer(modifier = Modifier
-                                            .padding(vertical = 16.dp, horizontal = 20.dp)
-                                            .fillMaxWidth()
-                                            .height(1.dp)
-                                            .background(color = MaterialTheme.colorScheme.outline))
+                            HtmlText(htmlString = detailData?.data?.pstCn?:"", modifier = Modifier
+                                .padding(horizontal = 20.dp)
+                                .fillMaxWidth())
+
+                            Row (
+                                modifier = Modifier
+                                    .padding(top = 40.dp)
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.onPrimaryContainer)
+                                    .height(36.dp)
+                                    .clickable { cmntExpanded = !cmntExpanded }
+                                ,
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+
+                                Icon(
+                                    painter = painterResource(id = R.drawable.icon_comment_line),
+                                    contentDescription = "", tint = Color.Unspecified,
+                                    modifier = Modifier.padding(start = 20.dp))
+
+                                Text(
+                                    text = "댓글 ${cmntList?.size ?: 0}",
+                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                    fontSize = 12.sp,
+                                    letterSpacing = (-0.6).sp,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.padding(start = 4.dp)
+                                )
+                            }
+
+                            AnimatedVisibility(
+                                visible = cmntExpanded && upCmntNo0.isNotEmpty(),
+                                enter = expandVertically(tween(durationMillis = 300)).plus(fadeIn()),
+                                exit = shrinkVertically(tween(durationMillis = 300)).plus(fadeOut())
+                            ) {
+                                LazyColumn(
+                                    state = rememberLazyListState(),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(max = 1000.dp),
+                                    contentPadding = PaddingValues(top = 18.dp, bottom = 20.dp)
+                                ){
+                                    itemsIndexed(upCmntNo0){ index, item ->
+                                        EventCommentListItem(comment = item, viewModel = viewModel, onReply, onReplyChange = {newValue -> onReply = newValue})
+
+                                        if(index != (upCmntNo0?.size?.minus(1) ?: 0)){
+                                            Spacer(modifier = Modifier
+                                                .padding(vertical = 16.dp, horizontal = 20.dp)
+                                                .fillMaxWidth()
+                                                .height(1.dp)
+                                                .background(color = MaterialTheme.colorScheme.outline))
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        AnimatedVisibility(
-                            visible =  onReply,
-                            enter = expandVertically(expandFrom = Alignment.Top),
-                            exit = shrinkVertically(shrinkTowards = Alignment.Top)
-                        ) {
-                            Row (
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(color = design_intro_bg),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ){
+                            AnimatedVisibility(
+                                visible =  onReply,
+                                enter = expandVertically(expandFrom = Alignment.Top),
+                                exit = shrinkVertically(shrinkTowards = Alignment.Top)
+                            ) {
                                 Row (
-                                    modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
-                                    verticalAlignment = Alignment.Bottom
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(color = design_intro_bg),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ){
-                                    Text(
-                                        text = "${replyCmnt?.petNm+"에게"} 답글 쓰는중",
-                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                                        color = design_white,
-                                        lineHeight = 14.sp,
-                                        modifier = Modifier.padding(start = 20.dp, end = 8.dp)
-                                    )
+                                    Row (
+                                        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
+                                        verticalAlignment = Alignment.Bottom
+                                    ){
+                                        Text(
+                                            text = "${replyCmnt?.petNm+"에게"} 답글 쓰는중",
+                                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                            color = design_white,
+                                            lineHeight = 14.sp,
+                                            modifier = Modifier.padding(start = 20.dp, end = 8.dp)
+                                        )
 
-                                    LoadingAnimation3(circleSize = 4.dp, circleColor = design_white, animationDelay = 600)
+                                        LoadingAnimation3(circleSize = 4.dp, circleColor = design_white, animationDelay = 600)
+                                    }
+
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = "", tint = design_white,
+                                        modifier = Modifier
+                                            .padding(end = 20.dp)
+                                            .clickable { onReply = false })
                                 }
 
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = "", tint = design_white,
-                                    modifier = Modifier
-                                        .padding(end = 20.dp)
-                                        .clickable { onReply = false })
+                                Spacer(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(MaterialTheme.colorScheme.onPrimary))
                             }
 
                             Spacer(modifier = Modifier
                                 .fillMaxWidth()
                                 .height(1.dp)
                                 .background(MaterialTheme.colorScheme.onPrimary))
-                        }
 
-                        Spacer(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(MaterialTheme.colorScheme.onPrimary))
-
-                        Row (
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            TextField(
-                                value = if (onReply) replyText else comment,
-                                onValueChange = {
-                                    if (onReply){
-                                        replyText = it
-                                    }else{
-                                        viewModel.updateBbsComment(it)
-                                    }
-                                },
-                                textStyle = TextStyle(
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                    fontSize = 14.sp,
-                                    letterSpacing = (-0.7).sp
-                                ),
-                                placeholder = {
-                                    Text(text = stringResource(R.string.ph_comment), style = TextStyle(
+                            Row (
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                TextField(
+                                    value = if (onReply) replyText else comment,
+                                    onValueChange = {
+                                        if (onReply){
+                                            replyText = it
+                                        }else{
+                                            viewModel.updateBbsComment(it)
+                                        }
+                                    },
+                                    textStyle = TextStyle(
+                                        color = MaterialTheme.colorScheme.onPrimary,
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 14.sp,
                                         letterSpacing = (-0.7).sp
-                                    )) },
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Text,
-                                    imeAction = ImeAction.Done),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .focusRequester(focusRequester)
-                                ,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                                    focusedContainerColor = MaterialTheme.colorScheme.primary,
-                                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
-                                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                                    ),
+                                    placeholder = {
+                                        Text(text = stringResource(R.string.ph_comment), style = TextStyle(
+                                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                            fontSize = 14.sp,
+                                            letterSpacing = (-0.7).sp
+                                        )) },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Done),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .focusRequester(focusRequester)
+                                    ,
+                                    colors = TextFieldDefaults.colors(
+                                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                                        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                                        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                                        focusedContainerColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                                        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                                        cursorColor = design_intro_bg.copy(alpha = 0.5f),
+                                        selectionColors = TextSelectionColors(
+                                            handleColor = design_intro_bg.copy(alpha = 0.5f),
+                                            backgroundColor = design_intro_bg.copy(alpha = 0.5f)
+                                        ),
+                                        focusedIndicatorColor = MaterialTheme.colorScheme.onPrimary,
+                                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
                                 )
-                            )
 
-                            Box(
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .size(width = 56.dp, height = 40.dp)
-                                    .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(12.dp))
-                                    .clip(shape = RoundedCornerShape(12.dp))
-                                    .clickable(
-                                        enabled = if (onReply) replyText != "" && !isLoading else comment != "" && !isLoading,
-                                        onClick = {
-                                            viewModel.viewModelScope.launch {
-                                                isLoading = true
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .size(width = 56.dp, height = 40.dp)
+                                        .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(12.dp))
+                                        .clip(shape = RoundedCornerShape(12.dp))
+                                        .clickable(
+                                            enabled = if (onReply) replyText != "" && !isLoading else comment != "" && !isLoading,
+                                            onClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    isLoading = true
 
-                                                if (onReply) {
-                                                    val result = viewModel.bbsCmntCreate(replyText)
-                                                    if (result) {
-                                                        replyText = ""
-                                                        onReply = false
-                                                        isLoading = false
+                                                    if (onReply) {
+                                                        val result = viewModel.bbsCmntCreate(replyText)
+                                                        if (result) {
+                                                            replyText = ""
+                                                            onReply = false
+                                                            isLoading = false
+                                                        } else {
+                                                            isLoading = false
+                                                            Toast
+                                                                .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
+                                                                .show()
+                                                        }
                                                     } else {
-                                                        isLoading = false
-                                                        Toast
-                                                            .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
-                                                            .show()
-                                                    }
-                                                } else {
-                                                    val result = viewModel.bbsCmntCreate()
-                                                    if (result) {
-                                                        viewModel.updateBbsComment("")
-                                                        isLoading = false
-                                                    } else {
-                                                        isLoading = false
-                                                        Toast
-                                                            .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
-                                                            .show()
+                                                        val result = viewModel.bbsCmntCreate()
+                                                        if (result) {
+                                                            viewModel.updateBbsComment("")
+                                                            isLoading = false
+                                                        } else {
+                                                            isLoading = false
+                                                            Toast
+                                                                .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
+                                                                .show()
+                                                        }
                                                     }
                                                 }
                                             }
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ){
+                                    if (isLoading){
+                                        LoadingAnimation3(
+                                            circleColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            circleSize = 4.dp
+                                        )
+                                    }else{
+                                        Text(text = stringResource(R.string.comment_apply), style = TextStyle(
+                                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                            fontSize = 14.sp,
+                                            letterSpacing = (-0.7).sp),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 4.dp)
+                                        .size(40.dp)
+                                        .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
+                                        .clip(shape = RoundedCornerShape(12.dp))
+                                        .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                                        .clickable(
+                                            enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
+                                        ) {
+                                            scope.launch {
+                                                rcmdtnLoading = true
+                                                val result = viewModel.bbsRcmdtn(pstSn = detailData?.data?.pstSn ?: 0, rcmdtnSeCd = "001")
+                                                if (result) {
+                                                    rcmdtnLoading = false
+                                                } else {
+                                                    rcmdtnLoading = false
+                                                    Toast
+                                                        .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                        .show()
+                                                }
+                                            }
                                         }
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ){
-                                if (isLoading){
-                                    LoadingAnimation3(
-                                        circleColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                        circleSize = 4.dp
-                                    )
-                                }else{
-                                    Text(text = stringResource(R.string.comment_apply), style = TextStyle(
-                                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                        fontSize = 14.sp,
-                                        letterSpacing = (-0.7).sp),
-                                        textAlign = TextAlign.Center
-                                    )
+                                    ,
+                                    contentAlignment = Alignment.Center
+                                ){
+                                    Icon(painter = painterResource(id = if (detailData?.data?.rcmdtnSeCd == "001" ) R.drawable.icon_like else R.drawable.icon_like_default),
+                                        contentDescription = "", tint = Color.Unspecified)
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .size(40.dp)
+                                        .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
+                                        .clip(shape = RoundedCornerShape(12.dp))
+                                        .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                                        .clickable(
+                                            enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
+                                        ) {
+                                            scope.launch {
+                                                rcmdtnLoading = true
+                                                val result = viewModel.bbsRcmdtn(pstSn = detailData?.data?.pstSn ?: 0, rcmdtnSeCd = "002")
+                                                if (result) {
+                                                    rcmdtnLoading = false
+                                                } else {
+                                                    rcmdtnLoading = false
+                                                    Toast
+                                                        .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                        .show()
+                                                }
+                                            }
+                                        }
+                                    ,
+                                    contentAlignment = Alignment.Center
+                                ){
+                                    Icon(painter = painterResource(id = if (detailData?.data?.rcmdtnSeCd == "002" ) R.drawable.icon_dislike else R.drawable.icon_dislike_default),
+                                        contentDescription = "", tint = Color.Unspecified)
                                 }
                             }
+                        }//col
+                    }
 
-                            Box(
-                                modifier = Modifier
-                                    .padding(end = 4.dp)
-                                    .size(40.dp)
-                                    .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
-                                    .clip(shape = RoundedCornerShape(12.dp))
-                                    .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
-                                    .clickable(
-                                        enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
-                                    ) {
-                                        scope.launch {
-                                            rcmdtnLoading = true
-                                            val result = viewModel.bbsRcmdtn(pstSn = detailData?.data?.pstSn ?: 0, rcmdtnSeCd = "001")
-                                            if (result) {
-                                                rcmdtnLoading = false
-                                            } else {
-                                                rcmdtnLoading = false
-                                                Toast
-                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
-                                                    .show()
-                                            }
-                                        }
-                                    }
-                                ,
-                                contentAlignment = Alignment.Center
-                            ){
-                                Icon(painter = painterResource(id = if (detailData?.data?.rcmdtnSeCd == "001" ) R.drawable.icon_like else R.drawable.icon_like_default),
-                                    contentDescription = "", tint = Color.Unspecified)
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .size(40.dp)
-                                    .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
-                                    .clip(shape = RoundedCornerShape(12.dp))
-                                    .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
-                                    .clickable(
-                                        enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
-                                    ) {
-                                        scope.launch {
-                                            rcmdtnLoading = true
-                                            val result = viewModel.bbsRcmdtn(pstSn = detailData?.data?.pstSn ?: 0, rcmdtnSeCd = "002")
-                                            if (result) {
-                                                rcmdtnLoading = false
-                                            } else {
-                                                rcmdtnLoading = false
-                                                Toast
-                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
-                                                    .show()
-                                            }
-                                        }
-                                    }
-                                ,
-                                contentAlignment = Alignment.Center
-                            ){
-                                Icon(painter = painterResource(id = if (detailData?.data?.rcmdtnSeCd == "002" ) R.drawable.icon_dislike else R.drawable.icon_dislike_default),
-                                    contentDescription = "", tint = Color.Unspecified)
-                            }
-                        }
-                    }//col
             }
         }
     }
@@ -798,15 +815,21 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                         modifier = Modifier
                             .weight(1f)
                         ,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedPlaceholderColor = design_placeHolder,
-                            focusedPlaceholderColor = design_placeHolder,
-                            unfocusedBorderColor = design_textFieldOutLine,
-                            focusedBorderColor = design_login_text,
-                            unfocusedContainerColor = design_white,
-                            focusedContainerColor = design_white,
-                            unfocusedLeadingIconColor = design_placeHolder,
-                            focusedLeadingIconColor = design_login_text),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                            focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                            focusedContainerColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                            focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                            cursorColor = design_intro_bg.copy(alpha = 0.5f),
+                            selectionColors = TextSelectionColors(
+                                handleColor = design_intro_bg.copy(alpha = 0.5f),
+                                backgroundColor = design_intro_bg.copy(alpha = 0.5f)
+                            ),
+                            focusedIndicatorColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedIndicatorColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ),
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Delete,
@@ -1324,15 +1347,21 @@ fun BbsCommentListItem2(
                             imeAction = ImeAction.Done),
                         modifier = Modifier
                             .weight(1f),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedPlaceholderColor = design_placeHolder,
-                            focusedPlaceholderColor = design_placeHolder,
-                            unfocusedBorderColor = design_textFieldOutLine,
-                            focusedBorderColor = design_login_text,
-                            unfocusedContainerColor = design_white,
-                            focusedContainerColor = design_white,
-                            unfocusedLeadingIconColor = design_placeHolder,
-                            focusedLeadingIconColor = design_login_text)
+                        colors = TextFieldDefaults.colors(
+                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                            focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                            focusedContainerColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                            focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                            cursorColor = design_intro_bg.copy(alpha = 0.5f),
+                            selectionColors = TextSelectionColors(
+                                handleColor = design_intro_bg.copy(alpha = 0.5f),
+                                backgroundColor = design_intro_bg.copy(alpha = 0.5f)
+                            ),
+                            focusedIndicatorColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedIndicatorColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
                     )
 
                     Box(
@@ -1346,7 +1375,7 @@ fun BbsCommentListItem2(
                                 onClick = {
                                     viewModel.viewModelScope.launch {
                                         updateLoading = true
-                                        val result = viewModel.updateComment(updateComment ?: "", comment.pstCmntNo ?: 0)
+                                        val result = viewModel.bbsUpdateComment(updateComment ?: "", comment.pstCmntNo ?: 0)
                                         if (result) {
                                             updateComment = ""
                                             updateLoading = false
@@ -1446,9 +1475,9 @@ fun BbsCommentListItem2(
                                                     rcmdtnLoading = true
                                                     val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo ?: 0, rcmdtnSeCd = "001", pstSn = eventDetail?.data?.pstSn ?: 0)
                                                     if (result) {
-                                                        rcmdtnLoading = true
+                                                        rcmdtnLoading = false
                                                     } else {
-                                                        rcmdtnLoading = true
+                                                        rcmdtnLoading = false
                                                         Toast
                                                             .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
                                                             .show()
@@ -1522,9 +1551,9 @@ fun BbsCommentListItem2(
                                                             rcmdtnLoading = true
                                                             val result = viewModel.bbsRcmdtnComment(pstCmntNo = comment.pstCmntNo ?: 0, rcmdtnSeCd = "002", pstSn = eventDetail?.data?.pstSn ?: 0)
                                                             if (result) {
-                                                                rcmdtnLoading = true
+                                                                rcmdtnLoading = false
                                                             } else {
-                                                                rcmdtnLoading = true
+                                                                rcmdtnLoading = false
                                                                 Toast
                                                                     .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
                                                                     .show()

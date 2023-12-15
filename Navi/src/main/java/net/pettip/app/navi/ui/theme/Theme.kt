@@ -3,6 +3,7 @@ package net.pettip.app.navi.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.lightColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -16,26 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF2D3034),
-    onPrimary = Color(0xFFFFFFFF),
-    secondary = Color(0xFF969BA1),
-    onSecondary = Color(0xFF45494D),
-    outline = Color(0xFF45484D),
-    outlineVariant = Color(0xFFD5D6D6),
-    primaryContainer = Color(0xFF6A7078),
-    onPrimaryContainer = Color(0xFF1E2124),
-    tertiary = Color(0xFF1E2124),
-    onTertiary = Color(0xFF1E2124),
-    surface = Color(0x26000000),
-    onSurface = Color(0x33000000),
-    onSecondaryContainer = Color(0xFF44474B),
-    secondaryContainer = Color(0xFFFFFFFF),
-    tertiaryContainer = Color(0xFFFFFFFF),
-    onTertiaryContainer = Color(0xFF222222),
-    surfaceVariant = Color(0xFF1E2124),
-    onSurfaceVariant = Color(0xFF232323)
-)
 
 private val LightColorScheme = lightColorScheme(
     primary = Color(0xFFFFFFFF),
@@ -55,7 +36,30 @@ private val LightColorScheme = lightColorScheme(
     tertiaryContainer = Color(0xFF333333),
     onTertiaryContainer = Color(0xFFFFFFFF),
     surfaceVariant = Color(0xFFE3E9F2),
-    onSurfaceVariant = Color(0xFFF1F1F1)
+    onSurfaceVariant = Color(0xFFF1F1F1),
+    onBackground = Color(0xFFE8EDF2)
+)
+
+private val DarkColorScheme = darkColorScheme(
+    primary = Color(0xFF2D3034),
+    onPrimary = Color(0xFFFFFFFF),
+    secondary = Color(0xFF969BA1),
+    onSecondary = Color(0xFF45494D),
+    outline = Color(0xFF45484D),
+    outlineVariant = Color(0xFFD5D6D6),
+    primaryContainer = Color(0xFF6A7078),
+    onPrimaryContainer = Color(0xFF1E2124),
+    tertiary = Color(0xFF1E2124),
+    onTertiary = Color(0xFF1E2124),
+    surface = Color(0x26000000),
+    onSurface = Color(0x33000000),
+    onSecondaryContainer = Color(0xFF44474B),
+    secondaryContainer = Color(0xFFFFFFFF),
+    tertiaryContainer = Color(0xFFFFFFFF),
+    onTertiaryContainer = Color(0xFF222222),
+    surfaceVariant = Color(0xFF1E2124),
+    onSurfaceVariant = Color(0xFF232323),
+    onBackground = Color(0xFF444950)
 )
 
 @Composable

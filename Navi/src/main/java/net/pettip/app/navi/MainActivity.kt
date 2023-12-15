@@ -22,6 +22,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -64,6 +65,7 @@ import net.pettip.app.navi.screens.commuscreen.EventEndDetail
 import net.pettip.app.navi.screens.commuscreen.StoryDetail
 import net.pettip.app.navi.screens.mainscreen.MainScreen
 import net.pettip.app.navi.screens.mainscreen.SettingScreen
+import net.pettip.app.navi.screens.mainscreen.WalkScreen
 import net.pettip.app.navi.screens.myscreen.AddPetScreen
 import net.pettip.app.navi.screens.myscreen.InquiryDetail
 import net.pettip.app.navi.screens.myscreen.InviteScreen
@@ -97,6 +99,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         //WindowCompat.setDecorFitsSystemWindows(window, true)
+
 
         val data = intent.extras;
         setContent {
@@ -378,30 +381,29 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
         }
         composable(
             "walkDetailContent",
-            enterTransition = {
-                fadeIn(
-                    animationSpec = tween(
-                        300, easing = LinearEasing
-                    )
-                ) + slideIntoContainer(
-                    animationSpec = tween(300, easing = EaseIn),
-                    towards = AnimatedContentTransitionScope.SlideDirection.Start
-                )
-            },
-            exitTransition = {
-                fadeOut(
-                    animationSpec = tween(
-                        300, easing = LinearEasing
-                    )
-                ) + slideOutOfContainer(
-                    animationSpec = tween(300, easing = EaseOut),
-                    towards = AnimatedContentTransitionScope.SlideDirection.End
-                )
-            }
+            //enterTransition = {
+            //    fadeIn(
+            //        animationSpec = tween(
+            //            300, easing = LinearEasing
+            //        )
+            //    ) + slideIntoContainer(
+            //        animationSpec = tween(300, easing = EaseIn),
+            //        towards = AnimatedContentTransitionScope.SlideDirection.Start
+            //    )
+            //},
+            //exitTransition = {
+            //    fadeOut(
+            //        animationSpec = tween(
+            //            300, easing = LinearEasing
+            //        )
+            //    ) + slideOutOfContainer(
+            //        animationSpec = tween(300, easing = EaseOut),
+            //        towards = AnimatedContentTransitionScope.SlideDirection.End
+            //    )
+            //}
         ){
             WalkDetailContent(walkViewModel = walkViewModel, navController)
         }
-        
         composable("dailyPostScreen"){
             DailyPostScreen(viewModel = communityViewModel, sharedViewModel = sharedViewModel, navController = navController)
         }
@@ -453,37 +455,14 @@ sealed class Screen(val route: String) {
     object SetKeyScreen : Screen("setKeyScreen")
     object AddPetScreen : Screen("addPetScreen")
     object WalkDetailContent : Screen("walkDetailContent")
-    object ModifyPetInfoScreen : Screen("modifyPetInfoScreen/{index}")
-    object PetProfileScreen : Screen("petProfileScreen/{index}")
     object DailyPostScreen : Screen("dailyPostScreen")
+    object WalkScreen : Screen("walkScreen")
 
 }
 
 sealed class BottomNav(val route: String, val title: String, val unSelectedIcon: Int, val selectedIcon: Int,){
     object HomeScreen : BottomNav("home", "홈", R.drawable.home, R.drawable.home_active)
-    object WalkScreen : BottomNav("walk", "산책", R.drawable.walk, R.drawable.walk_active)
+    object TimelineScreen : BottomNav("timeline", "산책", R.drawable.walk, R.drawable.walk_active)
     object CommuScreen : BottomNav("commu", "커뮤니티", R.drawable.community, R.drawable.community_active)
     object MyScreen : BottomNav("my", "MY", R.drawable.mypage, R.drawable.mypage_active)
-}
-
-@Composable
-fun DisableSystemBarsAnimation(
-    onBackPressedDispatcher: OnBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
-) {
-    val context = LocalContext.current
-
-    DisposableEffect(context) {
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // Do nothing when back button is pressed
-            }
-        }
-
-        onBackPressedDispatcher.addCallback(callback)
-
-        // Ensure that we clean up if the effect leaves the composition
-        onDispose {
-            callback.remove()
-        }
-    }
 }

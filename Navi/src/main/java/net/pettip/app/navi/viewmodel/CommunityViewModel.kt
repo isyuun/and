@@ -109,9 +109,6 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _storyList.value = emptyList()
     }
 
-    private val _toErrorPage = MutableStateFlow<Boolean>(false)
-    val toErrorPage: StateFlow<Boolean> = _toErrorPage.asStateFlow()
-
     private val _storyPage = MutableStateFlow<Int>(1)
     val storyPage:StateFlow<Int> = _storyPage.asStateFlow()
     fun updateStoryPage(newValue: Int){
@@ -141,6 +138,9 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
 
     private val _storyLoading = MutableStateFlow<Boolean>(false)
     val storyLoading:StateFlow<Boolean> = _storyLoading.asStateFlow()
+
+    private val _eventLoading = MutableStateFlow<Boolean>(false)
+    val eventLoading:StateFlow<Boolean> = _eventLoading.asStateFlow()
 
     private val _replyCmnt = MutableStateFlow<Cmnt?>(null)
     val replyCmnt:StateFlow<Cmnt?> = _replyCmnt.asStateFlow()
@@ -556,7 +556,6 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun getStoryList(page: Int):Boolean{
         val apiService = RetrofitClientServer.instance
 
-        _toErrorPage.value = false
         val order = if (_orderType.value == "최신순") "001" else "002"
         val view = if (_viewType.value == "전체") "001" else "002"
 
@@ -579,7 +578,6 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
                 override fun onFailure(call: Call<StoryRes>, t: Throwable) {
-                    _toErrorPage.value = true
                     continuation.resume(false)
                 }
             })
@@ -622,7 +620,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
                 override fun onFailure(call: Call<DailyDetailRes>, t: Throwable) {
-
+                    _storyLoading.value = false
                     continuation.resume(false)
                 }
 
@@ -634,7 +632,6 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         val apiService = RetrofitClientServer.instance
 
         val data = BbsReq(bbsSn = 9, page = page, pageSize = 10, recordSize = 20)
-        _toErrorPage.value = false
         val call = apiService.getEventList(data)
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<EventListRes>{
@@ -655,7 +652,6 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
                 override fun onFailure(call: Call<EventListRes>, t: Throwable) {
-                    _toErrorPage.value = true
                     continuation.resume(false)
                 }
             })
@@ -665,6 +661,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun getEventDetail(pstSn:Int):Boolean{
         val apiService = RetrofitClientServer.instance
 
+        _eventLoading.value = true
         val call = apiService.getEventDetail(pstSn)
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<BbsDetailRes>{
@@ -674,16 +671,19 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                         body?.let {
                             _bbsDetail.value = it
                             _eventCmntList.value = it.data.bbsCmnts
+                            _eventLoading.value = false
                             continuation.resume(true)
                         }
                     }else{
                         val errorBodyString = response.errorBody()!!.string()
                         _dm.value = errorBodyParse(errorBodyString)
+                        _eventLoading.value = false
                         continuation.resume(false)
                     }
                 }
 
                 override fun onFailure(call: Call<BbsDetailRes>, t: Throwable) {
+                    _eventLoading.value = false
                     continuation.resume(false)
                 }
 
@@ -696,7 +696,6 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
 
         val data = BbsReq(bbsSn = 11, page = page, pageSize = 10, recordSize = 20)
 
-        _toErrorPage.value = false
         val call = apiService.getEndEventList(data)
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<EndEventListRes>{
@@ -717,7 +716,6 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                 }
 
                 override fun onFailure(call: Call<EndEventListRes>, t: Throwable) {
-                    _toErrorPage.value = true
                     continuation.resume(false)
                 }
             })
@@ -727,6 +725,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun getEndEventDetail(pstSn:Int):Boolean{
         val apiService = RetrofitClientServer.instance
 
+        _eventLoading.value = true
         val call = apiService.getEndEventDetail(pstSn)
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<BbsDetailRes>{
@@ -736,16 +735,19 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                         body?.let {
                             _bbsDetail.value = it
                             _eventCmntList.value = it.data.bbsCmnts
+                            _eventLoading.value = false
                             continuation.resume(true)
                         }
                     }else{
                         val errorBodyString = response.errorBody()!!.string()
                         _dm.value = errorBodyParse(errorBodyString)
+                        _eventLoading.value = false
                         continuation.resume(false)
                     }
                 }
 
                 override fun onFailure(call: Call<BbsDetailRes>, t: Throwable) {
+                    _eventLoading.value = false
                     continuation.resume(false)
                 }
 

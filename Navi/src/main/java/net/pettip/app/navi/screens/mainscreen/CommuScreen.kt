@@ -86,7 +86,7 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.CustomIndicator
-import net.pettip.app.navi.component.ErrorPage
+import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.component.StoryListItem
 import net.pettip.app.navi.ui.theme.design_B5B9BE
@@ -199,14 +199,14 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
     val storyList by viewModel.storyList.collectAsState()
     val lazyGridState = rememberLazyGridState()
     val page by viewModel.storyPage.collectAsState()
-    var isLoading by remember{ mutableStateOf(false) }
     val orderType by viewModel.orderType.collectAsState()
     val viewType by viewModel.viewType.collectAsState()
     val currentTab by viewModel.currentTab.collectAsState()
-    val toErrorPage by viewModel.toErrorPage.collectAsState()
 
+    var isLoading by remember{ mutableStateOf(false) }
+    var isError by rememberSaveable{ mutableStateOf(false) }
+    var refreshing by rememberSaveable{ mutableStateOf(false) }
 
-    var refreshing by remember{ mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
         onRefresh = {
@@ -241,12 +241,22 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
     LaunchedEffect(key1 = refreshing){
         if (refreshing){
 
-            viewModel.updateStoryListClear()
-            viewModel.updateStoryPage(1)
-            viewModel.getStoryList(1)
+            isLoading = true
 
-            delay(300)
-            refreshing = false
+            viewModel.viewModelScope.launch {
+                viewModel.updateStoryListClear()
+                viewModel.updateStoryPage(1)
+                val result = viewModel.getStoryList(1)
+                if (result){
+                    isLoading = false
+                    isError = false
+                    refreshing = false
+                }else{
+                    isLoading = false
+                    isError = true
+                    refreshing = false
+                }
+            }
         }
     }
 
@@ -390,11 +400,8 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
             ) { storyList.isEmpty()
                 when(it){
                     true ->
-                        if (toErrorPage){
-                            ErrorPage(
-                                isLoading = refreshing,
-                                onClick = {newValue -> refreshing = newValue}
-                            )
+                        if (isError){
+                            ErrorScreen(onClick = { refreshing = true })
                         }else{
                             Box(modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
@@ -466,10 +473,7 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
         ) { eventList?.data?.bbsEvntList?.isEmpty()
             when(it){
                 true ->
-                    ErrorPage(
-                        isLoading = refreshing,
-                        onClick = {newValue -> refreshing = newValue}
-                    )
+                    ErrorScreen(onClick = { refreshing = true })
                 false ->
                     LazyColumn(
                         state = rememberLazyListState(),
@@ -540,10 +544,7 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
         ) { eventList?.data?.bbsAncmntWinnerList?.isEmpty()
             when(it){
                 true ->
-                    ErrorPage(
-                        isLoading = refreshing,
-                        onClick = {newValue -> refreshing = newValue}
-                    )
+                    ErrorScreen(onClick = { refreshing = true })
                 false ->
                     LazyColumn(
                         state = rememberLazyListState(),
@@ -593,9 +594,9 @@ fun EventItem(eventItemData: BbsEvnt, navController: NavHostController, viewMode
                 if (currentTime - lastClickTime >= 500) {
                     lastClickTime = currentTime
                     viewModel.viewModelScope.launch {
+                        navController.navigate(Screen.EventDetail.route)
                         viewModel.updateLastPstSn(eventItemData.pstSn)
                         viewModel.getEventDetail(eventItemData.pstSn)
-                        navController.navigate(Screen.EventDetail.route)
                     }
                 }
             }
@@ -678,9 +679,9 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
                 if (currentTime - lastClickTime >= 500) {
                     lastClickTime = currentTime
                     viewModel.viewModelScope.launch {
+                        navController.navigate(Screen.EventDetail.route)
                         viewModel.updateLastPstSn(eventItemData.pstSn)
                         viewModel.getEndEventDetail(eventItemData.pstSn)
-                        navController.navigate(Screen.EventDetail.route)
                     }
                 }
             }

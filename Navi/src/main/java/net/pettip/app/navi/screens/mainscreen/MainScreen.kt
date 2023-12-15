@@ -12,6 +12,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
@@ -28,14 +30,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,8 +55,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -62,13 +67,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.pettip.app.navi.BottomNav
 import net.pettip.app.navi.MapActivity
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.LogoTopBar
+import net.pettip.app.navi.component.SearchBox
 import net.pettip.app.navi.ui.theme.design_bottomnav_text
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_border
@@ -80,11 +86,10 @@ import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.singleton.G
-import net.pettip.util.Log
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavHostController,
@@ -103,13 +108,16 @@ fun MainScreen(
     var topBarChange by rememberSaveable { mutableStateOf("") }
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var calendarMode by rememberSaveable{ mutableStateOf(false) }
+
+    var isSearching by remember { mutableStateOf(false) }
+    val searchText by walkViewModel.searchText.collectAsState()
 
     val init by sharedViewModel.init.collectAsState()
     val dupleLogin by sharedViewModel.dupleLogin.collectAsState()
 
     val selectedPet by sharedViewModel.selectPet.collectAsState()
     val currentPet by sharedViewModel.currentPetInfo.collectAsState()
-    val petInfo by sharedViewModel.petInfo.collectAsState()
     val currentTab by sharedViewModel.currentTab.collectAsState()
 
     // logoTopbar back on/off
@@ -158,7 +166,7 @@ fun MainScreen(
                     label = ""
                 ) { topBarChange ->
                     when(topBarChange){
-                        "home" ->
+                        "home","timeline" ->
                             FloatingActionButton(
                                 onClick = {
                                     if (currentPet.isNotEmpty()){
@@ -267,7 +275,7 @@ fun MainScreen(
                 animationSpec = tween(700)
             ) { topBarChange ->
                 when(topBarChange){
-                    "home","walk" ->
+                    "home" ->
                         LogoTopBar(
                             petDetailData = selectedPet?:homeViewModel.emptyCurrentPet,
                             openBottomSheet = {newValue -> openBottomSheet = newValue},
@@ -276,6 +284,86 @@ fun MainScreen(
                             backBtnOnChange = { newValue -> backBtnOnLT = newValue},
                             sharedViewModel = sharedViewModel
                         )
+                    "timeline" ->
+                        Crossfade(
+                            targetState = calendarMode,
+                            label = ""
+                        ) {
+                            when(it){
+                                true ->
+                                    LogoTopBar(
+                                        petDetailData = selectedPet?:homeViewModel.emptyCurrentPet,
+                                        openBottomSheet = {newValue -> openBottomSheet = newValue},
+                                        backBtnOn = backBtnOnLT,
+                                        walkViewModel = walkViewModel,
+                                        backBtnOnChange = { newValue -> backBtnOnLT = newValue},
+                                        sharedViewModel = sharedViewModel
+                                    )
+                                false ->
+                                    CenterAlignedTopAppBar(
+                                        colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+                                        modifier = Modifier.height(60.dp),
+                                        title = {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                            ) {
+                                                AnimatedVisibility(
+                                                    visible = !isSearching,
+                                                    enter = fadeIn(tween(500)),
+                                                    exit = fadeOut(tween(500)),
+                                                    modifier = Modifier.align(Alignment.Center)
+                                                ) {
+                                                    Text(
+                                                        text = "PetTimeLine",
+                                                        fontSize = 20.sp,
+                                                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                                                        letterSpacing = (-1.0).sp,
+                                                        color = MaterialTheme.colorScheme.onPrimary,
+                                                        modifier = Modifier.align(Alignment.Center),
+                                                        textAlign = TextAlign.Center
+                                                    )
+                                                }
+
+                                                AnimatedVisibility(
+                                                    visible = isSearching,
+                                                    enter = fadeIn(tween(500)),
+                                                    exit = fadeOut(tween(500)),
+                                                    modifier = Modifier.align(Alignment.Center)
+                                                ) {
+                                                    SearchBox(
+                                                        viewModel = walkViewModel,
+                                                        modifier = Modifier
+                                                            .align(Alignment.Center)
+                                                            .padding(start = 20.dp, end = 60.dp)
+                                                    )
+                                                }
+
+                                                Icon(
+                                                    painter = painterResource(id = R.drawable.icon_search),
+                                                    contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary,
+                                                    modifier = Modifier
+                                                        .align(Alignment.CenterEnd)
+                                                        .padding(end = 20.dp)
+                                                        .clickable {
+                                                            if (isSearching) {
+                                                                walkViewModel.viewModelScope.launch {
+                                                                    if (searchText != "") {
+                                                                        walkViewModel.getTimeLineList()
+                                                                    }
+                                                                    isSearching = false
+                                                                }
+                                                            } else {
+                                                                isSearching = true
+                                                            }
+                                                            //isSearching = !isSearching
+                                                        }
+                                                )
+                                            }
+                                        }
+                                    )
+                            }
+                        }
                     "commu" ->
                         BackTopBar(title = stringResource(R.string.title_commu), navController = navController, false)
                     "my" ->
@@ -307,16 +395,33 @@ fun MainScreen(
                         communityViewModel = communityViewModel
                     )
                 }
-                composable(BottomNav.WalkScreen.route) {
-                    WalkScreen(
-                        navController = navController,
-                        walkViewModel = walkViewModel,
-                        sharedViewModel = sharedViewModel,
-                        homeViewModel = homeViewModel,
-                        backBtnOn = {newValue -> backBtnOnLT = newValue},
-                        openBottomSheet = openBottomSheet,
-                        onDissMiss = {newValue -> openBottomSheet = newValue}
-                    )
+                composable(BottomNav.TimelineScreen.route) {
+                    Crossfade(
+                        targetState = calendarMode,
+                        label = ""
+                    ) {
+                        when(it){
+                            true ->
+                                WalkScreen(
+                                    navController = navController,
+                                    walkViewModel = walkViewModel,
+                                    sharedViewModel = sharedViewModel,
+                                    homeViewModel = homeViewModel,
+                                    backBtnOn = {newValue -> backBtnOnLT = newValue},
+                                    openBottomSheet = openBottomSheet,
+                                    onDissMiss = {newValue -> openBottomSheet = newValue},
+                                    modeChange = {newValue -> calendarMode = newValue}
+                                )
+                            false ->
+                                TimelineScreen(
+                                    viewModel= walkViewModel,
+                                    isSearching = isSearching,
+                                    dismiss = {newValue -> isSearching = newValue},
+                                    navController = navController,
+                                    modeChange = {newValue -> calendarMode = newValue}
+                                )
+                        }
+                    }
                 }
                 composable(BottomNav.CommuScreen.route) {
                     CommuScreen(
@@ -347,7 +452,7 @@ fun BottomNavigationComponent(
 ) {
     val items = listOf(
         BottomNav.HomeScreen,
-        BottomNav.WalkScreen,
+        BottomNav.TimelineScreen,
         BottomNav.CommuScreen,
         BottomNav.MyScreen
     )
@@ -361,9 +466,9 @@ fun BottomNavigationComponent(
                 onChange(true)
                 onTopbarChange("home")
             }
-            BottomNav.WalkScreen.route -> {
-                onChange(false)
-                onTopbarChange("walk")
+            BottomNav.TimelineScreen.route -> {
+                onChange(true)
+                onTopbarChange("timeline")
             }
             BottomNav.CommuScreen.route -> {
                 onChange(true)

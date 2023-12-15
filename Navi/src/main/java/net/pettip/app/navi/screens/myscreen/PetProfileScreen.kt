@@ -608,7 +608,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                         "C" -> 0.dp
                         else -> 0.dp
                     },
-                    color = design_btn_border,
+                    color = design_button_bg,
                     shape = RoundedCornerShape(10.dp)
                 )
                 .background(
@@ -654,7 +654,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                 color =
                 when(item.mngrType){
                     "M" -> design_white
-                    "I" -> design_btn_border
+                    "I" -> design_button_bg
                     "C" -> design_999999
                     else -> design_DDDDDD
                 },
@@ -821,7 +821,7 @@ fun WeightCNDDialog(
                             focusedContainerColor = MaterialTheme.colorScheme.primary,
                             unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                             focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                            cursorColor = MaterialTheme.colorScheme.onPrimary
+                            cursorColor = design_intro_bg.copy(alpha = 0.5f)
                         ),
                         textStyle = TextStyle(
                             color = MaterialTheme.colorScheme.onPrimary,
@@ -1131,7 +1131,7 @@ fun WeightDialog(
                                 focusedContainerColor = MaterialTheme.colorScheme.primary,
                                 unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                                 focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                                cursorColor = MaterialTheme.colorScheme.onPrimary
+                                cursorColor = design_intro_bg.copy(alpha = 0.5f)
                             ),
                             textStyle = TextStyle(
                                 color = MaterialTheme.colorScheme.onPrimary,

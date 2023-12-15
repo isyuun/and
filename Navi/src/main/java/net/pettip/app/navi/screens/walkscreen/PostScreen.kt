@@ -433,7 +433,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -525,7 +525,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -577,7 +577,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                     focusedContainerColor = MaterialTheme.colorScheme.primary,
                     unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
+                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
                 ),
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,

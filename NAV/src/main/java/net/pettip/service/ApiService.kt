@@ -46,6 +46,8 @@ import net.pettip.data.daily.RTStoryListRes
 import net.pettip.data.daily.RlsDailyReq
 import net.pettip.data.daily.StoryReq
 import net.pettip.data.daily.StoryRes
+import net.pettip.data.daily.TimeLineReq
+import net.pettip.data.daily.TimeLineRes
 import net.pettip.data.daily.WalkListReq
 import net.pettip.data.daily.WalkListRes
 import net.pettip.data.daily.WeekRecordReq
@@ -225,6 +227,9 @@ interface ApiService {
 
     @POST("api/v1/daily-life/dclr/create")
     fun dclrCreate(@Body data:DclrCreateReq): Call<commonRes>
+
+    @POST("api/v1/daily-life/timeline/list")
+    fun getTimeList(@Body data:TimeLineReq): Call<TimeLineRes>
 
     // --------------------- 일상생활 ----------------------- //
 
