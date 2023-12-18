@@ -49,6 +49,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -101,6 +102,7 @@ import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.LifeTimeLineItem
 import net.pettip.data.pet.PetDetailData
+import net.pettip.singleton.G
 import net.pettip.util.Log
 
 /**
@@ -124,6 +126,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
     val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f,10f),0f)
     val sortType by viewModel.sortType.collectAsState()
     val refresh by viewModel.timeLineRefresh.collectAsState()
+    val preUserId by viewModel.preUserId.collectAsState()
 
     var isLoading by rememberSaveable { mutableStateOf(false) }
     var typeChange by rememberSaveable{ mutableStateOf(false) }
@@ -148,6 +151,15 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
     //        }
     //    }
     //}
+
+    SideEffect {
+        if (preUserId != G.userId && preUserId != ""){
+            viewModel.updateTimeLineRefresh(true)
+            viewModel.updatePreUserId(G.userId)
+        }else{
+            viewModel.updatePreUserId(G.userId)
+        }
+    }
 
     LaunchedEffect(key1 = refresh){
         if (refresh) {
@@ -398,7 +410,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
 }
 
 @Composable
-fun DateItem(viewModel: WalkViewModel, dateKey: String, dailyLifeTimeLineList: List<LifeTimeLineItem>, navController:NavHostController) {
+fun DateItem(viewModel: WalkViewModel, dateKey: String, dailyLifeTimeLineList: List<LifeTimeLineItem>?, navController:NavHostController) {
 
     Box{
 
@@ -430,7 +442,7 @@ fun DateItem(viewModel: WalkViewModel, dateKey: String, dailyLifeTimeLineList: L
                 state = rememberLazyListState(),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ){
-                items(dailyLifeTimeLineList){item ->
+                items(dailyLifeTimeLineList?: emptyList()){ item ->
                     TimeItem(timeData = item, viewModel = viewModel, navController = navController)
                 }
             }
@@ -526,9 +538,12 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
                 modifier = Modifier.padding(start = 20.dp, top = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy((-10).dp)
             ){
-                items(timeData.petList){item ->
-                    CircleImageTopBar(size = 42, imageUri = item.petImg)
+                timeData.petList?.let {
+                    items(timeData.petList!!){ item ->
+                        CircleImageTopBar(size = 42, imageUri = item.petImg)
+                    }
                 }
+
             }
 
             Row (

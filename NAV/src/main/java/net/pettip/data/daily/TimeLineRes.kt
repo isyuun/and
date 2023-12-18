@@ -25,7 +25,7 @@ data class TimeLineRes(
 
 data class Data(
     @SerializedName("dailyLifeTimeLineList")
-    val dailyLifeTimeLineList: Map<String, List<LifeTimeLineItem>>?,
+    val dailyLifeTimeLineList: Map<String, List<LifeTimeLineItem>?>?,
     @SerializedName("paginate")
     val paginate: Paginate
 )
@@ -42,7 +42,7 @@ data class LifeTimeLineItem(
     @SerializedName("walkDptreTime")
     val walkDptreTime: String,
     @SerializedName("petList")
-    val petList: List<PetItem>,
+    val petList: List<PetItem>?,
     @SerializedName("runTime")
     val runTime: String,
     @SerializedName("runDstnc")

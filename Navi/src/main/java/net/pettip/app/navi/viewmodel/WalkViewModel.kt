@@ -60,6 +60,12 @@ import kotlin.coroutines.resume
 
 class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() {
 
+    private val _preUserId = MutableStateFlow<String>("")
+    val preUserId : StateFlow<String> = _preUserId.asStateFlow()
+    fun updatePreUserId(newValue: String){
+        _preUserId.value = newValue
+    }
+
     val pushData:Bundle? = sharedViewModel.pushData.value
     fun clearPushData(){
         sharedViewModel.updatePushData(null)
