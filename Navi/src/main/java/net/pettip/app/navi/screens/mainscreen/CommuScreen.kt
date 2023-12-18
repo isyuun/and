@@ -98,6 +98,7 @@ import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.bbs.BbsAncmntWinner
 import net.pettip.data.bbs.BbsEvnt
+import net.pettip.singleton.G
 import net.pettip.util.Log
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -110,8 +111,7 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
     val coroutineScope = rememberCoroutineScope()
     val tabVisible by remember { mutableFloatStateOf(1f) }
     val toStory by sharedViewModel.toStory.collectAsState()
-
-    var init by rememberSaveable{ mutableStateOf(true) }
+    val preUserId by communityViewModel.preUserId.collectAsState()
 
     LaunchedEffect(key1 = toStory){
         if (toStory){
@@ -127,21 +127,14 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
         }
     }
 
-    LaunchedEffect(init){
-        if (init){
-            if (communityViewModel.storyRes.value == null){
-                communityViewModel.updateStoryListClear()
-                communityViewModel.getStoryList(1)
-            }
-            if (communityViewModel.eventList.value == null){
-                communityViewModel.updateEventListClear()
-                communityViewModel.getEventList(1)
-            }
-            if (communityViewModel.endEventList.value == null){
-                communityViewModel.updateEndEventListClear()
-                communityViewModel.getEndEventList(1)
-            }
-            init = false
+    LaunchedEffect(Unit){
+        if (preUserId != G.userId && preUserId != ""){
+            communityViewModel.updateStoryRefresh(true)
+            communityViewModel.updateEventRefresh(true)
+            communityViewModel.updateEndEventRefresh(true)
+            communityViewModel.updatePreUserId(G.userId)
+        }else{
+            communityViewModel.updatePreUserId(G.userId)
         }
     }
 
@@ -205,12 +198,13 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
 
     var isLoading by remember{ mutableStateOf(false) }
     var isError by rememberSaveable{ mutableStateOf(false) }
-    var refreshing by rememberSaveable{ mutableStateOf(false) }
+    //var refreshing by rememberSaveable{ mutableStateOf(false) }
+    val refreshing by viewModel.storyRefresh.collectAsState()
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
         onRefresh = {
-            refreshing = true
+            viewModel.updateStoryRefresh(true)
         })
 
     var oTDropDownShow by remember{ mutableStateOf(false) }
@@ -227,14 +221,20 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
 
     LaunchedEffect(key1 = typeChange){
         if (typeChange){
-            isLoading = true
 
-            viewModel.updateStoryListClear()
-            viewModel.updateStoryPage(1)
-            viewModel.getStoryList(1)
+            viewModel.viewModelScope.launch {
+                isLoading = true
 
-            isLoading = false
-            typeChange = false
+                viewModel.updateStoryListClear()
+                viewModel.updateStoryPage(1)
+                val result = viewModel.getStoryList(1)
+                isLoading = false
+                isError = !result
+                typeChange = false
+                if (result){
+                    lazyGridState.scrollToItem(0)
+                }
+            }
         }
     }
 
@@ -247,15 +247,9 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                 viewModel.updateStoryListClear()
                 viewModel.updateStoryPage(1)
                 val result = viewModel.getStoryList(1)
-                if (result){
-                    isLoading = false
-                    isError = false
-                    refreshing = false
-                }else{
-                    isLoading = false
-                    isError = true
-                    refreshing = false
-                }
+                isLoading = false
+                isError = !result
+                viewModel.updateStoryRefresh(false)
             }
         }
     }
@@ -394,44 +388,36 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                 }
             }
 
-            Crossfade(
-                targetState = storyList.isEmpty(),
-                label = "",
-            ) { storyList.isEmpty()
-                when(it){
-                    true ->
-                        if (isError){
-                            ErrorScreen(onClick = { refreshing = true })
-                        }else{
-                            Box(modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ){
-                                LoadingAnimation1()
-                            }
+            Box{
+                if (isLoading && storyList.isEmpty()){
+                    Box(modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        LoadingAnimation1()
+                    }
+                }else if (isError){
+                    ErrorScreen(onClick = { viewModel.updateStoryRefresh(true) })
+                }else{
+                    LazyVerticalGrid(
+                        modifier = Modifier
+                            .padding(top = 10.dp, start = 20.dp, end = 20.dp)
+                            .pullRefresh(pullRefreshState)
+                            .fillMaxSize(),
+                        columns = GridCells.Fixed(2),
+                        state = lazyGridState,
+                        verticalArrangement = Arrangement.spacedBy(20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(storyList?: emptyList()) { item ->
+                            StoryListItem(data = item, navController = navController, viewModel = viewModel)
                         }
-                    false ->
-                        LazyVerticalGrid(
-                            modifier = Modifier
-                                .padding(top = 10.dp, start = 20.dp, end = 20.dp)
-                                .pullRefresh(pullRefreshState)
-                                .fillMaxSize(),
-                            columns = GridCells.Fixed(2),
-                            state = lazyGridState,
-                            verticalArrangement = Arrangement.spacedBy(20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(storyList?: emptyList()) { item ->
-                                StoryListItem(data = item, navController = navController, viewModel = viewModel)
-                            }
-                        }
+                    }
                 }
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
                     CustomIndicator(state = pullRefreshState, refreshing = refreshing)
                 }
             }
-
-
         }// col
     }
 }
@@ -442,21 +428,27 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
 
     val eventList by viewModel.eventList.collectAsState()
 
-    var refreshing by remember{ mutableStateOf(false) }
+    val refreshing by viewModel.eventRefresh.collectAsState()
+    var isLoading by remember{ mutableStateOf(false) }
+    var isError by rememberSaveable { mutableStateOf( false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
         onRefresh = {
-            refreshing = true
+            viewModel.updateEventRefresh(true)
         })
 
     LaunchedEffect(key1 = refreshing) {
         if (refreshing) {
 
-            viewModel.updateEventListClear()
-            viewModel.getEventList(1)
+            isLoading = true
 
-            delay(300)
-            refreshing = false
+            viewModel.viewModelScope.launch {
+                viewModel.updateEventListClear()
+                val result = viewModel.getEventList(1)
+                isLoading = false
+                isError = !result
+                viewModel.updateEventRefresh(false)
+            }
         }
     }
 
@@ -467,43 +459,35 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
             .background(color = MaterialTheme.colorScheme.primary)
     ){
 
-        Crossfade(
-            targetState = eventList?.data?.bbsEvntList?.isEmpty(),
-            label = "",
-        ) { eventList?.data?.bbsEvntList?.isEmpty()
-            when(it){
-                true ->
-                    ErrorScreen(onClick = { refreshing = true })
-                false ->
-                    LazyColumn(
-                        state = rememberLazyListState(),
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .pullRefresh(pullRefreshState)
-                            .fillMaxWidth(),
-                        contentPadding = PaddingValues(vertical = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(40.dp)
-                    ){
-                        if (eventList?.data?.bbsEvntList != null){
-                            items(eventList?.data?.bbsEvntList ?: emptyList()){ item ->
-                                EventItem(eventItemData = item, navController, viewModel)
-                            }
-                        }
-                    }
-
-                else ->
-                    Box(modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ){
-                        LoadingAnimation1()
-                    }
+        if (isLoading){
+            Box(modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                LoadingAnimation1()
             }
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+        }else if (isError){
+            ErrorScreen(onClick = { viewModel.updateEventRefresh(true) })
+        }else{
+            LazyColumn(
+                state = rememberLazyListState(),
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .pullRefresh(pullRefreshState)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(40.dp)
+            ){
+                if (eventList?.data?.bbsEvntList != null){
+                    items(eventList?.data?.bbsEvntList ?: emptyList()){ item ->
+                        EventItem(eventItemData = item, navController, viewModel)
+                    }
+                }
             }
         }
 
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+            CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+        }
     }
 }
 
@@ -513,24 +497,29 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
 
     val eventList by viewModel.endEventList.collectAsState()
 
-    var refreshing by remember{ mutableStateOf(false) }
+    val refreshing by viewModel.endEventRefresh.collectAsState()
+    var isLoading by remember{ mutableStateOf(false) }
+    var isError by rememberSaveable { mutableStateOf( false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
         onRefresh = {
-            refreshing = true
+            viewModel.updateEndEventRefresh(true)
         })
 
     LaunchedEffect(key1 = refreshing) {
         if (refreshing) {
 
-            viewModel.updateEndEventListClear()
-            viewModel.getEndEventList(1)
+            isLoading = true
 
-            delay(300)
-            refreshing = false
+            viewModel.viewModelScope.launch {
+                viewModel.updateEndEventListClear()
+                val result = viewModel.getEndEventList(1)
+                isLoading = false
+                isError = !result
+                viewModel.updateEndEventRefresh(false)
+            }
         }
     }
-
 
     Box (
         Modifier
@@ -538,43 +527,35 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
             .background(color = MaterialTheme.colorScheme.primary)
     ){
 
-        Crossfade(
-            targetState = eventList?.data?.bbsAncmntWinnerList?.isEmpty(),
-            label = "",
-        ) { eventList?.data?.bbsAncmntWinnerList?.isEmpty()
-            when(it){
-                true ->
-                    ErrorScreen(onClick = { refreshing = true })
-                false ->
-                    LazyColumn(
-                        state = rememberLazyListState(),
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .pullRefresh(pullRefreshState)
-                            .fillMaxWidth(),
-                        contentPadding = PaddingValues(vertical = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(40.dp)
-                    ){
-                        if (eventList?.data?.bbsAncmntWinnerList != null){
-                            items(eventList?.data?.bbsAncmntWinnerList ?: emptyList()){ item ->
-                                EndEventItem(eventItemData = item, navController, viewModel)
-                            }
-                        }
-                    }
-
-                else ->
-                    Box(modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ){
-                        LoadingAnimation1()
-                    }
+        if (isLoading){
+            Box(modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                LoadingAnimation1()
             }
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+        }else if (isError){
+            ErrorScreen(onClick = { viewModel.updateEndEventRefresh(true) })
+        }else{
+            LazyColumn(
+                state = rememberLazyListState(),
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .pullRefresh(pullRefreshState)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(40.dp)
+            ){
+                if (eventList?.data?.bbsAncmntWinnerList != null){
+                    items(eventList?.data?.bbsAncmntWinnerList ?: emptyList()){ item ->
+                        EndEventItem(eventItemData = item, navController, viewModel)
+                    }
+                }
             }
         }
 
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+            CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+        }
     }
 }
 

@@ -87,6 +87,7 @@ import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.DailyLifeWalk
 import net.pettip.data.daily.Day
+import net.pettip.singleton.G
 import net.pettip.util.Log
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -131,6 +132,12 @@ fun WalkScreen(
     var selectPetPre:String? by remember { mutableStateOf(null) }
     var selectDayPre:String? by remember { mutableStateOf(null) }
     val selectDay by walkViewModel.selectDay.collectAsState()
+
+    LaunchedEffect(key1 = G.toPost){
+        if(G.toPost){
+            navController.navigate(Screen.PostScreen.route)
+        }
+    }
 
     LaunchedEffect(key1 = refresh){
         if (refresh){

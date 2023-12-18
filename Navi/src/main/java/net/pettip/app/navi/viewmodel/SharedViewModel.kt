@@ -60,7 +60,6 @@ class SharedViewModel:ViewModel(){
         memberList = emptyList()
     )
 
-
     private val _currentTab = MutableStateFlow<String>("스토리")
     val currentTab:StateFlow<String> = _currentTab.asStateFlow()
     fun updateCurrentTab(newValue: String){ _currentTab.value = newValue}

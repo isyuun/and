@@ -865,10 +865,8 @@ fun PetCreateScreen(
             Button(
                 onClick = {
                     scope.launch {
-
-                        isLoading = true
-
                         if (integrityCheck(viewModel, context)){
+                            isLoading = true
                             val userCreateSuccess = viewModel.sendUserToServer()
                             if (userCreateSuccess){
                                 val loginSuccess = loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)

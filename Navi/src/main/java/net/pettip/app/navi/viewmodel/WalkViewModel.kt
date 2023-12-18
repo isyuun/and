@@ -110,6 +110,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
     fun addAllSelectedPet(petList: List<PetDetailData>) {
         _selectedPets.value = _selectedPets.value.toMutableList().apply { addAll(petList) }
     }
+    fun clearSelectPet(){_selectedPets.value.clear()}
 
     private val _timeLineList = MutableStateFlow<TimeLineRes?>(null)
     val timeLineList:StateFlow<TimeLineRes?> = _timeLineList.asStateFlow()

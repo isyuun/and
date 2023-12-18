@@ -86,6 +86,30 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
 
     val selectedPet = sharedViewModel.selectPet
 
+    private val _preUserId = MutableStateFlow<String>("")
+    val preUserId : StateFlow<String> = _preUserId.asStateFlow()
+    fun updatePreUserId(newValue: String){
+        _preUserId.value = newValue
+    }
+
+    private val _storyRefresh = MutableStateFlow<Boolean>(true)
+    val storyRefresh: StateFlow<Boolean> = _storyRefresh.asStateFlow()
+    fun updateStoryRefresh(newValue: Boolean){
+        _storyRefresh.value = newValue
+    }
+
+    private val _eventRefresh = MutableStateFlow<Boolean>(true)
+    val eventRefresh: StateFlow<Boolean> = _eventRefresh.asStateFlow()
+    fun updateEventRefresh(newValue: Boolean){
+        _eventRefresh.value = newValue
+    }
+
+    private val _endEventRefresh = MutableStateFlow<Boolean>(true)
+    val endEventRefresh: StateFlow<Boolean> = _endEventRefresh.asStateFlow()
+    fun updateEndEventRefresh(newValue: Boolean){
+        _endEventRefresh.value = newValue
+    }
+
     private val _lastPstSn = MutableStateFlow<Int?>(null)
     val lastPstSn: StateFlow<Int?> = _lastPstSn.asStateFlow()
     fun updateLastPstSn(newValue: Int?){
@@ -1604,12 +1628,11 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     }
 
     fun concatUploadedFileList(newFiles: List<DailyLifeFile>) {
-        _uploadedFileList.value?.let { currentList ->
-            val combinedList = mutableListOf<DailyLifeFile>().apply {
-                addAll(currentList)
-                addAll(newFiles)
-            }
-            _uploadedFileList.value = combinedList
+        val currentList = _uploadedFileList.value ?: emptyList()
+        val combinedList = mutableListOf<DailyLifeFile>().apply {
+            addAll(currentList)
+            addAll(newFiles)
         }
+        _uploadedFileList.value = combinedList
     }
 }

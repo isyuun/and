@@ -161,9 +161,15 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
         }
     }
 
+    LaunchedEffect(key1 = G.toPost){
+        if(G.toPost){
+            navController.navigate(Screen.PostScreen.route)
+        }
+    }
+
     LaunchedEffect(key1 = refresh){
         if (refresh) {
-            viewModel.addAllSelectedPet(emptyList())
+            viewModel.clearSelectPet()
             viewModel.addAllSelectedPet(petList)
             delay(100)
             if (selectedPet.isNotEmpty()) {

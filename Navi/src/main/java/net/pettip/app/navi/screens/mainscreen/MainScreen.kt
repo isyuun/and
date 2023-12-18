@@ -348,9 +348,7 @@ fun MainScreen(
                                                         .clickable {
                                                             if (isSearching) {
                                                                 walkViewModel.viewModelScope.launch {
-                                                                    if (searchText != "") {
-                                                                        walkViewModel.getTimeLineList()
-                                                                    }
+                                                                    walkViewModel.getTimeLineList()
                                                                     isSearching = false
                                                                 }
                                                             } else {

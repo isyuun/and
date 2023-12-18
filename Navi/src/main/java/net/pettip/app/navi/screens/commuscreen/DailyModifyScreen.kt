@@ -127,7 +127,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
     val uploadedPet by viewModel.uploadedPetMulti.collectAsState()
     val newPetList by viewModel.newSelectPet.collectAsState()
     val uploadSchSeList by viewModel.uploadSchSeList.collectAsState()
-
+    val petList by sharedViewModel.currentPetInfo.collectAsState()
     val uploadSchTtl by viewModel.uploadSchTtl.collectAsState()
     val uploadSchCn by viewModel.uploadSchCn.collectAsState()
     val uploadPostStory by viewModel.uploadPostStory.collectAsState()
@@ -144,7 +144,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
     val state = viewModel.state
     val dummyUri = Uri.parse("")
     var expanded by remember { mutableStateOf(false) }
-    val items = listOf("Option 1", "Option 2", "Option 3")
+    val items = petList.map { "${it.petNm}와 즐거운 산책~!" }
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
     val scrollState = rememberScrollState()
 
@@ -158,7 +158,6 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
     var hashString by remember { mutableStateOf(hashtagString) }
 
     val uploadedPetList = storyDetail?.data?.dailyLifePetList // 이미 업로드된 펫 목록
-    val petList by sharedViewModel.currentPetInfo.collectAsState()
     val filteredCurrentPetList = petList.filter { currentPet ->
         uploadedPetList?.none { uploadedPet ->
             uploadedPet.ownrPetUnqNo == currentPet.ownrPetUnqNo

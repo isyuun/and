@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -104,7 +105,11 @@ fun ErrorScreen(
                 containerColor = design_button_bg, disabledContainerColor = design_button_bg,
                 contentColor = design_white, disabledContentColor = design_white
             ),
-            enabled = isButtonEnabled
+            enabled = isButtonEnabled,
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 5.dp,
+                pressedElevation = 0.dp
+            )
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
