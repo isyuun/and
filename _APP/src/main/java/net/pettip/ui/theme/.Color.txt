@@ -1,0 +1,186 @@
+아래는 `ColorScheme`의 각 변수가 주로 사용될 수 있는 안드로이드 컴포즈 컨트롤러의 몇 가지 예시입니다. 개발자의 프로젝트 구조나 커스텀 디자인에 따라 다를 수 있습니다.
+
+1. **`primary`**:
+   - Button
+   - Card
+   - Checkbox
+   - RadioButton
+   - Switch
+   - 등의 기본 색상
+
+2. **`onPrimary`**:
+   - Button
+   - Card
+   - Checkbox
+   - RadioButton
+   - Switch
+   - 등의 기본 색상 위에 배치되는 텍스트의 색상
+
+3. **`primaryContainer`**:
+   - Card
+   - Dialog
+   - DropdownMenu
+   - Snackbar
+   - 등의 기본 색상을 사용하는 컨테이너의 배경색상
+
+4. **`onPrimaryContainer`**:
+   - Card
+   - Dialog
+   - DropdownMenu
+   - Snackbar
+   - 등의 기본 색상을 사용하는 컨테이너 위에 배치되는 텍스트의 색상
+
+5. **`inversePrimary`**:
+   - TextField
+   - OutlinedTextField
+   - 등의 기본 색상의 반전 색상
+
+6. **`secondary`**:
+   - Tab
+   - TabRow
+   - BottomNavigation
+   - FloatingActionButton
+   - 등의 보조 색상
+
+7. **`onSecondary`**:
+   - Tab
+   - TabRow
+   - BottomNavigation
+   - FloatingActionButton
+   - 등의 보조 색상 위에 배치되는 텍스트의 색상
+
+8. **`secondaryContainer`**:
+   - Card
+   - Dialog
+   - DropdownMenu
+   - Snackbar
+   - 등의 보조 색상을 사용하는 컨테이너의 배경색상
+
+9. **`onSecondaryContainer`**:
+   - Card
+   - Dialog
+   - DropdownMenu
+   - Snackbar
+   - 등의 보조 색상을 사용하는 컨테이너 위에 배치되는 텍스트의 색상
+
+10. **`tertiary`**:
+    - Divider
+    - List
+    - Menu
+    - Slider
+    - 등의 제3 색상
+
+11. **`onTertiary`**:
+    - Divider
+    - List
+    - Menu
+    - Slider
+    - 등의 제3 색상 위에 배치되는 텍스트의 색상
+
+12. **`tertiaryContainer`**:
+    - Card
+    - Dialog
+    - DropdownMenu
+    - Snackbar
+    - 등의 제3 색상을 사용하는 컨테이너의 배경색상
+
+13. **`onTertiaryContainer`**:
+    - Card
+    - Dialog
+    - DropdownMenu
+    - Snackbar
+    - 등의 제3 색상을 사용하는 컨테이너 위에 배치되는 텍스트의 색상
+
+14. **`background`**:
+    - Scaffold
+    - ModalBottomSheetLayout
+    - BackdropScaffold
+    - 등의 배경색상
+
+15. **`onBackground`**:
+    - Scaffold
+    - ModalBottomSheetLayout
+    - BackdropScaffold
+    - 등의 배경색상 위에 배치되는 텍스트의 색상
+
+16. **`surface`**:
+    - Card
+    - Dialog
+    - DropdownMenu
+    - Snackbar
+    - 등의 표면색상
+
+17. **`onSurface`**:
+    - Card
+    - Dialog
+    - DropdownMenu
+    - Snackbar
+    - 등의 표면색상 위에 배치되는 텍스트의 색상
+
+18. **`surfaceVariant`**:
+    - Card
+    - Dialog
+    - DropdownMenu
+    - Snackbar
+    - 등의 표면색상의 변형 색상
+
+19. **`onSurfaceVariant`**:
+    - Card
+    - Dialog
+    - DropdownMenu
+    - Snackbar
+    - 등의 표면색상의 변형 색상 위에 배치되는 텍스트의 색상
+
+20. **`surfaceTint`**:
+    - Card
+    - Dialog
+    - DropdownMenu
+    - Snackbar
+    - 등의 표면색상의 음영
+
+21. **`inverseSurface`**:
+    - TextField
+    - OutlinedTextField
+    - 등의 표면색상의 반전 색상
+
+22. **`inverseOnSurface`**:
+    - TextField
+    - OutlinedTextField
+    - 등의 표면색상의 반전 색상 위에 배치되는 텍스트의 색상
+
+23. **`error`**:
+    - TextField
+    - OutlinedTextField
+    - 등의 오류 색상
+
+24. **`onError`**:
+    - TextField
+    - OutlinedTextField
+    - 등의 오류 색상 위에 배치되는 텍스트의 색상
+
+25. **`errorContainer`**:
+    - Card
+    - Dialog
+    - DropdownMenu
+    - Snackbar
+    - 등의 오류 색상을 사용하는 컨테이너의 배경색상
+
+26. **`onErrorContainer`**:
+    - Card
+    - Dialog
+    - DropdownMenu
+    - Snackbar
+    - 등의 오류 색상을 사용하는 컨테이너 위에 배치되는 텍스트의 색상
+
+27. **`outline`**:
+    - TextField
+    - OutlinedTextField
+    - 등의 테두리의 색상
+
+28. **`outlineVariant`**:
+    - TextField
+    - OutlinedTextField
+    - 등의 테두리의 변형 색상
+
+29. **`scrim`**:
+    - 전경을 어둡게 하는 레이어의 색상

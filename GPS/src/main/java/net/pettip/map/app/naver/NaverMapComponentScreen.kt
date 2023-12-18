@@ -594,9 +594,9 @@ private fun WalkInfoSheet() {
         Divider(
             modifier = Modifier
                 .padding(horizontal = 8.dp)
-                .height(50.dp)
-                .width(2.dp),
-            color = Color.Red
+                .height(60.dp)
+                .width(1.dp),
+            color = MaterialTheme.colorScheme.outline
         )
         R.string.walk_title_distance
         Column(

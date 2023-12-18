@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
     fun Content() {
         val context = LocalContext.current
         val shape = RoundedCornerShape(20.0.dp)
-        val border = 0.5.dp
+        val border = 0.1.dp
         val padding = 20.0.dp
         val modifier = Modifier
             .fillMaxSize()
