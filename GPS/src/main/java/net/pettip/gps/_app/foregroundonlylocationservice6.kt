@@ -70,6 +70,11 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
         //}
     }
 
+    internal fun show(file: File) {
+        Log.w(__CLASSNAME__, "${getMethodName()}$file, $_tracks")
+        read(file)
+    }
+
     override fun stop() {
         super.stop()
         Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")

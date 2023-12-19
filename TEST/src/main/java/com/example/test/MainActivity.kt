@@ -1,6 +1,5 @@
 package com.example.test
 
-import android.R
 import android.content.Context
 import android.os.Bundle
 import android.view.WindowManager
@@ -146,7 +145,7 @@ class MainActivity : ComponentActivity() {
                                     .padding(horizontal = padding),
                                 onClick = withClick { openMap(context) }) {
                                 //OutlinedTextField(value = "good", onValueChange = {})
-                                Text(text = stringResource(id = R.string.ok))
+                                Text(text = stringResource(id = android.R.string.ok))
                             }
                             Divider(modifier = Modifier.padding(horizontal = padding))
                             Button(
@@ -155,7 +154,7 @@ class MainActivity : ComponentActivity() {
                                     .padding(horizontal = padding),
                                 onClick = withClick { openGpx(context) }) {
                                 //OutlinedTextField(value = "bad", onValueChange = {})
-                                Text(text = stringResource(id = R.string.cancel))
+                                Text(text = stringResource(id = android.R.string.cancel))
                             }
                         } //Row
                     }   //Column
