@@ -53,7 +53,7 @@ sealed class DailyLifeUpdatePet {
                 ownrPetUnqNo = pet.ownrPetUnqNo,
                 petNm = pet.petNm,
                 stdgUmdNm = pet.stdgUmdNm ?: "",
-                age = pet.age?: "",
+                age = pet.age ?: "",
                 schUnqNo = pet.schUnqNo,
                 bwlMvmNmtm = pet.bwlMvmNmtm,
                 urineNmtm = pet.urineNmtm,

@@ -1,10 +1,10 @@
 package net.pettip.service
 
-import android.util.Log
 import com.google.gson.Gson
 import net.pettip.data.RefreshRes
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
+import net.pettip.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
@@ -33,9 +33,9 @@ class TokenInterceptor() : Interceptor {
 
         val responseBodyString = response.body
 
-        if (response.code == 403){
+        if (response.code == 403) {
             G.dupleLogin = true
-        }else if (response.code == 401) {
+        } else if (response.code == 401) {
             Log.d("LOG", "if 실행")
             val gson = Gson()
             val tokenResponse = gson.fromJson(responseBodyString.string(), RefreshRes::class.java)

@@ -25,7 +25,7 @@ data class TimeLineRes(
 
 data class Data(
     @SerializedName("dailyLifeTimeLineList")
-    val dailyLifeTimeLineList: Map<String, List<LifeTimeLineItem>?>?,
+    val dailyLifeTimeLineList: MutableMap<String, List<LifeTimeLineItem>?>?,
     @SerializedName("paginate")
     val paginate: Paginate
 )

@@ -142,12 +142,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
     //        viewModel.addTimeLinePage()
     //        viewModel.viewModelScope.launch {
     //            val result = viewModel.getTimeLineList()
-    //            isLoadingNextPage = if (result){
-    //                false
-    //            }else{
-    //                viewModel.subTimeLinePage()
-    //                false
-    //            }
+    //
     //        }
     //    }
     //}

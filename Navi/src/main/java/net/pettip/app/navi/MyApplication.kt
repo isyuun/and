@@ -1,6 +1,6 @@
 package net.pettip.app.navi
 
-import android.util.Log
+import net.pettip.util.Log
 import com.kakao.sdk.common.KakaoSdk
 
 class MyApplication : net.pettip.map.app.MapApplication() {

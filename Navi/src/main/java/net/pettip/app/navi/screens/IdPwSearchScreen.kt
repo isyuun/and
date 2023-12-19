@@ -2,7 +2,7 @@
 
 package net.pettip.app.navi.screens
 
-import android.util.Log
+import net.pettip.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

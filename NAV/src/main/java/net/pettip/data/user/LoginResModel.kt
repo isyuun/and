@@ -40,7 +40,7 @@ data class Data(
 )
 
 data class LoginData(
-    var appTypNm : String,
+    var appTypNm: String,
     var userID: String,
     var userPW: String
 )

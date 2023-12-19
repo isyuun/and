@@ -2,7 +2,7 @@ package net.pettip.app.navi.viewmodel
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
+import net.pettip.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.tasks.OnCompleteListener

@@ -286,7 +286,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
             ownrPetUnqNo = ownrPetUnqNoList,
             page = _timeLinePage.value,
             pageSize = 10,
-            recordSize = 20,
+            recordSize = 2,
             searchSort = if (_sortType.value=="오름차순") "001" else "002",
             searchWord = _searchText.value
         )

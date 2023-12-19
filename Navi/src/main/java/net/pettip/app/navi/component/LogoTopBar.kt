@@ -4,7 +4,7 @@
 
 package net.pettip.app.navi.component
 
-import android.util.Log
+import net.pettip.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut

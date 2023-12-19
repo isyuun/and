@@ -14,7 +14,6 @@ import net.pettip.data.bbs.BbsCmtCreateReq
 import net.pettip.data.bbs.BbsDetailRes
 import net.pettip.data.bbs.BbsRcmdtnReq
 import net.pettip.data.bbs.EndEventListRes
-import net.pettip.data.bbs.EventDetailRes
 import net.pettip.data.bbs.EventListRes
 import net.pettip.data.bbs.NtcListRes
 import net.pettip.data.bbs.QnaDetailRes
@@ -92,7 +91,7 @@ interface ApiService {
     // --------------------- 게시판 ----------------------- //
 
     @POST("api/v1/bbs/qna/create")
-    fun createQna(@Body data:QnaReq): Call<BbsDetailRes>
+    fun createQna(@Body data: QnaReq): Call<BbsDetailRes>
 
     @POST("api/v1/bbs/faq/list")
     fun getFaqList(@Body data: BbsReq): Call<FAQRes>
@@ -170,7 +169,7 @@ interface ApiService {
     fun withdraw(): Call<commonRes>
 
     @POST("/api/v1/member/trmnlMng")
-    fun trmnlMng(@Body data:TrmnlMngReq): Call<commonRes>
+    fun trmnlMng(@Body data: TrmnlMngReq): Call<commonRes>
     // --------------------- 회원 ----------------------- //
 
     // --------------------- 일상생활 ----------------------- //
@@ -226,10 +225,10 @@ interface ApiService {
     fun dailyRlsUpdate(@Body data: DailyRlsYnReq): Call<DailyDetailRes>
 
     @POST("api/v1/daily-life/dclr/create")
-    fun dclrCreate(@Body data:DclrCreateReq): Call<commonRes>
+    fun dclrCreate(@Body data: DclrCreateReq): Call<commonRes>
 
     @POST("api/v1/daily-life/timeline/list")
-    fun getTimeList(@Body data:TimeLineReq): Call<TimeLineRes>
+    fun getTimeList(@Body data: TimeLineReq): Call<TimeLineRes>
 
     // --------------------- 일상생활 ----------------------- //
 

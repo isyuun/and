@@ -4,7 +4,7 @@
 
 package net.pettip.app.navi.screens
 
-import android.util.Log
+import net.pettip.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -1356,7 +1356,8 @@ fun LocationPickContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(max = 400.dp)
-                            .background(color = Color.Transparent),
+                            .background(color = Color.Transparent)
+                            .padding(bottom = 100.dp),
                         verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         items(umdList){ umdList ->

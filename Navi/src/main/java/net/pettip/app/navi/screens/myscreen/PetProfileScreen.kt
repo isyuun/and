@@ -2,6 +2,7 @@ package net.pettip.app.navi.screens.myscreen
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -39,6 +40,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
@@ -110,6 +112,7 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomTextField
+import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.rememberMarker
 import net.pettip.app.navi.screens.mainscreen.CircleImage
 import net.pettip.app.navi.screens.mainscreen.formatWghtVl
@@ -162,6 +165,12 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
     var refreshPetList by remember{ mutableStateOf(false) }
     var updatePetWgt by remember{ mutableStateOf(false) }
 
+    var wgtRefresh by remember{ mutableStateOf(true) }
+    var wgtError by remember{ mutableStateOf(false) }
+
+    var detailRefresh by remember{ mutableStateOf(true) }
+    var detailError by remember{ mutableStateOf(false) }
+
     val scrollState = rememberChartScrollState()
     val petwgtList by settingViewModel.petWeightList.collectAsState()
 
@@ -213,40 +222,53 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             }
         }
     }
+    LaunchedEffect(key1 = detailRefresh){
+        if(detailRefresh){
+            val result = settingViewModel.getPetInfoDetail(selectedPet)
+            detailError = !result
 
-    LaunchedEffect(Unit){
-        settingViewModel.getPetInfoDetail(selectedPet)
-        settingViewModel.getPetWgt(selectedPet.ownrPetUnqNo)
-
-        Log.d("LOG",selectedPet.toString())
-
-        datasetForModel.clear()
-        datasetLineSpec.clear()
-        var xPos = 0f
-        val dataPoints = arrayListOf<FloatEntry>()
-
-        datasetLineSpec.add(
-            LineChart.LineSpec(
-                lineColor = design_sharp.toArgb(),
-                lineBackgroundShader = DynamicShaders.fromBrush(
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            design_sharp.copy(com.patrykandpatrick.vico.core.DefaultAlpha.LINE_BACKGROUND_SHADER_START),
-                            design_sharp.copy(com.patrykandpatrick.vico.core.DefaultAlpha.LINE_BACKGROUND_SHADER_END)
-                        )
-                    )
-                ),
-                //lineBackgroundShader = null,
-                pointConnector = pointConnector
-            )
-        )
-        for (petWgt in petwgtList?: emptyList()){
-            dataPoints.add(FloatEntry(x= xPos, y= petWgt.wghtVl.toFloat()))
-            xPos += 1f
+            detailRefresh = false
         }
-        datasetForModel.add(dataPoints)
+    }
 
-        modelProducer.setEntries(datasetForModel)
+    LaunchedEffect(key1 = wgtRefresh){
+        if (wgtRefresh){
+
+            val result = settingViewModel.getPetWgt(selectedPet.ownrPetUnqNo)
+
+            wgtError = !result
+
+            datasetForModel.clear()
+            datasetLineSpec.clear()
+            var xPos = 0f
+            val dataPoints = arrayListOf<FloatEntry>()
+
+            datasetLineSpec.add(
+                LineChart.LineSpec(
+                    lineColor = design_sharp.toArgb(),
+                    lineBackgroundShader = DynamicShaders.fromBrush(
+                        brush = Brush.verticalGradient(
+                            listOf(
+                                design_sharp.copy(com.patrykandpatrick.vico.core.DefaultAlpha.LINE_BACKGROUND_SHADER_START),
+                                design_sharp.copy(com.patrykandpatrick.vico.core.DefaultAlpha.LINE_BACKGROUND_SHADER_END)
+                            )
+                        )
+                    ),
+                    //lineBackgroundShader = null,
+                    pointConnector = pointConnector
+                )
+            )
+            for (petWgt in petwgtList?: emptyList()){
+                dataPoints.add(FloatEntry(x= xPos, y= petWgt.wghtVl.toFloat()))
+                xPos += 1f
+            }
+            datasetForModel.add(dataPoints)
+
+            modelProducer.setEntries(datasetForModel)
+
+            wgtRefresh = false
+        }
+
     }
 
     Scaffold (
@@ -273,7 +295,9 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             )
         }
 
-        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)){
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary)){
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
@@ -393,63 +417,134 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                     } // Row
                 }
 
-                if (datasetForModel.isNotEmpty()){
-                    val marker = rememberMarker()
 
-                    Chart(
-                        modifier = Modifier
-                            .padding(20.dp)
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.primary)
-                            .combinedClickable(
-                                onLongClick = {
-                                    weightCNDDialog = true
-                                },
-                                onClick = {}
-                            ),
-                        chart = lineChart,
-                        chartModelProducer = modelProducer,
-                        startAxis = rememberStartAxis(
-                            label = textComponent(
-                                color = MaterialTheme.colorScheme.secondary,
-                                textSize = 12.sp,
-                                margins = MutableDimensions(10f, 0f),
-                            ),
-                            tickLength = 0.dp,
-                            valueFormatter = { value,_ ->
-                                String.format("%.1f", value)
-                            },
-                            itemPlacer = AxisItemPlacer.Vertical.default(
-                                maxItemCount = 6
-                            ),
-                            axis = null
-                        ),
-                        bottomAxis = rememberBottomAxis(
-                            label = textComponent(
-                                color = MaterialTheme.colorScheme.secondary,
-                                textSize = 12.sp,
-                                margins = MutableDimensions(0f, 10f),
-                            ),
-                            axis = lineComponent(color = design_textFieldOutLine, thickness = 1.dp),
-                            tickLength = 0.dp,
-                            valueFormatter = { value,_ ->
-                                if (petwgtList != null && value.toInt() in 0 until petwgtList!!.size) {
-                                    petwgtList?.getOrNull(value.toInt())?.crtrYmd ?: ""
-                                } else {
-                                    ""
+                Crossfade(
+                    targetState = wgtError,
+                    label = ""
+                ) {
+                    when(it){
+                        true ->
+                            Row (
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp, vertical = 40.dp)
+                                    .fillMaxWidth()
+                            ){
+                                Icon(
+                                    painter = painterResource(id = R.drawable.img_error_light), contentDescription = "",
+                                    tint = Color.Unspecified,modifier = Modifier.weight(1f)
+                                )
+
+                                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+
+                                Column (
+                                    modifier = Modifier.weight(1f)
+                                ){
+                                    Text(
+                                        text = "일시적인 오류입니다.",
+                                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                                        fontSize = 24.sp, letterSpacing = (-1.2).sp,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.padding(top = 20.dp)
+                                    )
+
+                                    Button(
+                                        onClick = {
+                                            wgtRefresh = true
+                                        },
+                                        modifier = Modifier
+                                            .padding(top = 12.dp)
+                                            .fillMaxWidth()
+                                            .height(48.dp),
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonColors(
+                                            containerColor = design_button_bg, disabledContainerColor = design_button_bg,
+                                            contentColor = design_white, disabledContentColor = design_white
+                                        ),
+                                        elevation = ButtonDefaults.buttonElevation(
+                                            defaultElevation = 5.dp,
+                                            pressedElevation = 0.dp
+                                        )
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.icon_reflesh),
+                                                contentDescription = "", tint = design_white
+                                            )
+
+                                            Text(
+                                                text = "체중정보 새로고침",
+                                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                                color = design_white,
+                                                lineHeight = 16.sp,
+                                                modifier = Modifier.padding(start = 8.dp)
+                                            )
+                                        }
+                                    }
                                 }
-                            },
-                            itemPlacer = AxisItemPlacer.Horizontal.default(
+                            }
+                        false ->
+                            if (datasetForModel.isNotEmpty()){
+                                val marker = rememberMarker()
 
-                            ),
-                            guideline = null,
-                        ),
-                        marker = marker,
-                        chartScrollState = scrollState,
-                        markerVisibilityChangeListener = markerVisibilityChangeListener,
-                        isZoomEnabled = true,
-                        autoScaleUp = AutoScaleUp.None
-                    )
+                                Chart(
+                                    modifier = Modifier
+                                        .padding(20.dp)
+                                        .fillMaxWidth()
+                                        .background(MaterialTheme.colorScheme.primary)
+                                        .combinedClickable(
+                                            onLongClick = {
+                                                weightCNDDialog = true
+                                            },
+                                            onClick = {}
+                                        ),
+                                    chart = lineChart,
+                                    chartModelProducer = modelProducer,
+                                    startAxis = rememberStartAxis(
+                                        label = textComponent(
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            textSize = 12.sp,
+                                            margins = MutableDimensions(10f, 0f),
+                                        ),
+                                        tickLength = 0.dp,
+                                        valueFormatter = { value,_ ->
+                                            String.format("%.1f", value)
+                                        },
+                                        itemPlacer = AxisItemPlacer.Vertical.default(
+                                            maxItemCount = 6
+                                        ),
+                                        axis = null
+                                    ),
+                                    bottomAxis = rememberBottomAxis(
+                                        label = textComponent(
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            textSize = 12.sp,
+                                            margins = MutableDimensions(0f, 10f),
+                                        ),
+                                        axis = lineComponent(color = design_textFieldOutLine, thickness = 1.dp),
+                                        tickLength = 0.dp,
+                                        valueFormatter = { value,_ ->
+                                            if (petwgtList != null && value.toInt() in 0 until petwgtList!!.size) {
+                                                petwgtList?.getOrNull(value.toInt())?.crtrYmd ?: ""
+                                            } else {
+                                                ""
+                                            }
+                                        },
+                                        itemPlacer = AxisItemPlacer.Horizontal.default(
+
+                                        ),
+                                        guideline = null,
+                                    ),
+                                    marker = marker,
+                                    chartScrollState = scrollState,
+                                    markerVisibilityChangeListener = markerVisibilityChangeListener,
+                                    isZoomEnabled = true,
+                                    autoScaleUp = AutoScaleUp.None
+                                )
+                            }
+                    }
                 }
 
                 Row (
@@ -539,6 +634,70 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                         }
 
                         Spacer(modifier = Modifier.padding(bottom = 20.dp))
+                    }
+                }
+
+                if (detailError){
+                    Row (
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp, vertical = 40.dp)
+                            .fillMaxWidth()
+                    ){
+                        Icon(
+                            painter = painterResource(id = R.drawable.img_error_light), contentDescription = "",
+                            tint = Color.Unspecified,modifier = Modifier.weight(1f)
+                        )
+
+                        Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+
+                        Column (
+                            modifier = Modifier.weight(1f)
+                        ){
+                            Text(
+                                text = "일시적인 오류입니다.",
+                                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                                fontSize = 24.sp, letterSpacing = (-1.2).sp,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.padding(top = 20.dp)
+                            )
+
+                            Button(
+                                onClick = {
+                                    detailRefresh = true
+                                },
+                                modifier = Modifier
+                                    .padding(top = 12.dp)
+                                    .fillMaxWidth()
+                                    .height(48.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonColors(
+                                    containerColor = design_button_bg, disabledContainerColor = design_button_bg,
+                                    contentColor = design_white, disabledContentColor = design_white
+                                ),
+                                elevation = ButtonDefaults.buttonElevation(
+                                    defaultElevation = 5.dp,
+                                    pressedElevation = 0.dp
+                                )
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.icon_reflesh),
+                                        contentDescription = "", tint = design_white
+                                    )
+
+                                    Text(
+                                        text = "참여중인 그룹 새로고침",
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                        color = design_white,
+                                        lineHeight = 16.sp,
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }// Col
