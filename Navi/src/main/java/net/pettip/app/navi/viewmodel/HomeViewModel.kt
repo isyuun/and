@@ -57,7 +57,8 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
         petRprsImgAddr = "",
         sexTypNm = "",
         wghtVl =0.0f,
-        petRelUnqNo = 0
+        petRelUnqNo = 0,
+        mngrType = "M"
     )
 
     private val _showBottomSheet = MutableStateFlow<Boolean>(false)

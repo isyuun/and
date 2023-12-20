@@ -115,6 +115,8 @@ import coil.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.pettip._app.application
+import net.pettip._app.application2
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.CustomBottomSheet
@@ -142,6 +144,7 @@ import net.pettip.app.navi.viewmodel.HomeViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.daily.RTStoryData
 import net.pettip.data.pet.PetDetailData
+import net.pettip.gps.app.GPSApplication
 import net.pettip.singleton.G
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -213,6 +216,10 @@ fun HomeScreen(
         if(G.toPost){
             navController.navigate(Screen.PostScreen.route)
         }
+    }
+
+    LaunchedEffect(Unit){
+
     }
 
     LaunchedEffect(key1 = refreshing){
@@ -1246,10 +1253,13 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
             Box(
                 modifier = Modifier
                     .size(46.dp)
-                    .border(shape = CircleShape,
+                    .border(
+                        shape = CircleShape,
                         border =
-                        BorderStroke(2.dp,
-                            color = if(petList == selectPet) MaterialTheme.colorScheme.tertiary else design_white)
+                        BorderStroke(
+                            2.dp,
+                            color = if (petList == selectPet) MaterialTheme.colorScheme.tertiary else design_white
+                        )
                     )
                     .shadow(
                         color = MaterialTheme.colorScheme.onSurface,

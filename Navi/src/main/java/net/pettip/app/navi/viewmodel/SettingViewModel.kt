@@ -104,6 +104,9 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
 
     // -------------------PetInfo Screen---------------------
 
+    private val _profileData = MutableStateFlow<PetDetailData?>(null)
+    val profileData: StateFlow<PetDetailData?> = _profileData.asStateFlow()
+
     private val _memberList = MutableStateFlow<List<Member>?>(null)
     val memberList: StateFlow<List<Member>?> = _memberList.asStateFlow()
     fun updateMemberList(newValue: List<Member>?){
@@ -528,7 +531,8 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                         val body = response.body()
                         body?.let {
                             if (body.petDetailData != null){
-                                _memberList.value = body.petDetailData.memberList
+                                _memberList.value = it.petDetailData.memberList
+                                _profileData.value = it.petDetailData
                                 continuation.resume(true)
                             }else{
                                 _memberList.value = emptyList()

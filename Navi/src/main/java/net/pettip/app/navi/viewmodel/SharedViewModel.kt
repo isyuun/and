@@ -57,7 +57,8 @@ class SharedViewModel:ViewModel(){
         ntrTypNm = "모름",
         endDt = "",
         mngrType = "M",
-        memberList = emptyList()
+        memberList = emptyList(),
+        petTypCd = null
     )
 
     private val _currentTab = MutableStateFlow<String>("스토리")
@@ -321,7 +322,8 @@ class SharedViewModel:ViewModel(){
         petRprsImgAddr = "",
         sexTypNm = "모름",
         wghtVl =0.0f,
-        petRelUnqNo = 0
+        petRelUnqNo = 0,
+        mngrType = "M"
     )
 
     fun clear(){

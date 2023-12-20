@@ -66,7 +66,9 @@ data class PetDetailData(
     @SerializedName("stdgUmdNm")
     var stdgUmdNm: String?, // 공릉동
     @SerializedName("wghtVl")
-    var wghtVl: Float // 4.1
+    var wghtVl: Float, // 4.1
+    @SerializedName("petTypCd")
+    var petTypCd: String? // 개, 고양이 분류 코드
 )
 
 data class Member(

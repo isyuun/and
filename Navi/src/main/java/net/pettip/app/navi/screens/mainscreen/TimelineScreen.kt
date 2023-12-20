@@ -1,5 +1,6 @@
 package net.pettip.app.navi.screens.mainscreen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -127,6 +128,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
     val sortType by viewModel.sortType.collectAsState()
     val refresh by viewModel.timeLineRefresh.collectAsState()
     val preUserId by viewModel.preUserId.collectAsState()
+    val dailyLifeTimeLineList by viewModel.dailyLifeTimeLineList.collectAsState()
 
     var isLoading by rememberSaveable { mutableStateOf(false) }
     var typeChange by rememberSaveable{ mutableStateOf(false) }
@@ -136,16 +138,23 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
     var previousSortType: String? by remember { mutableStateOf(null) }
     var previousSelectedPet: MutableList<PetDetailData>? by remember { mutableStateOf(null) }
 
-    //LaunchedEffect(dateLazyState.canScrollForward) {
-    //    if (!dateLazyState.canScrollForward && !isLoadingNextPage){
-    //        isLoadingNextPage = true
-    //        viewModel.addTimeLinePage()
-    //        viewModel.viewModelScope.launch {
-    //            val result = viewModel.getTimeLineList()
-    //
-    //        }
-    //    }
-    //}
+    LaunchedEffect(dateLazyState.canScrollForward) {
+        if (!dateLazyState.canScrollForward && !isLoadingNextPage && dailyLifeTimeLineList != null){
+            if (timeLineList?.data?.paginate?.existNextPage == true){
+                isLoadingNextPage = true
+                viewModel.addTimeLinePage()
+                viewModel.viewModelScope.launch {
+                    val result = viewModel.getTimeLineList()
+                    if (result){
+                        isLoadingNextPage = false
+                    }else{
+                        isLoadingNextPage = false
+                        viewModel.subTimeLinePage()
+                    }
+                }
+            }
+        }
+    }
 
     SideEffect {
         if (preUserId != G.userId && preUserId != ""){
@@ -170,6 +179,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
             if (selectedPet.isNotEmpty()) {
                 isLoading = true
                 viewModel.viewModelScope.launch {
+                    viewModel.dailyLifeTimeLineListClear()
                     val result = viewModel.getTimeLineList()
                     isLoading = false
                     isError = !result
@@ -182,6 +192,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
     LaunchedEffect(key1 = sortType){
         if ((sortType  != previousSortType) && (previousSortType !=null)){
             viewModel.viewModelScope.launch {
+                viewModel.dailyLifeTimeLineListClear()
                 val result = viewModel.getTimeLineList()
                 isError = !result
                 typeChange = false
@@ -192,9 +203,12 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
 
     LaunchedEffect(key1 = selectedPet){
         if (selectedPet != previousSelectedPet && previousSelectedPet != null && !refresh){
-            viewModel.viewModelScope.launch {
-                val result = viewModel.getTimeLineList()
-                isError = !result
+            viewModel.dailyLifeTimeLineListClear()
+            if (selectedPet.size != 0){
+                viewModel.viewModelScope.launch {
+                    val result = viewModel.getTimeLineList()
+                    isError = !result
+                }
             }
         }
         previousSelectedPet = selectedPet
@@ -234,7 +248,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
                     contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(40.dp)
                 ){
-                    timeLineList?.data?.dailyLifeTimeLineList?.let { dailyLifeTimeLineList ->
+                    dailyLifeTimeLineList?.let { dailyLifeTimeLineList ->
                         for ((dateKey, itemList) in dailyLifeTimeLineList) {
                             item {
                                 DateItem(viewModel = viewModel, dateKey = dateKey, dailyLifeTimeLineList = itemList, navController = navController)
@@ -304,6 +318,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
                             .padding(start = 12.dp)
                             .clickable {
                                 modeChange(true)
+                                viewModel.updateToMonthCalendar(true)
                             }
                     ){
                         Icon(

@@ -14,7 +14,7 @@ import com.google.gson.annotations.SerializedName
 
 data class TimeLineRes(
     @SerializedName("data")
-    val data: Data,
+    val data: Data?,
     @SerializedName("statusCode")
     val statusCode: Int,
     @SerializedName("resultMessage")
@@ -25,9 +25,9 @@ data class TimeLineRes(
 
 data class Data(
     @SerializedName("dailyLifeTimeLineList")
-    val dailyLifeTimeLineList: MutableMap<String, List<LifeTimeLineItem>?>?,
+    val dailyLifeTimeLineList: MutableMap<String, List<LifeTimeLineItem>>?,
     @SerializedName("paginate")
-    val paginate: Paginate
+    val paginate: Paginate?
 )
 
 data class LifeTimeLineItem(
@@ -61,5 +61,5 @@ data class PetItem(
     @SerializedName("petNm")
     val petNm: String,
     @SerializedName("petImg")
-    val petImg: String
+    val petImg: String?
 )

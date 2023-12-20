@@ -79,10 +79,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
@@ -99,6 +101,7 @@ import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.DailyDetailData
 import net.pettip.data.daily.DailyLifePet
+import net.pettip.gps.app.GPSApplication
 import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 import kotlin.math.absoluteValue
@@ -118,6 +121,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     val dailyDetail by walkViewModel.dailyDetail.collectAsState()
     val lastDaily by walkViewModel.lastDaily.collectAsState()
 
+    val context = LocalContext.current
 
     var imageLoading by remember{ mutableStateOf(false) }
     var showImage by remember{ mutableStateOf(false) }
@@ -145,6 +149,12 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
             showImage = false
         }else{
             navController.popBackStack()
+        }
+    }
+
+    LaunchedEffect(key1 = dailyDetail){
+        if (dailyDetail?.totMvmnPathFile != null){
+            walkViewModel.downloadFile("${dailyDetail?.atchPath}${dailyDetail?.totMvmnPathFile}", context, "${dailyDetail?.schUnqNo}.GPX")
         }
     }
 

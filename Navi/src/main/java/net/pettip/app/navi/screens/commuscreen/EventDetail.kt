@@ -697,7 +697,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
-                    .background(design_white, RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp))
                     .clip(RoundedCornerShape(20.dp))
             ) {
                 Spacer(modifier = Modifier.padding(top = 20.dp))
@@ -712,7 +712,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 20.sp,
                         letterSpacing = (-1.0).sp,
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)
                     )
 
@@ -721,7 +721,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
-                        color = design_skip,
+                        color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier
                             .padding(end = 30.dp, bottom = 20.dp)
                             .clickable { openBottomSheet = false }
@@ -736,7 +736,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     elevation = CardDefaults.cardElevation(3.dp),
-                    colors = CardDefaults.cardColors(containerColor = design_white)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
                 ){
                     Row (
                         modifier = Modifier
@@ -758,7 +758,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
-                                    //color = if (G.userId == comment.userId) design_intro_bg else design_skip
+                                    color = if (G.userId == comment.userId) design_intro_bg else design_skip
                                 )
 
                                 Text(
@@ -766,7 +766,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                     fontSize = 10.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
-                                    color = design_skip.copy(alpha = 0.7f),
+                                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                                     modifier = Modifier.padding(start = 5.dp)
                                 )
                             }
@@ -776,7 +776,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp,
-                                color = design_login_text
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -797,7 +797,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                         value = updateComment?:"",
                         onValueChange = { updateComment = it},
                         textStyle = TextStyle(
-                            color = design_login_text,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp,
                             letterSpacing = (-0.7).sp
@@ -845,7 +845,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .size(width = 56.dp, height = 40.dp)
-                            .background(color = design_btn_border, shape = RoundedCornerShape(12.dp))
+                            .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(12.dp))
                             .clip(shape = RoundedCornerShape(12.dp))
                             .clickable(
                                 enabled = updateComment != "" && !updateLoading,
@@ -873,12 +873,12 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                     ){
                         if (updateLoading){
                             LoadingAnimation3(
-                                circleColor = design_white,
+                                circleColor = MaterialTheme.colorScheme.primary,
                                 circleSize = 4.dp
                             )
                         }else{
                             Text(text = "수정", style = TextStyle(
-                                color = design_white,
+                                color = MaterialTheme.colorScheme.primary,
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp),
@@ -1231,7 +1231,7 @@ fun BbsCommentListItem2(
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
-                    .background(design_white, RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp))
                     .clip(RoundedCornerShape(20.dp))
             ) {
                 Spacer(modifier = Modifier.padding(top = 20.dp))
@@ -1246,7 +1246,7 @@ fun BbsCommentListItem2(
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 20.sp,
                         letterSpacing = (-1.0).sp,
-                        color = design_login_text,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)
                     )
 
@@ -1255,7 +1255,7 @@ fun BbsCommentListItem2(
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
-                        color = design_skip,
+                        color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier
                             .padding(end = 30.dp, bottom = 20.dp)
                             .clickable { openBottomSheet = false }
@@ -1270,7 +1270,7 @@ fun BbsCommentListItem2(
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     elevation = CardDefaults.cardElevation(3.dp),
-                    colors = CardDefaults.cardColors(containerColor = design_white)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
                 ){
                     Row (
                         modifier = Modifier
@@ -1300,7 +1300,7 @@ fun BbsCommentListItem2(
                                     fontSize = 10.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
-                                    color = design_skip.copy(alpha = 0.7f),
+                                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                                     modifier = Modifier.padding(start = 5.dp)
                                 )
                             }
@@ -1310,7 +1310,7 @@ fun BbsCommentListItem2(
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp,
-                                color = design_login_text
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -1368,7 +1368,7 @@ fun BbsCommentListItem2(
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .size(width = 56.dp, height = 40.dp)
-                            .background(color = design_btn_border, shape = RoundedCornerShape(12.dp))
+                            .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(12.dp))
                             .clip(shape = RoundedCornerShape(12.dp))
                             .clickable(
                                 enabled = updateComment != "" && !updateLoading,
@@ -1395,12 +1395,12 @@ fun BbsCommentListItem2(
                     ){
                         if (updateLoading){
                             LoadingAnimation3(
-                                circleColor = design_white,
+                                circleColor = MaterialTheme.colorScheme.primary,
                                 circleSize = 4.dp
                             )
                         }else{
                             Text(text = "수정", style = TextStyle(
-                                color = design_white,
+                                color = MaterialTheme.colorScheme.primary,
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp),

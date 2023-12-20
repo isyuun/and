@@ -636,7 +636,8 @@ private fun WalkInfoNavi(
                 petRprsImgAddr = "",
                 sexTypNm = "",
                 wghtVl = 0.0f,
-                petRelUnqNo = 0
+                petRelUnqNo = 0,
+                mngrType = "M"
             )
         )
     }
@@ -821,8 +822,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     Log.v(__CLASSNAME__, "${getMethodName()}[ST][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
 
     if (G.mapPetInfo.isEmpty()) {   //test
-        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", -0.1f, -1)
-        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", -0.1f, -1)
+        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", -0.1f, -1, "M")
+        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", -0.1f, -1, "M")
         application.add(pet1)
         application.add(pet1)
         application.add(pet2)
