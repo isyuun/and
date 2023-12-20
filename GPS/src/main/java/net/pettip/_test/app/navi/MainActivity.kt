@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
         // A surface container using the 'surface'(default) color from the theme
         Surface(
             modifier = modifier.clickable(onClick = withClick(context) {}),
-            border = BorderStroke(0.9.dp, MaterialTheme.colorScheme.outline),
+            border = BorderStroke(0.9.dp, Color.Yellow),
         ) {
             Text(text = "Surface:surface", modifier = Modifier.padding(horizontal = padding))
             Box(
@@ -172,11 +172,6 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { enabled != enabled },
                             //colors = ButtonDefaults.buttonColors(Color.White),
-                        ) { Text(text = if (enabled) "Btn:enable" else "Btn:disable") }
-                        Button(
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = withClick { enabled != enabled },
-                            //colors = ButtonDefaults.buttonColors(Color.Black),
                         ) { Text(text = if (enabled) "Btn:enable" else "Btn:disable") }
                         Divider()
                         Button(

@@ -29,13 +29,13 @@
         </activity>
 
         <activity
-            android:name="net.pettip.app.navi.net.pettip._test.app.navi.MapActivity"
+            android:name="net.pettip._test.app.navi.MapActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat" />
 
         <activity
-            android:name="net.pettip.app.navi.net.pettip._test.app.navi.GpxActivity"
+            android:name="net.pettip._test.app.navi.GpxActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat" />
