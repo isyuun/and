@@ -30,5 +30,7 @@ data class CurrentPetData(
     @SerializedName("wghtVl")
     var wghtVl: Float, // 5.2
     @SerializedName("petRelUnqNo")
-    var petRelUnqNo: Int // 펫 관계번호
+    var petRelUnqNo: Int, // 펫 관계번호
+    @SerializedName("mngrType")
+    var mngrType: String // M: 관리중, I: 참여중
 )

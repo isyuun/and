@@ -280,7 +280,19 @@ fun PetCreateScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp)){
 
                 Button(
-                    onClick = { viewModel.updatePetDorC("강아지") },
+                    enabled = petDorC != "강아지",
+                    onClick = {
+                        viewModel.updatePetDorC("강아지")
+                        viewModel.updatePetKind(
+                            PetListData(
+                                petDogSzCd = "",
+                                petNm = "사이즈/품종 선택",
+                                petEnNm = "",
+                                petInfoUnqNo = 0,
+                                petTypCd = ""
+                            )
+                        )
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
@@ -316,7 +328,19 @@ fun PetCreateScreen(
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
                 Button(
-                    onClick = { viewModel.updatePetDorC("고양이") },
+                    enabled = petDorC != "고양이",
+                    onClick = {
+                        viewModel.updatePetDorC("고양이")
+                        viewModel.updatePetKind(
+                            PetListData(
+                                petDogSzCd = "",
+                                petNm = "사이즈/품종 선택",
+                                petEnNm = "",
+                                petInfoUnqNo = 0,
+                                petTypCd = ""
+                            )
+                        )
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)

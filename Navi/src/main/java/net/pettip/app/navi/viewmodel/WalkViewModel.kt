@@ -7,12 +7,13 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,7 @@ import net.pettip.data.daily.DailyDetailRes
 import net.pettip.data.daily.DailyLifeWalk
 import net.pettip.data.daily.DailyMonthData
 import net.pettip.data.daily.DailyMonthRes
+import net.pettip.data.daily.LifeTimeLineItem
 import net.pettip.data.daily.Paginate
 import net.pettip.data.daily.Pet
 import net.pettip.data.daily.PhotoData
@@ -36,19 +38,24 @@ import net.pettip.data.daily.WalkListRes
 import net.pettip.data.daily.WeekData
 import net.pettip.data.pet.PetDetailData
 import net.pettip.gps.app.GPSApplication
+import net.pettip.service.ApiService
 import net.pettip.singleton.RetrofitClientServer
 import net.pettip.util.Log
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.apache.commons.lang3.mutable.Mutable
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.lang.Integer.min
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -115,6 +122,28 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
     private val _timeLineList = MutableStateFlow<TimeLineRes?>(null)
     val timeLineList:StateFlow<TimeLineRes?> = _timeLineList.asStateFlow()
 
+    private val _dailyLifeTimeLineList = MutableStateFlow<MutableMap<String, List<LifeTimeLineItem>>?>(null)
+    val dailyLifeTimeLineList:StateFlow<MutableMap<String, List<LifeTimeLineItem>>?> = _dailyLifeTimeLineList.asStateFlow()
+    fun dailyLifeTimeLineListClear() {
+        _dailyLifeTimeLineList.value = mutableMapOf()
+        _timeLinePage.value = 1
+    }
+    private fun addToDailyLifeTimeLineList(newData: MutableMap<String, List<LifeTimeLineItem>>?) {
+        newData?.let {
+            _dailyLifeTimeLineList.value = (_dailyLifeTimeLineList.value ?: mutableMapOf()).apply {
+                for ((key, value) in it) {
+                    if (containsKey(key)) {
+                        get(key)?.let { existingList ->
+                            put(key, existingList + (value ?: emptyList()))
+                        }
+                    } else {
+                        put(key, value ?: emptyList())
+                    }
+                }
+            }
+        }
+    }
+
     suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String):Boolean {
         return sharedViewModel.getWeekRecord(ownrPetUnqNo, searchDay)
     }
@@ -130,7 +159,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         _toDetail.value = newValue
     }
 
-    private val _toMonthCalendar = MutableStateFlow(false)
+    private val _toMonthCalendar = MutableStateFlow(true)
     // 검색 중인지 여부를 StateFlow로 노출
     val toMonthCalendar = _toMonthCalendar.asStateFlow()
     fun updateToMonthCalendar(newValue: Boolean) {
@@ -286,7 +315,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
             ownrPetUnqNo = ownrPetUnqNoList,
             page = _timeLinePage.value,
             pageSize = 10,
-            recordSize = 2,
+            recordSize = 20,
             searchSort = if (_sortType.value=="오름차순") "001" else "002",
             searchWord = _searchText.value
         )
@@ -299,6 +328,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
                         val body = response.body()
                         body?.let {
                             _timeLineList.value = it
+                            addToDailyLifeTimeLineList(it.data?.dailyLifeTimeLineList)
                             continuation.resume(true)
                         }
                     }else{
@@ -388,6 +418,46 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
             })
         }
     }
+
+    fun downloadFile(fileUrl: String, context: Context, fileName:String) {
+        val url = URL(fileUrl)
+        val fileDir = context.filesDir
+        val file = File(fileDir, fileName)
+        val connection = url.openConnection() as HttpURLConnection
+
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                connection.connect()
+
+                if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                    // HTTP 요청이 성공적이지 않은 경우
+                    // 필요에 따라 예외 처리를 추가할 수 있습니다.
+                    throw IOException("HTTP error code: ${connection.responseCode}")
+                }
+
+                // 파일을 다운로드하고 지정된 경로에 저장
+                val inputStream: InputStream = BufferedInputStream(url.openStream())
+                val outputStream: OutputStream = FileOutputStream(file)
+
+                try {
+                    val buffer = ByteArray(1024)
+                    var bytesRead: Int
+
+                    while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                        outputStream.write(buffer, 0, bytesRead)
+                    }
+                } finally {
+                    inputStream.close()
+                    outputStream.close()
+                }
+            } finally {
+                connection.disconnect()
+            }
+        }
+        Log.d("LOG", file.absolutePath)
+    }
+
+
 
     suspend fun getMonthData(ownrPetUnqNo: String, searchMonth: String): Boolean {
         val apiService = RetrofitClientServer.instance

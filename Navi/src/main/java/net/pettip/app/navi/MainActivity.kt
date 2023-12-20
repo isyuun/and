@@ -377,7 +377,7 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
             AddPetScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)
         }
         composable("modifyPetInfoScreen"){
-            ModifyPetInfoScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)
+            ModifyPetInfoScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel, settingViewModel = settingViewModel)
         }
         composable(
             "walkDetailContent",

@@ -98,7 +98,9 @@ import net.pettip.app.navi.ui.theme.design_sharp
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
+import net.pettip.app.navi.ui.theme.seed
 import net.pettip.app.navi.viewmodel.PickerState
+import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.UserCreateViewModel
 import net.pettip.data.SCD
@@ -114,9 +116,11 @@ fun ModifyPetInfoScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: UserCreateViewModel,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
+    settingViewModel: SettingViewModel
 ){
     val selectPet by sharedViewModel.profilePet.collectAsState()
+    val profilePet by settingViewModel.profileData.collectAsState()
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -161,7 +165,13 @@ fun ModifyPetInfoScreen(
     LaunchedEffect(Unit){
         if (init){
             viewModel.updatePetName(selectPet.petNm)
-            viewModel.updatePetDorC("강아지")
+            viewModel.updatePetDorC(
+                if (profilePet?.petTypCd=="002"){
+                    "고양이"
+                }else{
+                    "강아지"
+                }
+            )
             viewModel.updatePetKind(
                 PetListData(
                     petDogSzCd = "",
@@ -341,7 +351,19 @@ fun ModifyPetInfoScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp)){
 
                 Button(
-                    onClick = { viewModel.updatePetDorC("강아지") },
+                    enabled = petDorC != "강아지",
+                    onClick = {
+                        viewModel.updatePetDorC("강아지")
+                        viewModel.updatePetKind(
+                            PetListData(
+                                petDogSzCd = "",
+                                petNm = "사이즈/품종 선택",
+                                petEnNm = "",
+                                petInfoUnqNo = 0,
+                                petTypCd = ""
+                            )
+                        )
+                              },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
@@ -377,7 +399,19 @@ fun ModifyPetInfoScreen(
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
                 Button(
-                    onClick = { viewModel.updatePetDorC("고양이") },
+                    enabled = petDorC != "고양이",
+                    onClick = {
+                        viewModel.updatePetDorC("고양이")
+                        viewModel.updatePetKind(
+                            PetListData(
+                                petDogSzCd = "",
+                                petNm = "사이즈/품종 선택",
+                                petEnNm = "",
+                                petInfoUnqNo = 0,
+                                petTypCd = ""
+                            )
+                        )
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
