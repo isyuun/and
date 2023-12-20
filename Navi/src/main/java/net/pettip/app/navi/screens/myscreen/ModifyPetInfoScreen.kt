@@ -107,6 +107,7 @@ import net.pettip.data.SCD
 import net.pettip.data.SggList
 import net.pettip.data.UmdList
 import net.pettip.data.pet.PetListData
+import net.pettip.util.Log
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -371,7 +372,7 @@ fun ModifyPetInfoScreen(
                     ,
                     shape = RoundedCornerShape(12.dp),
                     colors = if("강아지" == petDorC) {
-                        ButtonDefaults.buttonColors(design_select_btn_bg)
+                        ButtonDefaults.buttonColors(containerColor = design_select_btn_bg, disabledContainerColor = design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
@@ -418,7 +419,7 @@ fun ModifyPetInfoScreen(
                         .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = if("고양이" == petDorC) {
-                        ButtonDefaults.buttonColors(design_select_btn_bg)
+                        ButtonDefaults.buttonColors(containerColor = design_select_btn_bg, disabledContainerColor = design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
@@ -510,7 +511,11 @@ fun ModifyPetInfoScreen(
 
             CustomTextField(
                 value = petName,
-                onValueChange = { viewModel.updatePetName(it) },
+                onValueChange = {
+                    if (it.length <=10){
+                        viewModel.updatePetName(it)
+                    }
+                },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -632,8 +637,9 @@ fun ModifyPetInfoScreen(
                             modifier = Modifier.weight(0.3f),
                             textModifier = Modifier.padding(8.dp),
                             textStyle = TextStyle(
-                                fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = design_login_text
-                            )
+                                fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            dividerColor = MaterialTheme.colorScheme.onPrimary
                         )
                         Picker(
                             state = monthPickerState,
@@ -643,8 +649,9 @@ fun ModifyPetInfoScreen(
                             modifier = Modifier.weight(0.2f),
                             textModifier = Modifier.padding(8.dp),
                             textStyle = TextStyle(
-                                fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = design_login_text
-                            )
+                                fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            dividerColor = MaterialTheme.colorScheme.onPrimary
                         )
                         Picker(
                             state = dayPickerState,
@@ -654,8 +661,9 @@ fun ModifyPetInfoScreen(
                             modifier = Modifier.weight(0.3f),
                             textModifier = Modifier.padding(8.dp),
                             textStyle = TextStyle(
-                                fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = design_login_text
-                            )
+                                fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            dividerColor = MaterialTheme.colorScheme.onPrimary
                         )
                         Button(
                             onClick = {
@@ -969,7 +977,15 @@ fun ModifyPetInfoScreen(
                             val result = viewModel.modifyPet(context,selectPet.ownrPetUnqNo)
                             if(result){
                                 sharedViewModel.loadCurrentPetInfo()
-                                sharedViewModel.loadPetInfo()
+                                val result = sharedViewModel.loadPetInfo()
+                                if (result){
+                                    val updatedPet = sharedViewModel.petInfo.value.find { it.ownrPetUnqNo == selectPet.ownrPetUnqNo }?.copy(
+                                        mngrType = selectPet.mngrType, memberList = profilePet?.memberList ?: emptyList()
+                                    )
+                                    if (updatedPet != null) {
+                                        sharedViewModel.updateProfilePet(updatedPet)
+                                    }
+                                }
                                 isLoading = false
                                 navController.popBackStack()
                             }else{

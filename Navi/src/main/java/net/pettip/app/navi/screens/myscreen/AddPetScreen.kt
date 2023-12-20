@@ -314,7 +314,7 @@ fun AddPetScreen(
                     ,
                     shape = RoundedCornerShape(12.dp),
                     colors = if("강아지" == petDorC) {
-                        ButtonDefaults.buttonColors(design_select_btn_bg)
+                        ButtonDefaults.buttonColors(containerColor = design_select_btn_bg, disabledContainerColor = design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
@@ -361,7 +361,7 @@ fun AddPetScreen(
                         .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = if("고양이" == petDorC) {
-                        ButtonDefaults.buttonColors(design_select_btn_bg)
+                        ButtonDefaults.buttonColors(containerColor = design_select_btn_bg, disabledContainerColor = design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
@@ -453,7 +453,11 @@ fun AddPetScreen(
 
             CustomTextField(
                 value = petName,
-                onValueChange = {viewModel.updatePetName(it)},
+                onValueChange = {
+                    if (it.length <=10){
+                        viewModel.updatePetName(it)
+                    }
+                                },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -571,7 +575,8 @@ fun AddPetScreen(
                             textModifier = Modifier.padding(8.dp),
                             textStyle = TextStyle(
                                 fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary
-                            )
+                            ),
+                            dividerColor = MaterialTheme.colorScheme.onPrimary
                         )
                         Picker(
                             state = monthPickerState,
@@ -582,7 +587,8 @@ fun AddPetScreen(
                             textModifier = Modifier.padding(8.dp),
                             textStyle = TextStyle(
                                 fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary
-                            )
+                            ),
+                            dividerColor = MaterialTheme.colorScheme.onPrimary
                         )
                         Picker(
                             state = dayPickerState,
@@ -593,7 +599,8 @@ fun AddPetScreen(
                             textModifier = Modifier.padding(8.dp),
                             textStyle = TextStyle(
                                 fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary
-                            )
+                            ),
+                            dividerColor = MaterialTheme.colorScheme.onPrimary
                         )
                         Button(
                             onClick = {
@@ -797,7 +804,7 @@ fun AddPetScreen(
             }
 
             Text(text = "중성화", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = design_login_text
+                modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
             Row (modifier = Modifier
