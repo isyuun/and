@@ -1,14 +1,15 @@
 /*
  * Copyright (c) 2023. PetTip All right reserved.
- * This software is the proprietary information of Care Pet.
+ * This software is the proprietary information of Care Biz.
  *
- *  Revision History
- *  Author                         Date          Description
- *  --------------------------     ----------    ----------------------------------------
- *  isyuun@care-biz.co.kr             2023. 9. 20.   description...
+ * Revision History
+ *   Author                         Date          Description
+ *   --------------------------     ----------    ----------------------------------------
+ *   isyuun                         2023.12.20
+ *
  */
 
-package net.pettip.app.navi
+package net.pettip._test.app.navi
 
 /**import net.pettip.util.__CLASSNAME__*/
 

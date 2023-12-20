@@ -1,4 +1,15 @@
-package net.pettip.app.navi
+/*
+ * Copyright (c) 2023. PetTip All right reserved.
+ * This software is the proprietary information of Care Biz.
+ *
+ * Revision History
+ *   Author                         Date          Description
+ *   --------------------------     ----------    ----------------------------------------
+ *   isyuun                         2023.12.20
+ *
+ */
+
+package net.pettip._test.app.navi
 
 import android.content.Context
 import android.content.Intent

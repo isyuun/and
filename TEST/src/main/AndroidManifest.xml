@@ -8,8 +8,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.And">
+        <!--android:name="NEW:net.pettip._test.app.navi.MainActivity"-->
+        <!--android:name="ORG:com.example.test.MainActivity"-->
         <activity
-            android:name=".MainActivity"
+            android:name="net.pettip._test.app.navi.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.And">
