@@ -225,7 +225,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     }
 
     val upCmntNo0:List<Cmnt> = cmntList?.filter { cmnt ->
-        cmnt.upCmntNo == 0 } ?: emptyList()
+        cmnt.upCmntNo == cmnt.cmntNo } ?: emptyList()
 
     LaunchedEffect(key1 = onReply){
         if (onReply){

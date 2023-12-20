@@ -149,8 +149,6 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
             settingViewModel.updateMemberList(null)
         }
     }
-
-    val petInfo by sharedViewModel.petInfo.collectAsState()
     val selectedPet by sharedViewModel.profilePet.collectAsState()
 
     val memberList by settingViewModel.memberList.collectAsState()
