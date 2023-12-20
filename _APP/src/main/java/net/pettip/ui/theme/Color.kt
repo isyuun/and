@@ -11,6 +11,6 @@ import androidx.compose.ui.graphics.Color
 //val Pink40 = Color(0xFF7D5260)
 
 val IFCommBlue = Color(0xFF3AA5FF)
-val IFCommGreem = Color(0xFF2DCC66)
+val IFCommGreen = Color(0xFF2DCC66)
 val IFCommYellow = Color(0xFFFDA50E)
 val IFCommRed = Color(0xFFF94B65)

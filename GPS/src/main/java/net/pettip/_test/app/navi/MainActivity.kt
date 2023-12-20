@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import net.pettip.app.withClick
 import net.pettip.ui.theme.APPTheme
 import net.pettip.ui.theme.IFCommBlue
-import net.pettip.ui.theme.IFCommGreem
+import net.pettip.ui.theme.IFCommGreen
 import net.pettip.ui.theme.IFCommRed
 import net.pettip.ui.theme.IFCommYellow
 import net.pettip.util.Log
@@ -103,19 +103,19 @@ class MainActivity : ComponentActivity() {
     fun Content() {
         val context = LocalContext.current
         val shape = RoundedCornerShape(20.0.dp)
-        val border = 0.5.dp
+        val width = 0.5.dp
         val padding = 12.0.dp
         val modifier = Modifier
             .fillMaxSize()
             .padding(20.0.dp)
             .clip(shape = shape)
             .border(
-                width = border,
+                width = width,
                 color = MaterialTheme.colorScheme.outline,
                 shape = shape,
             )
             .clickable {}
-        var enabled by remember { mutableStateOf(true) }
+        var enabled by remember { mutableStateOf(false) }
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Box(contentAlignment = Alignment.TopEnd) {
@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
         // A surface container using the 'surface'(default) color from the theme
         Surface(
             modifier = modifier.clickable(onClick = withClick(context) {}),
-            border = BorderStroke(0.9.dp, Color.Yellow),
+            border = BorderStroke(0.9.dp, Color.Cyan),
         ) {
             Text(text = "Surface:surface", modifier = Modifier.padding(horizontal = padding))
             Box(
@@ -133,7 +133,7 @@ class MainActivity : ComponentActivity() {
                 modifier = modifier
                     .padding(2.0.dp)
                     .border(
-                        width = border,
+                        width = width,
                         color = Color.Red,
                         shape = shape,
                     ),
@@ -145,8 +145,8 @@ class MainActivity : ComponentActivity() {
                 modifier = modifier
                     .padding(4.0.dp)
                     .border(
-                        width = border,
-                        color = Color.Blue,
+                        width = width,
+                        color = Color.Yellow,
                         shape = shape,
                     ),
             ) {
@@ -170,9 +170,13 @@ class MainActivity : ComponentActivity() {
                         Text(text = "Column", modifier = Modifier.padding(horizontal = padding))
                         Button(
                             modifier = Modifier.fillMaxWidth(),
-                            onClick = withClick { enabled != enabled },
-                            //colors = ButtonDefaults.buttonColors(Color.White),
-                        ) { Text(text = if (enabled) "Btn:enable" else "Btn:disable") }
+                            onClick = withClick {
+                                Log.i(__CLASSNAME__, "${getMethodName()}$enabled")
+                                enabled = !enabled
+                                Log.w(__CLASSNAME__, "${getMethodName()}$enabled")
+                            },
+                            colors = ButtonDefaults.buttonColors(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary),
+                        ) { Text(text = if (enabled) "Btn:primary:enable" else "Btn:inverseP:disable") }
                         Divider()
                         Button(
                             modifier = Modifier.fillMaxWidth(),
@@ -204,19 +208,19 @@ class MainActivity : ComponentActivity() {
                             onClick = withClick { },
                             colors = ButtonDefaults.buttonColors(IFCommBlue),
                             enabled = enabled,
-                        ) { Text(text = "Btn:IFC_Blue") }
+                        ) { Text(text = "Btn:IFCommBlue") }
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { },
-                            colors = ButtonDefaults.buttonColors(IFCommGreem),
+                            colors = ButtonDefaults.buttonColors(IFCommGreen),
                             enabled = enabled,
-                        ) { Text(text = "Btn:IFC_Greem") }
+                        ) { Text(text = "Btn:IFCommGreen") }
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { },
                             colors = ButtonDefaults.buttonColors(IFCommYellow),
                             enabled = enabled,
-                        ) { Text(text = "Btn:IFC_Yellow") }
+                        ) { Text(text = "Btn:IFCommYellow") }
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { },
@@ -225,7 +229,7 @@ class MainActivity : ComponentActivity() {
                         ) { Text(text = "Btn:IFC_Redy") }
                         //TextField(value = "TextField", onValueChange = {})
                         OutlinedTextField(
-                            value = "OutlinedTF", onValueChange = {},
+                            value = "OutlinedTextF...", onValueChange = {},
                             enabled = enabled,
                         )
                     } //Row
@@ -241,7 +245,7 @@ class MainActivity : ComponentActivity() {
             //        //.clickable {}
             //) {
             //    Column(
-            //        modifier = Modifier.fillMaxSize(),
+            //        //modifier = Modifier.fillMaxSize(),
             //        horizontalAlignment = Alignment.CenterHorizontally,
             //        verticalArrangement = Arrangement.Center
             //    ) {
