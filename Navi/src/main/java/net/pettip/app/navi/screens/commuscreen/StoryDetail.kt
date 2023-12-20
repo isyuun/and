@@ -1206,7 +1206,7 @@ fun CommentListItem(
 
     val cmntList by viewModel.cmntList.collectAsState()
     val step2CmntList:List<Cmnt> = cmntList?.filter { cmnt ->
-        cmnt.upCmntNo == comment.cmntNo } ?: emptyList()
+        cmnt.upCmntNo == comment.cmntNo && cmnt.upCmntNo != cmnt.cmntNo } ?: emptyList()
 
     val storyDetail by viewModel.storyDetail.collectAsState()
     val atchPath = storyDetail?.data?.atchPath ?: ""
