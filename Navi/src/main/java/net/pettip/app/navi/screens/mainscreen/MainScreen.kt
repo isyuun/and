@@ -86,6 +86,8 @@ import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
+import net.pettip.util.Log
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
