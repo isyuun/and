@@ -27,7 +27,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -35,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -96,7 +99,7 @@ class MainActivity : ComponentActivity() {
     private fun SetContent() {
         APPTheme {
             Content()
-        } //APPTheme
+        }
     }
 
     @Composable
@@ -164,7 +167,7 @@ class MainActivity : ComponentActivity() {
                         modifier = modifier
                             .padding(8.0.dp)
                             .weight(0.9f)
-                            .clickable {},
+                            .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(padding),
                     ) {
                         Text(text = "Column", modifier = Modifier.padding(horizontal = padding))
@@ -176,7 +179,7 @@ class MainActivity : ComponentActivity() {
                                 Log.w(__CLASSNAME__, "${getMethodName()}$enabled")
                             },
                             colors = ButtonDefaults.buttonColors(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary),
-                        ) { Text(text = if (enabled) "Btn:primary:enable" else "Btn:inverseP:disable") }
+                        ) { Text(text = if (enabled) "Btn:enable" else "Btn:disable") }
                         Divider()
                         Button(
                             modifier = Modifier.fillMaxWidth(),
@@ -227,7 +230,10 @@ class MainActivity : ComponentActivity() {
                             colors = ButtonDefaults.buttonColors(IFCommRed),
                             enabled = enabled,
                         ) { Text(text = "Btn:IFCommRed") }
-                        //TextField(value = "TextField", onValueChange = {})
+                        TextField(
+                            value = "TextField", onValueChange = {},
+                            enabled = enabled,
+                        )
                         OutlinedTextField(
                             value = "OutlinedTextF...", onValueChange = {},
                             enabled = enabled,
