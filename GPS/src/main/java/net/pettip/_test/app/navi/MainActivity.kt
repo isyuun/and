@@ -226,7 +226,7 @@ class MainActivity : ComponentActivity() {
                             onClick = withClick { },
                             colors = ButtonDefaults.buttonColors(IFCommRed),
                             enabled = enabled,
-                        ) { Text(text = "Btn:IFC_Redy") }
+                        ) { Text(text = "Btn:IFCommRed") }
                         //TextField(value = "TextField", onValueChange = {})
                         OutlinedTextField(
                             value = "OutlinedTextF...", onValueChange = {},
