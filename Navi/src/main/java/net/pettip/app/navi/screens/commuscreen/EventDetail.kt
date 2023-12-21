@@ -140,7 +140,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
 
     var cmntExpanded by remember{ mutableStateOf(true) }
     val upCmntNo0:List<BbsCmnt> = cmntList?.filter { cmnt ->
-        cmnt.upCmntNo == 0 } ?: emptyList()
+        cmnt.upCmntNo == cmnt.pstCmntNo } ?: emptyList()
 
     var refresh by remember{ mutableStateOf(false) }
     var isLoading by remember{ mutableStateOf(false) }
@@ -649,7 +649,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
 
     val cmntList by viewModel.eventCmntList.collectAsState()
     val step2CmntList:List<BbsCmnt> = cmntList?.filter { cmnt ->
-        cmnt.upCmntNo == comment.pstCmntNo } ?: emptyList()
+        cmnt.upCmntNo == comment.pstCmntNo && cmnt.upCmntNo != cmnt.pstCmntNo} ?: emptyList()
 
     val eventDetail by viewModel.bbsDetail.collectAsState()
     var expand by remember { mutableStateOf(false) }
@@ -1331,7 +1331,7 @@ fun BbsCommentListItem2(
                         value = updateComment?:"",
                         onValueChange = { updateComment = it},
                         textStyle = TextStyle(
-                            color = design_login_text,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp,
                             letterSpacing = (-0.7).sp
@@ -1361,7 +1361,16 @@ fun BbsCommentListItem2(
                             ),
                             focusedIndicatorColor = MaterialTheme.colorScheme.onPrimary,
                             unfocusedIndicatorColor = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
+                        ),
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "", tint = design_skip,
+                                modifier = Modifier
+                                    .size(14.dp)
+                                    .clickable { updateComment = "" }
+                            )
+                        }
                     )
 
                     Box(
