@@ -11,7 +11,7 @@
         <!--android:name="NEW:net.pettip._test.app.navi.MainActivity"-->
         <!--android:name="ORG:com.example.test.MainActivity"-->
         <activity
-            android:name="net.pettip._test.app.navi.MainActivity"
+            android:name="com.example.test.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.And">
