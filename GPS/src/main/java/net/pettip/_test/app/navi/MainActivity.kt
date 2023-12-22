@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.pettip.app.withClick
@@ -179,64 +180,80 @@ class MainActivity : ComponentActivity() {
                                 Log.w(__CLASSNAME__, "${getMethodName()}$enabled")
                             },
                             colors = ButtonDefaults.buttonColors(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary),
-                        ) { Text(text = if (enabled) "Btn:enable" else "Btn:disable") }
+                        ) { Text(text = if (enabled) "Btn:primary:enable" else "Btn:inversePrimary:disable", maxLines = 1, overflow = TextOverflow.Ellipsis) }
                         Divider()
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { openMap(context) },
                             colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                             enabled = enabled,
-                        ) { Text(text = "Btn:primary") }
+                        ) { Text(text = "Btn:primary", maxLines = 1, overflow = TextOverflow.Ellipsis) }
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { openGpx(context) },
                             colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.inversePrimary),
                             enabled = enabled,
-                        ) { Text(text = "Btn:inversePrimary") }
+                        ) { Text(text = "Btn:inversePrimary", maxLines = 1, overflow = TextOverflow.Ellipsis) }
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { },
                             colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
                             enabled = enabled,
-                        ) { Text(text = "Btn:secondary") }
+                        ) { Text(text = "Btn:secondary", maxLines = 1, overflow = TextOverflow.Ellipsis) }
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { },
                             colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary),
                             enabled = enabled,
-                        ) { Text(text = "Btn:tertiary") }
+                        ) { Text(text = "Btn:tertiary", maxLines = 1, overflow = TextOverflow.Ellipsis) }
 
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { },
                             colors = ButtonDefaults.buttonColors(IFCommBlue),
                             enabled = enabled,
-                        ) { Text(text = "Btn:IFCommBlue") }
+                        ) { Text(text = "Btn:IFCommBlue", maxLines = 1, overflow = TextOverflow.Ellipsis) }
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { },
                             colors = ButtonDefaults.buttonColors(IFCommGreen),
                             enabled = enabled,
-                        ) { Text(text = "Btn:IFCommGreen") }
+                        ) { Text(text = "Btn:IFCommGreen", maxLines = 1, overflow = TextOverflow.Ellipsis) }
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { },
                             colors = ButtonDefaults.buttonColors(IFCommYellow),
                             enabled = enabled,
-                        ) { Text(text = "Btn:IFCommYellow") }
+                        ) { Text(text = "Btn:IFCommYellow", maxLines = 1, overflow = TextOverflow.Ellipsis) }
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = withClick { },
                             colors = ButtonDefaults.buttonColors(IFCommRed),
                             enabled = enabled,
-                        ) { Text(text = "Btn:IFCommRed") }
+                        ) { Text(text = "Btn:IFCommRed", maxLines = 1, overflow = TextOverflow.Ellipsis) }
                         TextField(
                             value = "TextField", onValueChange = {},
+                            singleLine = true,
                             enabled = enabled,
+                            isError = false,
+                        )
+                        TextField(
+                            value = "TextField:Error", onValueChange = {},
+                            singleLine = true,
+                            enabled = enabled,
+                            isError = true,
                         )
                         OutlinedTextField(
-                            value = "OutlinedTextF...", onValueChange = {},
+                            value = "OutlinedTextField", onValueChange = {},
+                            singleLine = true,
                             enabled = enabled,
+                            isError = false,
+                        )
+                        OutlinedTextField(
+                            value = "OutlinedTextField:Error", onValueChange = {},
+                            singleLine = true,
+                            enabled = enabled,
+                            isError = true,
                         )
                     } //Row
                 }   //Column
