@@ -205,8 +205,8 @@ private fun IconButton2(
         if (text.isNotEmpty())
             Text(
                 text = text,
-                fontWeight = FontWeight.Bold,
                 color = color,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.background(Color.Transparent),
             )
         IconButton(
@@ -347,8 +347,8 @@ fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track
         if (coords.size > 1) {
             val path = PathOverlay()
             path.coords = coords
-            path.color = 0xA0FFDBDB.toInt()
-            path.outlineColor = 0xA0FF5000.toInt()
+            path.color = Color(0xA0FFDBDB).toArgb()
+            path.outlineColor = Color(0xA0FF5000).toArgb()
             path.width = 18
             path.globalZIndex = 10
             path.outlineWidth = 3
@@ -492,7 +492,6 @@ private fun WalkPetRow(pet: CurrentPetData, checked: Boolean, onCheckedChange: (
                 Text(
                     text = petNm,
                     fontSize = 16.sp,
-                    color = Color.Gray
                 )
                 Checkbox(
                     checked = check,
@@ -537,7 +536,6 @@ private fun WalkPetCol(pet: CurrentPetData, checked: Boolean, onCheckedChange: (
                 modifier = Modifier.fillMaxWidth(),
                 text = petNm,
                 fontSize = 16.sp,
-                color = Color.Gray
             )
             Checkbox(
                 checked = check,
@@ -1137,7 +1135,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color(0xB0000000))
+                .background(color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.8f))
                 .clickable(enabled = showPetsSheet) {
                     showPetsSheet = false
                     refresh = !refresh

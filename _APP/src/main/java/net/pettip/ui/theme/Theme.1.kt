@@ -22,16 +22,22 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    //primary = Color(0xFF4783F5),//Color.Red, //test
-    //inversePrimary = Color(0xFFF54F68),
-    //onPrimary = Color(0xFFFFFFFF),
-    //secondary = Color(0xFFF54F68),//Color.Blue,//test
+    //primary = Color.Red,        //test
+    //secondary = Color.Blue,     //test
+    //tertiary = Color.Yellow,    //test
+    //background = Color.Cyan,    //test
+    //surface = Color.Black,      //test
+    primary = Color(0xFF4783F5),
+    inversePrimary = Color(0xFFF54F68),
+    onPrimary = Color(0xFFFFFFFF),
+    //secondary = Color(0xFFF54F68),
     //onSecondary = Color(0xFFFFFFFF),
     //tertiary = Color(0xFFEFB8C8),
     //onTertiary = Color(0xFF1C1B1F),
@@ -43,10 +49,15 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    //primary = Color(0xFF4783F5),//Color.Blue,//test
-    //inversePrimary = Color(0xFFF54F68),
-    //onPrimary = Color(0xFFFFFFFF),
-    //secondary = Color(0xFFF54F68),//Color.Red,//test
+    //primary = Color.Blue,       //test
+    //secondary = Color.Red,      //test
+    //tertiary = Color.Yellow,    //test
+    //background = Color.Cyan,    //test
+    //surface = Color.White,      //test
+    primary = Color(0xFF4783F5),
+    inversePrimary = Color(0xFFF54F68),
+    onPrimary = Color(0xFFFFFFFF),
+    //secondary = Color(0xFFF54F68),
     //onSecondary = Color(0xFFFFFFFF),
     //tertiary = Color(0xFFEFB8C8),
     //onTertiary = Color(0xFF1C1B1F),

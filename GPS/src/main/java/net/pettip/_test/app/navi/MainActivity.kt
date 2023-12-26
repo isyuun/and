@@ -56,6 +56,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -293,26 +294,30 @@ class MainActivity : ComponentActivity() {
                 colors = ButtonDefaults.buttonColors(IFCommRed),
                 enabled = enabled,
             ) { Text(text = "Btn:IFCommRed", maxLines = 1, overflow = TextOverflow.Ellipsis) }
+            var text1 by remember { mutableStateOf(TextFieldValue("TextField")) }
             TextField(
-                value = "TextField", onValueChange = {},
+                value = text1, onValueChange = { text1 = it },
                 singleLine = true,
                 enabled = enabled,
                 isError = false,
             )
+            var text2 by remember { mutableStateOf(TextFieldValue("TextField:Error")) }
             TextField(
-                value = "TextField:Error", onValueChange = {},
+                value = text2, onValueChange = { text2 = it },
                 singleLine = true,
                 enabled = enabled,
                 isError = true,
             )
+            var text3 by remember { mutableStateOf(TextFieldValue("OutlinedTextField")) }
             OutlinedTextField(
-                value = "OutlinedTextField", onValueChange = {},
+                value = text3, onValueChange = { text3 = it },
                 singleLine = true,
                 enabled = enabled,
                 isError = false,
             )
+            var text4 by remember { mutableStateOf(TextFieldValue("OutlinedTextField:Error")) }
             OutlinedTextField(
-                value = "OutlinedTextField:Error", onValueChange = {},
+                value = text4, onValueChange = { text4 = it },
                 singleLine = true,
                 enabled = enabled,
                 isError = true,
