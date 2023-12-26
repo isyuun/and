@@ -16,35 +16,31 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    //primary = Color.Red,      //test
-    //secondary = Color.Blue,   //test
     primary = Color(0xFFD0BCFF),
     secondary = Color(0xFFCCC2DC),
     tertiary = Color(0xFFEFB8C8),
 
-    /** Other default colors to override */
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color(0xFFFFFFFF),
-    onSecondary = Color(0xFFFFFFFF),
-    onTertiary = Color(0xFFFFFFFF),
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
+    ///** Other default colors to override */
+    //background = Color(0xFFFFFBFE),
+    //surface = Color(0xFFFFFBFE),
+    //onPrimary = Color(0xFFFFFFFF),
+    //onSecondary = Color(0xFFFFFFFF),
+    //onTertiary = Color(0xFFFFFFFF),
+    //onBackground = Color(0xFF1C1B1F),
+    //onSurface = Color(0xFF1C1B1F),
 )
 
 private val LightColorScheme = lightColorScheme(
-    //primary = Color.Blue,       //test
-    //secondary = Color.Red,      //test
     primary = Color(0xFF6650a4),
     secondary = Color(0xFF625b71),
     tertiary = Color(0xFF7D5260),
 
-    /** Other default colors to override */
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color(0xFFFFFFFF),
-    onSecondary = Color(0xFFFFFFFF),
-    onTertiary = Color(0xFFFFFFFF),
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
+    ///** Other default colors to override */
+    //background = Color(0xFFFFFBFE),
+    //surface = Color(0xFFFFFBFE),
+    //onPrimary = Color(0xFFFFFFFF),
+    //onSecondary = Color(0xFFFFFFFF),
+    //onTertiary = Color(0xFFFFFFFF),
+    //onBackground = Color(0xFF1C1B1F),
+    //onSurface = Color(0xFF1C1B1F),
 )

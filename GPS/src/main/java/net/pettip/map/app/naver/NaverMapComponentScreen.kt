@@ -194,7 +194,7 @@ private fun IconButton2(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit,
 ) {
-    val border: Color = MaterialTheme.colorScheme.tertiary
+    val border: Color = MaterialTheme.colorScheme.outline
     Row(
         horizontalArrangement = Arrangement.spacedBy(
             space = 8.0.dp,
@@ -679,7 +679,7 @@ private fun WalkInfoNavi(
                         )
                         .border(
                             width = 0.1.dp,
-                            color = MaterialTheme.colorScheme.tertiary,
+                            color = MaterialTheme.colorScheme.outline,
                             shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
                         )
                         .padding(horizontal = 24.0.dp)
@@ -739,7 +739,7 @@ private fun WalkInfoNavi(
                         )
                         .border(
                             width = 0.1.dp,
-                            color = MaterialTheme.colorScheme.tertiary,
+                            color = MaterialTheme.colorScheme.outline,
                             shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
                         )
                         .padding(horizontal = 24.0.dp)
@@ -886,7 +886,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
 
     val buttonText = if (start) stringResource(id = R.string.walk_button_end) else stringResource(R.string.walk_button_start)
-    val buttonColors = if (start) ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary) else ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+    val buttonColors = if (start) ButtonDefaults.buttonColors(MaterialTheme.colorScheme.inversePrimary) else ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
 
     val activity = LocalContext.current as Activity
 
@@ -1369,7 +1369,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             shape = RoundedCornerShape(12.0.dp),
                             modifier = Modifier.weight(1.0f),
                             contentPadding = PaddingValues(14.0.dp),
-                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.inversePrimary),
                         ) {
                             Text(text = stringResource(id = R.string.walk_button_finish))
                         }

@@ -21,6 +21,7 @@ import net.pettip.gpx.TRACK_ZERO_NUM
 import net.pettip.gpx.Track
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
+import java.io.File
 
 /**
  * @Project     : carepet-android
@@ -191,4 +192,6 @@ open class gpsapplication3 : gpsapplication2() {
     var preview: Bitmap? = null
 
     fun last() = this.service?.last()
+
+    fun show(file: File) = this.service?.show(file)
 }

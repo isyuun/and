@@ -5,11 +5,11 @@
  * Revision History
  *   Author                         Date          Description
  *   --------------------------     ----------    ----------------------------------------
- *   isyuun                         2023.12.8
+ *   isyuun                         2023.12.20
  *
  */
 
-package net.pettip.app.navi
+package net.pettip._test.app.navi
 
 import android.os.Bundle
 import android.view.WindowManager
