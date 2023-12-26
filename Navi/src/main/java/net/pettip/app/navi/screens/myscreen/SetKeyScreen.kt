@@ -57,14 +57,13 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.ui.theme.design_CBE8F3
 import net.pettip.app.navi.ui.theme.design_button_bg
-import net.pettip.app.navi.ui.theme.design_login_bg
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SettingViewModel
+import net.pettip.app.navi.viewmodel.SharedViewModel
+import net.pettip.util.Log
 
 @Composable
-fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewModel){
+fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingViewModel, sharedViewModel: SharedViewModel){
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -118,7 +117,7 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
 
                 Spacer(modifier = Modifier.padding(top = 20.dp))
 
-                SetKeyTemp(settingViewModel = settingViewModel)
+                SetKeyTemp(settingViewModel = settingViewModel, sharedViewModel = sharedViewModel)
 
                 Spacer(modifier = Modifier.padding(top = 40.dp))
 
@@ -163,11 +162,12 @@ fun SetKeyScreen(navController:NavHostController, settingViewModel: SettingViewM
 
 @OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
 @Composable
-fun SetKeyTemp(settingViewModel: SettingViewModel){
+fun SetKeyTemp(settingViewModel: SettingViewModel, sharedViewModel: SharedViewModel){
 
     val context = LocalContext.current
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
+    val inviCode by sharedViewModel.inviteCode.collectAsState()
     val otpValue by settingViewModel.otpValue.collectAsState()
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
     val inputService = LocalTextInputService.current
@@ -175,6 +175,11 @@ fun SetKeyTemp(settingViewModel: SettingViewModel){
     LaunchedEffect(Unit){
         focusRequester.requestFocus()
         settingViewModel.updateOtpValue("")
+
+        if (inviCode != null){
+            settingViewModel.updateOtpValue(inviCode?:"")
+            sharedViewModel.updateInviteCode(null)
+        }
     }
 
     BasicTextField(

@@ -430,8 +430,6 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
                 connection.connect()
 
                 if (connection.responseCode != HttpURLConnection.HTTP_OK) {
-                    // HTTP 요청이 성공적이지 않은 경우
-                    // 필요에 따라 예외 처리를 추가할 수 있습니다.
                     throw IOException("HTTP error code: ${connection.responseCode}")
                 }
 

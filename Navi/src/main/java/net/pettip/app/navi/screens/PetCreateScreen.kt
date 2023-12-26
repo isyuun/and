@@ -237,7 +237,7 @@ fun PetCreateScreen(
                                             userPw,
                                             snsLogin
                                         )
-                                    if (loginSuccess) {
+                                    if (loginSuccess == 0) {
                                         sharedViewModel.updateInit(true)
                                         navController.navigate(Screen.MainScreen.route) {
                                             popUpTo(0)
@@ -901,7 +901,7 @@ fun PetCreateScreen(
                             val userCreateSuccess = viewModel.sendUserToServer()
                             if (userCreateSuccess){
                                 val loginSuccess = loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)
-                                if (loginSuccess){
+                                if (loginSuccess == 0){
                                     val petCreateSuccess = viewModel.createPet(context)
                                     if(petCreateSuccess){
                                         isLoading = false

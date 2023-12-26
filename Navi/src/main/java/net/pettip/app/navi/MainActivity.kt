@@ -1,14 +1,11 @@
 package net.pettip.app.navi
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseIn
@@ -19,26 +16,17 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -54,7 +42,6 @@ import net.pettip.app.navi.screens.IdPwSearchScreen
 import net.pettip.app.navi.screens.IntroScreen
 import net.pettip.app.navi.screens.LocationPickContent
 import net.pettip.app.navi.screens.LoginScreen
-import net.pettip.app.navi.screens.PermissionScreen
 import net.pettip.app.navi.screens.PetCreateScreen
 import net.pettip.app.navi.screens.PetKindContent
 import net.pettip.app.navi.screens.PwFindScreen
@@ -65,11 +52,10 @@ import net.pettip.app.navi.screens.commuscreen.EventEndDetail
 import net.pettip.app.navi.screens.commuscreen.StoryDetail
 import net.pettip.app.navi.screens.mainscreen.MainScreen
 import net.pettip.app.navi.screens.mainscreen.SettingScreen
-import net.pettip.app.navi.screens.mainscreen.WalkScreen
+import net.pettip.app.navi.screens.mainscreen.clearPushDataFromIntent
 import net.pettip.app.navi.screens.myscreen.AddPetScreen
 import net.pettip.app.navi.screens.myscreen.InquiryDetail
 import net.pettip.app.navi.screens.myscreen.InviteScreen
-import net.pettip.app.navi.screens.myscreen.ModifyInquiryScreen
 import net.pettip.app.navi.screens.myscreen.ModifyPetInfoScreen
 import net.pettip.app.navi.screens.myscreen.NotiDetail
 import net.pettip.app.navi.screens.myscreen.OneNOneScreen
@@ -90,7 +76,7 @@ import net.pettip.app.navi.viewmodel.UserCreateViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.SCDLocalData
 import net.pettip.singleton.G
-import java.io.File
+import net.pettip.util.Log
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -98,14 +84,22 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //WindowCompat.setDecorFitsSystemWindows(window, true)
+        val intentData: Uri? = intent.data
+        if (intentData != null) {
+            val pathSegments: List<String>? = intentData.pathSegments
+            val lastPathSegment: String? = pathSegments?.lastOrNull()
 
+            if (!lastPathSegment.isNullOrBlank() && lastPathSegment.length == 6) {
+                G.inviteCode = lastPathSegment
 
-        val data = intent.extras;
+                Log.d("LOG","data :$lastPathSegment")
+            }
+        }
+
         setContent {
             AppTheme {
                 Surface {
-                    MyApp(data)
+                    MyApp(intentData)
                 }
             }
         }
@@ -125,16 +119,15 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun MyApp(data: Bundle?) {
+fun MyApp(intentData: Uri?) {
     val navController = rememberNavController()
 
-    AppNavigation(navController = navController, data = data)
+    AppNavigation(navController = navController, intentData = intentData)
 }
-
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun AppNavigation(navController: NavHostController, data: Bundle?){
+fun AppNavigation(navController: NavHostController, intentData: Uri?){
 
     val scdLocalData = remember { SCDLocalData() }
 
@@ -162,7 +155,6 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
             count = 3
         }
     }
-    sharedViewModel.updatePushData(data)
 
     NavHost(
         navController = navController,
@@ -171,32 +163,25 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
         exitTransition = { fadeOut(tween(700)) }
     ){
         composable(
-            route = "detail",
+            route = "intro",
             deepLinks = listOf(
                 navDeepLink {
-                    uriPattern = "http://pettip.kr/{seqNo}"
+                    uriPattern = "http://carepet.hopto.org/{data}"
                     action = Intent.ACTION_VIEW
                 }
             ),
             arguments = listOf(
-                navArgument("schUnqNo"){
-                    type = NavType.IntType
-                    defaultValue = 1
+                navArgument("data"){
+                    type = NavType.StringType
+                    defaultValue = ""
                 }
             )
-        ){entry ->
-            val id = entry.arguments?.getInt("schUnqNo")
-
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ){
-                Text(text = id.toString())
+        ){
+            val data = it.arguments?.getString("data")
+            if (!data.isNullOrBlank()){
+                sharedViewModel.updateInviteCode(data)
+                Log.d("LOG","intro: $data")
             }
-        }
-
-        composable("intro"){
-
             IntroScreen(navController = navController, viewModel = sharedViewModel)
         }
         composable("login"){
@@ -238,7 +223,9 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
                 sharedViewModel = sharedViewModel,
                 walkViewModel = walkViewModel,
                 communityViewModel = communityViewModel,
-                settingViewModel = settingViewModel)
+                settingViewModel = settingViewModel,
+                data = intentData
+            )
         }
 
         composable("postScreen"){
@@ -330,31 +317,6 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
         ){
             InquiryDetail(navController = navController, viewModel = communityViewModel, settingViewModel = settingViewModel)
         }
-        //composable(
-        //    route = "modifyInquiryScreen",
-        //    enterTransition = {
-        //        fadeIn(
-        //            animationSpec = tween(
-        //                300, easing = LinearEasing
-        //            )
-        //        ) + slideIntoContainer(
-        //            animationSpec = tween(300, easing = EaseIn),
-        //            towards = AnimatedContentTransitionScope.SlideDirection.Start
-        //        )
-        //    },
-        //    exitTransition = {
-        //        fadeOut(
-        //            animationSpec = tween(
-        //                300, easing = LinearEasing
-        //            )
-        //        ) + slideOutOfContainer(
-        //            animationSpec = tween(300, easing = EaseOut),
-        //            towards = AnimatedContentTransitionScope.SlideDirection.End
-        //        )
-        //    }
-        //){
-        //    ModifyInquiryScreen(navController = navController, viewModel = communityViewModel, settingViewModel = settingViewModel)
-        //}
         composable("oneNOneScreen"){
             OneNOneScreen(navController = navController, settingViewModel = settingViewModel)
         }
@@ -370,8 +332,8 @@ fun AppNavigation(navController: NavHostController, data: Bundle?){
         composable("inviteScreen"){
             InviteScreen(navController = navController, settingViewModel = settingViewModel)
         }
-        composable("setKeyScreen"){
-            SetKeyScreen(navController = navController, settingViewModel = settingViewModel)
+        composable( route = "setKeyScreen" ){
+            SetKeyScreen(navController = navController, settingViewModel = settingViewModel, sharedViewModel = sharedViewModel)
         }
         composable("addPetScreen"){
             AddPetScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)

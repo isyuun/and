@@ -61,6 +61,10 @@ class SharedViewModel:ViewModel(){
         petTypCd = null
     )
 
+    private val _inviteCode = MutableStateFlow<String?>(null)
+    val inviteCode:StateFlow<String?> = _inviteCode.asStateFlow()
+    fun updateInviteCode(newValue: String?){_inviteCode.value = newValue}
+
     private val _currentTab = MutableStateFlow<String>("스토리")
     val currentTab:StateFlow<String> = _currentTab.asStateFlow()
     fun updateCurrentTab(newValue: String){ _currentTab.value = newValue}

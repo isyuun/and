@@ -70,7 +70,6 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     fun updateCurrentPetInfo(){
         sharedViewModel.viewModelScope.launch { sharedViewModel.loadCurrentPetInfo() }
     }
-
     // -------------------My Screen--------------------------
     private val _endCheck = MutableStateFlow(false) // Data 저장
     val endCheck: StateFlow<Boolean> = _endCheck.asStateFlow() // state 노출
