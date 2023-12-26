@@ -22,40 +22,39 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF4783F5),//Color.Red, //test
-    inversePrimary = Color(0xFFF54F68),
-    onPrimary = Color(0xFFFFFFFF),
-    secondary = Color(0xFFF54F68),//Color.Blue,//test
-    onSecondary = Color(0xFFFFFFFF),
-    tertiary = Color(0xFFEFB8C8),
-    onTertiary = Color(0xFF1C1B1F),
-    background = Color(0xFF1E2124),//Color.Yellow,//test
-    onBackground = Color(0xFFFFFFFF),
-    surface = Color(0xFF2D3034),//Color.Cyan,//test
-    onSurface = Color(0xFFFFFFFF),
-    outline = Color(0xFF45484D)
+    //primary = Color(0xFF4783F5),//Color.Red, //test
+    //inversePrimary = Color(0xFFF54F68),
+    //onPrimary = Color(0xFFFFFFFF),
+    //secondary = Color(0xFFF54F68),//Color.Blue,//test
+    //onSecondary = Color(0xFFFFFFFF),
+    //tertiary = Color(0xFFEFB8C8),
+    //onTertiary = Color(0xFF1C1B1F),
+    //background = Color(0xFF1E2124),//Color.Yellow,//test
+    //onBackground = Color(0xFFFFFFFF),
+    //surface = Color(0xFF2D3034),//Color.Cyan,//test
+    //onSurface = Color(0xFFFFFFFF),
+    //outline = Color(0xFF45484D)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF4783F5),//Color.Blue,//test
-    inversePrimary = Color(0xFFF54F68),
-    onPrimary = Color(0xFFFFFFFF),
-    secondary = Color(0xFFF54F68),//Color.Red,//test
-    onSecondary = Color(0xFFFFFFFF),
-    tertiary = Color(0xFFEFB8C8),
-    onTertiary = Color(0xFF1C1B1F),
-    background = Color(0xFFF6F8FC),//Color.Cyan,//test
-    onBackground = Color(0xFF1C1B1F),
-    surface = Color(0xFFFFFFFF),//Color.Yellow,//test
-    onSurface = Color(0xFF1C1B1F),
-    outline = Color(0xFFE3E9F2)
+    //primary = Color(0xFF4783F5),//Color.Blue,//test
+    //inversePrimary = Color(0xFFF54F68),
+    //onPrimary = Color(0xFFFFFFFF),
+    //secondary = Color(0xFFF54F68),//Color.Red,//test
+    //onSecondary = Color(0xFFFFFFFF),
+    //tertiary = Color(0xFFEFB8C8),
+    //onTertiary = Color(0xFF1C1B1F),
+    //background = Color(0xFFF6F8FC),//Color.Cyan,//test
+    //onBackground = Color(0xFF1C1B1F),
+    //surface = Color(0xFFFFFFFF),//Color.Yellow,//test
+    //onSurface = Color(0xFF1C1B1F),
+    //outline = Color(0xFFE3E9F2)
 )
 
 val invertedColors: ColorScheme
