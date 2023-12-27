@@ -29,11 +29,13 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    //primary = Color.Red,        //test
-    //secondary = Color.Blue,     //test
-    //tertiary = Color.Yellow,    //test
-    //background = Color.Cyan,    //test
-    //surface = Color.Black,      //test
+    //primary = Color.Red,          //test
+    //secondary = Color.Blue,       //test
+    //tertiary = Color.Yellow,      //test
+    //background = Color.Cyan,      //test
+    //surface = Color.White,          //test
+    //surfaceVariant = Color.Magenta, //test
+    //onSurfaceVariant = Color.Green, //test
     primary = Color(0xFF4783F5),
     inversePrimary = Color(0xFFF54F68),
     onPrimary = Color(0xFFFFFFFF),
@@ -41,19 +43,21 @@ private val DarkColorScheme = darkColorScheme(
     //onSecondary = Color(0xFFFFFFFF),
     //tertiary = Color(0xFFEFB8C8),
     //onTertiary = Color(0xFF1C1B1F),
-    //background = Color(0xFF1E2124),//Color.Yellow,//test
-    //onBackground = Color(0xFFFFFFFF),
-    //surface = Color(0xFF2D3034),//Color.Cyan,//test
-    //onSurface = Color(0xFFFFFFFF),
+    background = Color(0xFF1E2124),
+    onBackground = Color(0xFFFFFFFF),
+    surface = Color(0xFF2D3034),
+    onSurface = Color(0xFFFFFFFF),
     //outline = Color(0xFF45484D)
 )
 
 private val LightColorScheme = lightColorScheme(
-    //primary = Color.Blue,       //test
-    //secondary = Color.Red,      //test
-    //tertiary = Color.Yellow,    //test
-    //background = Color.Cyan,    //test
-    //surface = Color.White,      //test
+    //primary = Color.Blue,         //test
+    //secondary = Color.Red,        //test
+    //tertiary = Color.Yellow,      //test
+    //background = Color.Cyan,      //test
+    //surface = Color.Black,          //test
+    //surfaceVariant = Color.Magenta, //test
+    //onSurfaceVariant = Color.Green, //test
     primary = Color(0xFF4783F5),
     inversePrimary = Color(0xFFF54F68),
     onPrimary = Color(0xFFFFFFFF),
@@ -61,10 +65,10 @@ private val LightColorScheme = lightColorScheme(
     //onSecondary = Color(0xFFFFFFFF),
     //tertiary = Color(0xFFEFB8C8),
     //onTertiary = Color(0xFF1C1B1F),
-    //background = Color(0xFFF6F8FC),//Color.Cyan,//test
-    //onBackground = Color(0xFF1C1B1F),
-    //surface = Color(0xFFFFFFFF),//Color.Yellow,//test
-    //onSurface = Color(0xFF1C1B1F),
+    background = Color(0xFFF6F8FC),
+    onBackground = Color(0xFF1C1B1F),
+    surface = Color(0xFFFFFFFF),
+    onSurface = Color(0xFF1C1B1F),
     //outline = Color(0xFFE3E9F2)
 )
 
