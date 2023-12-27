@@ -54,22 +54,17 @@ open class foregroundonlylocationservice4() : foregroundonlylocationservice3(), 
     //    observer = null
     //}
 
-    private val _imgs = Collections.synchronizedList(ArrayList<Uri>()) // The list of Tracks
+    private val _images = Collections.synchronizedList(ArrayList<Uri>()) // The list of Tracks
     internal val images
-        get() = _imgs
-
-    override fun start() {
-        super.start()
-        _imgs.clear()
-    }
+        get() = _images
 
     internal fun img(uri: Uri) {
-        if (_imgs.size > 0 && _imgs.contains(uri)) return
-        _imgs.add(uri)
+        if (_images.size > 0 && _images.contains(uri)) return
+        _images.add(uri)
         val loc = lastLocation
-        val img = _imgs.size
+        val img = _images.size
         val trk = loc?.let { Track(it/*, no = this.no*/, event = Track.EVENT.IMG, uri = uri) }
-        Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${_imgs.size}], ${_imgs[img - 1]}, $trk")
+        Log.w(__CLASSNAME__, "${getMethodName()}[$img, ${_images.size}], ${_images[img - 1]}, $trk")
         trk?.let { _tracks.add(it) }
         write()
     }
@@ -158,7 +153,7 @@ open class foregroundonlylocationservice4() : foregroundonlylocationservice3(), 
     override fun camera() {}
 
     override fun onCamera(file: File, uri: Uri) {
-        val camera = file.length() > 0 && !_imgs.contains(uri)
+        val camera = file.length() > 0 && !_images.contains(uri)
         if (camera) {
             Log.wtf(__CLASSNAME__, "${getMethodName()}[file.length() > 0:${(file.length() > 0)}][length:${file.length()}][file:$file][uri:$uri]")
             img(uri)

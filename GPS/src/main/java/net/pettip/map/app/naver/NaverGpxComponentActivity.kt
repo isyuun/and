@@ -70,7 +70,7 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 @Composable
 fun GpxApp() {
     val application = GPSApplication.instance
-    val file = application.last()
+    val file = application.last
     Log.wtf(__CLASSNAME__, "${getMethodName()}[$application][${application.service}][$file]")
     GpxApp(file = file)
 }

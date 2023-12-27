@@ -75,11 +75,6 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
         read(file)
     }
 
-    override fun stop() {
-        super.stop()
-        Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")
-    }
-
     override fun write() {
         super.write()
         Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")
@@ -87,6 +82,11 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
 
     override fun start() {
         super.start()
+        Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")
+    }
+
+    override fun stop() {
+        super.stop()
         Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")
     }
 }

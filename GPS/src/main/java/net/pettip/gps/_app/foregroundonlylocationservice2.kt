@@ -129,6 +129,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     override fun start() {
         Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
+        super.start()
         if (running) cancel()
         running = true
         val notification = generateNotification(lastLocation)
@@ -146,7 +147,6 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
             notify(NOTIFICATION_ID, notification)
         }
         timer()
-        super.start()
     }
 
     override fun stop() {

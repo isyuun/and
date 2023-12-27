@@ -33,11 +33,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -190,36 +190,31 @@ class MainActivity : ComponentActivity() {
             contentAlignment = Alignment.BottomStart,
         ) {
             var clicked by remember { mutableStateOf(false) }
-            ExtendedFloatingActionButton(
-                text = {
+            //ExtendedFloatingActionButton(
+            //    text = { Text(text = stringResource(net.pettip.R.string.start), fontSize = 12.sp) },
+            //    icon = { Icon(if (clicked) Icons.Default.Close else Icons.Default.Add, contentDescription = null) },
+            //    onClick = withClick { clicked = !clicked },
+            //    shape = CircleShape,
+            //    expanded = clicked,
+            //)
+            FloatingActionButton(
+                onClick = withClick { openMap(context) },
+                shape = CircleShape,
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(Icons.Default.Add),
+                        contentDescription = null,
+                    )
                     Text(
                         text = stringResource(net.pettip.R.string.start),
                         fontSize = 12.sp,
                     )
-                },
-                icon = { Icon(if (clicked) Icons.Default.Close else Icons.Default.Add, contentDescription = null) },
-                onClick = withClick { clicked = !clicked },
-                shape = CircleShape,
-                expanded = clicked,
-            )
-            //FloatingActionButton(
-            //    onClick = withClick { },
-            //    shape = CircleShape,
-            //) {
-            //    Column(
-            //        horizontalAlignment = Alignment.CenterHorizontally,
-            //        verticalArrangement = Arrangement.Center
-            //    ) {
-            //        Icon(
-            //            painter = rememberVectorPainter(Icons.Default.Add),
-            //            contentDescription = null,
-            //        )
-            //        Text(
-            //            text = stringResource(net.pettip.R.string.start),
-            //            fontSize = 12.sp,
-            //        )
-            //    }
-            //}
+                }
+            }
         }
     }
 
@@ -235,6 +230,7 @@ class MainActivity : ComponentActivity() {
         ) {
             Text(text = "Column", modifier = Modifier.padding(horizontal = padding))
             ColorChips()
+            Divider()
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = withClick {
@@ -269,7 +265,6 @@ class MainActivity : ComponentActivity() {
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary),
                 enabled = enabled,
             ) { Text(text = "Btn:tertiary", maxLines = 1, overflow = TextOverflow.Ellipsis) }
-
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = withClick { },

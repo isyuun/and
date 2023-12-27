@@ -17,6 +17,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.IBinder
 import net.pettip.data.pet.CurrentPetData
+import net.pettip.gpx.GPXParser
 import net.pettip.gpx.TRACK_ZERO_NUM
 import net.pettip.gpx.Track
 import net.pettip.util.Log
@@ -50,14 +51,45 @@ open class gpsapplication3 : gpsapplication2() {
         if (this.activity is ServiceConnection) (this.activity as ServiceConnection).onServiceDisconnected(name)
     }
 
-    override fun start() {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
-        if (start) return
-        super.start()
+    override fun onCreate() {
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start][last:$last]")
+        super.onCreate()
+        reload()
+    }
+
+    private fun reload() {
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start][last:$last]")
+        last?.let { last -> tracks?.let { tracks -> GPXParser(tracks).read(last) } }
+        tracks?.forEach { track ->
+            Log.v(__CLASSNAME__, "${getMethodName()}[$track]")
+            images?.add(track.uri)
+        }
+    }
+
+    private fun clear() {
         tracks?.clear()
         images?.clear()
         preview = null
     }
+
+    override fun start() {
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
+        if (start) return
+        clear()
+        super.start()
+    }
+
+    fun restart() {
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
+        if (start) return
+        clear()
+        reload()
+        super.start()
+    }
+
+    val last = this.service?.last()
+
+    fun show(file: File) = this.service?.show(file)
 
     override fun stop() {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
@@ -190,8 +222,4 @@ open class gpsapplication3 : gpsapplication2() {
     fun orient(context: Context, uri: Uri) = this.service?.orient(context, uri)
 
     var preview: Bitmap? = null
-
-    fun last() = this.service?.last()
-
-    fun show(file: File) = this.service?.show(file)
 }

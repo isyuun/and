@@ -110,14 +110,12 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     override fun onCreate() {
         Log.d(__CLASSNAME__, "${getMethodName()}$_tracks")
         super.onCreate()
-        _tracks.clear()
     }
 
     override fun start() {
         _start = System.currentTimeMillis()
         Log.wtf(__CLASSNAME__, "${getMethodName()}[$start][${lastLocation.toText()}][$lastLocation]")
         super.start()
-        _tracks.clear()
     }
 
     override fun stop() {
