@@ -12,6 +12,7 @@
 package net.pettip.gps._app
 
 import net.pettip.gpx.GPXParser
+import net.pettip.gpx.GPX_DATE_FORMAT
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
@@ -46,33 +47,15 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
         return file
     }
 
-    private fun read(): File? {
-        val path = File(this.path)
-        var file: File? = null
-        var last = 0L
-        //Log.v(__CLASSNAME__, "${getMethodName()}[${path.listFiles()}][${path}]")
-        path.listFiles()?.forEach {
-            //println(it)
-            if (last < it.lastModified()) file = it
-            last = it.lastModified()
-        }
-        Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
-        file?.let { read(it) }
-        return file
-    }
-
-    private fun read(file: File) {
+    internal fun read(file: File) {
         Log.w(__CLASSNAME__, "${getMethodName()}$file, $_tracks")
         GPXParser(_tracks).read(file)
         Log.v(__CLASSNAME__, "${getMethodName()}[_tracks.size:${_tracks.size}]")
-        //_tracks.forEach {
-        //    Log.w(__CLASSNAME__, "${getMethodName()}[${GPX_DATE_FORMAT.format(it.time)}]$it")
-        //}
-    }
-
-    internal fun show(file: File) {
-        Log.w(__CLASSNAME__, "${getMethodName()}$file, $_tracks")
-        read(file)
+        _images.clear()
+        _tracks.forEach { track ->
+            Log.w(__CLASSNAME__, "${getMethodName()}[${GPX_DATE_FORMAT.format(track.time)}]$track")
+            _images.add(track.uri)
+        }
     }
 
     override fun write() {

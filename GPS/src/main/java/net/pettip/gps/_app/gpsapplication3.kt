@@ -17,12 +17,10 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.IBinder
 import net.pettip.data.pet.CurrentPetData
-import net.pettip.gpx.GPXParser
 import net.pettip.gpx.TRACK_ZERO_NUM
 import net.pettip.gpx.Track
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
-import java.io.File
 
 /**
  * @Project     : carepet-android
@@ -59,11 +57,7 @@ open class gpsapplication3 : gpsapplication2() {
 
     private fun reload() {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start][last:$last]")
-        last?.let { last -> tracks?.let { tracks -> GPXParser(tracks).read(last) } }
-        tracks?.forEach { track ->
-            Log.v(__CLASSNAME__, "${getMethodName()}[$track]")
-            images?.add(track.uri)
-        }
+        last?.let { last -> service?.read(last) }
     }
 
     private fun clear() {
@@ -88,8 +82,6 @@ open class gpsapplication3 : gpsapplication2() {
     }
 
     val last = this.service?.last()
-
-    fun show(file: File) = this.service?.show(file)
 
     override fun stop() {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")

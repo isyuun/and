@@ -54,7 +54,7 @@ open class foregroundonlylocationservice4() : foregroundonlylocationservice3(), 
     //    observer = null
     //}
 
-    private val _images = Collections.synchronizedList(ArrayList<Uri>()) // The list of Tracks
+    protected val _images = Collections.synchronizedList(ArrayList<Uri>()) // The list of Tracks
     internal val images
         get() = _images
 
