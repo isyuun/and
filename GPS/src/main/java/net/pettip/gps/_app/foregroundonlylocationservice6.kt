@@ -11,8 +11,10 @@
 
 package net.pettip.gps._app
 
+import net.pettip.app.gpxs
 import net.pettip.gpx.GPXParser
 import net.pettip.gpx.GPX_DATE_FORMAT
+import net.pettip.gpx.TRACK_ZERO_URI
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
@@ -33,13 +35,16 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
         //read()  //test
     }
 
+    private fun read() {
+        last()?.let { last -> read(last) }
+    }
+
     internal fun last(): File? {
-        val path = File(this.path)
+        val path = File(gpxs(this))
         var file: File? = null
         var last = 0L
-        //Log.v(__CLASSNAME__, "${getMethodName()}[${path.listFiles()}][${path}]")
+        //Log.v(__CLASSNAME__, "${getMethodName()}[${path}]")
         path.listFiles()?.forEach {
-            //println(it)
             if (last < it.lastModified()) file = it
             last = it.lastModified()
         }
@@ -48,28 +53,29 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
     }
 
     internal fun read(file: File) {
-        Log.w(__CLASSNAME__, "${getMethodName()}$file, $_tracks")
-        GPXParser(_tracks).read(file)
-        Log.v(__CLASSNAME__, "${getMethodName()}[_tracks.size:${_tracks.size}]")
-        _images.clear()
+        Log.w(__CLASSNAME__, "${getMethodName()}$file")
+        _tracks.let { _tracks -> GPXParser(_tracks).read(file) }
+        //Log.v(__CLASSNAME__, "${getMethodName()}[_tracks.size:${_tracks.size}]")
+        images.clear()
         _tracks.forEach { track ->
-            Log.w(__CLASSNAME__, "${getMethodName()}[${GPX_DATE_FORMAT.format(track.time)}]$track")
-            _images.add(track.uri)
+            Log.i(__CLASSNAME__, "${getMethodName()}[${(track.uri != TRACK_ZERO_URI)}][${GPX_DATE_FORMAT.format(track.time)}]$track")
+            if (track.uri != TRACK_ZERO_URI) images.add(track.uri)
+
         }
     }
 
     override fun write() {
+        Log.v(__CLASSNAME__, "${getMethodName()}...")
         super.write()
-        Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")
     }
 
     override fun start() {
+        Log.v(__CLASSNAME__, "${getMethodName()}...")
         super.start()
-        Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")
     }
 
     override fun stop() {
+        Log.v(__CLASSNAME__, "${getMethodName()}...")
         super.stop()
-        Log.v(__CLASSNAME__, "${getMethodName()}${this.file}")
     }
 }

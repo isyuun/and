@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
+import net.pettip.RELEASE
 
 /**
  * @Project     : carepet-android
@@ -45,6 +46,20 @@ import androidx.core.content.res.ResourcesCompat
  */
 
 //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+fun root(context: Context): String {
+    val ret = if (RELEASE) context.filesDir.path else context.getExternalFilesDirs("")[0].path
+    return ret
+}
+
+fun pics(context: Context): String {
+    val ret = "${root(context)}/.PIC"
+    return ret
+}
+
+fun gpxs(context: Context): String {
+    val ret = "${root(context)}/.GPX"
+    return ret
+}
 
 private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
     val bitmap = Bitmap.createBitmap(

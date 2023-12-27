@@ -16,11 +16,14 @@ import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.IBinder
+import net.pettip.app.gpxs
 import net.pettip.data.pet.CurrentPetData
+import net.pettip.gpx.GPX_TICK_FORMAT
 import net.pettip.gpx.TRACK_ZERO_NUM
 import net.pettip.gpx.Track
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
+import java.io.File
 
 /**
  * @Project     : carepet-android
@@ -32,16 +35,6 @@ import net.pettip.util.getMethodName
 open class gpsapplication3 : gpsapplication2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        Log.w(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ServiceConnection)}]")
-        super.onServiceConnected(name, service)
-        Log.v(__CLASSNAME__, "${getMethodName()}[${activity?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
-        this.service?.launchActivityIntent = activity?.intent
-        Log.v(__CLASSNAME__, "${getMethodName()}[${activity?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
-        if (this.activity is ServiceConnection) (this.activity as ServiceConnection).onServiceConnected(name, service)
-        this.service?.onServiceConnected(name, service)
-    }
-
     override fun onServiceDisconnected(name: ComponentName) {
         Log.w(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ServiceConnection)}]")
         super.onServiceDisconnected(name)
@@ -49,15 +42,24 @@ open class gpsapplication3 : gpsapplication2() {
         if (this.activity is ServiceConnection) (this.activity as ServiceConnection).onServiceDisconnected(name)
     }
 
-    override fun onCreate() {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start][last:$last]")
-        super.onCreate()
+    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+        Log.w(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ServiceConnection)}]")
+        super.onServiceConnected(name, service)
+        this.service?.launchActivityIntent = activity?.intent
+        this.service?.onServiceConnected(name, service)
+        Log.v(__CLASSNAME__, "${getMethodName()}[${activity?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
         reload()
+        if (this.activity is ServiceConnection) (this.activity as ServiceConnection).onServiceConnected(name, service)
     }
 
+    val last
+        get() = service?.last()
+
+    private fun read(file: File) = service?.read(file)
+
     private fun reload() {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start][last:$last]")
-        last?.let { last -> service?.read(last) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start][last:${last}]")
+        last?.let { last -> read(last) }
     }
 
     private fun clear() {
@@ -81,8 +83,6 @@ open class gpsapplication3 : gpsapplication2() {
         super.start()
     }
 
-    val last = this.service?.last()
-
     override fun stop() {
         Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
         super.stop()
@@ -101,17 +101,11 @@ open class gpsapplication3 : gpsapplication2() {
         this.service?.resume()
     }
 
-    val root
-        get() = this.service?.root
-
-    val pics
-        get() = this.service?.pics
-
-    val path
-        get() = this.service?.path
-
-    val file
-        get() = this.service?.file
+    val file: File?
+        get() {
+            if (tracks?.isEmpty() == true) return null
+            return File("${gpxs(this)}/${GPX_TICK_FORMAT.format(tracks?.first()?.time)}.gpx")
+        }
 
     val images
         get() = this.service?.images

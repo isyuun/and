@@ -14,7 +14,7 @@ package net.pettip.gps._app
 import android.content.Intent
 import android.location.Location
 import com.google.android.gms.location.LocationResult
-import net.pettip.RELEASE
+import net.pettip.app.gpxs
 import net.pettip.gps.R
 import net.pettip.gpx.GPXWriter
 import net.pettip.gpx.GPX_DATE_FORMAT
@@ -88,25 +88,6 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         post { this.write() }
     }
 
-
-    fun root(): String {
-        val ret = if (RELEASE) filesDir.path else getExternalFilesDirs("")[0].path
-        Log.w(__CLASSNAME__, "${getMethodName()}$ret")
-        return ret
-    }
-
-    private fun pics(): String {
-        val ret = "${root()}/.PIC"
-        Log.w(__CLASSNAME__, "${getMethodName()}$ret")
-        return ret
-    }
-
-    private fun path(): String {
-        val ret = "${root()}/.GPX"
-        Log.w(__CLASSNAME__, "${getMethodName()}$ret")
-        return ret
-    }
-
     override fun onCreate() {
         Log.d(__CLASSNAME__, "${getMethodName()}$_tracks")
         super.onCreate()
@@ -137,22 +118,11 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     internal val tracks: MutableList<Track>
         get() = _tracks
 
-    internal val root
-        get() = root()
-    internal val pics
-        get() = pics()
-
-    internal val path
-        get() = path()
-
-
-    private fun File(): File? {
-        if (_tracks.isEmpty()) return null
-        return File("${path}/${GPX_TICK_FORMAT.format(_tracks.first().time)}.gpx")
-    }
-
-    internal val file
-        get() = File()
+    private val file: File?
+        get() {
+            if (_tracks.isEmpty()) return null
+            return File("${gpxs(this)}/${GPX_TICK_FORMAT.format(_tracks.first().time)}.gpx")
+        }
 
     private var _no = ""
     internal var no: String

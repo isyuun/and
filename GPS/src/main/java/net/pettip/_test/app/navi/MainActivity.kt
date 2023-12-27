@@ -72,7 +72,7 @@ import net.pettip.ui.theme.IFCommYellow
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
-class MainActivity : ComponentActivity() {
+open class MainActivity : ComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private fun openMap(context: Context) {
