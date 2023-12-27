@@ -63,8 +63,8 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
 
     private var built = false
     private fun generateNotification(location: Location?): Notification {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            generateNotificationChannel(NotificationManager.IMPORTANCE_MAX)
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        generateNotificationChannel(NotificationManager.IMPORTANCE_MAX)
         val text = "${getString(R.string.app_name)}이 ${getString(R.string.walk_text_in_tracking)}"
         val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent(), PendingIntent.FLAG_MUTABLE)
         val ret = if (built) notificationCompatBuilder.build() else

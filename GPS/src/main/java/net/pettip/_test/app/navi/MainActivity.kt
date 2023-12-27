@@ -189,7 +189,7 @@ open class MainActivity : ComponentActivity() {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomStart,
         ) {
-            var clicked by remember { mutableStateOf(false) }
+            //var clicked by remember { mutableStateOf(false) }
             //ExtendedFloatingActionButton(
             //    text = { Text(text = stringResource(net.pettip.R.string.start), fontSize = 12.sp) },
             //    icon = { Icon(if (clicked) Icons.Default.Close else Icons.Default.Add, contentDescription = null) },

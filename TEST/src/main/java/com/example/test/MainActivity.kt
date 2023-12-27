@@ -272,10 +272,10 @@ fun AppContent() {
         color = MaterialTheme.colorScheme.surface
         ControllerWithColorSchemeLabel(
             controller = {
-                var value by remember { mutableStateOf(TextFieldValue()) }
+                var value1 by remember { mutableStateOf(TextFieldValue()) }
                 TextField(
-                    value = text,
-                    onValueChange = {},
+                    value = value1,
+                    onValueChange = { value1 = it },
                     modifier = Modifier.fillMaxWidth()
                 )
             },
@@ -287,10 +287,10 @@ fun AppContent() {
         color = MaterialTheme.colorScheme.surface
         ControllerWithColorSchemeLabel(
             controller = {
-                var textValue by remember { mutableStateOf(TextFieldValue()) }
+                var value2 by remember { mutableStateOf(TextFieldValue()) }
                 OutlinedTextField(
-                    value = text,
-                    onValueChange = {},
+                    value = value2,
+                    onValueChange = { value2 = it },
                     modifier = Modifier.fillMaxWidth()
                 )
             },
@@ -402,7 +402,7 @@ fun ControllerWithColorSchemeLabel(
         controller()
         // 컬러 값확인
         Text(
-            text = "${colorToHexString(color)}",
+            text = colorToHexString(color),
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
