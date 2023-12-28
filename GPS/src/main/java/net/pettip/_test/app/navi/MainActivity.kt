@@ -13,6 +13,8 @@ package net.pettip._test.app.navi
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -39,6 +41,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Face
@@ -55,6 +58,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -68,13 +72,22 @@ import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -83,10 +96,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -102,6 +119,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import net.pettip.app.withClick
 import net.pettip.gps.R
 import net.pettip.ui.theme.APPTheme
@@ -137,99 +155,189 @@ open class MainActivity : ComponentActivity() {
     }
 
     private fun setContent() {
-        //Log.v(__CLASSNAME__, "${getMethodName()}...")
         setContent {
             SetContent()
         }
     }
 
+    @Preview(
+        uiMode = UI_MODE_NIGHT_YES,
+        name = "DefaultPreviewDark"
+    )
+    @Preview(
+        uiMode = Configuration.UI_MODE_NIGHT_NO,
+        name = "DefaultPreviewLight"
+    )
     @OptIn(ExperimentalMaterial3Api::class)
-    @Preview(showBackground = true)
     @Composable
     private fun SetContent() {
         APPTheme {
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = { Text(stringResource(id = R.string.app_name)) },
-                        navigationIcon = {
-                            IconButton(onClick = { /* Handle navigation icon click */ }) {
-                                Icon(Icons.Default.Menu, contentDescription = "Menu")
-                            }
-                        },
-                        actions = {
-                            //IconButton(onClick = { /* Handle search icon click */ }) {
-                            //    Icon(Icons.Default.Search, contentDescription = "Search")
-                            //}
-                            //IconButton(onClick = { /* Handle settings icon click */ }) {
-                            //    Icon(Icons.Default.Settings, contentDescription = "Settings")
-                            //}
-                            //IconButton(onClick = { /* Handle share icon click */ }) {
-                            //    Icon(Icons.Default.Share, contentDescription = "Share")
-                            //}
-                            IconButton(onClick = { /* Handle share icon click */ }) {
-                                Icon(Icons.Default.MoreVert, contentDescription = "MoreVert")
-                            }
-                        },
-                    )
+            val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+            val scope = rememberCoroutineScope()
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    ModalDrawerSheet { /* Drawer content */ }
                 },
-                bottomBar = {
-                    var selectedTabIndex by remember { mutableStateOf(0) }
-                    BottomAppBar {
-                        TabRow(
-                            selectedTabIndex = selectedTabIndex,
-                            indicator = { tabPositions ->
-                                TabRowDefaults.Indicator(
-                                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
-                                )
+            ) {
+                val snackbarHostState = remember { SnackbarHostState() }
+                var showBottomSheet by remember { mutableStateOf(false) }
+                Scaffold(
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackbarHostState)
+                    },
+                    topBar = {
+                        TopAppBar(
+                            title = { Text(stringResource(id = R.string.app_name)) },
+                            navigationIcon = {
+                                IconButton(
+                                    onClick = {
+                                        scope.launch {
+                                            drawerState.apply {
+                                                if (isClosed) open() else close()
+                                            }
+                                        }
+                                    }
+                                ) {
+                                    Icon(Icons.Default.Menu, contentDescription = "Menu")
+                                }
                             },
-                        ) {
-                            Tab(selected = selectedTabIndex == 0, onClick = withClick { selectedTabIndex = 0 }/*, enabled = enabled*/) {
-                                Icon(imageVector = Icons.Default.Face, contentDescription = null)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Tab",
-                                    maxLines = 1,
-                                )
-                            }
-                            Tab(selected = selectedTabIndex == 1, onClick = withClick { selectedTabIndex = 1 }/*, enabled = enabled*/) {
-                                Icon(imageVector = Icons.Default.Home, contentDescription = null)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Tab",
-                                    maxLines = 1,
-                                )
-                            }
-                            Tab(selected = selectedTabIndex == 2, onClick = withClick { selectedTabIndex = 2 }/*, enabled = enabled*/) {
-                                Icon(imageVector = Icons.Default.AccountBox, contentDescription = null)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Tab",
-                                    maxLines = 1,
-                                )
-                            }
-                            Tab(selected = selectedTabIndex == 3, onClick = withClick { selectedTabIndex = 3 }/*, enabled = enabled*/) {
-                                Icon(imageVector = Icons.Default.Info, contentDescription = null)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Tab",
-                                    maxLines = 1,
-                                )
+                            actions = {
+                                //IconButton(onClick = { /* Handle search icon click */ }) {
+                                //    Icon(Icons.Default.Search, contentDescription = "Search")
+                                //}
+                                //IconButton(onClick = { /* Handle settings icon click */ }) {
+                                //    Icon(Icons.Default.Settings, contentDescription = "Settings")
+                                //}
+                                //IconButton(onClick = { /* Handle share icon click */ }) {
+                                //    Icon(Icons.Default.Share, contentDescription = "Share")
+                                //}
+                                IconButton(onClick = { /* Handle share icon click */ }) {
+                                    Icon(Icons.Default.MoreVert, contentDescription = "MoreVert")
+                                }
+                            },
+                        )
+                    },
+                    bottomBar = {
+                        var selectedTabIndex by remember { mutableStateOf(0) }
+                        BottomAppBar {
+                            TabRow(
+                                selectedTabIndex = selectedTabIndex,
+                                indicator = { tabPositions ->
+                                    TabRowDefaults.Indicator(
+                                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
+                                    )
+                                },
+                            ) {
+                                Tab(
+                                    selected = selectedTabIndex == 0,
+                                    onClick = withClick {
+                                        selectedTabIndex = 0
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Snackbar")
+                                        }
+                                    },
+                                    //enabled = enabled,
+                                ) {
+                                    Icon(imageVector = Icons.Default.Face, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Tab",
+                                        maxLines = 1,
+                                    )
+                                }
+                                Tab(
+                                    selected = selectedTabIndex == 1,
+                                    onClick = withClick {
+                                        selectedTabIndex = 1
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Snackbar")
+                                        }
+                                    },
+                                    //enabled = enabled,
+                                ) {
+                                    Icon(imageVector = Icons.Default.Home, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Tab",
+                                        maxLines = 1,
+                                    )
+                                }
+                                Tab(
+                                    selected = selectedTabIndex == 2,
+                                    onClick = withClick {
+                                        selectedTabIndex = 2
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Snackbar")
+                                        }
+                                    },
+                                    //enabled = enabled,
+                                ) {
+                                    Icon(imageVector = Icons.Default.AccountBox, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Tab",
+                                        maxLines = 1,
+                                    )
+                                }
+                                Tab(
+                                    selected = selectedTabIndex == 3,
+                                    onClick = withClick {
+                                        selectedTabIndex = 3
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Snackbar")
+                                        }
+                                    },
+                                    //enabled = enabled,
+                                ) {
+                                    Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Tab",
+                                        maxLines = 1,
+                                    )
+                                }
                             }
                         }
+                    },
+                    floatingActionButton = {
+                        FloatingActionButton(
+                            onClick = withClick { showBottomSheet = true },
+                            shape = CircleShape,
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = "Add")
+                        }
                     }
-                },
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = { },
-                        shape = CircleShape,
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = "Add")
+                ) { innerPadding ->
+                    ShowBottomSheet(showBottomSheet = showBottomSheet) { showBottomSheet = false }
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        Content()
                     }
                 }
-            ) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    Content()
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun ShowBottomSheet(showBottomSheet: Boolean, onDismissRequest: () -> Unit) {
+        val scope = rememberCoroutineScope()
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = onDismissRequest,
+                sheetState = sheetState,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                // Sheet content
+                Button(onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            onDismissRequest()
+                        }
+                    }
+                }) {
+                    Text("Hide bottom sheet")
                 }
             }
         }
@@ -309,7 +417,13 @@ open class MainActivity : ComponentActivity() {
                 //        AppContent(modifier, padding)
                 //    }
                 //}   //Row
-                AppContent(modifier, padding)
+                Column(
+                    modifier = Modifier
+                        //.padding(4.0.dp)
+                        .clickable { },
+                ) {
+                    AppContent(modifier, padding)
+                }
             }   //Box2
         }   //Surface
         Box(
@@ -370,7 +484,6 @@ open class MainActivity : ComponentActivity() {
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    private
     @Composable
     fun AppContent(modifier: Modifier, padding: Dp) {
         val context = LocalContext.current
@@ -391,7 +504,6 @@ open class MainActivity : ComponentActivity() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.0.dp)
                     .clickable { enabled = !enabled },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -399,18 +511,54 @@ open class MainActivity : ComponentActivity() {
                 Text("Enabled")
                 Switch(
                     checked = enabled,
-                    onCheckedChange = { enabled = it }
+                    onCheckedChange = { enabled = it },
+                    colors = SwitchDefaults.colors()
                 )
             }
-            //Button(
-            //    modifier = Modifier.fillMaxWidth(),
-            //    onClick = withClick {
-            //        Log.i(__CLASSNAME__, "${getMethodName()}$enabled")
-            //        enabled = !enabled
-            //        Log.w(__CLASSNAME__, "${getMethodName()}$enabled")
-            //    },
-            //    colors = ButtonDefaults.buttonColors(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary),
-            //) { Text(text = if (enabled) "Btn:primary:enable" else "Btn:inversePrimary:disable", maxLines = 1, overflow = TextOverflow.Ellipsis) }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { enabled = !enabled },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Enabled")
+                Switch(
+                    checked = enabled,
+                    onCheckedChange = { enabled = it },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                    )
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { enabled = !enabled },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                var checked by remember { mutableStateOf(true) }
+                Text("Enabled")
+                Switch(
+                    checked = enabled,
+                    onCheckedChange = { enabled = it },
+                    thumbContent = if (checked) {
+                        {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                            )
+                        }
+                    } else {
+                        null
+                    }
+                )
+            }
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = withClick { openMap(context) },
@@ -525,7 +673,8 @@ open class MainActivity : ComponentActivity() {
                         contentDescription = "Settings",
                         Modifier.size(AssistChipDefaults.IconSize)
                     )
-                }
+                },
+                enabled = enabled,
             )
             var selected by remember { mutableStateOf(false) }
             FilterChip(
@@ -539,9 +688,10 @@ open class MainActivity : ComponentActivity() {
                         Modifier.size(FilterChipDefaults.IconSize)
                     )
                 },
+                enabled = enabled,
             )
             InputChip(
-                onClick = withClick { enabled = !enabled },
+                onClick = withClick { /*enabled = !enabled*/ },
                 label = { Text("InputChip") },
                 selected = enabled,
                 avatar = {
@@ -558,11 +708,49 @@ open class MainActivity : ComponentActivity() {
                         Modifier.size(InputChipDefaults.AvatarSize)
                     )
                 },
+                enabled = enabled,
             )
             SuggestionChip(
                 onClick = withClick { },
-                label = { Text("Suggestion chip") }
+                label = { Text("Suggestion chip") },
+                enabled = enabled,
             )
+            var sliderPosition by remember { mutableFloatStateOf(0f) }
+            Slider(
+                value = sliderPosition,
+                onValueChange = { sliderPosition = it },
+                colors = SliderDefaults.colors(),
+                steps = 3,
+                valueRange = 0f..50f,
+                enabled = enabled,
+            )
+            Text(text = sliderPosition.toString())
+            Slider(
+                value = sliderPosition,
+                onValueChange = { sliderPosition = it },
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.secondary,
+                    activeTrackColor = MaterialTheme.colorScheme.secondary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                ),
+                steps = 3,
+                valueRange = 0f..50f,
+                enabled = enabled,
+            )
+            Text(text = sliderPosition.toString())
+            var rangePosition by remember { mutableStateOf(0f..100f) }
+            RangeSlider(
+                value = rangePosition,
+                steps = 5,
+                onValueChange = { range -> rangePosition = range },
+                valueRange = 0f..100f,
+                onValueChangeFinished = {
+                    // launch some business logic update with the state you hold
+                    // viewModel.updateSelectedSliderValue(sliderPosition)
+                },
+                enabled = enabled,
+            )
+            Text(text = sliderPosition.toString())
             Divider()
             Text(
                 text = "Colors",
@@ -655,6 +843,6 @@ open class MainActivity : ComponentActivity() {
         ColorChip(label = "onErrorContainer", color = MaterialTheme.colorScheme.onErrorContainer, text = MaterialTheme.colorScheme.errorContainer)
         ColorChip(label = "outline", color = MaterialTheme.colorScheme.outline, text = MaterialTheme.colorScheme.outlineVariant)
         ColorChip(label = "outlineVariant", color = MaterialTheme.colorScheme.outlineVariant, text = MaterialTheme.colorScheme.outline)
-        ColorChip(label = "scrim", color = MaterialTheme.colorScheme.onSurface)
+        ColorChip(label = "scrim", color = MaterialTheme.colorScheme.scrim)
     }
 }
