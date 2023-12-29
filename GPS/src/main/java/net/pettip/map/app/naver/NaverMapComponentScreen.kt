@@ -41,6 +41,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -125,7 +126,6 @@ import net.pettip.DEBUG
 import net.pettip.RELEASE
 import net.pettip.app.getDeviceDensityString
 import net.pettip.app.getRounded
-import net.pettip.app.navigationBarHeight
 import net.pettip.app.toPx
 import net.pettip.app.withClick
 import net.pettip.app.withPress
@@ -1221,7 +1221,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         top = 24.0.dp,
                         bottom = vertical,
                     )
-                    .padding(bottom = navigationBarHeight())
+                    .navigationBarsPadding(),
             ) {
                 if (!start) {
                     Text(

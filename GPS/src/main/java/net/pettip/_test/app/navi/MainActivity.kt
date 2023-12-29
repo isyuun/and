@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -62,6 +63,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -183,9 +185,8 @@ open class MainActivity : ComponentActivity() {
                 val snackbarHostState = remember { SnackbarHostState() }
                 var showBottomSheet by remember { mutableStateOf(false) }
                 Scaffold(
-                    snackbarHost = {
-                        SnackbarHost(hostState = snackbarHostState)
-                    },
+                    modifier = Modifier
+                        .clickable { },
                     topBar = {
                         TopAppBar(
                             title = { Text(stringResource(id = R.string.app_name)) },
@@ -300,6 +301,9 @@ open class MainActivity : ComponentActivity() {
                             }
                         }
                     },
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackbarHostState)
+                    },
                     floatingActionButton = {
                         FloatingActionButton(
                             onClick = withClick { showBottomSheet = true },
@@ -307,7 +311,8 @@ open class MainActivity : ComponentActivity() {
                         ) {
                             Icon(Icons.Default.Add, contentDescription = "Add")
                         }
-                    }
+                    },
+                    floatingActionButtonPosition = FabPosition.End,
                 ) { innerPadding ->
                     ShowBottomSheet(showBottomSheet = showBottomSheet) { showBottomSheet = false }
                     Box(modifier = Modifier.padding(innerPadding)) {
@@ -327,17 +332,23 @@ open class MainActivity : ComponentActivity() {
             ModalBottomSheet(
                 onDismissRequest = onDismissRequest,
                 sheetState = sheetState,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .clickable { },
             ) {
-                // Sheet content
-                Button(onClick = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            onDismissRequest()
+                Column(
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .clickable { },
+                ) {
+                    Button(onClick = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                onDismissRequest()
+                            }
                         }
+                    }) {
+                        Text("Hide bottom sheet")
                     }
-                }) {
-                    Text("Hide bottom sheet")
                 }
             }
         }

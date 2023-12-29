@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import net.pettip.RELEASE
 
@@ -152,28 +151,6 @@ fun Dp.toPx(context: Context): Float {
 
 fun TextUnit.toPx(context: Context): Float {
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this.value, context.resources.displayMetrics)
-}
-
-/**
- * @see <a href="https://jeong9216.tistory.com/15">(안드로이드) 하단바(내비게이션바) 높이 구하기</a>
- */
-fun isUseBottomNavigation(context: Context): Boolean {
-    val id = context.resources.getIdentifier("config_showNavigationBar", "bool", "android")
-    return context.resources.getBoolean(id)
-}
-
-@Composable
-fun navigationBarHeight(): Dp {
-    val context = LocalContext.current
-    if (!isUseBottomNavigation(context)) return 0.dp
-    val density = context.resources.displayMetrics.density
-    val resourceId = context.resources.getIdentifier("navigation_bar_height", "dimen", "android")
-    val navigationBarHeight = if (resourceId > 0) {
-        (context.resources.getDimensionPixelSize(resourceId) / density).dp
-    } else {
-        0.dp
-    }
-    return navigationBarHeight
 }
 
 fun getDeviceDensityString(context: Context): String {
