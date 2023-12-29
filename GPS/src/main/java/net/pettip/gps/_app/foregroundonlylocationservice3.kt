@@ -108,7 +108,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
 
     protected open fun write() {
         if (_tracks.isEmpty()) return
-        val file = this.file
+        val file = this._file
         file?.parentFile?.mkdirs()
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${GPX_DATE_FORMAT.format(_tracks.first().time)}]$file")
         file?.let { GPXWriter().write(_tracks, it) }
@@ -118,7 +118,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     internal val tracks: MutableList<Track>
         get() = _tracks
 
-    private val file: File?
+    protected val _file: File?
         get() {
             if (_tracks.isEmpty()) return null
             return File("${gpxs(this)}/${GPX_TICK_FORMAT.format(_tracks.first().time)}.gpx")
