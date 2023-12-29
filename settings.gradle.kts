@@ -7,11 +7,10 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    //repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        //카카오 API 관련 maven 추가
         maven("https://devrepo.kakao.com/nexus/content/groups/public/")
         maven("https://naver.jfrog.io/artifactory/maven/")
     }

@@ -553,7 +553,7 @@ open class MainActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                var checked by remember { mutableStateOf(true) }
+                val checked by remember { mutableStateOf(true) }
                 Text("Enabled")
                 Switch(
                     checked = enabled,
