@@ -165,12 +165,16 @@ fun getDeviceDensityString(context: Context): String {
     return ""
 }
 
+/**
+ * How to play the platform CLICK sound in Jetpack Compose Button click
+ * @see <a href="https://stackoverflow.com/questions/66080018/how-to-play-the-platform-click-sound-in-jetpack-compose-button-click">How to play the platform CLICK sound in Jetpack Compose Button click</a>
+ */
 @Composable
-fun withCheck(onClick: () -> Unit): ((Boolean) -> Unit)? {
+fun withCheck(onCheckedChange: (Boolean) -> Unit): (Boolean) -> Unit {
     val context = LocalContext.current
-    return {
+    return { checked ->
         (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager).playSoundEffect(AudioManager.FX_KEY_CLICK)
-        onClick()
+        onCheckedChange(checked)
     }
 }
 

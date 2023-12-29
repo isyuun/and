@@ -122,6 +122,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import net.pettip.app.withCheck
 import net.pettip.app.withClick
 import net.pettip.gps.R
 import net.pettip.ui.theme.APPTheme
@@ -522,7 +523,7 @@ open class MainActivity : ComponentActivity() {
                 Text("Enabled")
                 Switch(
                     checked = enabled,
-                    onCheckedChange = { enabled = it },
+                    onCheckedChange = withCheck { enabled = it },
                     colors = SwitchDefaults.colors()
                 )
             }
@@ -536,7 +537,7 @@ open class MainActivity : ComponentActivity() {
                 Text("Enabled")
                 Switch(
                     checked = enabled,
-                    onCheckedChange = { enabled = it },
+                    onCheckedChange = withCheck { enabled = it },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.primary,
                         checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
@@ -556,7 +557,7 @@ open class MainActivity : ComponentActivity() {
                 Text("Enabled")
                 Switch(
                     checked = enabled,
-                    onCheckedChange = { enabled = it },
+                    onCheckedChange = withCheck { enabled = it },
                     thumbContent = if (checked) {
                         {
                             Icon(
