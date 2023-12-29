@@ -1403,11 +1403,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     )
     Log.v(__CLASSNAME__, "${getMethodName()}[ED][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
     /** VERSION */
-    version(context, vertical)
+    Version(context, vertical)
 }
 
 @Composable
-fun version(context: Context, height: Dp) {
+fun Version(context: Context, height: Dp) {
     //if (RELEASE) return
     val df = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
     val bt = df.format(Date(stringResource(id = R.string.build_time).toLong()))
