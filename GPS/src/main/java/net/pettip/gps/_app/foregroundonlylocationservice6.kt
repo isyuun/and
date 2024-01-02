@@ -76,7 +76,7 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
         val file: File? = this._file
         Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
         super.write()
-        file?.let { file -> sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, file.absolutePath).apply() }
+        file?.let { sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, it.absolutePath).apply() }
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${recent()}]")
     }
 
