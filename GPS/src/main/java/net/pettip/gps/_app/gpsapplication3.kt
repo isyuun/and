@@ -52,20 +52,25 @@ open class gpsapplication3 : gpsapplication2() {
         if (this.activity is ServiceConnection) (this.activity as ServiceConnection).onServiceConnected(name, service)
     }
 
+    val recent
+        get() = service?.recent()
+
     val last
         get() = service?.last()
 
-    private fun read(file: File) = service?.read(file)
+    fun read(file: File) = service?.read(file)
 
     private fun reload() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start][last:${last}]")
-        last?.let { last -> read(last) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start][recent:${recent}]")
+        recent?.let { recent -> read(recent) }
     }
 
-    private fun clear() {
-        tracks?.clear()
-        images?.clear()
-        preview = null
+    fun restart() {
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
+        if (start) return
+        clear()
+        reload()
+        super.start()
     }
 
     override fun start() {
@@ -75,12 +80,10 @@ open class gpsapplication3 : gpsapplication2() {
         super.start()
     }
 
-    fun restart() {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start]")
-        if (start) return
-        clear()
-        reload()
-        super.start()
+    private fun clear() {
+        tracks?.clear()
+        images?.clear()
+        preview = null
     }
 
     override fun stop() {

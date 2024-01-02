@@ -11,6 +11,7 @@
 
 package net.pettip.gps._app
 
+import android.content.SharedPreferences
 import net.pettip.app.gpxs
 import net.pettip.gpx.GPXParser
 import net.pettip.gpx.GPX_DATE_FORMAT
@@ -27,21 +28,44 @@ import java.io.File
  * @description : net.pettip.gps._app
  * @see net.pettip.gps._app.foregroundonlylocationservice6
  */
-open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
+open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), SharedPreferences.OnSharedPreferenceChangeListener {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate() {
         super.onCreate()
-        //read()  //test
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_FILE_KEY, MODE_PRIVATE)
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        //last()?.let { last -> read(last) }  //test
     }
 
-    private fun read() {
-        last()?.let { last -> read(last) }
+    override fun onDestroy() {
+        super.onDestroy()
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        Log.i(__CLASSNAME__, "${getMethodName()}[$sharedPreferences][$key]")
+    }
+
+    internal fun recent(): File? {
+        var file: File? = this._file
+        file = File(sharedPreferences.getString(KEY_FOREGROUND_GPXFILE, ""))
+        Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
+        return file
+    }
+
+    override fun write() {
+        var file: File? = this._file
+        Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
+        super.write()
+        file?.let { file -> sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, file.absolutePath) }
     }
 
     internal fun last(): File? {
         val path = File(gpxs(this))
-        var file: File? = null
+        var file: File? = this._file
         var last = 0L
         //Log.v(__CLASSNAME__, "${getMethodName()}[${path}]")
         path.listFiles()?.forEach {
@@ -64,18 +88,13 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5() {
         }
     }
 
-    override fun write() {
-        Log.v(__CLASSNAME__, "${getMethodName()}...")
-        super.write()
-    }
-
     override fun start() {
-        Log.v(__CLASSNAME__, "${getMethodName()}...")
+        Log.v(__CLASSNAME__, "${getMethodName()}[${this._file}")
         super.start()
     }
 
     override fun stop() {
-        Log.v(__CLASSNAME__, "${getMethodName()}...")
+        Log.v(__CLASSNAME__, "${getMethodName()}[${this._file}")
         super.stop()
     }
 }

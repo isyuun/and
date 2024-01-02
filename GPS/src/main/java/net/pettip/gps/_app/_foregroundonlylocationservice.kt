@@ -10,6 +10,8 @@
 
 package net.pettip.gps._app
 
+import android.content.Context
+import androidx.core.content.edit
 import net.pettip.app.Service
 
 private const val PACKAGE_NAME = "net.pettip.app.navi"
@@ -27,6 +29,39 @@ internal const val NOTIFICATION_ID = 12345678
 internal const val NOTIFICATION_CHANNEL_ID = "net.pettip.app.navi.channel.01"
 
 internal const val SHARED_PREFERENCE_FILE_KEY = "$PACKAGE_NAME.PREFERENCE_FILE_KEY"
+
+internal const val KEY_FOREGROUND_ENABLED = "tracking_foreground_location"
+internal const val KEY_FOREGROUND_GPXFILE = "tracking.foreground.gpx.flie"
+
+/**
+ * Provides access to SharedPreferences for location to Activities and Services.
+ */
+private object SharedPreferenceUtil {
+
+    /**
+     * Returns true if requesting location updates, otherwise returns false.
+     *
+     * @param context The [Context].
+     */
+    fun getLocationTrackingPref(context: Context): Boolean =
+        context.getSharedPreferences(
+            SHARED_PREFERENCE_FILE_KEY,
+            Context.MODE_PRIVATE
+        ).getBoolean(KEY_FOREGROUND_ENABLED, false)
+
+    /**
+     * Stores the location updates state in SharedPreferences.
+     * @param requestingLocationUpdates The location updates state.
+     */
+    fun saveLocationTrackingPref(context: Context, requestingLocationUpdates: Boolean) =
+        context.getSharedPreferences(
+            SHARED_PREFERENCE_FILE_KEY,
+            Context.MODE_PRIVATE
+        ).edit {
+            putBoolean(KEY_FOREGROUND_ENABLED, requestingLocationUpdates)
+        }
+}
+
 
 /**
  * @Project     : carepet-android

@@ -33,16 +33,16 @@ class MainActivity : net.pettip._test.app.navi.MainActivity(), ServiceConnection
     private val application = GPSApplication.instance
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.last}]")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.recent}]")
         super.onCreate(savedInstanceState)
         application.activity = this
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.last}]")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.recent}]")
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.last}]")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.recent}]")
     }
 }

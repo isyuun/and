@@ -96,7 +96,7 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     //@Deprecated("Use foregroundOnlyBroadcastReceiver instead. ", ReplaceWith("foregroundOnlyBroadcastReceiver"))
     private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver
 
-    private lateinit var sharedPreferences: SharedPreferences
+    //private lateinit var sharedPreferences: SharedPreferences
 
     //private lateinit var foregroundOnlyLocationButton: Button
 
@@ -138,14 +138,14 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
         Log.d(__CLASSNAME__, "${getMethodName()}...")
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
         Log.w(__CLASSNAME__, "${getMethodName()}${foregroundOnlyBroadcastReceiver}")
-        sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_FILE_KEY, MODE_PRIVATE)
-        Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences")
+        //sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_FILE_KEY, MODE_PRIVATE)
+        //Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences")
     }
 
     private fun bind() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
-        sharedPreferences.getBoolean(SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        //sharedPreferences.getBoolean(SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
+        //sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         val serviceIntent = Intent(this, ForegroundOnlyLocationService::class.java)
         bindService(serviceIntent, foregroundOnlyServiceConnection, BIND_AUTO_CREATE)
     }
@@ -162,7 +162,7 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
             unbindService(foregroundOnlyServiceConnection)
             foregroundOnlyLocationServiceBound = false
         }
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        //sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     val start
@@ -185,7 +185,7 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     // TODO: Step 1.0, Review Permissions: Method checks if permissions approved.
     private fun foregroundPermissionApproved(): Boolean {
         val ret = PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-        Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences,$ret")
+        Log.w(__CLASSNAME__, "${getMethodName()}[$ret]")
         return ret
     }
 

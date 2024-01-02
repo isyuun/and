@@ -143,7 +143,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
      */
     internal open fun start() {
         Log.i(__CLASSNAME__, "${getMethodName()}${lastLocation.toText()}, $lastLocation")
-        SharedPreferenceUtil.saveLocationTrackingPref(this, true)
+        //SharedPreferenceUtil.saveLocationTrackingPref(this, true)
         // Binding to this service doesn't actually trigger onStartCommand(). That is needed to
         // ensure this Service can be promoted to a foreground service, i.e., the service needs to
         // be officially started (which we do here).
@@ -160,7 +160,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
                 locationRequest, locationCallback, Looper.getMainLooper()
             )
         } catch (unlikely: SecurityException) {
-            SharedPreferenceUtil.saveLocationTrackingPref(this, false)
+            //SharedPreferenceUtil.saveLocationTrackingPref(this, false)
             Log.e(__CLASSNAME__, "Lost location permissions. Couldn't remove updates. $unlikely")
         }
     }
@@ -178,9 +178,9 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
                     Log.d(__CLASSNAME__, "Failed to remove Location Callback.")
                 }
             }
-            SharedPreferenceUtil.saveLocationTrackingPref(this, false)
+            //SharedPreferenceUtil.saveLocationTrackingPref(this, false)
         } catch (unlikely: SecurityException) {
-            SharedPreferenceUtil.saveLocationTrackingPref(this, true)
+            //SharedPreferenceUtil.saveLocationTrackingPref(this, true)
             Log.e(__CLASSNAME__, "Lost location permissions. Couldn't remove updates. $unlikely")
         }
         //stopSelf()
