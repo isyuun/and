@@ -1412,7 +1412,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 }
 
 @Composable
-fun ShowRestartDialog() {
+fun ShowDialogRestart() {
     Box {
         val application = GPSApplication.instance
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.start}][${application.recent()?.exists()}][${application.recent()}]")

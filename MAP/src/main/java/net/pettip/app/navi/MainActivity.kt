@@ -12,7 +12,7 @@
 package net.pettip.app.navi
 
 import androidx.activity.compose.setContent
-import net.pettip.map.app.naver.ShowRestartDialog
+import net.pettip.map.app.naver.ShowDialogRestart
 
 /**
  * @Project     : PetTip-Android
@@ -23,14 +23,10 @@ import net.pettip.map.app.naver.ShowRestartDialog
  * @see net.pettip.app.navi.MainActivity
  */
 class MainActivity : net.pettip._test.app.navi.MainActivity() {
-    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
     override fun setContent() {
         setContent {
             SetContent()
-            ShowRestartDialog()
+            ShowDialogRestart()
         }
     }
 }
-
-private val __CLASSNAME__ = Exception().stackTrace[0].fileName
