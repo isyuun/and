@@ -11,8 +11,6 @@
 
 package net.pettip._test.app.navi
 
-import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
@@ -125,22 +123,10 @@ import kotlinx.coroutines.launch
 import net.pettip.app.withCheck
 import net.pettip.app.withClick
 import net.pettip.gps.R
-import net.pettip.map.app.GpxActivity
-import net.pettip.map.app.MapActivity
+import net.pettip.gps.app.GPSApplication
 import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
-
-
-fun openMap(context: Context) {
-    val intent = Intent(context, MapActivity::class.java)
-    context.startActivity(intent)
-}
-
-fun openGpx(context: Context) {
-    val intent = Intent(context, GpxActivity::class.java)
-    context.startActivity(intent)
-}
 
 open class MainActivity : ComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
@@ -361,6 +347,7 @@ open class MainActivity : ComponentActivity() {
 
     @Composable
     fun Content() {
+        val application = GPSApplication.instance
         val context = LocalContext.current
         val shape = RoundedCornerShape(20.0.dp)
         val width = 0.5.dp
@@ -460,7 +447,7 @@ open class MainActivity : ComponentActivity() {
                 //    expanded = clicked,
                 //)
                 FloatingActionButton(
-                    onClick = withClick { openMap(context) },
+                    onClick = withClick { application.openMap() },
                     shape = CircleShape,
                 ) {
                     Column(
@@ -478,7 +465,7 @@ open class MainActivity : ComponentActivity() {
                     }
                 }
                 FloatingActionButton(
-                    onClick = withClick { openMap(context) },
+                    onClick = withClick { application.openMap() },
                     shape = CircleShape,
                 ) {
                     Column(
@@ -502,6 +489,7 @@ open class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AppContent(modifier: Modifier, padding: Dp) {
+        val application = GPSApplication.instance
         val context = LocalContext.current
         Column(
             modifier = modifier
@@ -577,13 +565,13 @@ open class MainActivity : ComponentActivity() {
             }
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = withClick { openMap(context) },
+                onClick = withClick { application.openMap() },
                 //colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                 enabled = enabled,
             ) { Text(text = "Btn:primary", maxLines = 1, overflow = TextOverflow.Ellipsis) }
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = withClick { openGpx(context) },
+                onClick = withClick { application.openGpx() },
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.inversePrimary),
                 enabled = enabled,
             ) { Text(text = "Btn:inversePrimary", maxLines = 1, overflow = TextOverflow.Ellipsis) }

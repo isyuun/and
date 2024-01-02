@@ -125,7 +125,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.DEBUG
 import net.pettip.RELEASE
-import net.pettip._test.app.navi.openMap
 import net.pettip.app.getDeviceDensityString
 import net.pettip.app.getRounded
 import net.pettip.app.toPx
@@ -1416,15 +1415,14 @@ fun ShowDialogRestart() {
     Box {
         val application = GPSApplication.instance
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.start}][${application.recent()?.exists()}][${application.recent()}]")
-        val context = LocalContext.current
         var showDialog by remember { mutableStateOf(false) }
-        if (application.start) openMap(context)
+        if (application.start) application.openMap()
         else application.recent()?.let { recent -> showDialog = recent.exists() }
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = {
                     showDialog = false
-                    //application.reset()
+                    application.reset()
                 },
                 title = { Text(stringResource(id = R.string.walk_text_in_running)) },
                 text = { Text(stringResource(id = R.string.walk_text_in_restore)) },
@@ -1434,7 +1432,7 @@ fun ShowDialogRestart() {
                         onClick = {
                             // Handle confirm button click
                             showDialog = false
-                            openMap(context)
+                            application.openMap()
                         }
                     ) {
                         Text(stringResource(id = android.R.string.ok))

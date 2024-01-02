@@ -11,8 +11,11 @@
 package net.pettip.gps.app
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import net.pettip.gps._app.gpsapplication4
+import net.pettip.map.app.GpxActivity
+import net.pettip.map.app.MapActivity
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
@@ -86,5 +89,16 @@ open class GPSApplication : gpsapplication4() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate()
         singleton = this
+    }
+
+
+    fun openMap() {
+        val intent = Intent(this, MapActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun openGpx() {
+        val intent = Intent(this, GpxActivity::class.java)
+        startActivity(intent)
     }
 }
