@@ -50,15 +50,17 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
     }
 
     override fun start() {
-        Log.v(__CLASSNAME__, "${getMethodName()}[${this._file}")
+        Log.v(__CLASSNAME__, "${getMethodName()}[${recent()}")
         super.start()
-        sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
+        //sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${recent()}")
     }
 
     override fun stop() {
-        Log.v(__CLASSNAME__, "${getMethodName()}[${this._file}")
+        Log.v(__CLASSNAME__, "${getMethodName()}[${recent()}")
         super.stop()
         sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${recent()}]")
     }
 
     internal fun reset() {

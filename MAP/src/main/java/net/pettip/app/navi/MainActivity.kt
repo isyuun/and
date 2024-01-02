@@ -13,6 +13,8 @@ package net.pettip.app.navi
 
 import androidx.activity.compose.setContent
 import net.pettip.map.app.naver.ShowDialogRestart
+import net.pettip.util.Log
+import net.pettip.util.getMethodName
 
 /**
  * @Project     : PetTip-Android
@@ -23,8 +25,11 @@ import net.pettip.map.app.naver.ShowDialogRestart
  * @see net.pettip.app.navi.MainActivity
  */
 class MainActivity : net.pettip._test.app.navi.MainActivity() {
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
     override fun setContent() {
         setContent {
+            Log.wtf(__CLASSNAME__, "${getMethodName()}...")
             SetContent()
             ShowDialogRestart()
         }

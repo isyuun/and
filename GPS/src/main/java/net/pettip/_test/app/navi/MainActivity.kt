@@ -134,16 +134,13 @@ open class MainActivity : ComponentActivity() {
     override fun onResume() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.onResume()
-        //if (!application.start) {
-        //    openMap(this)
-        //}
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")
         super.onCreate(savedInstanceState)
-        setContent()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        setContent()
     }
 
     protected open fun setContent() {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="version">버전</string>
     <string name="start">시작</string>
     <string name="stop">중지</string>
     <string name="end">종료</string>

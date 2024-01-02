@@ -14,7 +14,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.net.Uri
-import android.os.Build
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -30,7 +29,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -86,7 +84,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -124,13 +121,11 @@ import com.naver.maps.map.widget.LocationButtonView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.DEBUG
-import net.pettip.RELEASE
+import net.pettip.app.Version
 import net.pettip.app.getDeviceDensityString
 import net.pettip.app.getRounded
 import net.pettip.app.toPx
 import net.pettip.app.withClick
-import net.pettip.app.withPress
-import net.pettip.app.withTap
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.gps.R
 import net.pettip.gps.app.GPSApplication
@@ -144,9 +139,6 @@ import net.pettip.map.app.LoadingDialog
 import net.pettip.singleton.G
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 /**
@@ -624,7 +616,7 @@ private fun WalkInfoNavi(
 ) {
     val application = GPSApplication.instance
     val start = application.start
-    Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
+    Log.v(__CLASSNAME__, "${getMethodName()}$start")
     var pet by remember {
         mutableStateOf(
             CurrentPetData(
@@ -647,6 +639,7 @@ private fun WalkInfoNavi(
     /** 1초마다 업데이트*/
     if (start) {
         LaunchedEffect(Unit) {
+            Log.wtf(__CLASSNAME__, "${getMethodName()}$start")
             while (true) {
                 delay(1000) // 1초마다 업데이트
                 if (start) count++ else count = 0
@@ -655,14 +648,10 @@ private fun WalkInfoNavi(
             }
         }
     }
-    Box(modifier = Modifier
-        .onGloballyPositioned {
-            try {
-                onGloballyPositioned(it)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }) {
+    Box(
+        modifier = Modifier
+            .onGloballyPositioned { onGloballyPositioned(it) }
+    ) {
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
             R.string.walk_title_tip
             AnimatedVisibility(
@@ -816,7 +805,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var loading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val application = GPSApplication.instance
-    application.recent()?.let { recent ->
+    if (!application.start) application.recent()?.let { recent ->
         application.restart()
     }
     val start = application.start
@@ -949,45 +938,50 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val b = 68.0.dp
 
 
-    /** TOP */
+    /** MAP */
+
     val zc = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
     val co = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
     val lb = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
     var lh by remember { mutableStateOf(0.0.dp) }
-    WalkInfoNavi {
-        t = (it.size.height.div(d)).dp
-        var zh = 89.0.dp
-        Log.w(__CLASSNAME__, "::NaverMapApp.COOR${getMethodName()}[ZOOM.HEIGHT][$zh][${it.isAttached}][${it.size.width}][${it.size.height}][t:$t]")
-        if (zc.width > 0) zh = (zc.height / d).dp
-        Log.i(__CLASSNAME__, "::NaverMapApp.COOR${getMethodName()}[ZOOM.HEIGHT][$zh][${it.isAttached}][${it.size.width}][${it.size.height}][t:$t]")
-        Log.v(__CLASSNAME__, "::NaverMapApp.BOXX${getMethodName()}[d:$d-$p.dpi-$i][w:$width(${m.widthPixels}.px)][h:$height(${m.heightPixels}.px)][l:$l][t:$t][r:$r][b$b]")
-        Log.v(__CLASSNAME__, "::NaverMapApp.ZOOM${getMethodName()}[zc.w:${zc.width / d}.0.dp(${zc.width}.px)][zc.h:${zc.height / d}.0.dp(${zc.height}.px)][l:${zc.left}.px][t:${zc.top}.px][r:${zc.right}.px][b:${zc.bottom}].px")
-        Log.v(__CLASSNAME__, "::NaverMapApp.COMP${getMethodName()}[cc.w:${co.width}][cc.h:${co.height}][t:${co.top}][b:${co.bottom}][l:${co.left}][r:${co.right}]")
-        Log.v(__CLASSNAME__, "::NaverMapApp.LOCA${getMethodName()}[lb.w:${lb.width}][lb.h:${lb.height}][t:${lb.top}][b:${lb.bottom}][l:${lb.left}][r:${lb.right}]")
-        zc?.updateLayoutParams<FrameLayout.LayoutParams> {
-            this.gravity = Gravity.TOP or Gravity.START
-            this.topMargin = (t + space).toPx(context).toInt()
-            this.marginStart = (l + 9.0.dp).toPx(context).toInt()
+
+    /** TOP */
+    Box(
+        modifier = Modifier
+            .padding(0.0.dp)
+            .fillMaxSize()
+    ) {
+        /** TOP */
+        Log.w(__CLASSNAME__, "::NaverMapApp@::TOP${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+        WalkInfoNavi {
+            t = (it.size.height.div(d)).dp
+            var zh = 89.0.dp
+            if (zc.width > 0) zh = (zc.height / d).dp
+            zc?.updateLayoutParams<FrameLayout.LayoutParams> {
+                this.gravity = Gravity.TOP or Gravity.START
+                this.topMargin = (t + space).toPx(context).toInt()
+                this.marginStart = (l + 9.0.dp).toPx(context).toInt()
+            }
+            co?.updateLayoutParams<RelativeLayout.LayoutParams> {
+                this.topMargin = (t + space + zh).toPx(context).toInt()
+                this.marginStart = l.toPx(context).toInt()
+            }
+            lb?.updateLayoutParams<RelativeLayout.LayoutParams> {
+                this.bottomMargin = b.toPx(context).toInt()
+                this.marginStart = l.toPx(context).toInt()
+            }
+            lh = if (lb.height > 0) (lb.height / d).dp else 52.0.dp
         }
-        co?.updateLayoutParams<RelativeLayout.LayoutParams> {
-            this.topMargin = (t + space + zh).toPx(context).toInt()
-            this.marginStart = l.toPx(context).toInt()
-        }
-        lb?.updateLayoutParams<RelativeLayout.LayoutParams> {
-            this.bottomMargin = b.toPx(context).toInt()
-            this.marginStart = l.toPx(context).toInt()
-        }
-        lh = if (lb.height > 0) (lb.height / d).dp else 52.0.dp
     }
 
     /** LEFT/RIGHT/WALK */
     Box(
         modifier = Modifier
-            .fillMaxSize()
             .padding(
                 horizontal = horizontal,
                 vertical = vertical,
             )
+            .fillMaxSize(),
     ) {
         /** LEFT */
         Log.w(__CLASSNAME__, "::NaverMapApp@::LEFT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
@@ -1414,11 +1408,12 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 fun ShowDialogRestart() {
     Box {
         val application = GPSApplication.instance
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.start}][${application.recent()?.exists()}][${application.recent()}]")
         var showDialog by remember { mutableStateOf(false) }
         if (application.start) application.openMap()
         else application.recent()?.let { recent -> showDialog = recent.exists() }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$showDialog][${application.start}][${application.recent()?.exists()}][${application.recent()}]")
         if (showDialog) {
+            val scope = rememberCoroutineScope()
             AlertDialog(
                 onDismissRequest = withClick {
                     showDialog = false
@@ -1430,7 +1425,7 @@ fun ShowDialogRestart() {
                     Button(
                         onClick = withClick {
                             showDialog = false
-                            application.openMap()
+                            application.restart()
                         }
                     ) {
                         Text(stringResource(id = android.R.string.ok))
@@ -1448,62 +1443,5 @@ fun ShowDialogRestart() {
                 }
             )
         }//showDialog
-    }
-}
-
-@Composable
-fun Version(context: Context, height: Dp) {
-    //if (RELEASE) return
-    val df = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
-    val bt = df.format(Date(stringResource(id = R.string.build_time).toLong()))
-    val pi = context.packageManager.getPackageInfo(context.packageName, 0)
-    val vs = "[${pi.versionName}(${if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode else pi.versionCode})][${if (RELEASE) "REL" else "DEB"}][$bt]"
-    var version by remember { mutableStateOf(false) }
-    var timer by remember { mutableStateOf(false) }
-    LaunchedEffect(timer) {
-        delay(1000)
-        timer = false
-    }
-    if (version) Log.v(__CLASSNAME__, "${getMethodName()}[timer:$timer][version:$version][$vs]")
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onDoubleTap = /*withTap(context)*/ {
-                            /** Called on Double Tap */
-                            timer = true
-                            version = false
-                        },
-                        onLongPress = withTap(context) {
-                            /** Called on Long Press */
-                            if (timer) version = !version
-                            timer = false
-                        },
-                        onPress = withPress(context) {
-                            /** Called when the gesture starts */
-                            version = false
-                        },
-                        onTap = /*withTap(context)*/ {
-                            /** Called on Tap */
-                            version = false
-                        },
-                    )
-                }
-                //.clickable(
-                //    onClick = withClick {}
-                //)
-                .align(Alignment.BottomEnd)
-                //.fillMaxWidth()
-                .height(height),
-        ) {
-            Text(
-                text = "${stringResource(id = R.string.app_version)}:$vs",
-                modifier = Modifier.align(Alignment.BottomEnd),
-                fontSize = 6.sp,
-                color = if (version) Color.Red else Color.Transparent,
-                textAlign = TextAlign.Right,
-            )
-        }
     }
 }
