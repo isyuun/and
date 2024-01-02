@@ -12,6 +12,7 @@ package net.pettip.gps.app
 
 import android.Manifest
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import net.pettip.gps._app.gpsapplication4
 import net.pettip.map.app.GpxActivity
@@ -93,12 +94,12 @@ open class GPSApplication : gpsapplication4() {
 
 
     fun openMap() {
-        val intent = Intent(this, MapActivity::class.java)
+        val intent = Intent(this, MapActivity::class.java).addFlags(FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
 
     fun openGpx() {
-        val intent = Intent(this, GpxActivity::class.java)
+        val intent = Intent(this, GpxActivity::class.java).addFlags(FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
 }

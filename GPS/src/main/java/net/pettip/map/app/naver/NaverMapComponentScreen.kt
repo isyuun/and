@@ -1420,17 +1420,15 @@ fun ShowDialogRestart() {
         else application.recent()?.let { recent -> showDialog = recent.exists() }
         if (showDialog) {
             AlertDialog(
-                onDismissRequest = {
+                onDismissRequest = withClick {
                     showDialog = false
                     application.reset()
                 },
                 title = { Text(stringResource(id = R.string.walk_text_in_running)) },
                 text = { Text(stringResource(id = R.string.walk_text_in_restore)) },
                 confirmButton = {
-                    // Confirm button
                     Button(
-                        onClick = {
-                            // Handle confirm button click
+                        onClick = withClick {
                             showDialog = false
                             application.openMap()
                         }
@@ -1439,9 +1437,8 @@ fun ShowDialogRestart() {
                     }
                 },
                 dismissButton = {
-                    // Dismiss button
                     Button(
-                        onClick = {
+                        onClick = withClick {
                             showDialog = false
                             application.reset()
                         }
