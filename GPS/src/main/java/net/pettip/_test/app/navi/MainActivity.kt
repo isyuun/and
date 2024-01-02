@@ -132,12 +132,12 @@ import net.pettip.util.getMethodName
 open class MainActivity : ComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private fun openMap(context: Context) {
+    protected fun openMap(context: Context) {
         val intent = Intent(context, MapActivity::class.java)
         startActivity(intent)
     }
 
-    private fun openGpx(context: Context) {
+    protected fun openGpx(context: Context) {
         val intent = Intent(context, GpxActivity::class.java)
         startActivity(intent)
     }
