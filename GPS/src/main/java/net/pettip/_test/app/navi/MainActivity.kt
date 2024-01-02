@@ -487,7 +487,6 @@ open class MainActivity : ComponentActivity() {
     @Composable
     fun AppContent(modifier: Modifier, padding: Dp) {
         val application = GPSApplication.instance
-        val context = LocalContext.current
         Column(
             modifier = modifier
                 .padding(8.0.dp)
