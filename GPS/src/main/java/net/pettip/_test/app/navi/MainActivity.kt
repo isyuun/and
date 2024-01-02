@@ -125,22 +125,25 @@ import kotlinx.coroutines.launch
 import net.pettip.app.withCheck
 import net.pettip.app.withClick
 import net.pettip.gps.R
+import net.pettip.map.app.GpxActivity
+import net.pettip.map.app.MapActivity
 import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
+
+fun openMap(context: Context) {
+    val intent = Intent(context, MapActivity::class.java)
+    context.startActivity(intent)
+}
+
+fun openGpx(context: Context) {
+    val intent = Intent(context, GpxActivity::class.java)
+    context.startActivity(intent)
+}
+
 open class MainActivity : ComponentActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-    protected fun openMap(context: Context) {
-        val intent = Intent(context, MapActivity::class.java)
-        startActivity(intent)
-    }
-
-    protected fun openGpx(context: Context) {
-        val intent = Intent(context, GpxActivity::class.java)
-        startActivity(intent)
-    }
 
     override fun onResume() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}...")

@@ -51,6 +51,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -124,6 +125,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.DEBUG
 import net.pettip.RELEASE
+import net.pettip._test.app.navi.openMap
 import net.pettip.app.getDeviceDensityString
 import net.pettip.app.getRounded
 import net.pettip.app.toPx
@@ -1407,6 +1409,51 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     Log.v(__CLASSNAME__, "${getMethodName()}[ED][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
     /** VERSION */
     Version(context, vertical)
+}
+
+@Composable
+fun ShowRestartDialog() {
+    Box {
+        val application = GPSApplication.instance
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.start}][${application.recent()?.exists()}][${application.recent()}]")
+        val context = LocalContext.current
+        var showDialog by remember { mutableStateOf(false) }
+        if (application.start) openMap(context)
+        else application.recent()?.let { recent -> showDialog = recent.exists() }
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    showDialog = false
+                    //application.reset()
+                },
+                title = { Text(stringResource(id = R.string.walk_text_in_running)) },
+                text = { Text(stringResource(id = R.string.walk_text_in_restore)) },
+                confirmButton = {
+                    // Confirm button
+                    Button(
+                        onClick = {
+                            // Handle confirm button click
+                            showDialog = false
+                            openMap(context)
+                        }
+                    ) {
+                        Text(stringResource(id = android.R.string.ok))
+                    }
+                },
+                dismissButton = {
+                    // Dismiss button
+                    Button(
+                        onClick = {
+                            showDialog = false
+                            application.reset()
+                        }
+                    ) {
+                        Text(stringResource(id = android.R.string.cancel))
+                    }
+                }
+            )
+        }//showDialog
+    }
 }
 
 @Composable

@@ -24,11 +24,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.compose.setContent
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import com.naver.maps.map.util.FusedLocationSource
 import net.pettip.gps._app.toText
 import net.pettip.gps.app.GPSApplication
 import net.pettip.gps.app.GPSComponentActivity
+import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
@@ -43,7 +45,13 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
     }
 
     protected open fun setContent() {
-        setContent { MapApp() }
+        setContent {
+            APPTheme {
+                Surface {
+                    MapApp()
+                }
+            }
+        }
     }
 
     @Composable

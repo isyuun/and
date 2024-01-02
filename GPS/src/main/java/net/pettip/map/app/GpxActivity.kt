@@ -11,6 +11,8 @@
 
 package net.pettip.map.app
 
+import android.os.Bundle
+import android.view.WindowManager
 import net.pettip.map.app.naver.NaverGpxComponentActivity
 
 /**
@@ -21,4 +23,9 @@ import net.pettip.map.app.naver.NaverGpxComponentActivity
  * @description : net.pettip.map.app
  * @see net.pettip.map.app.GpxActivity
  */
-open class GpxActivity : NaverGpxComponentActivity()
+open class GpxActivity : NaverGpxComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+}

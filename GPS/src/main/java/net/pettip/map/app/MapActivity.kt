@@ -10,6 +10,8 @@
 
 package net.pettip.map.app
 
+import android.os.Bundle
+import android.view.WindowManager
 import net.pettip.map.app.naver.NaverMapComponentActivity
 
 /**
@@ -19,4 +21,9 @@ import net.pettip.map.app.naver.NaverMapComponentActivity
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
-open class MapActivity : NaverMapComponentActivity()
+open class MapActivity : NaverMapComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+}
