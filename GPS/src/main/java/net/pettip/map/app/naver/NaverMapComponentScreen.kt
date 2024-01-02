@@ -815,6 +815,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var loading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val application = GPSApplication.instance
+    application.recent()?.let { recent ->
+        application.restart()
+    }
     val start = application.start
     val tracks = application.tracks
     Log.v(__CLASSNAME__, "${getMethodName()}[ST][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")

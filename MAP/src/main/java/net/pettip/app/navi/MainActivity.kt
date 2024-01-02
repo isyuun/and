@@ -11,10 +11,18 @@
 
 package net.pettip.app.navi
 
-import android.content.ComponentName
-import android.content.ServiceConnection
-import android.os.Bundle
-import android.os.IBinder
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import net.pettip.gps.R
 import net.pettip.gps.app.GPSApplication
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
@@ -27,22 +35,52 @@ import net.pettip.util.getMethodName
  * @description : net.pettip.app.navi
  * @see net.pettip.app.navi.MainActivity
  */
-class MainActivity : net.pettip._test.app.navi.MainActivity(), ServiceConnection {
+class MainActivity : net.pettip._test.app.navi.MainActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    private val application = GPSApplication.instance
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.recent}]")
-        super.onCreate(savedInstanceState)
-        application.activity = this
-    }
-
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.recent}]")
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.recent}]")
+    override fun setContent() {
+        setContent {
+            SetContent()
+            Box {
+                val application = GPSApplication.instance
+                Log.wtf(__CLASSNAME__, "${getMethodName()}[${application.recent()?.exists()}][${application.recent()}]")
+                val context = LocalContext.current
+                var showDialog by remember { mutableStateOf(false) }
+                application.recent()?.let { recent -> showDialog = recent.exists() }
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            showDialog = false
+                            application.reset()
+                        },
+                        title = { Text(stringResource(id = R.string.walk_text_in_running)) },
+                        text = { Text(stringResource(id = R.string.walk_text_in_restore)) },
+                        confirmButton = {
+                            // Confirm button
+                            Button(
+                                onClick = {
+                                    // Handle confirm button click
+                                    showDialog = false
+                                    openMap(context)
+                                }
+                            ) {
+                                Text(stringResource(id = android.R.string.ok))
+                            }
+                        },
+                        dismissButton = {
+                            // Dismiss button
+                            Button(
+                                onClick = {
+                                    showDialog = false
+                                    application.reset()
+                                }
+                            ) {
+                                Text(stringResource(id = android.R.string.cancel))
+                            }
+                        }
+                    )
+                }//showDialog
+            }
+        }
     }
 }

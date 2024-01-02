@@ -18,7 +18,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
@@ -82,7 +81,7 @@ private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
-open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceChangeListener, ServiceConnection {
+open class gpsapplication : Application(), ServiceConnection {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private var foregroundOnlyLocationServiceBound = false
@@ -95,8 +94,6 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     // Listens for location broadcasts from ForegroundOnlyBroadcastReceiver2.
     //@Deprecated("Use foregroundOnlyBroadcastReceiver instead. ", ReplaceWith("foregroundOnlyBroadcastReceiver"))
     private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver
-
-    //private lateinit var sharedPreferences: SharedPreferences
 
     //private lateinit var foregroundOnlyLocationButton: Button
 
@@ -138,14 +135,10 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
         Log.d(__CLASSNAME__, "${getMethodName()}...")
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
         Log.w(__CLASSNAME__, "${getMethodName()}${foregroundOnlyBroadcastReceiver}")
-        //sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_FILE_KEY, MODE_PRIVATE)
-        //Log.w(__CLASSNAME__, "${getMethodName()}$sharedPreferences")
     }
 
     private fun bind() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}$foregroundOnlyLocationServiceBound, $foregroundOnlyServiceConnection")
-        //sharedPreferences.getBoolean(SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
-        //sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         val serviceIntent = Intent(this, ForegroundOnlyLocationService::class.java)
         bindService(serviceIntent, foregroundOnlyServiceConnection, BIND_AUTO_CREATE)
     }
@@ -176,10 +169,6 @@ open class gpsapplication : Application(), SharedPreferences.OnSharedPreferenceC
     open fun stop() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}${foregroundPermissionApproved()},${foregroundOnlyLocationService}")
         foregroundOnlyLocationService?.stop()
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        Log.i(__CLASSNAME__, "${getMethodName()}$sharedPreferences,$key")
     }
 
     // TODO: Step 1.0, Review Permissions: Method checks if permissions approved.

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import net.pettip.app.ComponentActivity
 import net.pettip.gps.app.GPSApplication
@@ -66,11 +67,11 @@ open class NaverGpxComponentActivity : ComponentActivity(), ServiceConnection {
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-
+@Preview
 @Composable
 fun GpxApp() {
     val application = GPSApplication.instance
-    val file = application.last
+    val file = application.recent()
     Log.wtf(__CLASSNAME__, "${getMethodName()}[$application][${application.service}][$file]")
     GpxApp(file = file)
 }

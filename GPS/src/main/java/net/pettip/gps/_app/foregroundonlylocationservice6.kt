@@ -49,18 +49,35 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
         Log.i(__CLASSNAME__, "${getMethodName()}[$sharedPreferences][$key]")
     }
 
+    override fun start() {
+        Log.v(__CLASSNAME__, "${getMethodName()}[${this._file}")
+        super.start()
+        sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
+    }
+
+    override fun stop() {
+        Log.v(__CLASSNAME__, "${getMethodName()}[${this._file}")
+        super.stop()
+        sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
+    }
+
+    internal fun reset() {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${recent()}]")
+        sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
+    }
+
     internal fun recent(): File? {
-        var file: File? = this._file
-        file = File(sharedPreferences.getString(KEY_FOREGROUND_GPXFILE, ""))
-        Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
-        return file
+        val file = sharedPreferences.getString(KEY_FOREGROUND_GPXFILE, "")?.let { File(it) }
+        //Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
+        return (if (file != null && file.exists()) file else null)
     }
 
     override fun write() {
-        var file: File? = this._file
+        val file: File? = this._file
         Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
         super.write()
-        file?.let { file -> sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, file.absolutePath) }
+        file?.let { file -> sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, file.absolutePath).apply() }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${recent()}]")
     }
 
     internal fun last(): File? {
@@ -86,15 +103,5 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
             if (track.uri != TRACK_ZERO_URI) images.add(track.uri)
 
         }
-    }
-
-    override fun start() {
-        Log.v(__CLASSNAME__, "${getMethodName()}[${this._file}")
-        super.start()
-    }
-
-    override fun stop() {
-        Log.v(__CLASSNAME__, "${getMethodName()}[${this._file}")
-        super.stop()
     }
 }

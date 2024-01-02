@@ -13,6 +13,7 @@ package net.pettip.gps._app
 import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.IBinder
@@ -32,8 +33,25 @@ import java.io.File
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
-open class gpsapplication3 : gpsapplication2() {
+open class gpsapplication3 : gpsapplication2(), SharedPreferences.OnSharedPreferenceChangeListener {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    private lateinit var sharedPreferences: SharedPreferences
+
+    override fun onCreate() {
+        super.onCreate()
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_FILE_KEY, MODE_PRIVATE)
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        Log.i(__CLASSNAME__, "${getMethodName()}[$sharedPreferences][$key]")
+    }
 
     override fun onServiceDisconnected(name: ComponentName) {
         Log.w(__CLASSNAME__, "${getMethodName()}[${this.activity}][${(this.activity is ServiceConnection)}]")
@@ -48,21 +66,26 @@ open class gpsapplication3 : gpsapplication2() {
         this.service?.launchActivityIntent = activity?.intent
         this.service?.onServiceConnected(name, service)
         Log.v(__CLASSNAME__, "${getMethodName()}[${activity?.intent}][${this.service}][${this.service?.launchActivityIntent}]")
-        reload()
         if (this.activity is ServiceConnection) (this.activity as ServiceConnection).onServiceConnected(name, service)
     }
 
-    val recent
-        get() = service?.recent()
-
-    val last
-        get() = service?.last()
-
     fun read(file: File) = service?.read(file)
 
+    fun recent(): File? {
+        if (service != null) return service?.recent()
+        val file = sharedPreferences.getString(KEY_FOREGROUND_GPXFILE, "")?.let { File(it) }
+        //Log.v(__CLASSNAME__, "${getMethodName()}[${file}]")
+        return (if (file != null && file.exists()) file else null)
+    }
+
+    fun reset() {
+        if (service != null) service?.reset()
+        sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
+    }
+
     private fun reload() {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start][recent:${recent}]")
-        recent?.let { recent -> read(recent) }
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${this.service?.no}][$no][$start][recent:${recent()}]")
+        recent()?.let { recent -> read(recent) }
     }
 
     fun restart() {

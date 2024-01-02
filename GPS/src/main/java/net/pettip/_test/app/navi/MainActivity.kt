@@ -157,7 +157,8 @@ open class MainActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
-    private fun setContent() {
+    protected open fun setContent() {
+        //Log.v(__CLASSNAME__, "${getMethodName()}...")
         setContent {
             SetContent()
         }
@@ -173,7 +174,7 @@ open class MainActivity : ComponentActivity() {
     )
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun SetContent() {
+    protected open fun SetContent() {
         APPTheme {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
