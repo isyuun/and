@@ -104,4 +104,12 @@ object MySharedPreference {
     fun getUserEmail(): String {
         return sharedPreferences.getString("userEmail", "").toString()
     }
+
+    fun setLastInviteCode(inviteCode: String) {
+        sharedPreferences.edit().putString("inviteCode", inviteCode).apply()
+    }
+
+    fun getLastInviteCode(): String {
+        return sharedPreferences.getString("inviteCode", "").toString()
+    }
 }

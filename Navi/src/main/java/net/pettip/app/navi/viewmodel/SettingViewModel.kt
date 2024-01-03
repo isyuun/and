@@ -174,8 +174,9 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     val newFileList:StateFlow<List<File>?> = _newFileList.asStateFlow()
     fun clearNewFileList(){_newFileList.value = null}
 
-    private val _detailMessage = MutableStateFlow("") // Data 저장
-    val detailMessage: StateFlow<String> = _detailMessage.asStateFlow() // state 노출
+    private val _detailMessage = MutableStateFlow<String?>(null) // Data 저장
+    val detailMessage: StateFlow<String?> = _detailMessage.asStateFlow() // state 노출
+    fun updateDetailMessage(){_detailMessage.value = null}
 
     private val _photoRes = MutableStateFlow<List<PhotoData>?>(emptyList())
     var state by mutableStateOf(MyScreenState())
@@ -396,14 +397,15 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                     if(response.isSuccessful){
                         val body = response.body()
                         if (body?.statusCode == 200){
-                            _detailMessage.value = body.detailMessage
+                            _detailMessage.value = body.resultMessage
                             continuation.resume(true)
                         }else{
-                            _detailMessage.value = body?.detailMessage.toString()
+                            _detailMessage.value = body?.detailMessage ?: ""
                             continuation.resume(false)
                         }
                     }else{
-                        _detailMessage.value = response.body()?.detailMessage.toString()
+                        val errorBodyString = response.errorBody()!!.string()
+                        _detailMessage.value = errorBodyParse(errorBodyString)
                         continuation.resume(false)
                     }
                 }

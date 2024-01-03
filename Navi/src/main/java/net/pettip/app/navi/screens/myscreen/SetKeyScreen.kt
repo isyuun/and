@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,6 +61,7 @@ import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
+import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 
 @Composable
@@ -68,6 +70,20 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val dm by settingViewModel.detailMessage.collectAsState()
+    val otp by settingViewModel.otpValue.collectAsState()
+
+    DisposableEffect(Unit){
+        onDispose {
+            settingViewModel.updateDetailMessage()
+        }
+    }
+
+    LaunchedEffect(key1 = dm){
+        if (!dm.isNullOrEmpty()){
+            Toast.makeText(context, dm, Toast.LENGTH_SHORT).show()
+            settingViewModel.updateDetailMessage()
+        }
+    }
 
     Scaffold (
         topBar = { BackTopBar(title = "초대코드 등록하기", navController = navController) }
@@ -126,12 +142,10 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
                         settingViewModel.viewModelScope.launch {
                             val result = settingViewModel.setInviteCode()
                             if (result){
-                                scope.launch { Toast.makeText(context, dm , Toast.LENGTH_SHORT).show() }
+                                MySharedPreference.setLastInviteCode(otp)
                                 settingViewModel.updateCurrentPetInfo()
                                 settingViewModel.updatePetInfo()
                                 navController.popBackStack()
-                            }else{
-                                scope.launch { Toast.makeText(context, dm , Toast.LENGTH_SHORT).show() }
                             }
                         }
 
@@ -202,7 +216,7 @@ fun SetKeyTemp(settingViewModel: SettingViewModel, sharedViewModel: SharedViewMo
                         index >= otpValue.length -> ""
                         else -> otpValue[index].toString()
                     }
-                    var isFocused = otpValue.length == index
+                    val isFocused = otpValue.length == index
 
                     Box(
                         modifier = Modifier

@@ -86,6 +86,11 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
     val nickName by viewModel.userNickName.collectAsState()
     val nickNamePass by viewModel.userNickNamePass.collectAsState()
 
+    // -- 추가 예정 --
+    val phoneNum by viewModel.userPhone.collectAsState()
+    val certiNum by viewModel.certiNum.collectAsState()
+    // -- 추가 예정 --
+
     var snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
     var countTime by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -341,9 +346,11 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
+            // ------------------ 휴대폰 인증 ---------------------
+
             //Row (Modifier.fillMaxWidth()){
             //    Text(text = "휴대폰 번호", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-            //        modifier=Modifier.padding(start = 20.dp), color = design_login_text)
+            //        modifier=Modifier.padding(start = 20.dp), color = MaterialTheme.colorScheme.onPrimary)
             //    Text(
             //        text = "*",
             //        fontSize = 16.sp,
@@ -366,14 +373,21 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
             //            .height(48.dp),
             //        placeholder = { Text(text = "“-” 없이 숫자만", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
             //        colors = OutlinedTextFieldDefaults.colors(
-            //            unfocusedPlaceholderColor = design_placeHolder,
-            //            focusedPlaceholderColor = design_placeHolder,
-            //            unfocusedBorderColor = design_textFieldOutLine,
-            //            focusedBorderColor = design_login_text,
-            //            unfocusedContainerColor = design_white,
-            //            focusedContainerColor = design_white,
-            //            unfocusedLeadingIconColor = design_placeHolder,
-            //            focusedLeadingIconColor = design_login_text),
+            //            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+            //            focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+            //            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            //            focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+            //            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+            //            focusedContainerColor = MaterialTheme.colorScheme.primary,
+            //            unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+            //            focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+            //            cursorColor = design_intro_bg.copy(alpha = 0.5f)
+            //        ),
+            //        textStyle = TextStyle(
+            //            color = MaterialTheme.colorScheme.onPrimary,
+            //            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //            fontSize = 16.sp, letterSpacing = (-0.4).sp
+            //        ),
             //        shape = RoundedCornerShape(4.dp),
             //        innerPadding = PaddingValues(start=16.dp)
             //    )
@@ -388,11 +402,14 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
             //            .wrapContentWidth()
             //            .height(48.dp),
             //        shape = RoundedCornerShape(12.dp),
-            //        colors = ButtonDefaults.buttonColors(design_white),
-            //        border = BorderStroke(1.dp, color = design_btn_border),
+            //        colors = ButtonDefaults.buttonColors(
+            //            containerColor = MaterialTheme.colorScheme.primary,
+            //            contentColor = MaterialTheme.colorScheme.onPrimary
+            //        ),
+            //        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outlineVariant),
             //        contentPadding = PaddingValues(start = 14.dp,end=14.dp)
             //    ) {
-            //        Text(text = "인증번호 발송", color = design_login_text,
+            //        Text(text = "인증번호 발송", color = MaterialTheme.colorScheme.onPrimary,
             //            fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             //            letterSpacing = (-0.7).sp)
             //    }
@@ -415,14 +432,21 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
             //            imeAction = ImeAction.Done),
             //        placeholder = { Text(text = "인증번호 입력", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
             //        colors = OutlinedTextFieldDefaults.colors(
-            //            unfocusedPlaceholderColor = design_placeHolder,
-            //            focusedPlaceholderColor = design_placeHolder,
-            //            unfocusedBorderColor = design_textFieldOutLine,
-            //            focusedBorderColor = if(countTime) design_weather_4 else design_login_text,
-            //            unfocusedContainerColor = design_white,
-            //            focusedContainerColor = design_white,
-            //            unfocusedLeadingIconColor = design_placeHolder,
-            //            focusedLeadingIconColor = design_login_text),
+            //            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+            //            focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+            //            unfocusedBorderColor = if (countTime) design_sharp else MaterialTheme.colorScheme.outline,
+            //            focusedBorderColor = if (countTime) design_sharp else MaterialTheme.colorScheme.onPrimary,
+            //            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+            //            focusedContainerColor = MaterialTheme.colorScheme.primary,
+            //            unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+            //            focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+            //            cursorColor = design_intro_bg.copy(alpha = 0.5f)
+            //        ),
+            //        textStyle = TextStyle(
+            //            color = MaterialTheme.colorScheme.onPrimary,
+            //            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //            fontSize = 16.sp, letterSpacing = (-0.4).sp
+            //        ),
             //        shape = RoundedCornerShape(4.dp),
             //        innerPadding = PaddingValues(start=16.dp)
             //    )

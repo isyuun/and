@@ -125,7 +125,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
     private val _dailyLifeTimeLineList = MutableStateFlow<MutableMap<String, List<LifeTimeLineItem>>?>(null)
     val dailyLifeTimeLineList:StateFlow<MutableMap<String, List<LifeTimeLineItem>>?> = _dailyLifeTimeLineList.asStateFlow()
     fun dailyLifeTimeLineListClear() {
-        _dailyLifeTimeLineList.value = mutableMapOf()
+        _dailyLifeTimeLineList.value = null
         _timeLinePage.value = 1
     }
     private fun addToDailyLifeTimeLineList(newData: MutableMap<String, List<LifeTimeLineItem>>?) {

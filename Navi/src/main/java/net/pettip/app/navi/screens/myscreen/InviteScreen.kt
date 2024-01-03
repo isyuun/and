@@ -206,7 +206,7 @@ private fun share(context: Context, inviteCode:String, selectPet:List<PetDetailD
         val inviteString =
             "${G.userNickName}님이 Pet Tip으로 초대했어요!" +
                     "\n${formattedString} 관리에 동참하시겠어요?"+
-                    "\n초대코드등록란에 [${inviteCode}]를 입력해주세요. \n https://www.care-biz.co.kr/ "
+                    "\n초대코드등록란에 [${inviteCode}]를 입력해주세요. \n carepet.hopto.org/kakao/${inviteCode} "
         putExtra(Intent.EXTRA_TEXT, inviteString)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         type = "text/plain"

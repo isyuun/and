@@ -64,7 +64,7 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
             )
 
             Text(
-                text = notiDetail?.data?.lastStrgDt?:"",
+                text = notiDetail?.data?.pstgBgngDt?:"",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,
@@ -80,15 +80,6 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
             )
 
             HtmlText(htmlString = notiDetail?.data?.pstCn?:"", modifier = Modifier.padding(horizontal = 20.dp))
-            //Text(
-            //    text = notiDetail?.data?.pstCn?:"",
-            //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-            //    fontSize = 14.sp, letterSpacing = (-0.7).sp,
-            //    color = design_login_text,
-            //    modifier = Modifier.padding(start = 20.dp, end = 20.dp)
-            //)
-
-
         }
     }
 

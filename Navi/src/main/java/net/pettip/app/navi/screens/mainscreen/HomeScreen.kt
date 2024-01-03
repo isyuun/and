@@ -57,6 +57,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -118,7 +119,9 @@ import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.CustomBottomSheet
 import net.pettip.app.navi.component.CustomDialog
 import net.pettip.app.navi.component.CustomIndicator
+import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
+import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_grad_end
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
 import net.pettip.app.navi.ui.theme.design_icon_distance_bg
@@ -530,12 +533,35 @@ fun ProfileContent(
                             }
                         false ->
                             if (currentPetInfo.isEmpty()){
-                                Box (modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(180.dp),
-                                    contentAlignment = Alignment.Center
-                                ){
-                                    Text(text = "불러오기 실패", color = design_login_text)
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.primary),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = if (isSystemInDarkTheme()) R.drawable.img_error_dark else R.drawable.img_error_light),
+                                        tint = Color.Unspecified, contentDescription = "",
+                                        modifier = Modifier.padding(top = 20.dp)
+                                    )
+
+                                    Text(
+                                        text = "일시적인 오류입니다.",
+                                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                                        fontSize = 24.sp, letterSpacing = (-1.2).sp,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.padding(top = 20.dp)
+                                    )
+
+                                    Text(
+                                        text = "새로 고침을 눌러 페이지를 다시 불러올 수 있습니다.\n문제가 반복된다면 문의하기를 눌러주세요.",
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        lineHeight = 20.sp,
+                                        modifier = Modifier.padding(top = 20.dp)
+                                    )
                                 }
                             }else{
                                 HorizontalPager(
@@ -1289,13 +1315,26 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
                     .padding(start = 8.dp)
                     .background(Color.Transparent)
             ){
-                Text(
-                    text = petName,
-                    fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                    fontSize = 16.sp,
-                    letterSpacing = (-0.8).sp,
-                    color = if (petList == selectPet) design_login_text else MaterialTheme.colorScheme.onPrimary
-                )
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(
+                        text = petName,
+                        fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+                        fontSize = 16.sp,
+                        letterSpacing = (-0.8).sp,
+                        color = if (petList == selectPet) design_login_text else MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    Text(
+                        text = if(petList.mngrType == "C") "~${petList.endDt}" else "",
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 12.sp,
+                        letterSpacing = (-0.8).sp,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.padding(start = 6.dp)
+                    )
+                }
 
                 Row (
                     modifier = Modifier

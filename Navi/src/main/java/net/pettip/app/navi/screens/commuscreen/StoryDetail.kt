@@ -244,6 +244,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
             viewModel.updateStoryDetail(null)
             viewModel.updateCmntList(null)
             viewModel.updateComment("")
+            viewModel.updateReplyCmnt(null)
         }
     }
 
@@ -1224,9 +1225,9 @@ fun CommentListItem(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(key1 = comment.cmntCn){
-        updateComment = comment.cmntCn
-    }
+    //LaunchedEffect(key1 = comment.cmntCn){
+    //    updateComment = comment.cmntCn
+    //}
 
     LaunchedEffect(key1 = cmntList){
         if (comment.cmntNo == viewModel.replyCmnt.value?.cmntNo){

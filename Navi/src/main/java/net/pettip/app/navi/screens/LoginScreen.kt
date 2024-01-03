@@ -355,9 +355,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                 isLoading = false
                                 Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
                             }
-                        }
-                              }
-                    ,
+                        } },
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .fillMaxWidth()

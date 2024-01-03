@@ -52,7 +52,6 @@ import net.pettip.app.navi.screens.commuscreen.EventEndDetail
 import net.pettip.app.navi.screens.commuscreen.StoryDetail
 import net.pettip.app.navi.screens.mainscreen.MainScreen
 import net.pettip.app.navi.screens.mainscreen.SettingScreen
-import net.pettip.app.navi.screens.mainscreen.clearPushDataFromIntent
 import net.pettip.app.navi.screens.myscreen.AddPetScreen
 import net.pettip.app.navi.screens.myscreen.InquiryDetail
 import net.pettip.app.navi.screens.myscreen.InviteScreen
@@ -76,6 +75,7 @@ import net.pettip.app.navi.viewmodel.UserCreateViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.SCDLocalData
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 
 class MainActivity : ComponentActivity() {
@@ -89,10 +89,15 @@ class MainActivity : ComponentActivity() {
             val pathSegments: List<String>? = intentData.pathSegments
             val lastPathSegment: String? = pathSegments?.lastOrNull()
 
-            if (!lastPathSegment.isNullOrBlank() && lastPathSegment.length == 6) {
-                G.inviteCode = lastPathSegment
-
-                Log.d("LOG","data :$lastPathSegment")
+            if (MySharedPreference.getLastInviteCode() != lastPathSegment){
+                if (!lastPathSegment.isNullOrBlank() && lastPathSegment.length == 6) {
+                    G.inviteCode = lastPathSegment
+                    intent.replaceExtras(Bundle())
+                    intent.setAction("")
+                    intent.setData(null)
+                    intent.setFlags(0)
+                    Log.d("LOG","data :$lastPathSegment")
+                }
             }
         }
 
@@ -422,7 +427,7 @@ sealed class Screen(val route: String) {
 
 }
 
-sealed class BottomNav(val route: String, val title: String, val unSelectedIcon: Int, val selectedIcon: Int,){
+sealed class BottomNav(val route: String, val title: String, val unSelectedIcon: Int, val selectedIcon: Int){
     object HomeScreen : BottomNav("home", "홈", R.drawable.home, R.drawable.home_active)
     object TimelineScreen : BottomNav("timeline", "산책", R.drawable.walk, R.drawable.walk_active)
     object CommuScreen : BottomNav("commu", "커뮤니티", R.drawable.community, R.drawable.community_active)
