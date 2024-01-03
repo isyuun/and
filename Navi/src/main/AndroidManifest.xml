@@ -85,13 +85,6 @@
         </activity>
 
         <activity
-            android:name="net.pettip.app.navi.MapActivity"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat" />
-
-
-        <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
             <intent-filter>

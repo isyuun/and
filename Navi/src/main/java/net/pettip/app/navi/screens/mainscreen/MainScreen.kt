@@ -70,7 +70,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.BottomNav
-import net.pettip.app.navi.MapActivity
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
@@ -86,8 +85,8 @@ import net.pettip.app.navi.viewmodel.HomeViewModel
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
+import net.pettip.gps.app.GPSApplication
 import net.pettip.singleton.G
-import net.pettip.util.Log
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -178,8 +177,7 @@ fun MainScreen(
                                             showDialog = true
                                         }else{
                                             G.mapPetInfo = currentPet
-                                            val intent = Intent(context,MapActivity::class.java)
-                                            context.startActivity(intent)
+                                            GPSApplication.instance.openMap()
                                         }
                                     }
                                 },
