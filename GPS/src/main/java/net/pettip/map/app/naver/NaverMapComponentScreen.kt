@@ -1252,12 +1252,13 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             .padding(bottom = 10.0.dp)
                     ) {
                         items(pets) { pet ->
-                            Log.i(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[${application.contains(pet)}][${pet}]")
+                            val checked = application.contains(pet)
+                            Log.wtf(__CLASSNAME__, "::NaverMapApp@ModalBottomSheet${getMethodName()}[${checked}][${pet}]")
                             Divider()
                             Box {
                                 WalkPetCol(
                                     pet = pet,
-                                    checked = application.contains(pet),
+                                    checked = checked,
                                     onCheckedChange = { checked ->
                                         refresh = !refresh
                                         if (checked) application.add(pet) else application.remove(pet)
@@ -1294,6 +1295,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                     showBottomSheet = false
                                 }
                             }
+                            val pest = ArrayList<CurrentPetData>()
+                            application.pets.forEach { pet -> if (pets.contains(pet)) pest.add(pet) }
+                            application.add(pest)
                             application.start()
                             loading = true
                         },
