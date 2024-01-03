@@ -68,7 +68,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -611,187 +610,188 @@ private fun WalkInfoSheet() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun WalkInfoNavi(
-    onGloballyPositioned: (LayoutCoordinates) -> Unit
+    modifier: Modifier = Modifier,
+    onGloballyPositioned: (LayoutCoordinates) -> Unit,
 ) {
-    val application = GPSApplication.instance
-    var start by remember { mutableStateOf(false) }
-    Log.v(__CLASSNAME__, "${getMethodName()}$start")
-    start = application.start
-    Log.v(__CLASSNAME__, "${getMethodName()}$start")
-    var pet by remember {
-        mutableStateOf(
-            CurrentPetData(
-                age = "",
-                ownrPetUnqNo = "",
-                petKindNm = "",
-                petNm = "",
-                petRprsImgAddr = "",
-                sexTypNm = "",
-                wghtVl = 0.0f,
-                petRelUnqNo = 0,
-                mngrType = "M"
+    Box(modifier = modifier) {
+        val application = GPSApplication.instance
+        var start by remember { mutableStateOf(false) }
+        //Log.v(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}$start")
+        start = application.start
+        var pet by remember {
+            mutableStateOf(
+                CurrentPetData(
+                    age = "",
+                    ownrPetUnqNo = "",
+                    petKindNm = "",
+                    petNm = "",
+                    petRprsImgAddr = "",
+                    sexTypNm = "",
+                    wghtVl = 0.0f,
+                    petRelUnqNo = 0,
+                    mngrType = "M"
+                )
             )
-        )
-    }
-    if (application.pets.isNotEmpty()) pet = application.pets[0]
-    var count by remember { mutableIntStateOf(0) }
-    var duration by remember { mutableStateOf("00:00:00") }
-    var distance by remember { mutableStateOf("0.00 km") }
-    /** 1초마다 업데이트*/
-    LaunchedEffect(start) {
-        Log.wtf(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}$start")
-        while (true) {
-            delay(1000) // 1초마다 업데이트
-            if (start) count++ else count = 0
-            duration = if (application.pause) "${application.duration}" else "${application.__duration}"
-            distance = "${application.distance}"
         }
-    }
-    Box(
-        modifier = Modifier
-            .onGloballyPositioned { onGloballyPositioned(it) }
-    ) {
-        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            R.string.walk_title_tip
-            AnimatedVisibility(
-                visible = !start,
-                enter = expandVertically(),
-                exit = shrinkVertically(),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.background,
-                            shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
-                        )
-                        .border(
-                            width = 0.1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
-                        )
-                        .padding(horizontal = 24.0.dp)
-                        .padding(vertical = 26.0.dp)
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(
-                        space = 8.0.dp,
-                        alignment = Alignment.CenterVertically,
-                    ),
-                    horizontalAlignment = Alignment.Start,
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.icon_bulb),
-                            contentDescription = "",
-                            tint = Color.Unspecified,
-                        )
-                        Text(
-                            modifier = Modifier
-                                .padding(start = 4.0.dp)
-                                .basicMarquee(),
-                            text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_tip),
-                            fontSize = 16.sp,
-                            letterSpacing = (-0.6).sp,
-                            maxLines = 1,
-                            //style = TextStyle(background = Color.Yellow),     //test
-                        )
-                    }
-                    Text(
-                        modifier = Modifier
-                            .padding(start = 24.0.dp)
-                            .basicMarquee(),
-                        text = stringResource(id = R.string.walk_title_tips),
-                        fontSize = 14.sp,
-                        letterSpacing = (-0.7).sp,
-                        maxLines = 1,
-                        //style = TextStyle(background = Color.Yellow),     //test
-                    )
-                }
+        if (application.pets.isNotEmpty()) pet = application.pets[0]
+        var duration by remember { mutableStateOf("00:00:00") }
+        var distance by remember { mutableStateOf("0.00 km") }
+        /** 1초마다 업데이트*/
+        LaunchedEffect(start) {
+            Log.wtf(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}$start")
+            while (true) {
+                //Log.w(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}$start")
+                delay(1000) // 1초마다 업데이트
+                duration = if (application.pause) "${application.duration}" else "${application.__duration}"
+                distance = "${application.distance}"
             }
-            R.string.walk_title_walking
-            AnimatedVisibility(
-                visible = start,
-                enter = expandVertically(),
-                exit = shrinkVertically(),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.background,
-                            shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
-                        )
-                        .border(
-                            width = 0.1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
-                        )
-                        .padding(horizontal = 24.0.dp)
-                        .padding(vertical = 16.0.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(
-                        space = 0.0.dp,
-                        alignment = Alignment.CenterHorizontally
-                    ),
-                    verticalAlignment = Alignment.CenterVertically,
+        }
+        Box(
+            modifier = Modifier
+                .onGloballyPositioned { onGloballyPositioned(it) }
+        ) {
+            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                R.string.walk_title_tip
+                AnimatedVisibility(
+                    visible = !start,
+                    enter = expandVertically(),
+                    exit = shrinkVertically(),
                 ) {
-                    CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
                     Column(
                         modifier = Modifier
-                            .padding(horizontal = 12.0.dp)
-                            .padding(vertical = 8.0.dp),
+                            .background(
+                                color = MaterialTheme.colorScheme.background,
+                                shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
+                            )
+                            .border(
+                                width = 0.1.dp,
+                                color = MaterialTheme.colorScheme.outline,
+                                shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
+                            )
+                            .padding(horizontal = 24.0.dp)
+                            .padding(vertical = 26.0.dp)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(
+                            space = 8.0.dp,
+                            alignment = Alignment.CenterVertically,
+                        ),
                         horizontalAlignment = Alignment.Start,
                     ) {
-                        Text(
-                            text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_walking),
-                            fontSize = 16.sp,
-                            letterSpacing = (-0.6).sp,
-                            fontWeight = FontWeight.Normal,
-                            maxLines = 1,
-                            //style = TextStyle(background = Color.Yellow),     //test
-                        )
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(20.0.dp)
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(
-                                modifier = Modifier
-                                    .weight(1.0f),
-                                text = duration,
-                                fontSize = 22.sp,
-                                letterSpacing = (-0.0).sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Left,
-                                maxLines = 1,
-                                //style = TextStyle(background = Color.Yellow),     //test
+                            Icon(
+                                painter = painterResource(id = R.drawable.icon_bulb),
+                                contentDescription = "",
+                                tint = Color.Unspecified,
                             )
                             Text(
                                 modifier = Modifier
-                                    .weight(1.0f),
-                                text = distance,
-                                fontSize = 22.sp,
-                                letterSpacing = (-0.0).sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Left,
+                                    .padding(start = 4.0.dp)
+                                    .basicMarquee(),
+                                text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_tip),
+                                fontSize = 16.sp,
+                                letterSpacing = (-0.6).sp,
                                 maxLines = 1,
                                 //style = TextStyle(background = Color.Yellow),     //test
                             )
                         }
+                        Text(
+                            modifier = Modifier
+                                .padding(start = 24.0.dp)
+                                .basicMarquee(),
+                            text = stringResource(id = R.string.walk_title_tips),
+                            fontSize = 14.sp,
+                            letterSpacing = (-0.7).sp,
+                            maxLines = 1,
+                            //style = TextStyle(background = Color.Yellow),     //test
+                        )
                     }
-                    //Text(
-                    //    text = "반려동물 변경",
-                    //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    //    fontSize = 14.sp,
-                    //    letterSpacing = (-0.6).sp,
-                    //    textDecoration = TextDecoration.Underline,
-                    //    color = design_skip,
-                    //    modifier = Modifier.clickable {
-                    //        viewModel.updateSheetChange("change")
-                    //        scope.launch { bottomSheetState.show() }
-                    //    }
-                    //)
+                }
+                R.string.walk_title_walking
+                AnimatedVisibility(
+                    visible = start,
+                    enter = expandVertically(),
+                    exit = shrinkVertically(),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.background,
+                                shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
+                            )
+                            .border(
+                                width = 0.1.dp,
+                                color = MaterialTheme.colorScheme.outline,
+                                shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
+                            )
+                            .padding(horizontal = 24.0.dp)
+                            .padding(vertical = 16.0.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            space = 0.0.dp,
+                            alignment = Alignment.CenterHorizontally
+                        ),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 12.0.dp)
+                                .padding(vertical = 8.0.dp),
+                            horizontalAlignment = Alignment.Start,
+                        ) {
+                            Text(
+                                text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_walking),
+                                fontSize = 16.sp,
+                                letterSpacing = (-0.6).sp,
+                                fontWeight = FontWeight.Normal,
+                                maxLines = 1,
+                                //style = TextStyle(background = Color.Yellow),     //test
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(20.0.dp)
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .weight(1.0f),
+                                    text = duration,
+                                    fontSize = 22.sp,
+                                    letterSpacing = (-0.0).sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Left,
+                                    maxLines = 1,
+                                    //style = TextStyle(background = Color.Yellow),     //test
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .weight(1.0f),
+                                    text = distance,
+                                    fontSize = 22.sp,
+                                    letterSpacing = (-0.0).sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Left,
+                                    maxLines = 1,
+                                    //style = TextStyle(background = Color.Yellow),     //test
+                                )
+                            }
+                        }
+                        //Text(
+                        //    text = "반려동물 변경",
+                        //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        //    fontSize = 14.sp,
+                        //    letterSpacing = (-0.6).sp,
+                        //    textDecoration = TextDecoration.Underline,
+                        //    color = design_skip,
+                        //    modifier = Modifier.clickable {
+                        //        viewModel.updateSheetChange("change")
+                        //        scope.launch { bottomSheetState.show() }
+                        //    }
+                        //)
+                    }
                 }
             }
         }
@@ -943,32 +943,28 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var lh by remember { mutableStateOf(0.0.dp) }
 
     /** TOP */
-    Box(
+    WalkInfoNavi(
         modifier = Modifier
-            .padding(0.0.dp)
             .fillMaxSize()
     ) {
-        /** TOP */
-        Log.w(__CLASSNAME__, "::NaverMapApp@::TOP${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-        WalkInfoNavi {
-            t = (it.size.height.div(d)).dp
-            var zh = 89.0.dp
-            if (zc.width > 0) zh = (zc.height / d).dp
-            zc?.updateLayoutParams<FrameLayout.LayoutParams> {
-                this.gravity = Gravity.TOP or Gravity.START
-                this.topMargin = (t + space).toPx(context).toInt()
-                this.marginStart = (l + 9.0.dp).toPx(context).toInt()
-            }
-            co?.updateLayoutParams<RelativeLayout.LayoutParams> {
-                this.topMargin = (t + space + zh).toPx(context).toInt()
-                this.marginStart = l.toPx(context).toInt()
-            }
-            lb?.updateLayoutParams<RelativeLayout.LayoutParams> {
-                this.bottomMargin = b.toPx(context).toInt()
-                this.marginStart = l.toPx(context).toInt()
-            }
-            lh = if (lb.height > 0) (lb.height / d).dp else 52.0.dp
+        Log.wtf(__CLASSNAME__, "::NaverMapApp@::TOP${getMethodName()}[$it][${it.size}][${it.size.height}][${it.size.width}]")
+        t = (it.size.height.div(d)).dp
+        var zh = 89.0.dp
+        if (zc.width > 0) zh = (zc.height / d).dp
+        zc?.updateLayoutParams<FrameLayout.LayoutParams> {
+            this.gravity = Gravity.TOP or Gravity.START
+            this.topMargin = (t + space).toPx(context).toInt()
+            this.marginStart = (l + 9.0.dp).toPx(context).toInt()
         }
+        co?.updateLayoutParams<RelativeLayout.LayoutParams> {
+            this.topMargin = (t + space + zh).toPx(context).toInt()
+            this.marginStart = l.toPx(context).toInt()
+        }
+        lb?.updateLayoutParams<RelativeLayout.LayoutParams> {
+            this.bottomMargin = b.toPx(context).toInt()
+            this.marginStart = l.toPx(context).toInt()
+        }
+        lh = if (lb.height > 0) (lb.height / d).dp else 52.0.dp
     }
 
     /** LEFT/RIGHT/WALK */
@@ -1406,7 +1402,14 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 }
 
 @Composable
-fun ShowDialogRestart() {
+fun ShowDialogRestart(
+    icon: @Composable (() -> Unit)? = null,
+    title: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.walk_text_in_running)) },
+    text: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.walk_text_in_restore)) },
+    onDismissRequest: () -> Unit,
+    onConfirmButton: () -> Unit,
+    onDismissButton: () -> Unit,
+) {
     Box {
         val application = GPSApplication.instance
         var showDialog by remember { mutableStateOf(false) }
@@ -1415,17 +1418,20 @@ fun ShowDialogRestart() {
         Log.wtf(__CLASSNAME__, "${getMethodName()}[$showDialog][${application.start}][${application.recent()?.exists()}][${application.recent()}]")
         if (showDialog) {
             AlertDialog(
+                icon = icon,
+                title = title,
+                text = text,
                 onDismissRequest = withClick {
                     showDialog = false
                     application.reset()
+                    onDismissRequest()
                 },
-                title = { Text(stringResource(id = R.string.walk_text_in_running)) },
-                text = { Text(stringResource(id = R.string.walk_text_in_restore)) },
                 confirmButton = {
                     Button(
                         onClick = withClick {
                             showDialog = false
                             application.restart()
+                            onConfirmButton()
                         }
                     ) {
                         Text(stringResource(id = android.R.string.ok))
@@ -1436,6 +1442,7 @@ fun ShowDialogRestart() {
                         onClick = withClick {
                             showDialog = false
                             application.reset()
+                            onDismissButton()
                         }
                     ) {
                         Text(stringResource(id = android.R.string.cancel))

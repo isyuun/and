@@ -33,7 +33,11 @@ class MainActivity : net.pettip._test.app.navi.MainActivity() {
             Log.wtf(__CLASSNAME__, "${getMethodName()}...")
             APPTheme {
                 SetContent()
-                ShowDialogRestart()
+                ShowDialogRestart(
+                    onDismissRequest = {},
+                    onConfirmButton = {},
+                    onDismissButton = {},
+                )
             }
         }
     }
