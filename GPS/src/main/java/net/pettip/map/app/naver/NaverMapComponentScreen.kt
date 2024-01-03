@@ -1407,8 +1407,8 @@ fun ShowDialogRestart(
     title: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.walk_text_in_running)) },
     text: @Composable (() -> Unit)? = { Text(stringResource(id = R.string.walk_text_in_restore)) },
     onDismissRequest: () -> Unit,
-    onConfirmButton: () -> Unit,
     onDismissButton: () -> Unit,
+    onConfirmButton: () -> Unit,
 ) {
     Box {
         val application = GPSApplication.instance

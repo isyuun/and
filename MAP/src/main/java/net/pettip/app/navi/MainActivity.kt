@@ -35,8 +35,8 @@ class MainActivity : net.pettip._test.app.navi.MainActivity() {
                 SetContent()
                 ShowDialogRestart(
                     onDismissRequest = {},
-                    onConfirmButton = {},
                     onDismissButton = {},
+                    onConfirmButton = {},
                 )
             }
         }
