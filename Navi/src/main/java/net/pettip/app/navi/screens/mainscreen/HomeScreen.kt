@@ -345,7 +345,9 @@ fun HomeScreen(
                     ShowDialogRestart(
                         onDismissRequest = {},
                         onDismissButton = {},
-                        onConfirmButton = {},
+                        onConfirmButton = {
+                            G.mapPetInfo = currentPetInfo
+                        },
                     )
                 }
             }
