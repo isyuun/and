@@ -439,7 +439,6 @@ private fun WalkPetRow(pet: CurrentPetData, checked: Boolean, onCheckedChange: (
 
     Log.w(__CLASSNAME__, "${getMethodName()}[$check][$checked]$pet, $checked, $onCheckedChange")
 
-    val context = LocalContext.current
     Button(
         onClick = withClick {
             check = !check
@@ -1349,16 +1348,14 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                     }
                                 }
                                 application.stop()
-                                if (start) {
-                                    mapView.getMapAsync { naverMap ->
-                                        ender(context = context, position = position).map = naverMap
-                                        naverMap.takeSnapshot(false) {
-                                            application.preview = it
-                                        }
+                                mapView.getMapAsync { naverMap ->
+                                    ender(context = context, position = position).map = naverMap
+                                    naverMap.takeSnapshot(false) {
+                                        application.preview = it
                                     }
-                                    G.toPost = true
-                                    activity.finish()
                                 }
+                                G.toPost = true
+                                activity.finish()
                             },
                             shape = RoundedCornerShape(12.0.dp),
                             modifier = Modifier.weight(1.0f),
@@ -1417,7 +1414,6 @@ fun ShowDialogRestart() {
         else application.recent()?.let { recent -> showDialog = recent.exists() }
         Log.wtf(__CLASSNAME__, "${getMethodName()}[$showDialog][${application.start}][${application.recent()?.exists()}][${application.recent()}]")
         if (showDialog) {
-            val scope = rememberCoroutineScope()
             AlertDialog(
                 onDismissRequest = withClick {
                     showDialog = false
