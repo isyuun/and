@@ -74,8 +74,10 @@ import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.UserCreateViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.SCDLocalData
+import net.pettip.map.app.naver.ShowDialogRestart
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
+import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 
 class MainActivity : ComponentActivity() {
@@ -89,14 +91,14 @@ class MainActivity : ComponentActivity() {
             val pathSegments: List<String>? = intentData.pathSegments
             val lastPathSegment: String? = pathSegments?.lastOrNull()
 
-            if (MySharedPreference.getLastInviteCode() != lastPathSegment){
+            if (MySharedPreference.getLastInviteCode() != lastPathSegment) {
                 if (!lastPathSegment.isNullOrBlank() && lastPathSegment.length == 6) {
                     G.inviteCode = lastPathSegment
                     intent.replaceExtras(Bundle())
                     intent.setAction("")
                     intent.setData(null)
                     intent.setFlags(0)
-                    Log.d("LOG","data :$lastPathSegment")
+                    Log.d("LOG", "data :$lastPathSegment")
                 }
             }
         }
@@ -106,6 +108,13 @@ class MainActivity : ComponentActivity() {
                 Surface {
                     MyApp(intentData)
                 }
+            }
+            APPTheme {
+                ShowDialogRestart(
+                    onDismissRequest = {},
+                    onDismissButton = {},
+                    onConfirmButton = {},
+                )
             }
         }
     }
@@ -132,17 +141,17 @@ fun MyApp(intentData: Uri?) {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun AppNavigation(navController: NavHostController, intentData: Uri?){
+fun AppNavigation(navController: NavHostController, intentData: Uri?) {
 
     val scdLocalData = remember { SCDLocalData() }
 
-    val viewModel = remember{ LoginViewModel()}
-    val userCreateViewModel = remember{UserCreateViewModel(scdLocalData)}
-    val sharedViewModel = remember{ SharedViewModel() }
+    val viewModel = remember { LoginViewModel() }
+    val userCreateViewModel = remember { UserCreateViewModel(scdLocalData) }
+    val sharedViewModel = remember { SharedViewModel() }
     val homeViewModel = remember { HomeViewModel(sharedViewModel) }
-    val walkViewModel = remember{WalkViewModel(sharedViewModel)}
-    val communityViewModel = remember{CommunityViewModel(sharedViewModel)}
-    val settingViewModel = remember{SettingViewModel(sharedViewModel)}
+    val walkViewModel = remember { WalkViewModel(sharedViewModel) }
+    val communityViewModel = remember { CommunityViewModel(sharedViewModel) }
+    val settingViewModel = remember { SettingViewModel(sharedViewModel) }
 
     var count by remember { mutableIntStateOf(3) }
 
@@ -166,7 +175,7 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?){
         startDestination = "intro",
         enterTransition = { fadeIn(tween(700)) },
         exitTransition = { fadeOut(tween(700)) }
-    ){
+    ) {
         composable(
             route = "intro",
             deepLinks = listOf(
@@ -176,51 +185,51 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?){
                 }
             ),
             arguments = listOf(
-                navArgument("data"){
+                navArgument("data") {
                     type = NavType.StringType
                     defaultValue = ""
                 }
             )
-        ){
+        ) {
             val data = it.arguments?.getString("data")
-            if (!data.isNullOrBlank()){
+            if (!data.isNullOrBlank()) {
                 sharedViewModel.updateInviteCode(data)
-                Log.d("LOG","intro: $data")
+                Log.d("LOG", "intro: $data")
             }
             IntroScreen(navController = navController, viewModel = sharedViewModel)
         }
-        composable("login"){
+        composable("login") {
             LoginScreen(navController = navController, viewModel, sharedViewModel)
         }
-        composable("idFindScreen"){
+        composable("idFindScreen") {
 
             IdFindScreen(navController = navController, viewModel = viewModel)
         }
-        composable("pwFindScreen"){
+        composable("pwFindScreen") {
 
             PwFindScreen(navController = navController, viewModel = viewModel)
         }
-        composable("idPwSearch/{initialTab}", arguments = listOf(navArgument("initialTab"){type = NavType.IntType})){backStackEntry ->
+        composable("idPwSearch/{initialTab}", arguments = listOf(navArgument("initialTab") { type = NavType.IntType })) { backStackEntry ->
 
-            IdPwSearchScreen(navController= navController, initialTab = backStackEntry.arguments?.getInt("initialTab")?:0, viewModel = viewModel)
+            IdPwSearchScreen(navController = navController, initialTab = backStackEntry.arguments?.getInt("initialTab") ?: 0, viewModel = viewModel)
         }
-        composable("userCreate"){
+        composable("userCreate") {
 
             UserCreateScreen(navController = navController, viewModel = userCreateViewModel)
         }
-        composable("petCreateScreen"){
+        composable("petCreateScreen") {
 
             PetCreateScreen(navController = navController, viewModel = userCreateViewModel, loginViewModel = viewModel, sharedViewModel = sharedViewModel)
         }
-        composable("petKindContent"){
+        composable("petKindContent") {
 
             PetKindContent(navController = navController, viewModel = userCreateViewModel)
         }
-        composable("locationPickContent"){
+        composable("locationPickContent") {
 
             LocationPickContent(viewModel = userCreateViewModel, navController = navController)
         }
-        composable("mainScreen"){
+        composable("mainScreen") {
 
             MainScreen(
                 navController = navController,
@@ -233,26 +242,26 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?){
             )
         }
 
-        composable("postScreen"){
+        composable("postScreen") {
             PostScreen(walkViewModel, navController)
         }
 
-        composable("easyRegScreen"){
+        composable("easyRegScreen") {
             EasyRegScreen(navController = navController, viewModel = viewModel, userCreateViewModel = userCreateViewModel)
         }
 
         composable(
             route = "storyDetail",
             enterTransition = {
-            fadeIn(
-                animationSpec = tween(
-                    300, easing = LinearEasing
+                fadeIn(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
+                    )
+                ) + slideInHorizontally(
+                    tween(300, easing = LinearEasing),
+                    initialOffsetX = { it / 3 * 2 }
                 )
-            )+ slideInHorizontally(
-                tween(300, easing = LinearEasing),
-                initialOffsetX = { it/3*2}
-            )
-        },
+            },
             exitTransition = {
                 fadeOut(
                     animationSpec = tween(
@@ -260,16 +269,16 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?){
                     )
                 ) + slideOutHorizontally(
                     tween(300, easing = LinearEasing),
-                    targetOffsetX = { it/3*2}
+                    targetOffsetX = { it / 3 * 2 }
                 )
             }
-        ){
+        ) {
             StoryDetail(viewModel = communityViewModel, sharedViewModel = sharedViewModel, navController = navController)
         }
-        composable("eventDetail"){
+        composable("eventDetail") {
             EventDetail(navController = navController, viewModel = communityViewModel)
         }
-        composable("eventEndDetail"){
+        composable("eventEndDetail") {
             EventEndDetail(navController = navController)
         }
         composable(
@@ -294,7 +303,7 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?){
                     towards = AnimatedContentTransitionScope.SlideDirection.End
                 )
             }
-        ){
+        ) {
             NotiDetail(navController = navController, viewModel = communityViewModel)
         }
         composable(
@@ -319,31 +328,31 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?){
                     towards = AnimatedContentTransitionScope.SlideDirection.End
                 )
             }
-        ){
+        ) {
             InquiryDetail(navController = navController, viewModel = communityViewModel, settingViewModel = settingViewModel)
         }
-        composable("oneNOneScreen"){
+        composable("oneNOneScreen") {
             OneNOneScreen(navController = navController, settingViewModel = settingViewModel)
         }
-        composable("settingScreen"){
+        composable("settingScreen") {
             SettingScreen(navController = navController, viewModel = communityViewModel)
         }
-        composable("userInfoScreen"){
+        composable("userInfoScreen") {
             UserInfoScreen(navController = navController, settingViewModel = settingViewModel)
         }
-        composable("petProfileScreen"){ backStackEntry ->
+        composable("petProfileScreen") { backStackEntry ->
             PetProfileScreen(navController = navController, sharedViewModel = sharedViewModel, settingViewModel)
         }
-        composable("inviteScreen"){
+        composable("inviteScreen") {
             InviteScreen(navController = navController, settingViewModel = settingViewModel)
         }
-        composable( route = "setKeyScreen" ){
+        composable(route = "setKeyScreen") {
             SetKeyScreen(navController = navController, settingViewModel = settingViewModel, sharedViewModel = sharedViewModel)
         }
-        composable("addPetScreen"){
+        composable("addPetScreen") {
             AddPetScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel)
         }
-        composable("modifyPetInfoScreen"){
+        composable("modifyPetInfoScreen") {
             ModifyPetInfoScreen(navController = navController, viewModel = userCreateViewModel, sharedViewModel = sharedViewModel, settingViewModel = settingViewModel)
         }
         composable(
@@ -368,15 +377,15 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?){
             //        towards = AnimatedContentTransitionScope.SlideDirection.End
             //    )
             //}
-        ){
+        ) {
             WalkDetailContent(walkViewModel = walkViewModel, navController)
         }
-        composable("dailyPostScreen"){
+        composable("dailyPostScreen") {
             DailyPostScreen(viewModel = communityViewModel, sharedViewModel = sharedViewModel, navController = navController)
         }
     }
 
-    if (G.dupleLogin){
+    if (G.dupleLogin) {
         AlertDialog(
             onDismissRequest = { },
             buttons = { },
@@ -384,12 +393,14 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?){
                 Text(
                     text = "다른 기기에서 로그인",
                     fontFamily = FontFamily(Font(R.font.pretendard_bold))
-                ) },
+                )
+            },
             text = {
                 Text(
                     text = "잠시 후 로그아웃 됩니다...${count}",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular))
-                )},
+                )
+            },
             backgroundColor = design_white,
             contentColor = design_login_text
         )
@@ -427,7 +438,7 @@ sealed class Screen(val route: String) {
 
 }
 
-sealed class BottomNav(val route: String, val title: String, val unSelectedIcon: Int, val selectedIcon: Int){
+sealed class BottomNav(val route: String, val title: String, val unSelectedIcon: Int, val selectedIcon: Int) {
     object HomeScreen : BottomNav("home", "홈", R.drawable.home, R.drawable.home_active)
     object TimelineScreen : BottomNav("timeline", "산책", R.drawable.walk, R.drawable.walk_active)
     object CommuScreen : BottomNav("commu", "커뮤니티", R.drawable.community, R.drawable.community_active)
