@@ -252,49 +252,49 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            Row (Modifier.fillMaxWidth()){
-                Text(text = "휴대폰 번호", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier=Modifier.padding(start = 20.dp), color = MaterialTheme.colorScheme.onPrimary)
-                Text(
-                    text = "*",
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    color= design_sharp
-                )
-            }
-            CustomTextField(
-                value = userPhoneNum,
-                onValueChange = {settingViewModel.updateUserPhoneNum(it)},
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next),
-                modifier = Modifier
-                    .padding(start = 20.dp, top = 8.dp, end = 20.dp)
-                    .fillMaxWidth()
-                    .height(48.dp),
-                placeholder = { Text(text = "휴대폰 번호를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                    focusedContainerColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
-                ),
-                textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 16.sp, letterSpacing = (-0.4).sp
-                ),
-                shape = RoundedCornerShape(4.dp),
-                innerPadding = PaddingValues(start=16.dp)
-            )
-
-            Spacer(modifier = Modifier.padding(top = 16.dp))
+            //Row (Modifier.fillMaxWidth()){
+            //    Text(text = "휴대폰 번호", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //        modifier=Modifier.padding(start = 20.dp), color = MaterialTheme.colorScheme.onPrimary)
+            //    Text(
+            //        text = "*",
+            //        fontSize = 16.sp,
+            //        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //        color= design_sharp
+            //    )
+            //}
+            //CustomTextField(
+            //    value = userPhoneNum,
+            //    onValueChange = {settingViewModel.updateUserPhoneNum(it)},
+            //    singleLine = true,
+            //    keyboardOptions = KeyboardOptions(
+            //        keyboardType = KeyboardType.Text,
+            //        imeAction = ImeAction.Next),
+            //    modifier = Modifier
+            //        .padding(start = 20.dp, top = 8.dp, end = 20.dp)
+            //        .fillMaxWidth()
+            //        .height(48.dp),
+            //    placeholder = { Text(text = "휴대폰 번호를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+            //    colors = OutlinedTextFieldDefaults.colors(
+            //        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+            //        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+            //        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            //        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+            //        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+            //        focusedContainerColor = MaterialTheme.colorScheme.primary,
+            //        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+            //        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+            //        cursorColor = design_intro_bg.copy(alpha = 0.5f)
+            //    ),
+            //    textStyle = TextStyle(
+            //        color = MaterialTheme.colorScheme.onPrimary,
+            //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //        fontSize = 16.sp, letterSpacing = (-0.4).sp
+            //    ),
+            //    shape = RoundedCornerShape(4.dp),
+            //    innerPadding = PaddingValues(start=16.dp)
+            //)
+            //
+            //Spacer(modifier = Modifier.padding(top = 16.dp))
 
             Row {
                 Text(text = "비밀번호 변경", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),

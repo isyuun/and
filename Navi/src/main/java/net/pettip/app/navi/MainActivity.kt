@@ -109,13 +109,6 @@ class MainActivity : ComponentActivity() {
                     MyApp(intentData)
                 }
             }
-            APPTheme {
-                ShowDialogRestart(
-                    onDismissRequest = {},
-                    onDismissButton = {},
-                    onConfirmButton = {},
-                )
-            }
         }
     }
 

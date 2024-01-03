@@ -133,7 +133,7 @@ class HomeViewModel(private val sharedViewModel: SharedViewModel):ViewModel() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
         // 권한 체크와 위치 업데이트
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 location?.let {
                     val latitude = it.latitude

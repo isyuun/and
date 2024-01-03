@@ -4,6 +4,7 @@
 
 package net.pettip.app.navi.screens.mainscreen
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
 import android.net.Uri
@@ -75,6 +76,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -112,6 +114,9 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
@@ -140,7 +145,9 @@ import net.pettip.app.navi.viewmodel.HomeViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.daily.RTStoryData
 import net.pettip.data.pet.PetDetailData
+import net.pettip.map.app.naver.ShowDialogRestart
 import net.pettip.singleton.G
+import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -182,6 +189,9 @@ fun HomeScreen(
         onRefresh = {
             refreshing = true
         })
+
+    val petLoading by viewModel.petLoading.collectAsState()
+    val currentPetLoading by viewModel.currentPetLoading.collectAsState()
 
     val context = LocalContext.current
     val density = LocalDensity.current.density
@@ -329,6 +339,16 @@ fun HomeScreen(
                     }
                 }
             }
+
+            if (!currentPetLoading){
+                APPTheme {
+                    ShowDialogRestart(
+                        onDismissRequest = {},
+                        onDismissButton = {},
+                        onConfirmButton = {},
+                    )
+                }
+            }
         }
         CustomIndicator(state = pullRefreshState, refreshing = refreshing)
     }
@@ -336,7 +356,7 @@ fun HomeScreen(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ProfileContent(
     viewModel: HomeViewModel,
@@ -363,6 +383,7 @@ fun ProfileContent(
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
     val weatherData by viewModel.weatherData.collectAsState()
     val weatherRefresh by viewModel.weatherRefresh.collectAsState()
+    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_COARSE_LOCATION)
 
     val currentTime = LocalTime.now() // 현재 시간을 가져옵니다
     val afternoon6 = LocalTime.of(18, 0) // 오후 6시
@@ -400,6 +421,8 @@ fun ProfileContent(
                     viewModel.getWeather()
                     viewModel.updateWeatherRefresh(false)
                 }
+            }else{
+                viewModel.updateWeatherRefresh(false)
             }
         }
     }
@@ -436,7 +459,14 @@ fun ProfileContent(
                 Row (modifier = Modifier
                     .clickable(
                         enabled = (!weatherRefresh && sky == null),
-                        onClick = { viewModel.updateWeatherRefresh(true) }
+                        onClick = {
+                            if (locationPermissionState.status.isGranted) {
+                                viewModel.updateWeatherRefresh(true)
+                                Log.d("LOG", "1")
+                            } else {
+                                locationPermissionState.launchPermissionRequest()
+                            }
+                        }
                     )
                     .wrapContentWidth()
                     .height(30.dp)

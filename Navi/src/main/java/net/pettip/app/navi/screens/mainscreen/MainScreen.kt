@@ -68,6 +68,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.BottomNav
 import net.pettip.app.navi.R
@@ -87,6 +89,7 @@ import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.gps.app.GPSApplication
 import net.pettip.singleton.G
+import net.pettip.util.Log
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -127,6 +130,18 @@ fun MainScreen(
     var backBtnOnLT by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+
+    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+        if (!task.isSuccessful) {
+            Log.d("LOG", "Fetching FCM registration token failed", task.exception)
+            return@OnCompleteListener
+        }
+
+        // Get new FCM registration token
+        val token = task.result
+
+      Log.d("LOG",token)
+    })
 
     LaunchedEffect(key1 = init){
         if (init && !dupleLogin){
