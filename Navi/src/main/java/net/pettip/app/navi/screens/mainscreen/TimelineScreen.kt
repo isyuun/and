@@ -16,6 +16,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -105,6 +107,7 @@ import net.pettip.data.daily.LifeTimeLineItem
 import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.G
 import net.pettip.util.Log
+import org.apache.commons.lang3.mutable.Mutable
 
 /**
  * @Project     : PetTip-Android
@@ -267,6 +270,10 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
                     AnimatedVisibility(
                         modifier = Modifier
                             .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = rememberRipple(
+                                    color = Color.Black
+                                ),
                                 enabled = !typeChange
                             ) {
                                 if (sortType == "오름차순") {
@@ -316,7 +323,12 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .padding(start = 12.dp)
-                            .clickable {
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = rememberRipple(
+                                    color = Color.Black
+                                )
+                            ) {
                                 modeChange(true)
                                 viewModel.updateToMonthCalendar(true)
                             }
@@ -347,6 +359,10 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
                             .fillMaxSize()
                             .background(Color.Black.copy(alpha = 0.5f))
                             .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = rememberRipple(
+                                    color = Color.Black
+                                ),
                                 enabled = isSearching
                             ) { dismiss(false) }
                     )

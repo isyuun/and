@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
@@ -69,27 +71,19 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     @SuppressLint("ServiceCast")
     private fun sendNotification(remoteMessage: RemoteMessage) {
 
-        val deepLinkIntent = Intent(this, MainActivity::class.java).apply {
-            action = Intent.ACTION_VIEW
-            data = Uri.parse("http://pettip.kr/${remoteMessage.data["schUnqNo"]}")
+        val intent = Intent(this, MyFirebaseMessagingService::class.java).apply {
+            addFlags(FLAG_ACTIVITY_CLEAR_TOP)
         }
 
-        // Create a TaskStackBuilder to handle the back stack
-        val stackBuilder = TaskStackBuilder.create(this)
-
-        // Add the deep link intent to the stack
-        stackBuilder.addNextIntentWithParentStack(deepLinkIntent)
-
-        // Get a PendingIntent containing the entire back stack
-        val pendingIntent = stackBuilder.getPendingIntent(
-            0,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, intent, FLAG_IMMUTABLE
         )
+
 
         val channelId = "fcm_default_channel"
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.icon_sole)
+            .setSmallIcon(R.drawable.pettip_launcher_icon)
             .setContentTitle(remoteMessage.notification?.title ?: "Pet Tip")
             .setContentText(remoteMessage.notification?.body ?: "새로운 알림이 왔어요!")
             .setAutoCancel(true)

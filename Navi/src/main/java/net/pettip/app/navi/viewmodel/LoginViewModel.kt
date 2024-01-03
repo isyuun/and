@@ -127,7 +127,7 @@ class LoginViewModel() : ViewModel() {
     }
 
     // 이메일 로그인
-    suspend fun onLoginButtonClick(userId: String, userPw: String, loginMethod: String): Boolean {
+    suspend fun onLoginButtonClick(userId: String, userPw: String, loginMethod: String): Int {
         if (userId.isNotEmpty() && userPw.isNotEmpty()) {
             // 서버로 전송
             val apiService = RetrofitClientServer.instance
@@ -165,26 +165,26 @@ class LoginViewModel() : ViewModel() {
                                     MySharedPreference.setLastLoginMethod(loginMethod)
                                     MySharedPreference.setIsLogin(true)
 
-                                    continuation.resume(true)
+                                    continuation.resume(0)
                                 } else {
 
-                                    continuation.resume(false)
+                                    continuation.resume(1)
                                 }
                             }
                         }else{
-                            continuation.resume(false)
+                            Log.d("LOG","로그인 실패")
+                            continuation.resume(1)
                         }
                     }
 
                     override fun onFailure(call: Call<LoginResModel>, t: Throwable) {
-                        Log.d("LOG", "userid : ${userId}, userpw: ${userPw}, " + t.message)
-                        continuation.resume(false)
+                        Log.d("LOG","통신실패시 진입")
+                        continuation.resume(2)
                     }
                 })
             }
-        } else {
-            return false
         }
+        return 2
     }
 
 

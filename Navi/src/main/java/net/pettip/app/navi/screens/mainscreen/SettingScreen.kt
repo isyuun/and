@@ -527,6 +527,7 @@ fun InquiryItem(inquiryItemData: BbsQna, navController: NavHostController, viewM
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,
             color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.padding(top = 8.dp)
         )
 
         Spacer(modifier = Modifier

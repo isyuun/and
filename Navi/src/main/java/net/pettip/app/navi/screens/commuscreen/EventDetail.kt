@@ -161,6 +161,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
         onDispose {
             viewModel.updateBbsDetail(null)
             viewModel.updateLastPstSn(null)
+            viewModel.updateEventReplyCmnt(null)
         }
     }
 
@@ -190,7 +191,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
             focusRequester.requestFocus()
         } else{
             delay(300)
-            viewModel.updateReplyCmnt(null)
+            viewModel.updateEventReplyCmnt(null)
             replyText = ""
         }
     }
@@ -666,9 +667,9 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(key1 = comment.cmntCn){
-        updateComment = comment.cmntCn
-    }
+    //LaunchedEffect(key1 = comment.cmntCn){
+    //    updateComment = comment.cmntCn
+    //}
 
     LaunchedEffect(key1 = cmntList){
         if (comment.pstCmntNo == viewModel.eventReplyCmnt.value?.pstCmntNo){
@@ -1195,7 +1196,7 @@ fun BbsCommentListItem2(
     var openBottomSheet by remember{ mutableStateOf(false) }
     var deleteDialog by remember{ mutableStateOf(false) }
     val context = LocalContext.current
-    var updateComment by remember{ mutableStateOf(comment.cmntCn) }
+    var updateComment by remember { mutableStateOf(comment.cmntCn) }
     var updateLoading by remember { mutableStateOf(false) }
     var rcmdtnLoading by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current

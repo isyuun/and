@@ -125,7 +125,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
     private val _dailyLifeTimeLineList = MutableStateFlow<MutableMap<String, List<LifeTimeLineItem>>?>(null)
     val dailyLifeTimeLineList:StateFlow<MutableMap<String, List<LifeTimeLineItem>>?> = _dailyLifeTimeLineList.asStateFlow()
     fun dailyLifeTimeLineListClear() {
-        _dailyLifeTimeLineList.value = mutableMapOf()
+        _dailyLifeTimeLineList.value = null
         _timeLinePage.value = 1
     }
     private fun addToDailyLifeTimeLineList(newData: MutableMap<String, List<LifeTimeLineItem>>?) {
@@ -430,8 +430,6 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
                 connection.connect()
 
                 if (connection.responseCode != HttpURLConnection.HTTP_OK) {
-                    // HTTP 요청이 성공적이지 않은 경우
-                    // 필요에 따라 예외 처리를 추가할 수 있습니다.
                     throw IOException("HTTP error code: ${connection.responseCode}")
                 }
 

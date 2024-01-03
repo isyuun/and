@@ -160,15 +160,17 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
             scope.launch {
                 val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "GOOGLE")
                 // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
-                if (loginResult){
+                if (loginResult == 0){
                     sharedViewModel.updateInit(true)
                     sharedViewModel.updateDupleLogin(false)
                     navController.navigate(Screen.MainScreen.route){
                         popUpTo(0)
                     }
-                }else{
+                }else if (loginResult == 1){
                     viewModel.updateLoginMethod("GOOGLE")
                     navController.navigate(Screen.EasyRegScreen.route)
+                }else{
+                    Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -332,7 +334,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         scope.launch {
                             isLoading = true
                             val result = viewModel.onLoginButtonClick(userId = id, userPw = password, loginMethod = "EMAIL")
-                            if (result){
+                            if (result==0){
                                 isLoading = false
                                 MySharedPreference.setUserEmail(id)
                                 sharedViewModel.updateInit(true)
@@ -340,8 +342,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                 navController.navigate(Screen.MainScreen.route){
                                     popUpTo(0)
                                 }
-
-                            }else{
+                            }else if (result == 1){
                                 isLoading = false
                                 focusManager.clearFocus()
                                 snackbarHostState.showSnackbar(
@@ -350,10 +351,11 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                     duration = SnackbarDuration.Short,
                                     withDismissAction = false
                                 )
+                            }else{
+                                isLoading = false
+                                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
                             }
-                        }
-                              }
-                    ,
+                        } },
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .fillMaxWidth()
@@ -423,17 +425,20 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         if (kakaoLoginResult){
 
                             val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "KAKAO")
-                            if (loginResult){
+                            if (loginResult == 0){
                                 sharedViewModel.updateInit(true)
                                 sharedViewModel.updateDupleLogin(false)
                                 navController.navigate(Screen.MainScreen.route){
                                     popUpTo(0)
                                 }
-                            }else{
+                            }else if (loginResult == 1){
+                                // 실패시의 상황을 하나로 상정하면 안됨.
+                                // 통신실패의 경우에는 토스트를 띄어 다시시도하기 유도
                                 viewModel.updateLoginMethod("KAKAO")
                                 navController.navigate(Screen.EasyRegScreen.route)
+                            }else{
+                                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
                             }
-
                         }else{
                             Toast.makeText(context, "Kakao 로그인 실패", Toast.LENGTH_SHORT).show()
                         }
@@ -463,17 +468,18 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
 
                             val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "NAVER")
                             // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
-                            if (loginResult){
+                            if (loginResult == 0){
                                 sharedViewModel.updateInit(true)
                                 sharedViewModel.updateDupleLogin(false)
                                 navController.navigate(Screen.MainScreen.route){
                                     popUpTo(0)
                                 }
-                            }else{
+                            }else if(loginResult == 1){
                                 viewModel.updateLoginMethod("NAVER")
                                 navController.navigate(Screen.EasyRegScreen.route)
+                            }else{
+                                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
                             }
-
                         }else{
                             Toast.makeText(context, "Naver 로그인 실패", Toast.LENGTH_SHORT).show()
                         }
@@ -495,24 +501,6 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)))
                     }
                 }
-
-                //Button(onClick = { /*TODO 네이버*/ },
-                //    modifier = Modifier
-                //        .padding(top = 8.dp)
-                //        .fillMaxWidth()
-                //        .height(48.dp)
-                //        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                //    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                //    colors = ButtonDefaults.buttonColors(containerColor = design_login_facebookbtn, contentColor = design_white)
-                //) {
-                //    Box (modifier = Modifier.fillMaxSize()){
-                //        Icon(painter = painterResource(id = R.drawable.icon_facebook), contentDescription = "",
-                //            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
-                //        Text(text = "페이스북으로 로그인", modifier = Modifier.align(Alignment.Center),
-                //            fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                //            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-                //    }
-                //}
 
                 Button(onClick = {
                     scope.launch {

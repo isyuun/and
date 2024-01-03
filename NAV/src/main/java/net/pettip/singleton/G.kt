@@ -13,6 +13,7 @@ object G {
 
     var accessToken: String = ""
     var refreshToken: String = ""
+    var inviteCode by mutableStateOf<String?>(null)
 
     var mapPetInfo: List<CurrentPetData> = emptyList()
 

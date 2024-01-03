@@ -6,6 +6,7 @@ package net.pettip.app.navi.screens.mainscreen
 
 import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
@@ -23,7 +24,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,7 +44,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerSnapDistance
@@ -57,8 +56,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -115,23 +114,20 @@ import coil.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.pettip._app.application
-import net.pettip._app.application2
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.CustomBottomSheet
 import net.pettip.app.navi.component.CustomDialog
 import net.pettip.app.navi.component.CustomIndicator
+import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
-import net.pettip.app.navi.ui.theme.design_btn_border
+import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_grad_end
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
-import net.pettip.app.navi.ui.theme.design_icon_bg
 import net.pettip.app.navi.ui.theme.design_icon_distance_bg
 import net.pettip.app.navi.ui.theme.design_icon_time_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_main_pattern
 import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_shadow
@@ -144,8 +140,8 @@ import net.pettip.app.navi.viewmodel.HomeViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.daily.RTStoryData
 import net.pettip.data.pet.PetDetailData
-import net.pettip.gps.app.GPSApplication
 import net.pettip.singleton.G
+import net.pettip.util.Log
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
@@ -169,7 +165,7 @@ fun HomeScreen(
     onDissMiss: (Boolean) -> Unit,
     bottomNavController: NavHostController,
     showDialog: Boolean,
-    showDialogChange : (Boolean) -> Unit
+    showDialogChange: (Boolean) -> Unit
 ){
     val currentPetInfo by viewModel.currentPetInfo.collectAsState()
 
@@ -178,6 +174,7 @@ fun HomeScreen(
     var refreshing by remember{ mutableStateOf(false) }
 
     val selectedPet by sharedViewModel.selectPet.collectAsState()
+    val inviteCode by sharedViewModel.inviteCode.collectAsState()
 
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val pullRefreshState = rememberPullRefreshState(
@@ -212,14 +209,19 @@ fun HomeScreen(
         pagerState.animateScrollToPage(index)
     }
 
-    LaunchedEffect(key1 = G.toPost){
+    LaunchedEffect(key1 = G.toPost, key2 = inviteCode, key3 = G.inviteCode){
         if(G.toPost){
             navController.navigate(Screen.PostScreen.route)
+        }else if ((inviteCode?.length ?: 0) == 6){
+            delay(700)
+            navController.navigate(Screen.SetKeyScreen.route)
+        }else if (G.inviteCode?.length == 6) {
+            sharedViewModel.updateInviteCode(G.inviteCode)
+            G.inviteCode = null
+            delay(700)
+            navController.navigate(Screen.SetKeyScreen.route)
+            Log.d("LOG","진입")
         }
-    }
-
-    LaunchedEffect(Unit){
-
     }
 
     LaunchedEffect(key1 = refreshing){
@@ -531,12 +533,35 @@ fun ProfileContent(
                             }
                         false ->
                             if (currentPetInfo.isEmpty()){
-                                Box (modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(180.dp),
-                                    contentAlignment = Alignment.Center
-                                ){
-                                    Text(text = "불러오기 실패", color = design_login_text)
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.primary),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = if (isSystemInDarkTheme()) R.drawable.img_error_dark else R.drawable.img_error_light),
+                                        tint = Color.Unspecified, contentDescription = "",
+                                        modifier = Modifier.padding(top = 20.dp)
+                                    )
+
+                                    Text(
+                                        text = "일시적인 오류입니다.",
+                                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                                        fontSize = 24.sp, letterSpacing = (-1.2).sp,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.padding(top = 20.dp)
+                                    )
+
+                                    Text(
+                                        text = "새로 고침을 눌러 페이지를 다시 불러올 수 있습니다.\n문제가 반복된다면 문의하기를 눌러주세요.",
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        lineHeight = 20.sp,
+                                        modifier = Modifier.padding(top = 20.dp)
+                                    )
                                 }
                             }else{
                                 HorizontalPager(
@@ -1290,13 +1315,26 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
                     .padding(start = 8.dp)
                     .background(Color.Transparent)
             ){
-                Text(
-                    text = petName,
-                    fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                    fontSize = 16.sp,
-                    letterSpacing = (-0.8).sp,
-                    color = if (petList == selectPet) design_login_text else MaterialTheme.colorScheme.onPrimary
-                )
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(
+                        text = petName,
+                        fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+                        fontSize = 16.sp,
+                        letterSpacing = (-0.8).sp,
+                        color = if (petList == selectPet) design_login_text else MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    Text(
+                        text = if(petList.mngrType == "C") "~${petList.endDt}" else "",
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 12.sp,
+                        letterSpacing = (-0.8).sp,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.padding(start = 6.dp)
+                    )
+                }
 
                 Row (
                     modifier = Modifier

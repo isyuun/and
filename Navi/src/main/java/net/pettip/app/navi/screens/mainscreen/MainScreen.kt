@@ -4,6 +4,7 @@ package net.pettip.app.navi.screens.mainscreen
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -86,7 +87,6 @@ import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.singleton.G
-import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 
 
@@ -96,10 +96,12 @@ import net.pettip.util.Log
 fun MainScreen(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
-    sharedViewModel:SharedViewModel,
+    sharedViewModel: SharedViewModel,
     walkViewModel: WalkViewModel,
     communityViewModel: CommunityViewModel,
-    settingViewModel: SettingViewModel) {
+    settingViewModel: SettingViewModel,
+    data: Uri?
+) {
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(color = MaterialTheme.colorScheme.primary)
@@ -350,6 +352,7 @@ fun MainScreen(
                                                         .clickable {
                                                             if (isSearching) {
                                                                 walkViewModel.viewModelScope.launch {
+                                                                    walkViewModel.dailyLifeTimeLineListClear()
                                                                     walkViewModel.getTimeLineList()
                                                                     isSearching = false
                                                                 }
@@ -569,7 +572,7 @@ fun BackOnPressed() {
     }
 }
 
-private fun clearPushDataFromIntent() {
+fun clearPushDataFromIntent() {
     val intent = Intent()
-    intent.data = null // Replace with your actual intent
+    intent.data = null
 }

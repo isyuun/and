@@ -551,7 +551,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                         when (petDetailData.mngrType) {
                             "M" -> 0.dp
                             "I" -> 1.dp
-                            "G" -> 0.dp
+                            "C" -> 0.dp
                             else -> 0.dp
                         },
                         color = design_button_bg,
@@ -562,7 +562,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                         when (petDetailData.mngrType) {
                             "M" -> design_button_bg
                             "I" -> Color.Transparent
-                            "G" -> design_DDDDDD
+                            "C" -> design_DDDDDD
                             else -> design_DDDDDD
                         },
                         shape = RoundedCornerShape(10.dp)
@@ -574,7 +574,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                     when(petDetailData.mngrType){
                         "M" -> stringResource(R.string.ing_manage)
                         "I" -> stringResource(R.string.ing_join)
-                        "C" -> stringResource(R.string.stop_join)
+                        "C" -> petDetailData.endDt?: ""
                         else -> stringResource(R.string.error)
                     },
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
