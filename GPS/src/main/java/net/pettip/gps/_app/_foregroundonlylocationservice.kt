@@ -30,8 +30,9 @@ internal const val NOTIFICATION_CHANNEL_ID = "net.pettip.app.navi.channel.01"
 
 internal const val SHARED_PREFERENCE_FILE_KEY = "$PACKAGE_NAME.PREFERENCE_FILE_KEY"
 
-internal const val KEY_FOREGROUND_ENABLED = "tracking_foreground_location"
-internal const val KEY_FOREGROUND_GPXFILE = "tracking.foreground.gpx.flie"
+internal const val KEY_FOREGROUND_ENABLED = "key.foreground.enabled"
+internal const val KEY_FOREGROUND_GPXFILE = "key.foreground.gpxflie"
+internal const val KEY_FOREGROUND_GPXPETS = "key.foreground.gpxpets"
 
 /**
  * Provides access to SharedPreferences for location to Activities and Services.

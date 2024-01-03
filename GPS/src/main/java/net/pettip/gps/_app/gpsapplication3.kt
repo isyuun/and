@@ -17,6 +17,8 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.IBinder
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import net.pettip.app.gpxs
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.gpx.GPX_TICK_FORMAT
@@ -38,10 +40,30 @@ open class gpsapplication3 : gpsapplication2(), SharedPreferences.OnSharedPrefer
 
     private lateinit var sharedPreferences: SharedPreferences
 
+    fun savePets(pets: ArrayList<CurrentPetData>) {
+        val gson = Gson()
+        val petsString = gson.toJson(pets)
+        Log.v(__CLASSNAME__, "${getMethodName()}[$petsString]")
+        sharedPreferences.edit().putString(KEY_FOREGROUND_GPXPETS, petsString).apply()
+    }
+
+    fun loadPets(): List<CurrentPetData> {
+        val gson = Gson()
+        val petsString = sharedPreferences.getString(KEY_FOREGROUND_GPXPETS, null)
+        Log.v(__CLASSNAME__, "${getMethodName()}[$petsString]")
+        return if (petsString.isNullOrEmpty()) {
+            emptyList()
+        } else {
+            gson.fromJson(petsString, object : TypeToken<List<CurrentPetData>>() {}.type)
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_FILE_KEY, MODE_PRIVATE)
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        loadPets().forEach { pet -> add(pet) }
+        Log.v(__CLASSNAME__, "${getMethodName()}${this.pets}")
     }
 
     override fun onTerminate() {
@@ -50,7 +72,7 @@ open class gpsapplication3 : gpsapplication2(), SharedPreferences.OnSharedPrefer
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[$sharedPreferences][$key]")
+        Log.v(__CLASSNAME__, "${getMethodName()}[$sharedPreferences][$key]")
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
@@ -160,31 +182,33 @@ open class gpsapplication3 : gpsapplication2(), SharedPreferences.OnSharedPrefer
     val pets = ArrayList<CurrentPetData>()
 
     fun add(pet: CurrentPetData) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.pets.contains(pet)}][$no]$pet$pets")
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.pets.contains(pet)}][$no][$pet]")
         if (!this.pets.contains(pet)) this.pets.add(pet)
         select()
     }
 
     fun add(pets: List<CurrentPetData>) {
-        Log.i(__CLASSNAME__, "${getMethodName()}$pets")
+        Log.i(__CLASSNAME__, "${getMethodName()}[$pets]")
         this.pets.clear(); this.pets.addAll(pets)
         select()
     }
 
     fun remove(pet: CurrentPetData) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[${this.pets.contains(pet)}][$no]$pet$pets")
+        Log.i(__CLASSNAME__, "${getMethodName()}[${this.pets.contains(pet)}][$no][$pet]")
         if (this.pets.contains(pet)) this.pets.remove(pet)
         select()
     }
 
     fun remove() {
-        Log.i(__CLASSNAME__, "${getMethodName()}$pets")
+        Log.i(__CLASSNAME__, "${getMethodName()}[$pets]")
         this.pets.clear()
         select()
     }
 
     private fun select() {
         if (!this.pets.isEmpty()) select(this.pets.last()) else no = TRACK_ZERO_NUM
+        savePets(this.pets)
+        //Log.i(__CLASSNAME__, "${getMethodName()}${loadPets()}")   //test
     }
 
     private fun select(pet: CurrentPetData) {

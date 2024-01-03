@@ -812,12 +812,12 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     Log.v(__CLASSNAME__, "${getMethodName()}[ST][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
 
     if (G.mapPetInfo.isEmpty()) {   //test
+        val pets = ArrayList<CurrentPetData>()
         val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", -0.1f, -1, "M")
         val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", -0.1f, -1, "M")
-        application.add(pet1)
-        application.add(pet1)
-        application.add(pet2)
-        G.mapPetInfo = application.pets
+        pets.add(pet1)
+        pets.add(pet2)
+        G.mapPetInfo = pets
     }
     val pets = G.mapPetInfo
     if (pets.size == 1) application.add(pets[0])

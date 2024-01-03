@@ -45,7 +45,7 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        Log.i(__CLASSNAME__, "${getMethodName()}[$sharedPreferences][$key]")
+        Log.v(__CLASSNAME__, "${getMethodName()}[$sharedPreferences][$key]")
     }
 
     override fun start() {
