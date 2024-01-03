@@ -14,7 +14,6 @@ package net.pettip.gps._app
 import android.content.SharedPreferences
 import net.pettip.app.gpxs
 import net.pettip.gpx.GPXParser
-import net.pettip.gpx.GPX_DATE_FORMAT
 import net.pettip.gpx.TRACK_ZERO_URI
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
@@ -101,7 +100,7 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
         //Log.v(__CLASSNAME__, "${getMethodName()}[_tracks.size:${_tracks.size}]")
         images.clear()
         _tracks.forEach { track ->
-            Log.i(__CLASSNAME__, "${getMethodName()}[${(track.uri != TRACK_ZERO_URI)}][${GPX_DATE_FORMAT.format(track.time)}]$track")
+            //Log.i(__CLASSNAME__, "${getMethodName()}[${(track.uri != TRACK_ZERO_URI)}][${GPX_DATE_FORMAT.format(track.time)}]$track")
             if (track.uri != TRACK_ZERO_URI) images.add(track.uri)
 
         }
