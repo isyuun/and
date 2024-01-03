@@ -146,7 +146,9 @@ open class MainActivity : ComponentActivity() {
     protected open fun setContent() {
         //Log.v(__CLASSNAME__, "${getMethodName()}...")
         setContent {
-            SetContent()
+            APPTheme {
+                SetContent()
+            }
         }
     }
 
@@ -161,151 +163,149 @@ open class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     protected open fun SetContent() {
-        APPTheme {
-            val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-            val scope = rememberCoroutineScope()
-            ModalNavigationDrawer(
-                drawerState = drawerState,
-                drawerContent = {
-                    ModalDrawerSheet { /* Drawer content */ }
-                },
-            ) {
-                val snackbarHostState = remember { SnackbarHostState() }
-                var showBottomSheet by remember { mutableStateOf(false) }
-                Scaffold(
-                    modifier = Modifier
-                        .clickable { },
-                    topBar = {
-                        TopAppBar(
-                            title = { Text(stringResource(id = R.string.app_name)) },
-                            navigationIcon = {
-                                IconButton(
-                                    onClick = {
-                                        scope.launch {
-                                            drawerState.apply {
-                                                if (isClosed) open() else close()
-                                            }
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet { /* Drawer content */ }
+            },
+        ) {
+            val snackbarHostState = remember { SnackbarHostState() }
+            var showBottomSheet by remember { mutableStateOf(false) }
+            Scaffold(
+                modifier = Modifier
+                    .clickable { },
+                topBar = {
+                    TopAppBar(
+                        title = { Text(stringResource(id = R.string.app_name)) },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        drawerState.apply {
+                                            if (isClosed) open() else close()
                                         }
                                     }
-                                ) {
-                                    Icon(Icons.Default.Menu, contentDescription = "Menu")
                                 }
-                            },
-                            actions = {
-                                //IconButton(onClick = { /* Handle search icon click */ }) {
-                                //    Icon(Icons.Default.Search, contentDescription = "Search")
-                                //}
-                                //IconButton(onClick = { /* Handle settings icon click */ }) {
-                                //    Icon(Icons.Default.Settings, contentDescription = "Settings")
-                                //}
-                                //IconButton(onClick = { /* Handle share icon click */ }) {
-                                //    Icon(Icons.Default.Share, contentDescription = "Share")
-                                //}
-                                IconButton(onClick = { /* Handle share icon click */ }) {
-                                    Icon(Icons.Default.MoreVert, contentDescription = "MoreVert")
-                                }
-                            },
-                        )
-                    },
-                    bottomBar = {
-                        var selectedTabIndex by remember { mutableStateOf(0) }
-                        BottomAppBar {
-                            TabRow(
-                                selectedTabIndex = selectedTabIndex,
-                                indicator = { tabPositions ->
-                                    TabRowDefaults.Indicator(
-                                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
-                                    )
-                                },
                             ) {
-                                Tab(
-                                    selected = selectedTabIndex == 0,
-                                    onClick = withClick {
-                                        selectedTabIndex = 0
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar("Snackbar")
-                                        }
-                                    },
-                                    //enabled = enabled,
-                                ) {
-                                    Icon(imageVector = Icons.Default.Face, contentDescription = null)
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "Tab",
-                                        maxLines = 1,
-                                    )
-                                }
-                                Tab(
-                                    selected = selectedTabIndex == 1,
-                                    onClick = withClick {
-                                        selectedTabIndex = 1
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar("Snackbar")
-                                        }
-                                    },
-                                    //enabled = enabled,
-                                ) {
-                                    Icon(imageVector = Icons.Default.Home, contentDescription = null)
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "Tab",
-                                        maxLines = 1,
-                                    )
-                                }
-                                Tab(
-                                    selected = selectedTabIndex == 2,
-                                    onClick = withClick {
-                                        selectedTabIndex = 2
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar("Snackbar")
-                                        }
-                                    },
-                                    //enabled = enabled,
-                                ) {
-                                    Icon(imageVector = Icons.Default.AccountBox, contentDescription = null)
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "Tab",
-                                        maxLines = 1,
-                                    )
-                                }
-                                Tab(
-                                    selected = selectedTabIndex == 3,
-                                    onClick = withClick {
-                                        selectedTabIndex = 3
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar("Snackbar")
-                                        }
-                                    },
-                                    //enabled = enabled,
-                                ) {
-                                    Icon(imageVector = Icons.Default.Info, contentDescription = null)
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "Tab",
-                                        maxLines = 1,
-                                    )
-                                }
+                                Icon(Icons.Default.Menu, contentDescription = "Menu")
+                            }
+                        },
+                        actions = {
+                            //IconButton(onClick = { /* Handle search icon click */ }) {
+                            //    Icon(Icons.Default.Search, contentDescription = "Search")
+                            //}
+                            //IconButton(onClick = { /* Handle settings icon click */ }) {
+                            //    Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            //}
+                            //IconButton(onClick = { /* Handle share icon click */ }) {
+                            //    Icon(Icons.Default.Share, contentDescription = "Share")
+                            //}
+                            IconButton(onClick = { /* Handle share icon click */ }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "MoreVert")
+                            }
+                        },
+                    )
+                },
+                bottomBar = {
+                    var selectedTabIndex by remember { mutableStateOf(0) }
+                    BottomAppBar {
+                        TabRow(
+                            selectedTabIndex = selectedTabIndex,
+                            indicator = { tabPositions ->
+                                TabRowDefaults.Indicator(
+                                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
+                                )
+                            },
+                        ) {
+                            Tab(
+                                selected = selectedTabIndex == 0,
+                                onClick = withClick {
+                                    selectedTabIndex = 0
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Snackbar")
+                                    }
+                                },
+                                //enabled = enabled,
+                            ) {
+                                Icon(imageVector = Icons.Default.Face, contentDescription = null)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Tab",
+                                    maxLines = 1,
+                                )
+                            }
+                            Tab(
+                                selected = selectedTabIndex == 1,
+                                onClick = withClick {
+                                    selectedTabIndex = 1
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Snackbar")
+                                    }
+                                },
+                                //enabled = enabled,
+                            ) {
+                                Icon(imageVector = Icons.Default.Home, contentDescription = null)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Tab",
+                                    maxLines = 1,
+                                )
+                            }
+                            Tab(
+                                selected = selectedTabIndex == 2,
+                                onClick = withClick {
+                                    selectedTabIndex = 2
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Snackbar")
+                                    }
+                                },
+                                //enabled = enabled,
+                            ) {
+                                Icon(imageVector = Icons.Default.AccountBox, contentDescription = null)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Tab",
+                                    maxLines = 1,
+                                )
+                            }
+                            Tab(
+                                selected = selectedTabIndex == 3,
+                                onClick = withClick {
+                                    selectedTabIndex = 3
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Snackbar")
+                                    }
+                                },
+                                //enabled = enabled,
+                            ) {
+                                Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Tab",
+                                    maxLines = 1,
+                                )
                             }
                         }
-                    },
-                    snackbarHost = {
-                        SnackbarHost(hostState = snackbarHostState)
-                    },
-                    floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = withClick { showBottomSheet = true },
-                            shape = CircleShape,
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = "Add")
-                        }
-                    },
-                    floatingActionButtonPosition = FabPosition.End,
-                ) { innerPadding ->
-                    ShowBottomSheet(showBottomSheet = showBottomSheet) { showBottomSheet = false }
-                    Box(modifier = Modifier.padding(innerPadding)) {
-                        Content()
                     }
+                },
+                snackbarHost = {
+                    SnackbarHost(hostState = snackbarHostState)
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = withClick { showBottomSheet = true },
+                        shape = CircleShape,
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add")
+                    }
+                },
+                floatingActionButtonPosition = FabPosition.End,
+            ) { innerPadding ->
+                ShowBottomSheet(showBottomSheet = showBottomSheet) { showBottomSheet = false }
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    Content()
                 }
             }
         }

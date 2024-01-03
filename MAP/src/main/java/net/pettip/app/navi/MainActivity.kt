@@ -13,6 +13,7 @@ package net.pettip.app.navi
 
 import androidx.activity.compose.setContent
 import net.pettip.map.app.naver.ShowDialogRestart
+import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
@@ -30,8 +31,10 @@ class MainActivity : net.pettip._test.app.navi.MainActivity() {
     override fun setContent() {
         setContent {
             Log.wtf(__CLASSNAME__, "${getMethodName()}...")
-            SetContent()
-            ShowDialogRestart()
+            APPTheme {
+                SetContent()
+                ShowDialogRestart()
+            }
         }
     }
 }
