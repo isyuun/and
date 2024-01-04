@@ -29,13 +29,13 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    //primary = Color.Red,          //test
-    //secondary = Color.Blue,       //test
-    //tertiary = Color.Yellow,      //test
-    //background = Color.Cyan,      //test
-    //surface = Color.White,          //test
-    //surfaceVariant = Color.Magenta, //test
-    //onSurfaceVariant = Color.Green, //test
+    //primary = Color.Red,              //test
+    //secondary = Color.Blue,           //test
+    //tertiary = Color.Yellow,          //test
+    //background = Color.Cyan,          //test
+    //surface = Color.White,            //test
+    //surfaceVariant = Color.Magenta,   //test
+    //onSurfaceVariant = Color.Green,   //test
     primary = Color(0xFF4783F5),
     inversePrimary = Color(0xFFF54F68),
     onPrimary = Color(0xFFFFFFFF),
@@ -48,16 +48,18 @@ private val DarkColorScheme = darkColorScheme(
     surface = Color(0xFF2D3034),
     onSurface = Color(0xFFFFFFFF),
     //outline = Color(0xFF45484D)
+    //error = Color.Blue,               //test
+    //onError = Color.Red,              //test
 )
 
 private val LightColorScheme = lightColorScheme(
-    //primary = Color.Blue,         //test
-    //secondary = Color.Red,        //test
-    //tertiary = Color.Yellow,      //test
-    //background = Color.Cyan,      //test
-    //surface = Color.Black,          //test
-    //surfaceVariant = Color.Magenta, //test
-    //onSurfaceVariant = Color.Green, //test
+    //primary = Color.Blue,             //test
+    //secondary = Color.Red,            //test
+    //tertiary = Color.Yellow,          //test
+    //background = Color.Cyan,          //test
+    //surface = Color.Black,            //test
+    //surfaceVariant = Color.Magenta,   //test
+    //onSurfaceVariant = Color.Green,   //test
     primary = Color(0xFF4783F5),
     inversePrimary = Color(0xFFF54F68),
     onPrimary = Color(0xFFFFFFFF),
@@ -70,6 +72,8 @@ private val LightColorScheme = lightColorScheme(
     surface = Color(0xFFFFFFFF),
     onSurface = Color(0xFF1C1B1F),
     //outline = Color(0xFFE3E9F2)
+    //error = Color.Blue,               //test
+    //onError = Color.Red,              //test
 )
 
 val invertedColors: ColorScheme
