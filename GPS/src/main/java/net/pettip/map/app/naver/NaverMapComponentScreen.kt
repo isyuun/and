@@ -377,9 +377,19 @@ fun naverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Tr
     }
 }
 
-fun naverMapView(context: Context, naverMap: NaverMap, tracks: MutableList<Track>) {
+fun naverMapView(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, padding: Dp = 52.0.dp) {
     naverMapPath(context = context, naverMap = naverMap, tracks = tracks, finished = true)
-    naverMapPreview(context = context, naverMap = naverMap, tracks = tracks, 52.0.dp)
+    naverMapPreview(context = context, naverMap = naverMap, tracks = tracks, padding)
+}
+
+fun naverMapReturn(naverMap: NaverMap, camera: CameraPosition) {
+    //val target = camera.target
+    //val zoom = camera.zoom
+    //val tilt = camera.tilt
+    //val bearing = camera.bearing
+    //val camera = CameraPosition(target, zoom, tilt, bearing)
+    naverMap.cameraPosition = camera
+    naverMap.locationTrackingMode = LocationTrackingMode.Follow
 }
 
 @Composable
@@ -834,7 +844,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val config = LocalConfiguration.current
     val mapOptions = remember {
         NaverMapOptions()
-            .camera(camera)
             .logoClickEnabled(true)
             .mapType(NaverMap.MapType.Navi)
             .nightModeEnabled(isSystemInDarkTheme)
@@ -843,6 +852,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             .locationButtonEnabled(true)
             .zoomGesturesEnabled(true)
             .indoorEnabled(true)
+            .camera(camera)
     }
     val mapView = rememberMapViewWithLifecycle(context, mapOptions)
 
@@ -907,7 +917,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             locationOverlay.iconWidth = 100
                             locationOverlay.iconHeight = 100
                             ///**locationOverlay.subAnchor = PointF(-0.0f, 0.0f)*/
-                            //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.ic_location_overlay_start)
+                            //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.marker_start)
                             //locationOverlay.subIconWidth = 80
                             //locationOverlay.subIconHeight = 80
                         }
@@ -1194,8 +1204,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 application.resume()
                 mapView.getMapAsync { naverMap ->
                     Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                    naverMap.cameraPosition = camera
-                    naverMap.locationTrackingMode = LocationTrackingMode.Follow
+                    naverMapReturn(naverMap, camera)
                 }
             },
             sheetState = sheetState,
@@ -1376,8 +1385,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 application.resume()
                                 mapView.getMapAsync { naverMap ->
                                     Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                                    naverMap.cameraPosition = camera
-                                    naverMap.locationTrackingMode = LocationTrackingMode.Follow
+                                    naverMapReturn(naverMap, camera)
                                 }
                             },
                             shape = RoundedCornerShape(12.0.dp),

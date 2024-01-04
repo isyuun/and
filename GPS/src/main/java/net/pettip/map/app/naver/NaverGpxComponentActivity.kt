@@ -16,17 +16,24 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.naver.maps.map.NaverMap
+import com.naver.maps.map.NaverMapOptions
 import net.pettip.app.ComponentActivity
+import net.pettip.gps._app.KEY_FOREGROUND_GPXFILE
 import net.pettip.gps.app.GPSApplication
 import net.pettip.gpx.GPXParser
 import net.pettip.gpx.Track
+import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
@@ -47,7 +54,11 @@ open class NaverGpxComponentActivity : ComponentActivity(), ServiceConnection {
 
     protected open fun setContent() {
         setContent {
-            GpxApp()
+            APPTheme {
+                Surface {
+                    GpxApp()
+                }
+            }
         }
     }
 
@@ -67,11 +78,10 @@ open class NaverGpxComponentActivity : ComponentActivity(), ServiceConnection {
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-@Preview
 @Composable
 fun GpxApp() {
     val application = GPSApplication.instance
-    val file = application.recent()
+    val file = (LocalContext.current as? ComponentActivity)?.intent?.getStringExtra(KEY_FOREGROUND_GPXFILE)?.let { File(it) }
     Log.wtf(__CLASSNAME__, "${getMethodName()}[$application][${application.service}][$file]")
     GpxApp(file = file)
 }
@@ -84,7 +94,15 @@ fun GpxApp(file: File?) {
 
     file?.let { GPXParser(tracks).read(it) }
 
-    val mapView = rememberMapViewWithLifecycle(context)
+    val isSystemInDarkTheme = isSystemInDarkTheme()
+    val mapOptions = remember {
+        NaverMapOptions()
+            .logoClickEnabled(true)
+            .mapType(NaverMap.MapType.Navi)
+            .nightModeEnabled(isSystemInDarkTheme)
+            .zoomControlEnabled(false)
+    }
+    val mapView = rememberMapViewWithLifecycle(context, mapOptions)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -93,9 +111,7 @@ fun GpxApp(file: File?) {
             factory = {
                 mapView.apply {
                     getMapAsync { naverMap ->
-                        naverMap.uiSettings.isZoomControlEnabled = false
-                        naverMap.uiSettings.isLogoClickEnabled = false
-                        naverMapView(context = context, naverMap = naverMap, tracks = tracks)
+                        naverMapView(context = context, naverMap = naverMap, tracks = tracks, padding = 104.0.dp)
                         naverMap.takeSnapshot(false) {
                             application.preview = it
                         }
