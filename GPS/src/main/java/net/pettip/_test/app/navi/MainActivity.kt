@@ -575,7 +575,8 @@ open class MainActivity : ComponentActivity() {
             }
             var value1 by remember { mutableStateOf(TextFieldValue("TextField:surfaceVariant")) }
             TextField(
-                label = { Text(value1.text) },
+                label = { Text("label") },
+                placeholder = { Text("placeholder") },
                 value = value1, onValueChange = { value1 = it },
                 singleLine = true,
                 enabled = enabled,
@@ -583,6 +584,8 @@ open class MainActivity : ComponentActivity() {
             )
             var value2 by remember { mutableStateOf(TextFieldValue("TextField:surfaceVariant:Error")) }
             TextField(
+                label = { Text("label") },
+                placeholder = { Text("placeholder") },
                 value = value2, onValueChange = { value2 = it },
                 singleLine = true,
                 enabled = enabled,
@@ -590,6 +593,8 @@ open class MainActivity : ComponentActivity() {
             )
             var value3 by remember { mutableStateOf(TextFieldValue("OutlinedTextField")) }
             OutlinedTextField(
+                label = { Text("label") },
+                placeholder = { Text("placeholder") },
                 value = value3, onValueChange = { value3 = it },
                 singleLine = true,
                 enabled = enabled,
@@ -597,6 +602,8 @@ open class MainActivity : ComponentActivity() {
             )
             var value4 by remember { mutableStateOf(TextFieldValue("OutlinedTextField:Error")) }
             OutlinedTextField(
+                label = { Text("label") },
+                placeholder = { Text("placeholder") },
                 value = value4, onValueChange = { value4 = it },
                 singleLine = true,
                 enabled = enabled,

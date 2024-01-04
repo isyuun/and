@@ -67,7 +67,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -824,9 +823,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 
     val location = application.lastLocation ?: source.lastLocation
     var position by rememberSaveable { mutableStateOf(if (location != null) LatLng(location.latitude, location.longitude) else LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
-    var zoom by rememberSaveable { mutableDoubleStateOf(GPX_CAMERA_ZOOM_ZERO) }
+    var camera by rememberSaveable { mutableStateOf(CameraPosition(position, GPX_CAMERA_ZOOM_ZERO)) }
 
-    Log.i(__CLASSNAME__, "${getMethodName()}[$start][$zoom][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
+    Log.i(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
 
     source.lastLocation?.let { position = LatLng(it.latitude, it.longitude) }
     source.isCompassEnabled = true
@@ -835,7 +834,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val config = LocalConfiguration.current
     val mapOptions = remember {
         NaverMapOptions()
-            .camera(CameraPosition(position, zoom))
+            .camera(camera)
             .logoClickEnabled(true)
             .mapType(NaverMap.MapType.Navi)
             .nightModeEnabled(isSystemInDarkTheme)
@@ -859,11 +858,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
 
     val scope = rememberCoroutineScope()
-    Log.w(__CLASSNAME__, "${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
+    Log.w(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
     LaunchedEffect(refresh, position) {
         scope.launch {
             mapView.getMapAsync { naverMap ->
-                Log.v(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
+                Log.v(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                 if (start) {
                     tracks?.let { naverMapPath(context = context, naverMap = naverMap, tracks = it, finished = false) }
                 }
@@ -899,7 +898,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             Log.i(__CLASSNAME__, "::NaverMapApp@AndroidView${getMethodName()}[isSystemInDarkTheme:$isSystemInDarkTheme][isNightModeEnabled:$isNightModeEnabled]")
                             locationSource = source
                             locationTrackingMode = LocationTrackingMode.Follow
-                            cameraPosition = CameraPosition(cameraPosition.target, zoom)
+                            //cameraPosition = CameraPosition(cameraPosition.target, zoom)
+                            cameraPosition = camera
                             locationOverlay.isVisible = true
                             locationOverlay.circleRadius = 100
                             /**locationOverlay.anchor = PointF(0.0f, 0.0f)*/
@@ -1082,10 +1082,10 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         /** WALK */
         Button(
             onClick = withClick {
-                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_title_end)}${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
+                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_title_end)}${getMethodName()}[$start`][`${tracks?.size}][${markers.size}][${position.toText()}]")
                 if (start)
                     mapView.getMapAsync { naverMap ->
-                        zoom = naverMap.cameraPosition.zoom
+                        camera = naverMap.cameraPosition
                         tracks?.let { naverMapPreview(context = context, naverMap = naverMap, tracks = it, padding = 104.0.dp) }
                     }
                 if (pets.size == 1 && !start) {
@@ -1193,9 +1193,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 showBottomSheet = false
                 application.resume()
                 mapView.getMapAsync { naverMap ->
-                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
+                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                    naverMap.cameraPosition = camera
                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
-                    naverMap.cameraPosition = CameraPosition(position, zoom)
                 }
             },
             sheetState = sheetState,
@@ -1324,7 +1324,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 } else {
                     application.pause()
                     mapView.getMapAsync { naverMap ->
-                        Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_title_end)}${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
+                        Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_title_end)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     }
                     Text(
                         text = stringResource(id = R.string.walk_title_end),
@@ -1341,7 +1341,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         R.string.walk_button_finish
                         Button(
                             onClick = withClick {
-                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
+                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_finish)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
                                         showBottomSheet = false
@@ -1367,7 +1367,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                         R.string.walk_button_resume
                         Button(
                             onClick = withClick {
-                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
+                                Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                                     if (!sheetState.isVisible) {
                                         showBottomSheet = false
@@ -1375,9 +1375,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 }
                                 application.resume()
                                 mapView.getMapAsync { naverMap ->
-                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][$zoom][${tracks?.size}][${markers.size}][${position.toText()}]")
+                                    Log.wtf(__CLASSNAME__, "::NaverMapApp@TRK${context.getString(R.string.walk_button_resume)}${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+                                    naverMap.cameraPosition = camera
                                     naverMap.locationTrackingMode = LocationTrackingMode.Follow
-                                    naverMap.cameraPosition = CameraPosition(position, zoom)
                                 }
                             },
                             shape = RoundedCornerShape(12.0.dp),
