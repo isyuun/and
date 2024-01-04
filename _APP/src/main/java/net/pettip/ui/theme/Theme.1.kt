@@ -103,6 +103,7 @@ val invertedColors: ColorScheme
 
 @Composable
 fun APPTheme(
+    statusColor: Boolean = true,
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
@@ -118,7 +119,7 @@ fun APPTheme(
         else -> LightColorScheme
     }
     val view = LocalView.current
-    if (!view.isInEditMode) {
+    if (!view.isInEditMode && statusColor) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()

@@ -14,11 +14,13 @@ import android.Manifest
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
+import net.pettip.gps._app.KEY_FOREGROUND_GPXFILE
 import net.pettip.gps._app.gpsapplication4
 import net.pettip.map.app.GpxActivity
 import net.pettip.map.app.MapActivity
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
+import java.io.File
 
 /**
  * @Project     : carepet-android
@@ -98,8 +100,9 @@ open class GPSApplication : gpsapplication4() {
         startActivity(intent)
     }
 
-    fun openGpx() {
+    fun openGpx(file: File) {
         val intent = Intent(this, GpxActivity::class.java).addFlags(FLAG_ACTIVITY_NEW_TASK)
+        intent.putExtra(KEY_FOREGROUND_GPXFILE, file.absolutePath)
         startActivity(intent)
     }
 }

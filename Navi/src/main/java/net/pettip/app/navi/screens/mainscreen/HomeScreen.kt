@@ -7,7 +7,6 @@ package net.pettip.app.navi.screens.mainscreen
 import android.Manifest
 import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
@@ -58,7 +57,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -76,7 +74,6 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -114,7 +111,6 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
@@ -124,9 +120,7 @@ import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.CustomBottomSheet
 import net.pettip.app.navi.component.CustomDialog
 import net.pettip.app.navi.component.CustomIndicator
-import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
-import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_grad_end
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
 import net.pettip.app.navi.ui.theme.design_icon_distance_bg
@@ -341,7 +335,7 @@ fun HomeScreen(
             }
 
             if (!currentPetLoading){
-                APPTheme {
+                APPTheme(statusColor = false) {
                     ShowDialogRestart(
                         onDismissRequest = {},
                         onDismissButton = {},

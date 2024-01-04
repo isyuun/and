@@ -96,6 +96,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -168,7 +169,7 @@ open class MainActivity : ComponentActivity() {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
-                ModalDrawerSheet { /* Drawer content */ }
+                ModalDrawerSheet {}
             },
         ) {
             val snackbarHostState = remember { SnackbarHostState() }
@@ -209,83 +210,19 @@ open class MainActivity : ComponentActivity() {
                     )
                 },
                 bottomBar = {
-                    var selectedTabIndex by remember { mutableStateOf(0) }
                     BottomAppBar {
-                        TabRow(
-                            selectedTabIndex = selectedTabIndex,
-                            indicator = { tabPositions ->
-                                TabRowDefaults.Indicator(
-                                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
-                                )
-                            },
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Tab(
-                                selected = selectedTabIndex == 0,
+                            FloatingActionButton(
                                 onClick = withClick {
-                                    selectedTabIndex = 0
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar("Snackbar")
-                                    }
+                                    showBottomSheet = true
                                 },
-                                //enabled = enabled,
+                                shape = CircleShape,
                             ) {
-                                Icon(imageVector = Icons.Default.Face, contentDescription = null)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Tab",
-                                    maxLines = 1,
-                                )
-                            }
-                            Tab(
-                                selected = selectedTabIndex == 1,
-                                onClick = withClick {
-                                    selectedTabIndex = 1
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar("Snackbar")
-                                    }
-                                },
-                                //enabled = enabled,
-                            ) {
-                                Icon(imageVector = Icons.Default.Home, contentDescription = null)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Tab",
-                                    maxLines = 1,
-                                )
-                            }
-                            Tab(
-                                selected = selectedTabIndex == 2,
-                                onClick = withClick {
-                                    selectedTabIndex = 2
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar("Snackbar")
-                                    }
-                                },
-                                //enabled = enabled,
-                            ) {
-                                Icon(imageVector = Icons.Default.AccountBox, contentDescription = null)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Tab",
-                                    maxLines = 1,
-                                )
-                            }
-                            Tab(
-                                selected = selectedTabIndex == 3,
-                                onClick = withClick {
-                                    selectedTabIndex = 3
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar("Snackbar")
-                                    }
-                                },
-                                //enabled = enabled,
-                            ) {
-                                Icon(imageVector = Icons.Default.Info, contentDescription = null)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Tab",
-                                    maxLines = 1,
-                                )
+                                Icon(Icons.Default.Add, contentDescription = "Add")
                             }
                         }
                     }
@@ -294,16 +231,22 @@ open class MainActivity : ComponentActivity() {
                     SnackbarHost(hostState = snackbarHostState)
                 },
                 floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = withClick { showBottomSheet = true },
-                        shape = CircleShape,
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = "Add")
-                    }
+                    //FloatingActionButton(
+                    //    onClick = withClick { showBottomSheet = true },
+                    //    shape = CircleShape,
+                    //) {
+                    //    Icon(Icons.Default.Add, contentDescription = "Add")
+                    //}
                 },
                 floatingActionButtonPosition = FabPosition.End,
             ) { innerPadding ->
-                ShowBottomSheet(showBottomSheet = showBottomSheet) { showBottomSheet = false }
+                ShowBottomSheet(showBottomSheet = showBottomSheet) {
+                    showBottomSheet = false
+                    scope.launch {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                        snackbarHostState.showSnackbar("Snackbar")
+                    }
+                }
                 Box(modifier = Modifier.padding(innerPadding)) {
                     Content()
                 }
@@ -371,6 +314,10 @@ open class MainActivity : ComponentActivity() {
             }
         }
         // A surface container using the 'surface'(default) color from the theme
+        val primary = MaterialTheme.colorScheme.primary
+        val onPrimary = MaterialTheme.colorScheme.onPrimary
+        var containerColor by remember { mutableStateOf(primary) }
+        var contentColor by remember { mutableStateOf(onPrimary) }
         Surface(
             modifier = modifier
                 .fillMaxSize()
@@ -422,30 +369,29 @@ open class MainActivity : ComponentActivity() {
                         //.padding(4.0.dp)
                         .clickable { },
                 ) {
-                    AppContent(modifier, padding)
+                    AppContent(modifier, padding) { color, text ->
+                        Log.wtf(__CLASSNAME__, "${getMethodName()}...")
+                        containerColor = color
+                        contentColor = text
+                    }
                 }
             }   //Box2
         }   //Surface
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.0.dp),
+                .padding(16.0.dp),
             contentAlignment = Alignment.BottomStart,
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.0.dp)
             ) {
-                //var clicked by remember { mutableStateOf(false) }
-                //ExtendedFloatingActionButton(
-                //    text = { Text(text = stringResource(net.pettip.R.string.start), fontSize = 12.sp) },
-                //    icon = { Icon(if (clicked) Icons.Default.Close else Icons.Default.Add, contentDescription = null) },
-                //    onClick = withClick { clicked = !clicked },
-                //    shape = CircleShape,
-                //    expanded = clicked,
-                //)
+                net.pettip.R.string.start
                 FloatingActionButton(
-                    onClick = withClick { application.openMap() },
+                    onClick = withClick { containerColor = Color.Red/*application.openMap()*/ },
                     shape = CircleShape,
+                    containerColor = containerColor,
+                    contentColor = contentColor
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -461,9 +407,12 @@ open class MainActivity : ComponentActivity() {
                         )
                     }
                 }
+                net.pettip.R.string.stop
                 FloatingActionButton(
-                    onClick = withClick { application.openMap() },
+                    onClick = withClick { containerColor = Color.Red/*application.recent()?.let { application.openGpx(it) }*/ },
                     shape = CircleShape,
+                    containerColor = containerColor,
+                    contentColor = contentColorFor(containerColor)
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -479,13 +428,21 @@ open class MainActivity : ComponentActivity() {
                         )
                     }
                 }
+                //var clicked by remember { mutableStateOf(false) }
+                //ExtendedFloatingActionButton(
+                //    text = { Text(text = stringResource(net.pettip.R.string.start), fontSize = 12.sp) },
+                //    icon = { Icon(if (clicked) Icons.Default.Close else Icons.Default.Add, contentDescription = null) },
+                //    onClick = withClick { clicked = !clicked },
+                //    shape = CircleShape,
+                //    expanded = clicked,
+                //)
             }   //Column
         }   //Box
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun AppContent(modifier: Modifier, padding: Dp) {
+    fun AppContent(modifier: Modifier, padding: Dp, onColorClick: (color: Color, text: Color) -> Unit) {
         val application = GPSApplication.instance
         Column(
             modifier = modifier
@@ -567,7 +524,7 @@ open class MainActivity : ComponentActivity() {
             ) { Text(text = "Btn:primary", maxLines = 1, overflow = TextOverflow.Ellipsis) }
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = withClick { application.openGpx() },
+                onClick = withClick { application.recent()?.let { application.openGpx(it) } },
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.inversePrimary),
                 enabled = enabled,
             ) { Text(text = "Btn:inversePrimary", maxLines = 1, overflow = TextOverflow.Ellipsis) }
@@ -752,13 +709,80 @@ open class MainActivity : ComponentActivity() {
             )
             Text(text = sliderPosition.toString())
             Divider()
+            var selectedTabIndex by remember { mutableStateOf(0) }
+            TabRow(
+                selectedTabIndex = selectedTabIndex,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
+                    )
+                },
+            ) {
+                Tab(
+                    selected = selectedTabIndex == 0,
+                    onClick = withClick {
+                        selectedTabIndex = 0
+                    },
+                    //enabled = enabled,
+                ) {
+                    Icon(imageVector = Icons.Default.Face, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Tab",
+                        maxLines = 1,
+                    )
+                }
+                Tab(
+                    selected = selectedTabIndex == 1,
+                    onClick = withClick {
+                        selectedTabIndex = 1
+                    },
+                    //enabled = enabled,
+                ) {
+                    Icon(imageVector = Icons.Default.Home, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Tab",
+                        maxLines = 1,
+                    )
+                }
+                Tab(
+                    selected = selectedTabIndex == 2,
+                    onClick = withClick {
+                        selectedTabIndex = 2
+                    },
+                    //enabled = enabled,
+                ) {
+                    Icon(imageVector = Icons.Default.AccountBox, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Tab",
+                        maxLines = 1,
+                    )
+                }
+                Tab(
+                    selected = selectedTabIndex == 3,
+                    onClick = withClick {
+                        selectedTabIndex = 3
+                    },
+                    //enabled = enabled,
+                ) {
+                    Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Tab",
+                        maxLines = 1,
+                    )
+                }
+            }
+            Divider()
             Text(
                 text = "Colors",
                 modifier = Modifier
                     .padding(horizontal = padding)
                     .clickable(onClick = withClick {}),
             )
-            ColorChips()
+            ColorChips { color, text -> onColorClick(color, text) }
         } //Column
     }
 
@@ -780,13 +804,13 @@ open class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ColorChip(label: String, color: Color, text: Color = MaterialTheme.colorScheme.onPrimary) {
+    fun ColorChip(label: String, color: Color, text: Color = MaterialTheme.colorScheme.onPrimary, onColorClick: (color: Color, text: Color) -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color)
                 .padding(8.dp)
-                .clickable(onClick = withClick {}),
+                .clickable(onClick = withClick { onColorClick(color, text) }),
         ) {
             Text(
                 text = label,
@@ -814,35 +838,35 @@ open class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ColorChips() {
-        ColorChip(label = "primary", color = MaterialTheme.colorScheme.primary, text = MaterialTheme.colorScheme.onPrimary)
-        ColorChip(label = "onPrimary", color = MaterialTheme.colorScheme.onPrimary, text = MaterialTheme.colorScheme.primary)
-        ColorChip(label = "primaryContainer", color = MaterialTheme.colorScheme.primaryContainer, text = MaterialTheme.colorScheme.onPrimaryContainer)
-        ColorChip(label = "onPrimaryContainer", color = MaterialTheme.colorScheme.onPrimaryContainer, text = MaterialTheme.colorScheme.primaryContainer)
-        ColorChip(label = "inversePrimary", color = MaterialTheme.colorScheme.inversePrimary, text = MaterialTheme.colorScheme.primary)
-        ColorChip(label = "secondary", color = MaterialTheme.colorScheme.secondary, text = MaterialTheme.colorScheme.onSecondary)
-        ColorChip(label = "onSecondary", color = MaterialTheme.colorScheme.onSecondary, text = MaterialTheme.colorScheme.secondary)
-        ColorChip(label = "secondaryContainer", color = MaterialTheme.colorScheme.secondaryContainer, text = MaterialTheme.colorScheme.onSecondaryContainer)
-        ColorChip(label = "onSecondaryContainer", color = MaterialTheme.colorScheme.onSecondaryContainer, text = MaterialTheme.colorScheme.secondaryContainer)
-        ColorChip(label = "tertiary", color = MaterialTheme.colorScheme.tertiary, text = MaterialTheme.colorScheme.onTertiary)
-        ColorChip(label = "onTertiary", color = MaterialTheme.colorScheme.onTertiary, text = MaterialTheme.colorScheme.tertiary)
-        ColorChip(label = "tertiaryContainer", color = MaterialTheme.colorScheme.tertiaryContainer, text = MaterialTheme.colorScheme.onTertiaryContainer)
-        ColorChip(label = "onTertiaryContainer", color = MaterialTheme.colorScheme.onTertiaryContainer, text = MaterialTheme.colorScheme.tertiaryContainer)
-        ColorChip(label = "background", color = MaterialTheme.colorScheme.background, text = MaterialTheme.colorScheme.onBackground)
-        ColorChip(label = "onBackground", color = MaterialTheme.colorScheme.onBackground, text = MaterialTheme.colorScheme.background)
-        ColorChip(label = "surface", color = MaterialTheme.colorScheme.surface, text = MaterialTheme.colorScheme.onSurface)
-        ColorChip(label = "onSurface", color = MaterialTheme.colorScheme.onSurface, text = MaterialTheme.colorScheme.surface)
-        ColorChip(label = "surfaceVariant", color = MaterialTheme.colorScheme.surfaceVariant, text = MaterialTheme.colorScheme.onSurfaceVariant)
-        ColorChip(label = "onSurfaceVariant", color = MaterialTheme.colorScheme.onSurfaceVariant, text = MaterialTheme.colorScheme.surfaceVariant)
-        ColorChip(label = "surfaceTint", color = MaterialTheme.colorScheme.surfaceTint)
-        ColorChip(label = "inverseSurface", color = MaterialTheme.colorScheme.inverseSurface, text = MaterialTheme.colorScheme.inverseOnSurface)
-        ColorChip(label = "inverseOnSurface", color = MaterialTheme.colorScheme.inverseOnSurface, text = MaterialTheme.colorScheme.inverseSurface)
-        ColorChip(label = "error", color = MaterialTheme.colorScheme.error, text = MaterialTheme.colorScheme.onError)
-        ColorChip(label = "onError", color = MaterialTheme.colorScheme.onError, text = MaterialTheme.colorScheme.error)
-        ColorChip(label = "errorContainer", color = MaterialTheme.colorScheme.errorContainer, text = MaterialTheme.colorScheme.onErrorContainer)
-        ColorChip(label = "onErrorContainer", color = MaterialTheme.colorScheme.onErrorContainer, text = MaterialTheme.colorScheme.errorContainer)
-        ColorChip(label = "outline", color = MaterialTheme.colorScheme.outline, text = MaterialTheme.colorScheme.outlineVariant)
-        ColorChip(label = "outlineVariant", color = MaterialTheme.colorScheme.outlineVariant, text = MaterialTheme.colorScheme.outline)
-        ColorChip(label = "scrim", color = MaterialTheme.colorScheme.scrim)
+    fun ColorChips(onColorClick: (color: Color, text: Color) -> Unit) {
+        ColorChip(label = "primary", color = MaterialTheme.colorScheme.primary, text = MaterialTheme.colorScheme.onPrimary) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onPrimary", color = MaterialTheme.colorScheme.onPrimary, text = MaterialTheme.colorScheme.primary) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "primaryContainer", color = MaterialTheme.colorScheme.primaryContainer, text = MaterialTheme.colorScheme.onPrimaryContainer) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onPrimaryContainer", color = MaterialTheme.colorScheme.onPrimaryContainer, text = MaterialTheme.colorScheme.primaryContainer) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "inversePrimary", color = MaterialTheme.colorScheme.inversePrimary, text = MaterialTheme.colorScheme.primary) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "secondary", color = MaterialTheme.colorScheme.secondary, text = MaterialTheme.colorScheme.onSecondary) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onSecondary", color = MaterialTheme.colorScheme.onSecondary, text = MaterialTheme.colorScheme.secondary) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "secondaryContainer", color = MaterialTheme.colorScheme.secondaryContainer, text = MaterialTheme.colorScheme.onSecondaryContainer) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onSecondaryContainer", color = MaterialTheme.colorScheme.onSecondaryContainer, text = MaterialTheme.colorScheme.secondaryContainer) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "tertiary", color = MaterialTheme.colorScheme.tertiary, text = MaterialTheme.colorScheme.onTertiary) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onTertiary", color = MaterialTheme.colorScheme.onTertiary, text = MaterialTheme.colorScheme.tertiary) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "tertiaryContainer", color = MaterialTheme.colorScheme.tertiaryContainer, text = MaterialTheme.colorScheme.onTertiaryContainer) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onTertiaryContainer", color = MaterialTheme.colorScheme.onTertiaryContainer, text = MaterialTheme.colorScheme.tertiaryContainer) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "background", color = MaterialTheme.colorScheme.background, text = MaterialTheme.colorScheme.onBackground) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onBackground", color = MaterialTheme.colorScheme.onBackground, text = MaterialTheme.colorScheme.background) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "surface", color = MaterialTheme.colorScheme.surface, text = MaterialTheme.colorScheme.onSurface) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onSurface", color = MaterialTheme.colorScheme.onSurface, text = MaterialTheme.colorScheme.surface) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "surfaceVariant", color = MaterialTheme.colorScheme.surfaceVariant, text = MaterialTheme.colorScheme.onSurfaceVariant) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onSurfaceVariant", color = MaterialTheme.colorScheme.onSurfaceVariant, text = MaterialTheme.colorScheme.surfaceVariant) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "surfaceTint", color = MaterialTheme.colorScheme.surfaceTint) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "inverseSurface", color = MaterialTheme.colorScheme.inverseSurface, text = MaterialTheme.colorScheme.inverseOnSurface) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "inverseOnSurface", color = MaterialTheme.colorScheme.inverseOnSurface, text = MaterialTheme.colorScheme.inverseSurface) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "error", color = MaterialTheme.colorScheme.error, text = MaterialTheme.colorScheme.onError) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onError", color = MaterialTheme.colorScheme.onError, text = MaterialTheme.colorScheme.error) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "errorContainer", color = MaterialTheme.colorScheme.errorContainer, text = MaterialTheme.colorScheme.onErrorContainer) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "onErrorContainer", color = MaterialTheme.colorScheme.onErrorContainer, text = MaterialTheme.colorScheme.errorContainer) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "outline", color = MaterialTheme.colorScheme.outline, text = MaterialTheme.colorScheme.outlineVariant) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "outlineVariant", color = MaterialTheme.colorScheme.outlineVariant, text = MaterialTheme.colorScheme.outline) { color, text -> onColorClick(color, text) }
+        ColorChip(label = "scrim", color = MaterialTheme.colorScheme.scrim) { color, text -> onColorClick(color, text) }
     }
 }
