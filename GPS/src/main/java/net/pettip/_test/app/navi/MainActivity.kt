@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -384,11 +385,17 @@ open class MainActivity : ComponentActivity() {
             contentAlignment = Alignment.BottomStart,
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.0.dp)
+                modifier = Modifier
+                    //.padding(bottom = 100.0.dp)
+                    .imePadding(),
+                verticalArrangement = Arrangement.spacedBy(12.0.dp),
             ) {
                 net.pettip.R.string.start
                 FloatingActionButton(
-                    onClick = withClick { containerColor = Color.Red/*application.openMap()*/ },
+                    onClick = withClick {
+                        containerColor = Color.Red
+                        application.openMap()
+                    },
                     shape = CircleShape,
                     containerColor = containerColor,
                     contentColor = contentColor
@@ -409,7 +416,10 @@ open class MainActivity : ComponentActivity() {
                 }
                 net.pettip.R.string.stop
                 FloatingActionButton(
-                    onClick = withClick { containerColor = Color.Red/*application.recent()?.let { application.openGpx(it) }*/ },
+                    onClick = withClick {
+                        containerColor = Color.Red
+                        application.recent()?.let { application.openGpx(it) }
+                    },
                     shape = CircleShape,
                     containerColor = containerColor,
                     contentColor = contentColorFor(containerColor)
@@ -565,6 +575,7 @@ open class MainActivity : ComponentActivity() {
             }
             var value1 by remember { mutableStateOf(TextFieldValue("TextField:surfaceVariant")) }
             TextField(
+                label = { Text(value1.text) },
                 value = value1, onValueChange = { value1 = it },
                 singleLine = true,
                 enabled = enabled,
