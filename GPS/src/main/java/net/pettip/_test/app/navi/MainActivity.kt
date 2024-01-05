@@ -741,7 +741,7 @@ open class MainActivity : ComponentActivity() {
                     onClick = withClick {
                         selectedTabIndex = 0
                     },
-                    //enabled = enabled,
+                    enabled = enabled,
                 ) {
                     Icon(imageVector = Icons.Default.Face, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
@@ -755,7 +755,7 @@ open class MainActivity : ComponentActivity() {
                     onClick = withClick {
                         selectedTabIndex = 1
                     },
-                    //enabled = enabled,
+                    enabled = enabled,
                 ) {
                     Icon(imageVector = Icons.Default.Home, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
@@ -769,7 +769,7 @@ open class MainActivity : ComponentActivity() {
                     onClick = withClick {
                         selectedTabIndex = 2
                     },
-                    //enabled = enabled,
+                    enabled = enabled,
                 ) {
                     Icon(imageVector = Icons.Default.AccountBox, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
@@ -783,7 +783,7 @@ open class MainActivity : ComponentActivity() {
                     onClick = withClick {
                         selectedTabIndex = 3
                     },
-                    //enabled = enabled,
+                    enabled = enabled,
                 ) {
                     Icon(imageVector = Icons.Default.Info, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
