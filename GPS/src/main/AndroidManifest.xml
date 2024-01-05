@@ -64,12 +64,12 @@
             android:name="net.pettip.map.app.MapActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat" />
+            android:theme="@style/Theme.MAP" />
 
         <activity
             android:name="net.pettip.map.app.GpxActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat" />
+            android:theme="@style/Theme.MAP" />
     </application>
 </manifest>
