@@ -335,7 +335,7 @@ fun HomeScreen(
             }
 
             if (!currentPetLoading){
-                APPTheme {
+                APPTheme(statusBarColor = MaterialTheme.colorScheme.primary) {
                     ShowDialogRestart(
                         onDismissRequest = {},
                         onDismissButton = {},
