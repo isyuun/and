@@ -33,10 +33,12 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -69,13 +71,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AndTheme {
-                //Surface {
-                //    AppContent()
-                //    Column/*(modifier = Modifier.fillMaxSize())*/ {
-                //        FloatingActionButton(onClick = {}) {
-                //        }
-                //    }
-                //}
+                Surface {
+                    AppContent()
+                    Column/*(modifier = Modifier.fillMaxSize())*/ {
+                        FloatingActionButton(onClick = {}) {
+                        }
+                    }
+                }
             }
         }
     }
