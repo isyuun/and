@@ -5,6 +5,7 @@
     <!--<style name="Theme.GPS" parent="Theme.MaterialComponents.DayNight" />-->
 
     <!--<style name="APPTheme" parent="android:Theme.Material.Light.NoActionBar" />-->
+    <!--<style name="APPTheme" parent="Theme.AppCompat.Light">-->
     <!--<style name="APPTheme" parent="Theme.AppCompat.DayNight">-->
     <style name="APPTheme" parent="Theme.MaterialComponents.DayNight">
         <!--<item name="android:windowBackground">@color/white</item>-->

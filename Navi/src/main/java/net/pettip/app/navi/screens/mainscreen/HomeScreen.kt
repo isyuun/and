@@ -335,7 +335,7 @@ fun HomeScreen(
             }
 
             if (!currentPetLoading){
-                APPTheme(statusColor = false) {
+                APPTheme(statusBarColor = Color.Unspecified) {
                     ShowDialogRestart(
                         onDismissRequest = {},
                         onDismissButton = {},

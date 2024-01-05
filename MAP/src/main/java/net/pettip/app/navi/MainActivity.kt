@@ -25,7 +25,8 @@ import net.pettip.util.getMethodName
  * @description : net.pettip.app.navi
  * @see net.pettip.app.navi.MainActivity
  */
-class MainActivity : net.pettip._test.app.navi.MainActivity() {
+class
+MainActivity : net.pettip._test.app.navi.MainActivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun setContent() {
@@ -33,6 +34,8 @@ class MainActivity : net.pettip._test.app.navi.MainActivity() {
             Log.wtf(__CLASSNAME__, "${getMethodName()}...")
             APPTheme {
                 SetContent()
+            }
+            APPTheme {
                 ShowDialogRestart(
                     onDismissRequest = {},
                     onDismissButton = {},

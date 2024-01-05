@@ -23,6 +23,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -106,7 +107,8 @@ val invertedColors: ColorScheme
 
 @Composable
 fun APPTheme(
-    statusColor: Boolean = true,
+    statusBarColor: Color = Color.Unspecified,
+    windowLightStatusBar: Boolean = !isSystemInDarkTheme(),
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
@@ -122,14 +124,11 @@ fun APPTheme(
         else -> LightColorScheme
     }
     val view = LocalView.current
-    if (!view.isInEditMode/* && statusColor*/) {
+    if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            //window.statusBarColor = colorScheme.primary.toArgb()
-            //window.statusBarColor = Color.Unspecified.toArgb()
-            //window.statusBarColor = Color.Transparent.toArgb()
-            //window.statusBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            window.statusBarColor = statusBarColor.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = windowLightStatusBar
         }
     }
 
