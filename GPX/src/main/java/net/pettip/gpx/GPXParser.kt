@@ -35,14 +35,17 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
 
     @Throws(XmlPullParserException::class, IOException::class)
     fun read(file: File) {
-        //if (!file.exists()) return
-        val `in` = file.inputStream()
-        `in`.use {
-            val parser = Xml.newPullParser()
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true)
-            parser.setInput(it, null)
-            parser.nextTag()
-            readGpx(parser)
+        try {
+            val `in` = file.inputStream()
+            `in`.use {
+                val parser = Xml.newPullParser()
+                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true)
+                parser.setInput(it, null)
+                parser.nextTag()
+                readGpx(parser)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

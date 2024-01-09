@@ -19,6 +19,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -88,7 +91,6 @@ fun GpxApp() {
 
 @Composable
 fun GpxApp(file: File?) {
-    val application = GPSApplication.instance
     val context = LocalContext.current
     val tracks = Collections.synchronizedList(ArrayList<Track>())
 
@@ -112,9 +114,48 @@ fun GpxApp(file: File?) {
                 mapView.apply {
                     getMapAsync { naverMap ->
                         naverMapView(context = context, naverMap = naverMap, tracks = tracks, padding = 104.0.dp)
-                        naverMap.takeSnapshot(false) {
-                            application.preview = it
-                        }
+                        //naverMap.takeSnapshot(false) {
+                        //    application.preview = it
+                        //}
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxSize(),
+        )
+    }
+}
+
+@Composable
+fun GpxMap(file: File?) {
+    val context = LocalContext.current
+    val tracks = Collections.synchronizedList(ArrayList<Track>())
+
+    file?.let { GPXParser(tracks).read(it) }
+
+    val isSystemInDarkTheme = isSystemInDarkTheme()
+    val mapOptions = remember {
+        NaverMapOptions()
+            .logoClickEnabled(true)
+            .mapType(NaverMap.MapType.Navi)
+            .nightModeEnabled(isSystemInDarkTheme)
+            .zoomControlEnabled(false)
+    }
+    val mapView = rememberMapViewWithLifecycle(context, mapOptions)
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .height(360.dp)
+        //.background(color = design_icon_bg)
+    ) {
+        AndroidView(
+            factory = {
+                mapView.apply {
+                    getMapAsync { naverMap ->
+                        naverMapView(context = context, naverMap = naverMap, tracks = tracks, padding = 104.0.dp)
+                        //naverMap.takeSnapshot(false) {
+                        //    application.preview = it
+                        //}
                     }
                 }
             },

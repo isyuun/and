@@ -100,7 +100,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
@@ -113,7 +112,6 @@ import net.pettip.app.navi.screens.mainscreen.getFormattedDate
 import net.pettip.app.navi.ui.theme.design_alpha50_black
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
-import net.pettip.app.navi.ui.theme.design_icon_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_select_btn_text
@@ -126,12 +124,9 @@ import net.pettip.data.daily.Pet
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.gps.app.GPSApplication
 import net.pettip.gpx.Track
-import net.pettip.map.app.naver.naverMapPath
-import net.pettip.map.app.naver.naverMapPreview
-import net.pettip.map.app.naver.rememberMapViewWithLifecycle
+import net.pettip.map.app.naver.GpxMap
 import net.pettip.singleton.G
 import net.pettip.util.Log
-import java.security.AccessController.getContext
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -253,12 +248,6 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
             viewModel.updateSelectedImageList(listOf(dummyUri))
         }
 
-    val mapView = rememberMapViewWithLifecycle(context)
-    //val markers = remember { mutableListOf<Marker>() }
-    //val coords = remember { mutableListOf<LatLng>() }
-    //val departure = stringResource(id = net.pettip.gps.R.string.departure)
-    //val arrival = stringResource(id = net.pettip.gps.R.string.arrival)
-
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackState, Modifier) }
     ) { paddingValues ->
@@ -312,30 +301,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
 
             var scale by remember { mutableStateOf(1f) }
 
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .fillMaxWidth()
-                    .height(360.dp)
-                    .background(color = design_icon_bg)
-            ) {
-                AndroidView(
-                    factory = {
-                        mapView.apply {
-                            getMapAsync { naverMap ->
-                                naverMap.uiSettings.isZoomControlEnabled = false
-                                naverMap.uiSettings.isLogoClickEnabled = false
-                                tracks?.let { naverMapPath(context = context, naverMap = naverMap, tracks = it, finished = true) }
-                                tracks?.let { naverMapPreview(context = context, naverMap = naverMap, tracks = it) }
-                                naverMap.takeSnapshot(false) {
-                                    application.preview = it
-                                }
-                            }
-                        }
-                    },
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
+            application.file?.let { GpxMap(it) }
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 

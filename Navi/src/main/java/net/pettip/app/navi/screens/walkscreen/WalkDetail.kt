@@ -92,10 +92,12 @@ import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.DailyDetailData
 import net.pettip.data.daily.DailyLifePet
-import net.pettip.map.app.naver.GpxApp
+import net.pettip.map.app.naver.GpxMap
 import net.pettip.util.Log
+import net.pettip.util.getMethodName
 import java.io.File
 
+private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -282,7 +284,9 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                 enter = fadeIn(),
                                 exit = fadeOut()
                             ) {
-                                GpxApp(File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX"))
+                                val file = File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX")
+                                Log.wtf(__CLASSNAME__, "::GpxMap()${getMethodName()}[${file.exists()}][${file.length()}][${file}]")
+                                GpxMap(file)
                             }
                             // ----------- 맵 들어갈 자리 -------------------
 
