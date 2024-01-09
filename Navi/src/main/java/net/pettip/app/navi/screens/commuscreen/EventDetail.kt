@@ -224,7 +224,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                         }
 
                         Text(
-                            text = "이벤트",
+                            text = stringResource(id = R.string.title_event),
                             fontSize = 20.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = (-1.0).sp,
@@ -314,7 +314,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                     modifier = Modifier.padding(start = 20.dp))
 
                                 Text(
-                                    text = "댓글 ${cmntList?.size ?: 0}",
+                                    text = "${stringResource(id = R.string.comment)} ${cmntList?.size ?: 0}",
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     fontSize = 12.sp,
                                     letterSpacing = (-0.6).sp,
@@ -366,7 +366,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                         verticalAlignment = Alignment.Bottom
                                     ){
                                         Text(
-                                            text = "${replyCmnt?.petNm+"에게"} 답글 쓰는중",
+                                            text = "${replyCmnt?.petNm}${stringResource(id = R.string.to_comment_writing)}",
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
                                             color = design_white,
@@ -680,10 +680,10 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
     if (deleteDialog){
         CustomDialogDelete(
             onDismiss = { newValue -> deleteDialog = newValue },
-            confirm = "삭제하기",
-            dismiss = "취소",
-            title = "댓글 삭제하기",
-            text = "정말 삭제하시겠어요?",
+            confirm = stringResource(R.string.delete),
+            dismiss = stringResource(R.string.cancel_kor),
+            title = stringResource(R.string.comment_delete),
+            text = stringResource(R.string.delete_confirm),
             valueChange = { newValue -> commentDelete = newValue}
         )
     }
@@ -709,7 +709,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Text(
-                        text = "댓글 수정하기",
+                        text = stringResource(R.string.comment_modify),
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 20.sp,
                         letterSpacing = (-1.0).sp,
@@ -718,7 +718,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                     )
 
                     Text(
-                        text = "취소",
+                        text = stringResource(id = R.string.cancel_kor),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -878,7 +878,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                 circleSize = 4.dp
                             )
                         }else{
-                            Text(text = "수정", style = TextStyle(
+                            Text(text = stringResource(R.string.modify), style = TextStyle(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
@@ -1026,7 +1026,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                 if (G.userId == comment.userId){
                                     Row (verticalAlignment = Alignment.CenterVertically){
                                         Text(
-                                            text = "수정",
+                                            text = stringResource(id = R.string.modify),
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                             color = MaterialTheme.colorScheme.secondary,
@@ -1041,7 +1041,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                                 }
                                         )
                                         Text(
-                                            text = "삭제",
+                                            text = stringResource(R.string.remove),
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                             color = MaterialTheme.colorScheme.secondary,
@@ -1150,7 +1150,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                 )
 
                 if (step2CmntList.isNotEmpty()){
-                    Text(text = if(!step2Expand) "└ 답글 ${step2CmntList.size}개" else "└ 답글접기",
+                    Text(text = if(!step2Expand) "└ ${stringResource(id = R.string.reply)} ${step2CmntList.size}개" else stringResource(R.string.reply_collapse),
                         style = TextStyle(color = MaterialTheme.colorScheme.secondary,fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 12.sp,
                             letterSpacing = (-0.6).sp),
@@ -1214,10 +1214,10 @@ fun BbsCommentListItem2(
     if (deleteDialog){
         CustomDialogDelete(
             onDismiss = { newValue -> deleteDialog = newValue },
-            confirm = "삭제하기",
-            dismiss = "취소",
-            title = "댓글 삭제하기",
-            text = "정말 삭제하시겠어요?",
+            confirm = stringResource(id = R.string.delete),
+            dismiss = stringResource(id = R.string.cancel_kor),
+            title = stringResource(id = R.string.comment_delete),
+            text = stringResource(id = R.string.delete_confirm),
             valueChange = { newValue -> commentDelete = newValue}
         )
     }
@@ -1243,7 +1243,7 @@ fun BbsCommentListItem2(
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Text(
-                        text = "댓글 수정하기",
+                        text = stringResource(id = R.string.comment_modify),
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 20.sp,
                         letterSpacing = (-1.0).sp,
@@ -1252,7 +1252,7 @@ fun BbsCommentListItem2(
                     )
 
                     Text(
-                        text = "취소",
+                        text = stringResource(id = R.string.cancel_kor),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -1409,7 +1409,7 @@ fun BbsCommentListItem2(
                                 circleSize = 4.dp
                             )
                         }else{
-                            Text(text = "수정", style = TextStyle(
+                            Text(text = stringResource(id = R.string.modify), style = TextStyle(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
@@ -1523,7 +1523,7 @@ fun BbsCommentListItem2(
                             if (G.userId == comment.userId){
                                 Row (verticalAlignment = Alignment.CenterVertically){
                                     Text(
-                                        text = "수정",
+                                        text = stringResource(id = R.string.modify),
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                         color = MaterialTheme.colorScheme.secondary,
@@ -1535,7 +1535,7 @@ fun BbsCommentListItem2(
                                             }
                                     )
                                     Text(
-                                        text = "삭제",
+                                        text = stringResource(id = R.string.remove),
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                         color = MaterialTheme.colorScheme.secondary,

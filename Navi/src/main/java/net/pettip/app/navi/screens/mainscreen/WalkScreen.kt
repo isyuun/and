@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
@@ -375,7 +376,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
                     .weight(1f)
             ){
                 Text(
-                    text = "산책자",
+                    text = stringResource(id = R.string.walker),
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
@@ -402,7 +403,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
             ){
 
                 Text(
-                    text = "산책 시간",
+                    text = stringResource(id = R.string.walk_time),
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
@@ -432,7 +433,7 @@ fun WalkListContentItem(walk: DailyLifeWalk, walkViewModel: WalkViewModel, navCo
             ){
 
                 Text(
-                    text = "산책 거리",
+                    text = stringResource(id = R.string.walk_distance),
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,
@@ -466,17 +467,18 @@ fun WeekContent(
 ){
 
     val data = arrayListOf(
-        Day(date = "", dayNm = "일", runCnt = 0),
-        Day(date = "", dayNm = "월", runCnt = 0),
-        Day(date = "", dayNm = "화", runCnt = 0),
-        Day(date = "", dayNm = "수", runCnt = 0),
-        Day(date = "", dayNm = "목", runCnt = 0),
-        Day(date = "", dayNm = "금", runCnt = 0),
-        Day(date = "", dayNm = "토", runCnt = 0),
+        Day(date = "", dayNm = stringResource(R.string.sunday), runCnt = 0),
+        Day(date = "", dayNm = stringResource(R.string.monday), runCnt = 0),
+        Day(date = "", dayNm = stringResource(R.string.tuesday), runCnt = 0),
+        Day(date = "", dayNm = stringResource(R.string.wednesday), runCnt = 0),
+        Day(date = "", dayNm = stringResource(R.string.thursday), runCnt = 0),
+        Day(date = "", dayNm = stringResource(R.string.friday), runCnt = 0),
+        Day(date = "", dayNm = stringResource(R.string.saturday), runCnt = 0),
     )
 
     val weekRecord by viewModel.weekRecord.collectAsState()
     val toDetail by viewModel.toDetail.collectAsState()
+    val toMonthCalender by viewModel.toMonthCalendar.collectAsState()
 
     val selectDay by viewModel.selectDay.collectAsState()
     val isThisWeek = getMonthAndWeek(getFormattedTodayDate()) == getMonthAndWeek(selectDay)
@@ -515,9 +517,9 @@ fun WeekContent(
 
                         Text(
                             text = if (!isThisWeek){
-                                "${month}월 ${week}주차 산책기록"
+                                "${month}${stringResource(id = R.string.month)} ${week}${stringResource(id = R.string.week)} ${stringResource(id = R.string.walk_record)}"
                             } else {
-                                "이번주 산책기록"
+                                stringResource(R.string.this_week_walk_record)
                             },
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             fontSize = 20.sp,
@@ -537,7 +539,9 @@ fun WeekContent(
 
                     Row (
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.clickable(
+                            enabled = !toMonthCalender
+                        ) {
                             modeChange(false)
                         }
                     ){
@@ -546,7 +550,7 @@ fun WeekContent(
                         )
 
                         Text(
-                            text = "타임라인", fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            text = stringResource(id = R.string.all_journal_no_blank), fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp, color = design_white,
                             modifier = Modifier.padding(start = 8.dp)
                         )
@@ -564,7 +568,7 @@ fun WeekContent(
                             .weight(1f)
                     ){
                         Text(
-                            text = "산책시간",
+                            text = stringResource(id = R.string.walk_time),
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
@@ -592,7 +596,7 @@ fun WeekContent(
                     ){
 
                         Text(
-                            text = "산책거리",
+                            text = stringResource(id = R.string.walk_distance),
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
@@ -649,7 +653,7 @@ fun WeekContent(
         }
 
         Text(
-            text = "월간기록 보기",
+            text = stringResource(id = R.string.month_walk_record),
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp,
             letterSpacing = (-0.7).sp,

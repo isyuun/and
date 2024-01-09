@@ -371,17 +371,17 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                 Row (modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
-                    Text(
-                        text = "아이디 찾기",
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.clickable { navController.navigate(route = Screen.IdPwSearch.route+"/0") })
+                    //Text(
+                    //    text = "아이디 찾기",
+                    //    fontSize = 14.sp,
+                    //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    //    color = MaterialTheme.colorScheme.onPrimary,
+                    //    modifier = Modifier.clickable { navController.navigate(route = Screen.IdPwSearch.route+"/0") })
 
-                    Spacer(modifier = Modifier
-                        .padding(horizontal = 9.dp)
-                        .size(2.dp, 8.dp)
-                        .background(color = design_login_text))
+                    //Spacer(modifier = Modifier
+                    //    .padding(horizontal = 9.dp)
+                    //    .size(2.dp, 8.dp)
+                    //    .background(color = design_login_text))
 
                     Text(
                         text = "비밀번호 찾기",

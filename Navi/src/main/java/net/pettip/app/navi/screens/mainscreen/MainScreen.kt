@@ -131,18 +131,6 @@ fun MainScreen(
 
     val context = LocalContext.current
 
-    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-        if (!task.isSuccessful) {
-            Log.d("LOG", "Fetching FCM registration token failed", task.exception)
-            return@OnCompleteListener
-        }
-
-        // Get new FCM registration token
-        val token = task.result
-
-      Log.d("LOG",token)
-    })
-
     LaunchedEffect(key1 = init){
         if (init && !dupleLogin){
 
@@ -332,7 +320,7 @@ fun MainScreen(
                                                     modifier = Modifier.align(Alignment.Center)
                                                 ) {
                                                     Text(
-                                                        text = "PetTimeLine",
+                                                        text = stringResource(R.string.all_journal),
                                                         fontSize = 20.sp,
                                                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                                                         letterSpacing = (-1.0).sp,

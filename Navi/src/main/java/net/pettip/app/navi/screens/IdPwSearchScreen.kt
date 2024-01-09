@@ -81,38 +81,39 @@ fun IdPwSearchScreen(
     Scaffold (
         modifier = Modifier.fillMaxSize(),
         topBar = {
-                BackTopBar(title = "아이디/비밀번호 찾기", navController = navController)
+                BackTopBar(title = "비밀번호 찾기", navController = navController)
             }
     ) { paddingValues ->
         Column(modifier= Modifier
             .padding(paddingValues)
-            .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            TabRow(
-                modifier = Modifier.alpha(tabVisible),
-                selectedTabIndex = pagerState.currentPage,
-                indicator = { tabPositions -> TabRowDefaults.Indicator(Modifier.pagerTabIndicatorOffset(pagerState, tabPositions), color = design_login_text, height = 2.dp) },
-                backgroundColor = design_white
-            ) {
-                IDPWTabItems.forEachIndexed { index, idpwTabItem ->
-                    Tab(
-                        text = { Text(text = idpwTabItem.title, fontSize = 16.sp,
-                            fontFamily = if(index == pagerState.currentPage) FontFamily(Font(R.font.pretendard_bold)) else FontFamily(Font(R.font.pretendard_regular))
-                        )},
-                        selected = index == pagerState.currentPage,
-                        onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) }}
-                        )
-                }
-            }
-
-            HorizontalPager(
-                count = IDPWTabItems.size,
-                state = pagerState
-            ) { page ->
-                when(page){
-                    0 -> IdFindScreen(navController, viewModel)
-                    1 -> PwFindScreen(navController, viewModel)
-                }
-            }
+            .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally)
+        {
+            //TabRow(
+            //    modifier = Modifier.alpha(tabVisible),
+            //    selectedTabIndex = pagerState.currentPage,
+            //    indicator = { tabPositions -> TabRowDefaults.Indicator(Modifier.pagerTabIndicatorOffset(pagerState, tabPositions), color = design_login_text, height = 2.dp) },
+            //    backgroundColor = design_white
+            //) {
+            //    IDPWTabItems.forEachIndexed { index, idpwTabItem ->
+            //        Tab(
+            //            text = { Text(text = idpwTabItem.title, fontSize = 16.sp,
+            //                fontFamily = if(index == pagerState.currentPage) FontFamily(Font(R.font.pretendard_bold)) else FontFamily(Font(R.font.pretendard_regular))
+            //            )},
+            //            selected = index == pagerState.currentPage,
+            //            onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) }}
+            //            )
+            //    }
+            //}
+            //
+            //HorizontalPager(
+            //    count = IDPWTabItems.size,
+            //    state = pagerState
+            //) { page ->
+            //    when(page){
+            //        0 -> IdFindScreen(navController, viewModel)
+            //        1 -> PwFindScreen(navController, viewModel)
+            //    }
+            //}
         }
 
     }
@@ -177,6 +178,7 @@ fun IFMain(navController: NavHostController, viewModel: LoginViewModel) {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IFbyPhone(navController: NavHostController, viewModel: LoginViewModel){
 
@@ -186,7 +188,7 @@ fun IFbyPhone(navController: NavHostController, viewModel: LoginViewModel){
     Column (modifier = Modifier
         .fillMaxSize()
         .background(design_white)){
-        
+
         Text(
             text = "휴대폰 번호",
             fontSize = 16.sp,

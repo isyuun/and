@@ -54,6 +54,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -106,7 +107,7 @@ fun SettingScreen(navController: NavHostController, viewModel:CommunityViewModel
 
     Scaffold (
         modifier = Modifier.fillMaxSize(),
-        topBar = {BackTopBar(title = "고객센터", navController = navController, backVisible = true)}
+        topBar = {BackTopBar(title = stringResource(id = R.string.service_center), navController = navController, backVisible = true)}
     ) { paddingValues ->
         Column(modifier= Modifier
             .padding(paddingValues)
@@ -274,7 +275,7 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
         )
         {
             Text(
-                text = "1:1 문의하기",
+                text = stringResource(R.string.one_one_inquiry),
                 color = design_white,
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -288,7 +289,7 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
             .background(color = MaterialTheme.colorScheme.onSurfaceVariant))
 
         Text(
-            text = "나의 문의 내역",
+            text = stringResource(R.string.my_inquiry),
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 20.sp,
             letterSpacing = (-1.0).sp,
@@ -304,11 +305,13 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
 
         if (qnaRes?.data?.bbsQnaList?.isEmpty() == true){
             Box (
-                modifier = Modifier.padding(top = 20.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ){
                 Text(
-                    text = "나의 문의 내역이 없습니다",
+                    text = stringResource(R.string.no_my_inquiry),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 16.sp, letterSpacing = (-0.8).sp,
                     color = MaterialTheme.colorScheme.onPrimary
@@ -505,9 +508,9 @@ fun InquiryItem(inquiryItemData: BbsQna, navController: NavHostController, viewM
         ){
             Text(
                 text = if (inquiryItemData.pstAnw!=0){
-                    "답변 완료"
+                    stringResource(R.string.answer_complete)
                 }else{
-                    "문의 접수"
+                    stringResource(R.string.inquiry_received)
                 },
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 12.sp,

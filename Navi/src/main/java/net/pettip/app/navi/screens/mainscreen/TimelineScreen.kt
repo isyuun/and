@@ -67,17 +67,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -105,6 +112,7 @@ import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_shadow
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.WalkViewModel
+import net.pettip.app.navi.viewmodel.getLastSegmentAfterSlash
 import net.pettip.data.daily.LifeTimeLineItem
 import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.G
@@ -134,6 +142,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
     val refresh by viewModel.timeLineRefresh.collectAsState()
     val preUserId by viewModel.preUserId.collectAsState()
     val dailyLifeTimeLineList by viewModel.dailyLifeTimeLineList.collectAsState()
+
 
     var isLoading by rememberSaveable { mutableStateOf(false) }
     var typeChange by rememberSaveable{ mutableStateOf(false) }
@@ -248,7 +257,8 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
                 }
 
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize(),
                     state = dateLazyState,
                     contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(40.dp)
@@ -341,7 +351,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
                         )
 
                         Text(
-                            text = "달력보기",
+                            text = stringResource(R.string.monthly_journal),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
                             lineHeight = 16.sp, color = MaterialTheme.colorScheme.onPrimary,
@@ -395,7 +405,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
                         Spacer(modifier = Modifier.padding(top = 20.dp))
 
                         Text(
-                            text = "반려동물 선택하기",
+                            text = stringResource(R.string.pet_select),
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             fontSize = 20.sp,
                             letterSpacing = (-1.0).sp,
@@ -491,6 +501,7 @@ fun DateItem(viewModel: WalkViewModel, dateKey: String, dailyLifeTimeLineList: L
 fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:NavHostController) {
 
     var lastClickTime by remember { mutableStateOf(System.currentTimeMillis()) }
+    val searchText by viewModel.searchText.collectAsState()
 
 
     Column (
@@ -591,7 +602,14 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
                         .weight(1f)
                 ){
                     Text(
-                        text = timeData.runTit,
+                        text =
+                        buildAnnotatedString {
+                            val str = timeData.runTit
+                            val startIndex = str.indexOf(searchText)
+                            val endIndex = str.indexOf(searchText)+searchText.length
+                            append(str)
+                            if (searchText != "") addStyle(style = SpanStyle(color = design_intro_bg), start = startIndex, end = endIndex)
+                        },
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 16.sp, letterSpacing = (-0.8).sp, lineHeight = 16.sp,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -637,7 +655,7 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
                         .weight(1f)
                 ){
                     Text(
-                        text = "산책자",
+                        text = stringResource(R.string.walker),
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         lineHeight = 14.sp,
@@ -666,7 +684,7 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
                         .weight(1f)
                 ){
                     Text(
-                        text = "산책시간",
+                        text = stringResource(R.string.walk_time),
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         lineHeight = 14.sp,
@@ -677,17 +695,6 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
                     Row (modifier= Modifier.fillMaxWidth()){
                         Text(
                             text = timeData.runTime,
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                            lineHeight = 14.sp,
-                            letterSpacing = 0.sp,
-                            modifier = Modifier
-                                .padding(top = 4.dp)
-                                .alignByBaseline(),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Text(
-                            text = "km",
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             lineHeight = 14.sp,
@@ -711,7 +718,7 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
                 ){
 
                     Text(
-                        text = "산책 거리",
+                        text = stringResource(R.string.walk_distance),
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         lineHeight = 14.sp,

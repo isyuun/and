@@ -212,8 +212,8 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
 
     var typeChange by remember{ mutableStateOf(false) }
 
-    val oTItems = listOf("최신순", "인기순")
-    val vTItems = listOf("전체", "내 스토리")
+    val oTItems = listOf(stringResource(id = R.string.commu_latest), stringResource(id = R.string.commu_popularity))
+    val vTItems = listOf(stringResource(id = R.string.commu_all), stringResource(id = R.string.commu_my))
 
     SideEffect {
         viewModel.updateToStory(false)

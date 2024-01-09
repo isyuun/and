@@ -18,6 +18,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -45,7 +46,7 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = "공지사항", navController = navController) }
+        topBar = { BackTopBar(title = stringResource(R.string.announcement), navController = navController) }
     ) { paddingValues ->
         Column(
             modifier = Modifier

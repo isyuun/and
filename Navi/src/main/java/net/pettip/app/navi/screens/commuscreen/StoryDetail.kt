@@ -263,7 +263,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
 
         Crossfade(
             targetState = !storyLoading && storyDetail==null,
-            label = "에러페이지"
+            label = stringResource(R.string.error_page)
         ){
             when(it){
                 true ->
@@ -368,7 +368,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                 modifier = Modifier.padding(start = 20.dp))
 
                             Text(
-                                text = "댓글 ${cmntList?.size?:0}",
+                                text = "${stringResource(id = R.string.comment)} ${cmntList?.size?:0}",
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp,
                                 letterSpacing = (-0.6).sp,
@@ -424,7 +424,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                     verticalAlignment = Alignment.Bottom
                                 ){
                                     Text(
-                                        text = "${replyCmnt?.petNm+"에게"} 답글 쓰는중",
+                                        text = "${replyCmnt?.petNm} ${stringResource(id = R.string.to_comment_writing)}",
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                                         color = design_white,
@@ -680,17 +680,17 @@ fun StoryDetailTopContent(
     if (deleteDialog){
         CustomDialogDelete(
             onDismiss = { newValue -> deleteDialog = newValue },
-            confirm = "삭제하기",
-            dismiss = "취소",
-            title = "게시글 삭제하기",
-            text = "정말 삭제하시겠어요?",
+            confirm = stringResource(id = R.string.delete),
+            dismiss = stringResource(id = R.string.remove),
+            title = stringResource(R.string.story_delete),
+            text = stringResource(id = R.string.delete_confirm),
             valueChange = { newValue -> storyDelete = newValue}
         )
     }
 
     if (loading){
         LoadingDialog(
-            loadingText = "삭제중..",
+            loadingText = stringResource(R.string.delete_ing),
             loadingState = loading
         )
     }
@@ -901,7 +901,7 @@ fun StoryDetailTopContent(
                                 modifier = Modifier
                                     .size(14.dp))
                             Text(
-                                text = "비공개",
+                                text = stringResource(R.string.private_kor),
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp,
                                 letterSpacing = (-0.6).sp,
@@ -937,7 +937,7 @@ fun StoryDetailTopContent(
                                 .size(14.dp))
 
                         Text(
-                            text = "수정하기",
+                            text = stringResource(id = R.string.modify_verb),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 12.sp,
                             letterSpacing = (-0.6).sp,
@@ -960,7 +960,7 @@ fun StoryDetailTopContent(
                                 .size(14.dp))
 
                         Text(
-                            text = "삭제하기",
+                            text = stringResource(id = R.string.delete),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 12.sp,
                             letterSpacing = (-0.6).sp,
@@ -990,7 +990,7 @@ fun StoryDetailTopContent(
                         modifier = Modifier.padding(start = 12.dp))
 
                     Text(
-                        text = "신고하기",
+                        text = stringResource(R.string.report),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 12.sp,
                         letterSpacing = (-0.6).sp,
@@ -1238,10 +1238,10 @@ fun CommentListItem(
     if (deleteDialog){
         CustomDialogDelete(
             onDismiss = { newValue -> deleteDialog = newValue },
-            confirm = "삭제하기",
-            dismiss = "취소",
-            title = "댓글 삭제하기",
-            text = "정말 삭제하시겠어요?",
+            confirm = stringResource(id = R.string.delete),
+            dismiss = stringResource(id = R.string.cancel_kor),
+            title = stringResource(id = R.string.comment_delete),
+            text = stringResource(id = R.string.delete_confirm),
             valueChange = { newValue -> commentDelete = newValue}
         )
     }
@@ -1267,7 +1267,7 @@ fun CommentListItem(
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Text(
-                        text = "댓글 수정하기",
+                        text = stringResource(id = R.string.comment_modify),
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 20.sp,
                         letterSpacing = (-1.0).sp,
@@ -1276,7 +1276,7 @@ fun CommentListItem(
                     )
 
                     Text(
-                        text = "취소",
+                        text = stringResource(id = R.string.cancel_kor),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -1434,7 +1434,7 @@ fun CommentListItem(
                                 circleSize = 4.dp
                             )
                         }else{
-                            Text(text = "수정", style = TextStyle(
+                            Text(text = stringResource(id = R.string.modify), style = TextStyle(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
@@ -1582,7 +1582,7 @@ fun CommentListItem(
                                 if (G.userId == comment.userId){
                                     Row (verticalAlignment = Alignment.CenterVertically){
                                         Text(
-                                            text = "수정",
+                                            text = stringResource(id = R.string.modify),
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                             color = MaterialTheme.colorScheme.secondary,
@@ -1597,7 +1597,7 @@ fun CommentListItem(
                                                 }
                                         )
                                         Text(
-                                            text = "삭제",
+                                            text = stringResource(id = R.string.remove),
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                             color = MaterialTheme.colorScheme.secondary,
@@ -1709,7 +1709,7 @@ fun CommentListItem(
                 )
 
                 if (step2CmntList.isNotEmpty()){
-                    Text(text = if(!step2Expand) "└ 답글 ${step2CmntList.size}개" else "└ 답글접기",
+                    Text(text = if(!step2Expand) "└ ${stringResource(id = R.string.reply)} ${step2CmntList.size}개" else stringResource(id = R.string.reply_collapse),
                         style = TextStyle(color = MaterialTheme.colorScheme.secondary,fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 12.sp,
                         letterSpacing = (-0.6).sp),
@@ -1773,10 +1773,10 @@ fun CommentListItem2(
     if (deleteDialog){
         CustomDialogDelete(
             onDismiss = { newValue -> deleteDialog = newValue },
-            confirm = "삭제하기",
-            dismiss = "취소",
-            title = "댓글 삭제하기",
-            text = "정말 삭제하시겠어요?",
+            confirm = stringResource(id = R.string.delete),
+            dismiss = stringResource(id = R.string.cancel_kor),
+            title = stringResource(id = R.string.comment_delete),
+            text = stringResource(id = R.string.delete_confirm),
             valueChange = { newValue -> commentDelete = newValue}
         )
     }
@@ -1802,7 +1802,7 @@ fun CommentListItem2(
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Text(
-                        text = "댓글 수정하기",
+                        text = stringResource(id = R.string.comment_modify),
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 20.sp,
                         letterSpacing = (-1.0).sp,
@@ -1811,7 +1811,7 @@ fun CommentListItem2(
                     )
 
                     Text(
-                        text = "취소",
+                        text = stringResource(id = R.string.cancel_kor),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -1968,7 +1968,7 @@ fun CommentListItem2(
                                 circleSize = 4.dp
                             )
                         }else{
-                            Text(text = "수정", style = TextStyle(
+                            Text(text = stringResource(id = R.string.modify), style = TextStyle(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
@@ -2082,7 +2082,7 @@ fun CommentListItem2(
                             if (G.userId == comment.userId){
                                 Row (verticalAlignment = Alignment.CenterVertically){
                                     Text(
-                                        text = "수정",
+                                        text = stringResource(id = R.string.modify),
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                         color = MaterialTheme.colorScheme.secondary,
@@ -2094,7 +2094,7 @@ fun CommentListItem2(
                                             }
                                     )
                                     Text(
-                                        text = "삭제",
+                                        text = stringResource(id = R.string.remove),
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                         color = MaterialTheme.colorScheme.secondary,

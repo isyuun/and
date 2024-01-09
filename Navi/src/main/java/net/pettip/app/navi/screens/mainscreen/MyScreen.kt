@@ -151,7 +151,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
     ){ paddingValues ->
 
         LoadingDialog(
-            loadingText = "로그아웃..",
+            loadingText = stringResource(R.string.logout_ing),
             loadingState = isLoading
         )
 

@@ -71,6 +71,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -270,15 +271,15 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = "${selectedPet.petNm} 프로필", navController = navController) }
+        topBar = { BackTopBar(title = "${selectedPet.petNm} ${stringResource(id = R.string.profile)}", navController = navController) }
     ) { paddingValues ->
 
         if (weightRgstDialog){
             WeightDialog(
                 onDismiss = {newValue -> weightRgstDialog = newValue},
                 viewModel = settingViewModel,
-                confirm = "등록",
-                dismiss = "취소",
+                confirm = stringResource(id = R.string.register),
+                dismiss = stringResource(id = R.string.cancel_kor),
                 ownrPetUnqNo = selectedPet.ownrPetUnqNo,
                 refresh = {newValue -> updatePetWgt = newValue}
             )
@@ -360,7 +361,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
                         Text(
                             text = if (selectedPet.petBrthYmd=="미상"){
-                                "미상"
+                                stringResource(id = R.string.age_unknown)
                             }else{
                                 sharedViewModel.changeBirth(selectedPet.petBrthYmd)
                             },
@@ -438,7 +439,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                                     modifier = Modifier.weight(1f)
                                 ){
                                     Text(
-                                        text = "일시적인 오류입니다.",
+                                        text = stringResource(id = R.string.error_msg_temp_error),
                                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                                         fontSize = 24.sp, letterSpacing = (-1.2).sp,
                                         color = MaterialTheme.colorScheme.onPrimary,
@@ -472,7 +473,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                                             )
 
                                             Text(
-                                                text = "체중정보 새로고침",
+                                                text = stringResource(R.string.weight_refresh),
                                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                                                 color = design_white,
@@ -565,7 +566,11 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                             .height(48.dp)
                     ) {
                         Text(
-                            text = if(selectedPet.mngrType == "M"){"정보 수정하기"}else{"관리자만 수정가능"},
+                            text = if(selectedPet.mngrType == "M"){
+                                stringResource(R.string.information_modify)
+                            }else{
+                                stringResource(R.string.editable_admin)
+                            },
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
                             color = design_white
@@ -591,7 +596,11 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                             .height(48.dp)
                     ) {
                         Text(
-                            text = if(selectedPet.mngrType != "C"){"몸무게 등록"}else{"참여자만 등록가능"},
+                            text = if(selectedPet.mngrType != "C"){
+                                stringResource(R.string.weight_register)
+                            }else{
+                                stringResource(R.string.only_register_participants)
+                            },
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
                             color = MaterialTheme.colorScheme.onPrimary
@@ -612,7 +621,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                             .background(color = MaterialTheme.colorScheme.onPrimaryContainer)
                     ){
                         Text(
-                            text = "참여중인 그룹",
+                            text = stringResource(R.string.joined_group),
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             fontSize = 20.sp, letterSpacing = (-1.0).sp,
                             color = MaterialTheme.colorScheme.onPrimary,
@@ -652,7 +661,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                             modifier = Modifier.weight(1f)
                         ){
                             Text(
-                                text = "일시적인 오류입니다.",
+                                text = stringResource(id = R.string.error_msg_temp_error),
                                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                                 fontSize = 24.sp, letterSpacing = (-1.2).sp,
                                 color = MaterialTheme.colorScheme.onPrimary,
@@ -686,7 +695,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                                     )
 
                                     Text(
-                                        text = "참여중인 그룹 새로고침",
+                                        text = stringResource(R.string.joined_group_refresh),
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                                         color = design_white,
@@ -800,10 +809,10 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
             Text(
                 text =
                 when(item.mngrType){
-                    "M" -> "관리중"
-                    "I" -> if (!expandText)"참여중" else "참여를 중단하시겠습니까?"
-                    "C" -> "동행중단"
-                    else -> "에러"
+                    "M" -> stringResource(id = R.string.ing_manage)
+                    "I" -> if (!expandText) stringResource(id = R.string.ing_join) else stringResource(R.string.withdraw_join)
+                    "C" -> stringResource(id = R.string.stop_join)
+                    else -> stringResource(id = R.string.error)
                 },
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 12.sp,
@@ -858,7 +867,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                 contentAlignment = Alignment.Center
             ){
                 Text(
-                    text = "네",
+                    text = stringResource(R.string.yes),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,
@@ -912,7 +921,7 @@ fun WeightCNDDialog(
                 modifier = Modifier.fillMaxWidth()
             ){
                 Text(
-                    text = "등록일자",
+                    text = stringResource(R.string.registration_date),
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 16.sp, letterSpacing = (-0.8).sp,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -946,7 +955,7 @@ fun WeightCNDDialog(
                 }
 
                 Text(
-                    text = "몸무게",
+                    text = stringResource(id = R.string.weight),
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 16.sp, letterSpacing = (-0.8).sp,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -968,7 +977,7 @@ fun WeightCNDDialog(
                             .padding(start = 20.dp)
                             .weight(1f)
                             .height(48.dp),
-                        placeholder = { Text(text = "몸무게를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                        placeholder = { Text(text = stringResource(id = R.string.place_holder_weight), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                             focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -1036,7 +1045,7 @@ fun WeightCNDDialog(
                         contentAlignment = Alignment.Center
                     ){
                         Text(
-                            text = "삭제",
+                            text = stringResource(id = R.string.remove),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
                             color = MaterialTheme.colorScheme.onPrimary,
@@ -1078,7 +1087,7 @@ fun WeightCNDDialog(
                         contentAlignment = Alignment.Center
                     ){
                         Text(
-                            text = "변경",
+                            text = stringResource(R.string.change),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
                             color = design_white,
@@ -1170,7 +1179,7 @@ fun WeightDialog(
                             contentAlignment = Alignment.Center
                         ){
                             Text(
-                                text = "취소",
+                                text = stringResource(id = R.string.cancel_kor),
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                                 color = MaterialTheme.colorScheme.onPrimary,
@@ -1196,7 +1205,7 @@ fun WeightDialog(
                             contentAlignment = Alignment.Center
                         ){
                             Text(
-                                text = "확인",
+                                text = stringResource(id = R.string.confirm),
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                                 color = design_white,
@@ -1223,7 +1232,7 @@ fun WeightDialog(
                     modifier = Modifier.fillMaxWidth()
                 ){
                     Text(
-                        text = "등록일자",
+                        text = stringResource(id = R.string.registration_date),
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 16.sp, letterSpacing = (-0.8).sp,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -1246,7 +1255,11 @@ fun WeightDialog(
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart){
                             Text(
                                 text =
-                                if(pickDate ==""){ "등록일자를 입력해주세요" } else { pickDate },
+                                if(pickDate ==""){
+                                    stringResource(R.string.place_holder_registration_date) 
+                                } else { 
+                                    pickDate 
+                                       },
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                                 color = if(pickDate ==""){ MaterialTheme.colorScheme.primaryContainer } else { MaterialTheme.colorScheme.onPrimary },
@@ -1256,7 +1269,7 @@ fun WeightDialog(
                     }
 
                     Text(
-                        text = "몸무게",
+                        text = stringResource(id = R.string.weight),
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 16.sp, letterSpacing = (-0.8).sp,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -1278,7 +1291,7 @@ fun WeightDialog(
                                 .padding(start = 20.dp)
                                 .weight(1f)
                                 .height(48.dp),
-                            placeholder = { Text(text = "몸무게를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                            placeholder = { Text(text = stringResource(id = R.string.place_holder_weight), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                                 focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,

@@ -83,6 +83,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -235,7 +236,7 @@ fun AddPetScreen(
                                         viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
                                         viewModel.updatePetBirth("")
                                         viewModel.updateYear(net.pettip.app.navi.viewmodel.PickerState())
-                                        viewModel.setImageUri(null,context)
+                                        viewModel.setImageUri(null, context)
                                     }
                                 }
                                 .align(Alignment.CenterStart),
@@ -248,7 +249,7 @@ fun AddPetScreen(
                         }
 
                         Text(
-                            text = "반려동물 등록",
+                            text = stringResource(R.string.pet_register),
                             fontSize = 20.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = (-1.0).sp,
@@ -263,7 +264,7 @@ fun AddPetScreen(
     ){ paddingValues ->
 
         LoadingDialog(
-            loadingText = "펫 등록중...",
+            loadingText = stringResource(R.string.pet_register_ing),
             loadingState = isLoading
         )
 
@@ -285,7 +286,7 @@ fun AddPetScreen(
                 }
             }
 
-            Text(text = "반려동물", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.pet), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -332,7 +333,7 @@ fun AddPetScreen(
 
                 ) {
                     Text(
-                        text = "강아지",
+                        text = stringResource(R.string.dog),
                         color = if("강아지" == petDorC) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -378,7 +379,7 @@ fun AddPetScreen(
                     }
                 ) {
                     Text(
-                        text = "고양이",
+                        text = stringResource(R.string.cat),
                         color = if("고양이" == petDorC) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -388,7 +389,7 @@ fun AddPetScreen(
             }
 
             // 사이즈 품종 선택
-            Text(text = "사이즈/품종 선택", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.size_breed_selection), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -418,7 +419,7 @@ fun AddPetScreen(
 
 
             // 주소 선택
-            Text(text = "주소", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.address), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -437,7 +438,7 @@ fun AddPetScreen(
             ) {
                 Row(modifier=Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
                     Text(
-                        text = if(scd.cdld == "") "주소 선택" else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
+                        text = if(scd.cdld == "") stringResource(R.string.address_selection) else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
 
@@ -447,7 +448,7 @@ fun AddPetScreen(
                 }
             }
 
-            Text(text = "이름", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.name), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -466,7 +467,7 @@ fun AddPetScreen(
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                     .fillMaxWidth()
                     .height(48.dp),
-                placeholder = { Text(text = "이름을 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                placeholder = { Text(text = stringResource(R.string.place_holder_pet_name), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -487,7 +488,7 @@ fun AddPetScreen(
                 innerPadding = PaddingValues(start=16.dp)
             )
 
-            Text(text = "생일", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.birthday), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -517,7 +518,7 @@ fun AddPetScreen(
                             }
                             expanded = focusState.isFocused
                         },
-                    placeholder = { Text(text = "생일을 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                    placeholder = { Text(text = stringResource(R.string.place_holder_birthday), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                         focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -551,7 +552,7 @@ fun AddPetScreen(
                             checkmarkColor = design_white)
                     )
 
-                    Text(text = "나이 모름", fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    Text(text = stringResource(id = R.string.age_unknown_), fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         color = MaterialTheme.colorScheme.onPrimary, modifier=Modifier.offset(x = (-8).dp), letterSpacing = (-0.7).sp
                     )
                 }
@@ -625,7 +626,7 @@ fun AddPetScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
                         )
                         {
-                            Text(text = "완\n료", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(
+                            Text(text = stringResource(R.string.complete_col), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(
                                 Font(R.font.pretendard_regular)
                             )
                             )
@@ -636,7 +637,7 @@ fun AddPetScreen(
             }
 
 
-            Text(text = "몸무게", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.weight), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -653,7 +654,7 @@ fun AddPetScreen(
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp),
-                    placeholder = { Text(text = "몸무게를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
+                    placeholder = { Text(text = stringResource(R.string.place_holder_weight), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                         focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -683,7 +684,7 @@ fun AddPetScreen(
 
             }
 
-            Text(text = "* 1kg 미만의 경우, 600g = 0.6으로 입력",
+            Text(text = stringResource(R.string.weight_guidance_message),
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary,
                 modifier= Modifier
@@ -691,7 +692,7 @@ fun AddPetScreen(
                 letterSpacing = (-0.6).sp
             )
 
-            Text(text = "성별", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.gender), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -725,7 +726,7 @@ fun AddPetScreen(
 
                 ) {
                     Text(
-                        text = "남아",
+                        text = stringResource(R.string.male),
                         color = if("남아" == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -759,7 +760,7 @@ fun AddPetScreen(
                     }
                 ) {
                     Text(
-                        text = "여아",
+                        text = stringResource(R.string.female),
                         color = if("여아" == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -793,7 +794,7 @@ fun AddPetScreen(
                     }
                 ) {
                     Text(
-                        text = "모름",
+                        text = stringResource(id = R.string.type_uk),
                         color = if("모름" == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -803,7 +804,7 @@ fun AddPetScreen(
 
             }
 
-            Text(text = "중성화", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.neutering), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -836,7 +837,7 @@ fun AddPetScreen(
 
                 ) {
                     Text(
-                        text = "했어요",
+                        text = stringResource(R.string.did),
                         color = if ("했어요" == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -870,7 +871,7 @@ fun AddPetScreen(
                     }
                 ) {
                     Text(
-                        text = "안했어요",
+                        text = stringResource(R.string.didnot),
                         color = if ("안했어요" == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -904,7 +905,7 @@ fun AddPetScreen(
                     }
                 ) {
                     Text(
-                        text = "모름",
+                        text = stringResource(id = R.string.type_uk),
                         color = if ("모름" == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -940,7 +941,7 @@ fun AddPetScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
             )
             {
-                Text(text = "등록하기", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(
+                Text(text = stringResource(R.string.registration), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(
                     Font(R.font.pretendard_regular)
                 )
                 )

@@ -79,6 +79,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -203,7 +204,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
 
     LaunchedEffect(key1 = state.listOfSelectedImages) {
         if (state.listOfSelectedImages.size > 6) {
-            Toast.makeText(context, "최대 5장까지 가능합니다", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -223,7 +224,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
     ) { paddingValues ->
 
         LoadingDialog(
-            loadingText = "게시글 업로드중...",
+            loadingText = stringResource(R.string.daily_uploading),
             loadingState = isLoading
         )
 
@@ -231,9 +232,9 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             CustomDialogInPost(
                 onDismiss = { showDiagLog = false},
                 navController = navController,
-                title =  "글 작성을 그만하시겠습니까?",
-                text = "작성중인 글은 삭제됩니다",
-                dismiss = "나가기", confirm = "더 작성할래요"
+                title = stringResource(R.string.daily_dialog_title),
+                text = stringResource(R.string.daily_dialog_text),
+                dismiss = stringResource(R.string.daily_dialog_dismiss), confirm = stringResource(R.string.daily_dialog_confirm)
                 )
         }
 
@@ -269,7 +270,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "어느 아이의 글인가요?",
+                text = stringResource(R.string.daily_pet_title),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -278,7 +279,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             )
 
             Text(
-                text = "→ 현재 등록된 아이",
+                text = stringResource(R.string.daily_pet_current),
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,
@@ -299,7 +300,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             }
 
             Text(
-                text = "→ 추가 가능한 아이",
+                text = stringResource(R.string.daily_pet_add),
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,
@@ -320,7 +321,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             }
 
             Text(
-                text = "첨부 사진",
+                text = stringResource(R.string.attatched_image),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -350,7 +351,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "일상 구분",
+                text = stringResource(R.string.daily_category),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -377,7 +378,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "제목",
+                text = stringResource(R.string.title),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -410,7 +411,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                     },
                 placeholder = {
                     Text(
-                        text = "제목을 입력해주세요",
+                        text = stringResource(R.string.place_holder_title),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp
                     )
@@ -498,7 +499,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "메모",
+                text = stringResource(R.string.memo),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -521,7 +522,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                     .heightIn(min = 120.dp),
                 placeholder = {
                     Text(
-                        text = "일상을 기록해주세요.",
+                        text = stringResource(R.string.place_holder_daily),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp
                     )
@@ -549,7 +550,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "해시 태그",
+                text = stringResource(R.string.hashtag),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -572,7 +573,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                     .heightIn(min = 40.dp),
                 placeholder = {
                     Text(
-                        text = "해쉬태그를 남겨주세요. ex) #댕댕이",
+                        text = stringResource(R.string.place_holder_hashtag),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp
                     )
@@ -646,11 +647,11 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                     }
 
                     if (((uploadedPet.count { it.rowState == null })?.plus(newPetList.size))==0){
-                        Toast.makeText(context, "반려동물을 선택해주세요", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.toast_msg_select_pet, Toast.LENGTH_SHORT).show()
                     }else if(uploadSchSeList.count { it.rowState==null }.plus(uploadSchSeList.count{it.rowState == "C"})==0){
-                        Toast.makeText(context, "일상구분을 선택해주세요", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.toast_msg_select_daily, Toast.LENGTH_SHORT).show()
                     }else if(((uploadedFile?.count { it.rowState == null } ?: 0) + (localUriList.size-1)) >5){
-                        Toast.makeText(context, "5장까지만 등록 가능합니다", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
                     }else{
                         scope.launch {
                             isLoading = true
@@ -713,7 +714,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             )
             {
                 Text(
-                    text = "수정 완료",
+                    text = stringResource(R.string.modify_complete),
                     color = design_white,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular))
@@ -1023,7 +1024,7 @@ fun PhotoItemInModify(uri: Uri, index: Int, onClick: () -> Unit, onDelete:()->Un
                         .align(Alignment.BottomCenter)
                 ) {
                     Text(
-                        text = "대표이미지",
+                        text = stringResource(R.string.main_image),
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.6).sp,

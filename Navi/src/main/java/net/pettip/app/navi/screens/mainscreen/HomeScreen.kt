@@ -213,18 +213,14 @@ fun HomeScreen(
         pagerState.animateScrollToPage(index)
     }
 
-    LaunchedEffect(key1 = G.toPost, key2 = inviteCode, key3 = G.inviteCode){
+    LaunchedEffect(key1 = G.toPost, key2 = G.inviteCode){
         if(G.toPost){
             navController.navigate(Screen.PostScreen.route)
-        }else if ((inviteCode?.length ?: 0) == 6){
-            delay(700)
-            navController.navigate(Screen.SetKeyScreen.route)
         }else if (G.inviteCode?.length == 6) {
             sharedViewModel.updateInviteCode(G.inviteCode)
-            G.inviteCode = null
-            delay(700)
+            delay(400)
             navController.navigate(Screen.SetKeyScreen.route)
-            Log.d("LOG","진입")
+            G.inviteCode = null
         }
     }
 
@@ -487,7 +483,7 @@ fun ProfileContent(
                                     .width(200.dp)
                                 , contentAlignment = Alignment.Center
                             ){
-                                Text(text = "날씨정보 불러오기" ,
+                                Text(text = stringResource(R.string.get_weather) ,
                                     fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                                     color = design_white, letterSpacing = (-0.6).sp,
                                     textAlign = TextAlign.Center)
@@ -522,7 +518,7 @@ fun ProfileContent(
                                 .size(2.dp, 8.dp)
                                 .background(color = design_white))
 
-                            Text(text = "현재 기온 : $temp℃ " ,
+                            Text(text = "${stringResource(id = R.string.current_temp)} : $temp℃ " ,
                                 fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                                 color = design_white, letterSpacing = (-0.6).sp,
                                 textAlign = TextAlign.Center)
@@ -532,7 +528,7 @@ fun ProfileContent(
                                 .size(2.dp, 8.dp)
                                 .background(color = design_white))
 
-                            Text(text = "강수 : $pop% ",
+                            Text(text = "${stringResource(id = R.string.precipitation)} : $pop% ",
                                 fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                                 color = design_white, letterSpacing = (-0.6).sp,
                                 modifier = Modifier.padding(end = 16.dp),
@@ -573,7 +569,7 @@ fun ProfileContent(
                                     )
 
                                     Text(
-                                        text = "일시적인 오류입니다.",
+                                        text = stringResource(R.string.error_msg_temp_error),
                                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                                         fontSize = 24.sp, letterSpacing = (-1.2).sp,
                                         color = MaterialTheme.colorScheme.onPrimary,
@@ -581,7 +577,7 @@ fun ProfileContent(
                                     )
 
                                     Text(
-                                        text = "새로 고침을 눌러 페이지를 다시 불러올 수 있습니다.\n문제가 반복된다면 문의하기를 눌러주세요.",
+                                        text = stringResource(R.string.error_msg_refresh),
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                                         color = MaterialTheme.colorScheme.onPrimary,

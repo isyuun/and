@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
@@ -74,7 +75,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = "초대하기", navController = navController) }
+        topBar = { BackTopBar(title = stringResource(id = R.string.invite), navController = navController) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -83,7 +84,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                 .background(MaterialTheme.colorScheme.primary)
         ) {
             Text(
-                text = "회원 초대",
+                text = stringResource(R.string.member_invitation),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp, letterSpacing = (-1.0).sp,
                 lineHeight = 20.sp, color = MaterialTheme.colorScheme.onPrimary,
@@ -91,7 +92,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
             )
 
             Text(
-                text = "코드를 직접 말해주거나 메시지로 전송하세요.",
+                text = stringResource(R.string.code_or_msg),
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                 lineHeight = 14.sp, color = MaterialTheme.colorScheme.onPrimary,
@@ -126,7 +127,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                         .height(60.dp)
                 ){
                     Text(
-                        text = if (inviteCode=="") "초대키 생성중입니다" else inviteCode,
+                        text = if (inviteCode=="") stringResource(R.string.generate_invite_code) else inviteCode,
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 24.sp, color = design_select_btn_text,
                         modifier = Modifier.align(Alignment.Center)
@@ -156,15 +157,15 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                 Text(
                     text = buildAnnotatedString {
 
-                        append("이 코드는 ")
+                        append(stringResource(R.string.this_code))
                         withStyle(
                             style = SpanStyle(
                                 design_sharp
                             ),
                         ) {
-                            append("1일 동안 유효")
+                            append(stringResource(R.string.valid_oneday))
                         }
-                        append("합니다 ")
+                        append(stringResource(R.string.is_doing))
                     },
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
@@ -184,7 +185,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                     colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
                 )
                 {
-                    Text(text = "코드 전송",
+                    Text(text = stringResource(R.string.transfer_code),
                         color = design_white, fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp

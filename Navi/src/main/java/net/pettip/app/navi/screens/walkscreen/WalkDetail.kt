@@ -28,6 +28,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,7 +39,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
@@ -58,6 +61,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -66,6 +70,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -126,6 +131,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     var imageLoading by remember{ mutableStateOf(false) }
     var showImage by remember{ mutableStateOf(false) }
     var refresh by remember{ mutableStateOf(false) }
+    var curruntImage by remember{ mutableIntStateOf(0) }
 
     val pagerState = rememberPagerState( pageCount = {dailyDetail?.dailyLifeFileList?.size ?: 0 })
 
@@ -209,79 +215,83 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                 )
                             }
 
-                            Column {
-                                Spacer(modifier = Modifier.padding(top= 20.dp))
+                            //Column {
+                            //    Spacer(modifier = Modifier.padding(top= 20.dp))
+                            //
+                            //    HorizontalPager(
+                            //        modifier = Modifier
+                            //            .padding(horizontal = 10.dp)
+                            //            .fillMaxWidth()
+                            //            .heightIn(max = 240.dp),
+                            //        state = pagerState,
+                            //        beyondBoundsPageCount = 1,
+                            //        flingBehavior = PagerDefaults.flingBehavior(
+                            //            state = pagerState, snapVelocityThreshold = 100.dp)
+                            //    ) { page ->
+                            //        val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
+                            //
+                            //        // 선택된 아이템의 Z-index를 높게 설정
+                            //        val zIndexModifier = if (isSelected) Modifier.zIndex(1f) else Modifier
+                            //
+                            //        Box(Modifier
+                            //            .then(zIndexModifier)
+                            //            .graphicsLayer {
+                            //                val pageOffset = pagerState.calculateCurrentOffsetForPage(page)
+                            //                // translate the contents by the size of the page, to prevent the pages from sliding in from left or right and stays in the center
+                            //                //translationX = pageOffset * size.width/4
+                            //                // apply an alpha to fade the current page in and the old page out
+                            //                alpha = 1 - pageOffset.absoluteValue / 3 * 2
+                            //                scaleX = 1 - pageOffset.absoluteValue / 3
+                            //                scaleY = 1 - pageOffset.absoluteValue / 3
+                            //            }
+                            //            .fillMaxSize()
+                            //            , contentAlignment = Alignment.Center) {
+                            //
+                            //            AsyncImage(
+                            //                onLoading = { imageLoading = true },
+                            //                onError = {Log.d("LOG", "onError")},
+                            //                onSuccess = { imageLoading = false},
+                            //                model = ImageRequest.Builder(LocalContext.current)
+                            //                    .data(
+                            //                        "http://carepet.hopto.org/img/"+
+                            //                                (dailyDetail!!.dailyLifeFileList?.get(page)?.filePathNm ?: "") +
+                            //                                (dailyDetail!!.dailyLifeFileList?.get(page)?.atchFileNm ?: "")
+                            //                    )
+                            //                    .crossfade(true)
+                            //                    .build(),
+                            //                contentDescription = "",
+                            //                //placeholder = painterResource(id = R.drawable.profile_default),
+                            //                //error= painterResource(id = R.drawable.profile_default),
+                            //                modifier= Modifier
+                            //                    .fillMaxSize()
+                            //                    .clickable { showImage = true },
+                            //                contentScale = ContentScale.Fit
+                            //            )
+                            //        }
+                            //    }
+                            //
+                            //    Row(
+                            //        Modifier
+                            //            .fillMaxWidth()
+                            //            .padding(top = 8.dp),
+                            //        horizontalArrangement = Arrangement.Center
+                            //    ) {
+                            //        repeat(dailyDetail?.dailyLifeFileList?.size ?: 0 ) { iteration ->
+                            //            val color = if (pagerState.currentPage == iteration) design_intro_bg else design_DDDDDD
+                            //            Box(
+                            //                modifier = Modifier
+                            //                    .padding(horizontal = 4.dp)
+                            //                    .clip(CircleShape)
+                            //                    .background(color)
+                            //                    .size(10.dp)
+                            //            )
+                            //        }
+                            //    }
+                            //}
 
-                                HorizontalPager(
-                                    modifier = Modifier
-                                        .padding(horizontal = 10.dp)
-                                        .fillMaxWidth()
-                                        .heightIn(max = 240.dp),
-                                    state = pagerState,
-                                    beyondBoundsPageCount = 1,
-                                    flingBehavior = PagerDefaults.flingBehavior(
-                                        state = pagerState, snapVelocityThreshold = 100.dp)
-                                ) { page ->
-                                    val isSelected = page == pagerState.currentPage // 선택된 페이지 여부를 확인
+                            // ----------- 맵 들어갈 자리 -------------------
 
-                                    // 선택된 아이템의 Z-index를 높게 설정
-                                    val zIndexModifier = if (isSelected) Modifier.zIndex(1f) else Modifier
-
-                                    Box(Modifier
-                                        .then(zIndexModifier)
-                                        .graphicsLayer {
-                                            val pageOffset = pagerState.calculateCurrentOffsetForPage(page)
-                                            // translate the contents by the size of the page, to prevent the pages from sliding in from left or right and stays in the center
-                                            //translationX = pageOffset * size.width/4
-                                            // apply an alpha to fade the current page in and the old page out
-                                            alpha = 1 - pageOffset.absoluteValue / 3 * 2
-                                            scaleX = 1 - pageOffset.absoluteValue / 3
-                                            scaleY = 1 - pageOffset.absoluteValue / 3
-                                        }
-                                        .fillMaxSize()
-                                        , contentAlignment = Alignment.Center) {
-
-                                        AsyncImage(
-                                            onLoading = { imageLoading = true },
-                                            onError = {Log.d("LOG", "onError")},
-                                            onSuccess = { imageLoading = false},
-                                            model = ImageRequest.Builder(LocalContext.current)
-                                                .data(
-                                                    "http://carepet.hopto.org/img/"+
-                                                            (dailyDetail!!.dailyLifeFileList?.get(page)?.filePathNm ?: "") +
-                                                            (dailyDetail!!.dailyLifeFileList?.get(page)?.atchFileNm ?: "")
-                                                )
-                                                .crossfade(true)
-                                                .build(),
-                                            contentDescription = "",
-                                            //placeholder = painterResource(id = R.drawable.profile_default),
-                                            //error= painterResource(id = R.drawable.profile_default),
-                                            modifier= Modifier
-                                                .fillMaxSize()
-                                                .clickable { showImage = true },
-                                            contentScale = ContentScale.Fit
-                                        )
-                                    }
-                                }
-
-                                Row(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp),
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    repeat(dailyDetail?.dailyLifeFileList?.size ?: 0 ) { iteration ->
-                                        val color = if (pagerState.currentPage == iteration) design_intro_bg else design_DDDDDD
-                                        Box(
-                                            modifier = Modifier
-                                                .padding(horizontal = 4.dp)
-                                                .clip(CircleShape)
-                                                .background(color)
-                                                .size(10.dp)
-                                        )
-                                    }
-                                }
-                            }
+                            // ----------- 맵 들어갈 자리 -------------------
 
                             Spacer(modifier = Modifier.padding(top = 20.dp))
 
@@ -435,7 +445,45 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                 }
                             }
 
+                            Spacer(modifier = Modifier.padding(top = 16.dp))
 
+                            LazyRow(
+                                state = rememberLazyListState(),
+                                modifier = Modifier
+                                    .padding(horizontal = 10.dp)
+                                    .fillMaxWidth(),
+                                contentPadding = PaddingValues(horizontal = 10.dp),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ){
+                                itemsIndexed(dailyDetail?.dailyLifeFileList?: emptyList()){ index, item ->
+                                    Box(
+                                        modifier = Modifier
+                                            .size(100.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .clickable {
+                                                curruntImage = index
+                                                showImage = true
+                                            }
+                                    ){
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(
+                                                    "http://carepet.hopto.org/img/"+
+                                                            item.filePathNm +
+                                                            item.atchFileNm
+                                                )
+                                                .crossfade(true)
+                                                .build(),
+                                            contentDescription = "",
+                                            placeholder = null,
+                                            error= null,
+                                            modifier= Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop,
+                                            filterQuality = FilterQuality.Low
+                                        )
+                                    }
+                                }
+                            }
 
                             Spacer(modifier = Modifier.padding(top = 16.dp))
                         }// column
@@ -446,12 +494,12 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
     AnimatedVisibility(
         visible =  showImage,
-        enter = scaleIn(transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.3f)).plus(fadeIn()),
-        exit = scaleOut(transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.3f)).plus(fadeOut())
+        enter = scaleIn(transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.9f)).plus(fadeIn()),
+        exit = scaleOut(transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.9f)).plus(fadeOut())
     ) {
         FullScreenImage(
             dailyDetail = dailyDetail!!,
-            page = pagerState.currentPage,
+            page = curruntImage,
             onDismiss = {newValue -> showImage = newValue})
     }
 

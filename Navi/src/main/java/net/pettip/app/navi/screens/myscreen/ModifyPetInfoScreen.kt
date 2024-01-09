@@ -70,6 +70,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -306,23 +307,23 @@ fun ModifyPetInfoScreen(
     Scaffold (
         modifier = modifier.fillMaxSize(),
         topBar = {
-            BackTopBarInModify(title = "반려동물 정보 수정", navController = navController, viewModel = viewModel, initChange = {newValue -> init = newValue})
+            BackTopBarInModify(title = stringResource(R.string.modify_pet_information), navController = navController, viewModel = viewModel, initChange = { newValue -> init = newValue})
         }
     ){ paddingValues ->
 
         if (showDialog){
             CustomDialogDelete(
                 onDismiss = { newValue -> showDialog = newValue },
-                confirm = "삭제하기",
-                dismiss = "취소",
-                title = "반려동물 정보 삭제하기",
-                text = "정말 삭제하시겠어요?",
+                confirm = stringResource(id = R.string.delete),
+                dismiss = stringResource(id = R.string.cancel_kor),
+                title = stringResource(R.string.pet_information_delete),
+                text = stringResource(id = R.string.delete_confirm),
                 valueChange = { newValue -> delete = newValue}
             )
         }
 
         LoadingDialog(
-            loadingText = if(delete) "삭제 처리중.." else "정보 수정중..",
+            loadingText = if(delete) stringResource(R.string.delete_progress) else stringResource(R.string.modify_progress),
             loadingState = isLoading)
 
         Column (modifier= Modifier
@@ -343,7 +344,7 @@ fun ModifyPetInfoScreen(
                 }
             }
 
-            Text(text = "반려동물", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.pet), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -390,7 +391,7 @@ fun ModifyPetInfoScreen(
 
                 ) {
                     Text(
-                        text = "강아지",
+                        text = stringResource(id = R.string.dog),
                         color = if("강아지" == petDorC) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -436,7 +437,7 @@ fun ModifyPetInfoScreen(
                     }
                 ) {
                     Text(
-                        text = "고양이",
+                        text = stringResource(id = R.string.cat),
                         color = if("고양이" == petDorC) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -446,7 +447,7 @@ fun ModifyPetInfoScreen(
             }
 
             // 사이즈 품종 선택
-            Text(text = "사이즈/품종 선택", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.size_breed_selection), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -476,7 +477,7 @@ fun ModifyPetInfoScreen(
             }
 
             //주소 선택
-            Text(text = "주소", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.address), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -494,7 +495,7 @@ fun ModifyPetInfoScreen(
             ) {
                 Row(modifier= Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
                     Text(
-                        text = if(scd.cdld == "") "주소 선택" else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
+                        text = if(scd.cdld == "") stringResource(id = R.string.address_selection) else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular))
                     )
@@ -505,7 +506,7 @@ fun ModifyPetInfoScreen(
                 }
             }
 
-            Text(text = "이름", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.name), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -524,7 +525,7 @@ fun ModifyPetInfoScreen(
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                     .fillMaxWidth()
                     .height(48.dp),
-                placeholder = { Text(text = "이름을 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
+                placeholder = { Text(text = stringResource(id = R.string.place_holder_pet_name), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -545,7 +546,7 @@ fun ModifyPetInfoScreen(
                 innerPadding = PaddingValues(start=16.dp)
             )
 
-            Text(text = "생일", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.birthday), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -576,7 +577,7 @@ fun ModifyPetInfoScreen(
                             }
                             expanded = focusState.isFocused
                         },
-                    placeholder = { Text(text = "생일을 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
+                    placeholder = { Text(text = stringResource(id = R.string.place_holder_birthday), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                         focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -612,7 +613,7 @@ fun ModifyPetInfoScreen(
                         )
                     )
 
-                    Text(text = "나이 모름", fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    Text(text = stringResource(id = R.string.age_unknown_), fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         color = MaterialTheme.colorScheme.onPrimary, modifier= Modifier.offset(x = (-8).dp), letterSpacing = (-0.7).sp
                     )
                 }
@@ -688,7 +689,7 @@ fun ModifyPetInfoScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
                         )
                         {
-                            Text(text = "완\n료", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(
+                            Text(text = stringResource(id = R.string.complete_col), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(
                                 Font(R.font.pretendard_regular)
                             )
                             )
@@ -748,7 +749,7 @@ fun ModifyPetInfoScreen(
             //    letterSpacing = (-0.6).sp
             //)
 
-            Text(text = "성별", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.gender), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -782,7 +783,7 @@ fun ModifyPetInfoScreen(
 
                 ) {
                     Text(
-                        text = "남아",
+                        text = stringResource(id = R.string.male),
                         color = if("남아" == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -816,7 +817,7 @@ fun ModifyPetInfoScreen(
                     }
                 ) {
                     Text(
-                        text = "여아",
+                        text = stringResource(id = R.string.female),
                         color = if("여아" == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -850,7 +851,7 @@ fun ModifyPetInfoScreen(
                     }
                 ) {
                     Text(
-                        text = "모름",
+                        text = stringResource(id = R.string.type_uk),
                         color = if("모름" == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -860,7 +861,7 @@ fun ModifyPetInfoScreen(
 
             }
 
-            Text(text = "중성화", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.neutering), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -893,7 +894,7 @@ fun ModifyPetInfoScreen(
 
                 ) {
                     Text(
-                        text = "했어요",
+                        text = stringResource(id = R.string.did),
                         color = if ("했어요" == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -927,7 +928,7 @@ fun ModifyPetInfoScreen(
                     }
                 ) {
                     Text(
-                        text = "안했어요",
+                        text = stringResource(id = R.string.didnot),
                         color = if ("안했어요" == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -961,7 +962,7 @@ fun ModifyPetInfoScreen(
                     }
                 ) {
                     Text(
-                        text = "모름",
+                        text = stringResource(id = R.string.type_uk),
                         color = if ("모름" == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -1004,14 +1005,14 @@ fun ModifyPetInfoScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
             )
             {
-                Text(text = "수정하기", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(
+                Text(text = stringResource(id = R.string.modify_verb), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(
                     Font(R.font.pretendard_regular)
                 )
                 )
             }
 
             Text(
-                text = "반려동물 등록 정보 삭제",
+                text = stringResource(R.string.pet_registinformation_delete),
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                 textDecoration = TextDecoration.Underline,

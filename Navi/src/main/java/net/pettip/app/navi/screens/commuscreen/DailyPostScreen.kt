@@ -82,6 +82,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -182,7 +183,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
 
     LaunchedEffect(key1 = state.listOfSelectedImages) {
         if (state.listOfSelectedImages.size > 6) {
-            Toast.makeText(context, "최대 5장까지 가능합니다", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -202,7 +203,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
     ) { paddingValues ->
 
         LoadingDialog(
-            loadingText = "게시글 업로드중...",
+            loadingText = stringResource(id = R.string.daily_uploading),
             loadingState = isLoading
         )
 
@@ -210,9 +211,9 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             CustomDialogInPost(
                 onDismiss = { showDiagLog = false},
                 navController = navController,
-                title =  "글 작성을 그만하시겠습니까?",
-                text = "작성중인 글은 삭제됩니다",
-                dismiss = "나가기", confirm = "더 작성할래요"
+                title =  stringResource(id = R.string.daily_dialog_title),
+                text = stringResource(id = R.string.daily_dialog_text),
+                dismiss = stringResource(id = R.string.daily_dialog_dismiss), confirm = stringResource(id = R.string.daily_dialog_confirm)
                 )
         }
 
@@ -257,7 +258,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "어느 아이의 글인가요?",
+                text = stringResource(id = R.string.daily_pet_title),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -278,7 +279,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             }
 
             Text(
-                text = "첨부 사진",
+                text = stringResource(id = R.string.attatched_image),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -306,7 +307,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "일상 구분",
+                text = stringResource(id = R.string.daily_category),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -333,7 +334,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "제목",
+                text = stringResource(id = R.string.title),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -366,7 +367,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                     },
                 placeholder = {
                     Text(
-                        text = "제목을 입력해주세요",
+                        text = stringResource(id = R.string.place_holder_title),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp
                     )
@@ -454,7 +455,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "메모",
+                text = stringResource(id = R.string.memo),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -477,7 +478,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                     .heightIn(min = 120.dp),
                 placeholder = {
                     Text(
-                        text = "일상을 기록해주세요.",
+                        text = stringResource(id = R.string.place_holder_daily),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp
                     )
@@ -505,7 +506,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "해시 태그",
+                text = stringResource(id = R.string.hashtag),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -528,7 +529,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                     .heightIn(min = 40.dp),
                 placeholder = {
                     Text(
-                        text = "해쉬태그를 남겨주세요. ex) #댕댕이",
+                        text = stringResource(id = R.string.place_holder_hashtag),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp
                     )
@@ -557,7 +558,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
             Text(
-                text = "오늘 일상 스토리에 올리기",
+                text = stringResource(R.string.daily_upload),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -584,7 +585,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 )
 
                 Text(
-                    text = "사진이 스토리에 공유됩니다.",
+                    text = stringResource(R.string.photo_story_share),
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -598,9 +599,9 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             Button(
                 onClick = {
                     if (selectedPet.size == 0){
-                        Toast.makeText(context, "반려동물을 선택해주세요", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.toast_msg_select_pet, Toast.LENGTH_SHORT).show()
                     }else if (selectedCategory.size == 0 ){
-                        Toast.makeText(context, "일상 구분을 선택해주세요", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.toast_msg_select_daily, Toast.LENGTH_SHORT).show()
                     }else{
                         scope.launch {
                             isLoading = true
@@ -667,7 +668,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             )
             {
                 Text(
-                    text = "산책 완료",
+                    text = stringResource(R.string.walk_complete),
                     color = design_white,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular))
@@ -711,7 +712,7 @@ fun PhotoItem(uri: Uri, index: Int, onClick: () -> Unit) {
                         .align(Alignment.BottomCenter)
                 ) {
                     Text(
-                        text = "대표이미지",
+                        text = stringResource(id = R.string.main_image),
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.6).sp,
@@ -778,7 +779,7 @@ fun OnDialog(onDismiss: () -> Unit, navController: NavHostController) {
                     navController.popBackStack()
                 },
             ) {
-                Text(text = "나가기")
+                Text(text = stringResource(R.string.out))
             }
         },
         title = { Text(text = "포스트 작성을 그만하시겠어요?") },

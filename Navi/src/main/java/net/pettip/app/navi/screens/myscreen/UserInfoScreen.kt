@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -137,17 +138,17 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = "개인 정보 수정", navController = navController) },
+        topBar = { BackTopBar(title = stringResource(R.string.userinfo_modify), navController = navController) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
 
         if (showDialog){
             CustomDialogDelete(
                 onDismiss = { newValue -> showDialog = newValue },
-                confirm = "탈퇴하기",
-                dismiss = "취소",
-                title = "회원 탈퇴하기",
-                text = "정말 탈퇴하시겠어요?",
+                confirm = stringResource(R.string.withdraw),
+                dismiss = stringResource(R.string.cancel_kor),
+                title = stringResource(R.string.member_withdraw),
+                text = stringResource(R.string.member_withdraw_confirm),
                 valueChange = { newValue -> withDraw = newValue}
             )
         }
@@ -161,7 +162,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
             Spacer(modifier = Modifier.padding(top = 20.dp))
             
             Row (Modifier.fillMaxWidth()){
-                Text(text = "닉네임", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                Text(text = stringResource(R.string.nickname), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     modifier=Modifier.padding(start = 20.dp), color = MaterialTheme.colorScheme.onPrimary)
                 Text(
                     text = "*",
@@ -181,7 +182,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                     .fillMaxWidth()
                     .height(48.dp),
-                placeholder = { Text(text = "닉네임을 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                placeholder = { Text(text = stringResource(R.string.place_holder_nickname), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -240,7 +241,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                             contentPadding = PaddingValues(horizontal = 0.dp)
                         ) {
                             Text(
-                                text = "중복확인",
+                                text = stringResource(R.string.duplicate_check),
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                 color = MaterialTheme.colorScheme.onPrimary
@@ -297,7 +298,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
             //Spacer(modifier = Modifier.padding(top = 16.dp))
 
             Row {
-                Text(text = "비밀번호 변경", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                Text(text = stringResource(R.string.password_change), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     modifier= Modifier
                         .padding(start = 20.dp)
                         .alignByBaseline(),
@@ -305,7 +306,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
                 if (loginMethod!="EMAIL"){
 
-                    Text(text = "(간편가입시 비밀번호 변경이 불가능합니다)",
+                    Text(text = stringResource(R.string.pw_change_easylogin_guide),
                         fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         letterSpacing = (-0.6).sp,
                         modifier= Modifier
@@ -329,7 +330,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                     .fillMaxWidth()
                     .height(48.dp),
-                placeholder = { Text(text = "8~16자 영문/숫자 조합", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                placeholder = { Text(text = stringResource(R.string.place_holder_password), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -363,7 +364,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                     .fillMaxWidth()
                     .height(48.dp),
-                placeholder = { Text(text = "비밀번호 확인", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                placeholder = { Text(text = stringResource(R.string.place_holder_password_confirm), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                     focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -462,7 +463,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
             )
             {
-                Text(text = "수정하기",
+                Text(text = stringResource(id = R.string.modify_verb),
                     color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp)
             }
@@ -485,7 +486,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = design_sharp)
                 ) {
-                    Text(text = "회원탈퇴",
+                    Text(text = stringResource(R.string.member_withdraw_),
                         color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp)
                 }

@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -86,7 +87,7 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = "초대코드 등록하기", navController = navController) }
+        topBar = { BackTopBar(title = stringResource(R.string.invite_code_register), navController = navController) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -95,7 +96,7 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
                 .background(MaterialTheme.colorScheme.primary)
         ) {
             Text(
-                text = "초대 코드 입력",
+                text = stringResource(R.string.invite_code_enter),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp, letterSpacing = (-1.0).sp,
                 lineHeight = 20.sp, color = MaterialTheme.colorScheme.onPrimary,
@@ -103,7 +104,7 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
             )
 
             Text(
-                text = "전달받은 코드를 입력후 [등록하기]버튼을 클릭해 주세요.",
+                text = stringResource(R.string.invite_code_guide),
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                 lineHeight = 14.sp, color = MaterialTheme.colorScheme.onPrimary,
@@ -159,7 +160,7 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
                     colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
                 )
                 {
-                    Text(text = "코드 전송",
+                    Text(text = stringResource(id = R.string.transfer_code),
                         color = design_white, fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp

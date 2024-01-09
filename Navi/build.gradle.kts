@@ -1,5 +1,8 @@
+import java.util.Properties
+
 //import org.jetbrains.kotlin.base.kapt3.KaptOptions
 //import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
 
 plugins {
     id("com.android.application")
@@ -25,6 +28,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
     }
 
     compileOptions {
@@ -91,7 +95,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
-    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     implementation("androidx.compose.ui:ui-util:1.5.1")
     implementation("androidx.compose.material3:material3:1.2.0-alpha08")

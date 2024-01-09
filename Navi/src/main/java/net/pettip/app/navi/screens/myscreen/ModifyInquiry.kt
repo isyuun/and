@@ -67,6 +67,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -196,7 +197,7 @@ fun ModifyInquiryScreen(
                         }
 
                         Text(
-                            text = "1:1 문의 수정",
+                            text = stringResource(R.string.edit_inquiry),
                             fontSize = 20.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                             letterSpacing = (-1.0).sp,
@@ -223,7 +224,7 @@ fun ModifyInquiryScreen(
                 .verticalScroll(rememberScrollState())
         ) {
 
-            Text(text = "문의유형", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.inquiry_type), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -243,7 +244,7 @@ fun ModifyInquiryScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 Text(
-                    text = inquiryKind?.cdNm ?: "문의유형을 선택해주세요",
+                    text = inquiryKind?.cdNm ?: stringResource(R.string.inquiry_type_select),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -276,18 +277,18 @@ fun ModifyInquiryScreen(
                 }
             }
 
-            Text(text = "제목", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.title), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
             CustomTFInInquiry(
                 value = title,
                 onValueChange = {newValue -> settingViewModel.updateTitle(newValue)},
-                placeholder = "제목을 입력해주세요",
+                placeholder = stringResource(id = R.string.place_holder_title),
                 keyboardType = KeyboardType.Text
             )
 
-            Text(text = "문의내용", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.inquiry_content), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -303,7 +304,7 @@ fun ModifyInquiryScreen(
                     .fillMaxWidth()
                     .heightIn(min = 200.dp, max = 300.dp),
                 placeholder = { Text(
-                    text = "문의 내용을 상세히 기재해주시면 문의 확인에 도움이 됩니다.\n\n-핸드폰기종 정보 \n-문의 상세 내용 \n-오류화면 캡쳐 첨부",
+                    text = stringResource(R.string.place_holder_inquiry_content),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -326,7 +327,7 @@ fun ModifyInquiryScreen(
             )
 
 
-            Text(text = "사진 등록(최대 5장)", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.image_regist_max), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -355,7 +356,7 @@ fun ModifyInquiryScreen(
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
-                    text = "폰기종 : ${Build.MODEL}",
+                    text = "${stringResource(id = R.string.phone_type)} : ${Build.MODEL}",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -404,7 +405,7 @@ fun ModifyInquiryScreen(
                     modifier = Modifier.offset(y=(-10).dp)
                 )
 
-                Text(text = "문의 내용 해결 및 답변을 위해 아이디/연락처/이메일 등의 정보 수집에 동의합니다. \n(이외의 용도에는 사용되지 않습니다.)",
+                Text(text = stringResource(R.string.inquiry_information_consent),
                     fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     color = MaterialTheme.colorScheme.onPrimary, modifier=Modifier.offset(x = (-8).dp), letterSpacing = (-0.7).sp
                 )
@@ -478,7 +479,7 @@ fun ModifyInquiryScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
             )
             {
-                Text(text = "문의 수정", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                Text(text = stringResource(R.string.edit_inquiry_), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
             }
         }
     }

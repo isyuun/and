@@ -332,11 +332,13 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
                             continuation.resume(true)
                         }
                     }else{
+                        _timeLineList.value = null
                         continuation.resume(false)
                     }
                 }
 
                 override fun onFailure(call: Call<TimeLineRes>, t: Throwable) {
+                    _timeLineList.value = null
                     continuation.resume(false)
                 }
 

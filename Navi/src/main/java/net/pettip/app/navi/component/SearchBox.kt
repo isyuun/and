@@ -1,12 +1,16 @@
 package net.pettip.app.navi.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -21,6 +25,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.viewmodel.WalkViewModel
@@ -68,6 +74,22 @@ fun SearchBox(viewModel:WalkViewModel, modifier: Modifier){
             fontSize = 16.sp, letterSpacing = (-0.4).sp
         ),
         shape = RoundedCornerShape(4.dp),
-        innerPadding = PaddingValues(start=16.dp)
+        innerPadding = PaddingValues(start=16.dp),
+        trailingIcon = {
+            if (searchText != "") {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "",
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.clickable {
+                        viewModel.updateSearchText("")
+                        viewModel.viewModelScope.launch {
+                            viewModel.dailyLifeTimeLineListClear()
+                            viewModel.getTimeLineList()
+                        }
+                    }
+                )
+            }
+        }
     )
 }

@@ -36,7 +36,9 @@ class TokenInterceptor() : Interceptor {
         if (response.code == 403) {
             G.dupleLogin = true
         } else if (response.code == 401) {
-            Log.d("LOG", "if 실행")
+            // code 401 : access Token 만료시 응답 코드
+            // response로 새로운 access Token과  Refresh가 떨어짐
+            // 새로 받은 토큰으로 통신 재시도
             val gson = Gson()
             val tokenResponse = gson.fromJson(responseBodyString.string(), RefreshRes::class.java)
 

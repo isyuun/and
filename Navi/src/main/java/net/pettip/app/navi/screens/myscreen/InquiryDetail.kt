@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -105,16 +106,16 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = "1:1 문의", navController = navController) }
+        topBar = { BackTopBar(title = stringResource(R.string.inquiry), navController = navController) }
     ) { paddingValues ->
 
         if (deleteDialog){
             CustomDialogDelete(
                 onDismiss = { newValue -> deleteDialog = newValue },
-                confirm = "삭제하기",
-                dismiss = "취소",
-                title = "문의 삭제하기",
-                text = "정말 삭제하시겠어요?",
+                confirm = stringResource(id = R.string.delete),
+                dismiss = stringResource(id = R.string.cancel_kor),
+                title = stringResource(R.string.inquiry_delete),
+                text = stringResource(id = R.string.delete_confirm),
                 valueChange = { newValue -> qnaDelete = newValue}
             )
         }
@@ -168,7 +169,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                                     .size(14.dp))
 
                             Text(
-                                text = "수정하기",
+                                text = stringResource(id = R.string.modify_verb),
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp,
                                 letterSpacing = (-0.6).sp,
@@ -190,7 +191,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                                     .size(14.dp))
 
                             Text(
-                                text = "삭제하기",
+                                text = stringResource(id = R.string.delete),
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 12.sp,
                                 letterSpacing = (-0.6).sp,
@@ -221,7 +222,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
             if (!uriList.isNullOrEmpty()){
 
                 Text(
-                    text = "첨부파일",
+                    text = stringResource(R.string.attached_file),
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -298,7 +299,7 @@ fun InquiryDetailNoAnswer(){
             contentDescription = "", tint = Color.Unspecified)
 
         Text(
-            text = "조금만 기다려 주세요.\n답변 준비 중입니다.",
+            text = stringResource(R.string.preparing_response),
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp, letterSpacing = (-0.7).sp,
             color = MaterialTheme.colorScheme.secondary,

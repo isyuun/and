@@ -21,6 +21,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.delay
+import net.pettip.BuildConfig
 import net.pettip.app.navi.screens.EasyRegScreen
 import net.pettip.app.navi.screens.IdFindScreen
 import net.pettip.app.navi.screens.IdPwSearchScreen
@@ -122,6 +124,27 @@ class MainActivity : ComponentActivity() {
             file.delete()
         }
     }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+
+        val intentData: Uri? = intent?.data
+        if (intentData != null) {
+            val pathSegments: List<String>? = intentData.pathSegments
+            val lastPathSegment: String? = pathSegments?.lastOrNull()
+
+            if (MySharedPreference.getLastInviteCode() != lastPathSegment) {
+                if (!lastPathSegment.isNullOrBlank() && lastPathSegment.length == 6) {
+                    G.inviteCode = lastPathSegment
+                    intent.replaceExtras(Bundle())
+                    intent.setAction("")
+                    intent.setData(null)
+                    intent.setFlags(0)
+                    Log.d("LOG", "data :$lastPathSegment")
+                }
+            }
+        }
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -147,6 +170,7 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
     val settingViewModel = remember { SettingViewModel(sharedViewModel) }
 
     var count by remember { mutableIntStateOf(3) }
+    val init by sharedViewModel.init.collectAsState()
 
     LaunchedEffect(key1 = G.dupleLogin) {
         if (G.dupleLogin) {
@@ -160,6 +184,16 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
             }
             G.dupleLogin = false
             count = 3
+        }
+    }
+
+    LaunchedEffect(key1 = G.inviteCode){
+        delay(400)
+        if (G.inviteCode?.length == 6 && !init ) {
+            sharedViewModel.updateInviteCode(G.inviteCode)
+            delay(400)
+            navController.navigate(Screen.SetKeyScreen.route)
+            G.inviteCode = null
         }
     }
 
@@ -184,11 +218,11 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
                 }
             )
         ) {
-            val data = it.arguments?.getString("data")
-            if (!data.isNullOrBlank()) {
-                sharedViewModel.updateInviteCode(data)
-                Log.d("LOG", "intro: $data")
-            }
+            //val data = it.arguments?.getString("data")
+            //if (!data.isNullOrBlank()) {
+            //    sharedViewModel.updateInviteCode(data)
+            //    Log.d("LOG", "intro: $data")
+            //}
             IntroScreen(navController = navController, viewModel = sharedViewModel)
         }
         composable("login") {
