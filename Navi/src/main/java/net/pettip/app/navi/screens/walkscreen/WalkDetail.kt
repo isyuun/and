@@ -113,8 +113,10 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     val dailyDetail by walkViewModel.dailyDetail.collectAsState()
     val lastDaily by walkViewModel.lastDaily.collectAsState()
 
+
     val context = LocalContext.current
 
+    var gpxDownload by remember{ mutableStateOf(false) }
     var imageLoading by remember { mutableStateOf(false) }
     var showImage by remember { mutableStateOf(false) }
     var refresh by remember { mutableStateOf(false) }
@@ -148,7 +150,10 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
     LaunchedEffect(key1 = dailyDetail) {
         if (dailyDetail?.totMvmnPathFile != null) {
-            walkViewModel.downloadFile("${dailyDetail?.atchPath}${dailyDetail?.totMvmnPathFile}", context, "${dailyDetail?.schUnqNo}.GPX")
+            val result = walkViewModel.downloadFile("${dailyDetail?.atchPath}${dailyDetail?.totMvmnPathFile}", context, "${dailyDetail?.schUnqNo}.GPX")
+            if (result){
+                gpxDownload = true
+            }
         }
     }
 
@@ -280,7 +285,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
                             // ----------- 맵 들어갈 자리 -------------------\
                             AnimatedVisibility(
-                                visible = dailyDetail != null,
+                                visible = dailyDetail != null && gpxDownload,
                                 enter = fadeIn(),
                                 exit = fadeOut()
                             ) {

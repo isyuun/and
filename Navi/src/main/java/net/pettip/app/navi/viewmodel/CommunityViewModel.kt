@@ -999,7 +999,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun getFaqList(page:Int):Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val data = BbsReq(8, page, 100, 100)
+        val data = BbsReq(8, page, 10, 20)
 
         val call = apiService.getFaqList(data)
         return suspendCancellableCoroutine { continuation ->
@@ -1028,7 +1028,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun getQnaList(page:Int):Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val data = BbsReq(10, page, 100, 100)
+        val data = BbsReq(10, page, 10, 20)
 
         val call = apiService.getQnaList(data)
         return suspendCancellableCoroutine { continuation ->

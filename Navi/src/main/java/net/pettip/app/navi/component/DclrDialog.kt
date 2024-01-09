@@ -94,6 +94,8 @@ fun DclrDialog(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    var isLoading by remember{ mutableStateOf(false) }
+
     LaunchedEffect(Unit){
         viewModel.getDclrList()
     }
@@ -253,6 +255,10 @@ fun DclrDialog(
                                     Toast
                                         .makeText(context, "신고사유를 선택해주세요", Toast.LENGTH_SHORT)
                                         .show()
+                                } else if (dclrCn.isNullOrBlank()){
+                                    Toast
+                                        .makeText(context, "신고내용을 입력해주세요", Toast.LENGTH_SHORT)
+                                        .show()
                                 } else {
                                     scope.launch {
                                         val result = viewModel.dclrCreate()
@@ -262,7 +268,6 @@ fun DclrDialog(
                                                 .makeText(context, "신고처리 되었습니다", Toast.LENGTH_SHORT)
                                                 .show()
                                         }else{
-                                            Log.d("LOG","4")
                                             Toast
                                                 .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
                                                 .show()

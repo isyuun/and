@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import net.pettip.app.navi.screens.mainscreen.getFormattedTodayDate
 import net.pettip.data.daily.DailyCreateReq
 import net.pettip.data.daily.DailyCreateRes
@@ -421,13 +422,13 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         }
     }
 
-    fun downloadFile(fileUrl: String, context: Context, fileName:String) {
-        val url = URL(fileUrl)
-        val fileDir = context.filesDir
-        val file = File(fileDir, fileName)
-        val connection = url.openConnection() as HttpURLConnection
+    suspend fun downloadFile(fileUrl: String, context: Context, fileName: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            val url = URL(fileUrl)
+            val fileDir = context.filesDir
+            val file = File(fileDir, fileName)
+            val connection = url.openConnection() as HttpURLConnection
 
-        GlobalScope.launch(Dispatchers.IO) {
             try {
                 connection.connect()
 
@@ -450,11 +451,16 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
                     inputStream.close()
                     outputStream.close()
                 }
+
+                // 파일 다운로드 성공 시 true 반환
+                true
+            } catch (e: Exception) {
+                // 파일 다운로드 실패 시 false 반환
+                false
             } finally {
                 connection.disconnect()
             }
         }
-        Log.d("LOG", file.absolutePath)
     }
 
 
