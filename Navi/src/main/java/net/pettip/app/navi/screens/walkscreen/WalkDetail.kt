@@ -1,10 +1,8 @@
-
 package net.pettip.app.navi.screens.walkscreen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -43,11 +41,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -83,40 +78,30 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
 import net.pettip.app.navi.component.ErrorScreen
-import net.pettip.app.navi.component.LoadingAnimation1
-import net.pettip.app.navi.screens.mainscreen.calculateCurrentOffsetForPage
-import net.pettip.app.navi.ui.theme.design_DDDDDD
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_bg
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_skip
-import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.DailyDetailData
 import net.pettip.data.daily.DailyLifePet
-import net.pettip.gps.app.GPSApplication
-import net.pettip.singleton.MySharedPreference
+import net.pettip.map.app.naver.GpxApp
 import net.pettip.util.Log
-import kotlin.math.absoluteValue
+import java.io.File
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostController){
+fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostController) {
 
-    DisposableEffect(Unit){
+    DisposableEffect(Unit) {
         onDispose {
             walkViewModel.updateDailyDetail(null)
         }
@@ -128,12 +113,12 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
     val context = LocalContext.current
 
-    var imageLoading by remember{ mutableStateOf(false) }
-    var showImage by remember{ mutableStateOf(false) }
-    var refresh by remember{ mutableStateOf(false) }
-    var curruntImage by remember{ mutableIntStateOf(0) }
+    var imageLoading by remember { mutableStateOf(false) }
+    var showImage by remember { mutableStateOf(false) }
+    var refresh by remember { mutableStateOf(false) }
+    var curruntImage by remember { mutableIntStateOf(0) }
 
-    val pagerState = rememberPagerState( pageCount = {dailyDetail?.dailyLifeFileList?.size ?: 0 })
+    val pagerState = rememberPagerState(pageCount = { dailyDetail?.dailyLifeFileList?.size ?: 0 })
 
     val annotatedString = buildAnnotatedString {
         val hashTagList = dailyDetail?.dailyLifeSchHashTagList ?: emptyList()
@@ -141,35 +126,36 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
         append("\n\n")
 
         hashTagList.forEach {
-            withStyle(style = SpanStyle(
-                color = design_intro_bg, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular))
-            )
-            ){
+            withStyle(
+                style = SpanStyle(
+                    color = design_intro_bg, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular))
+                )
+            ) {
                 append("#${it.hashTagNm} ")
             }
         }
     }
 
     BackHandler {
-        if (showImage){
+        if (showImage) {
             showImage = false
-        }else{
+        } else {
             navController.popBackStack()
         }
     }
 
-    LaunchedEffect(key1 = dailyDetail){
-        if (dailyDetail?.totMvmnPathFile != null){
+    LaunchedEffect(key1 = dailyDetail) {
+        if (dailyDetail?.totMvmnPathFile != null) {
             walkViewModel.downloadFile("${dailyDetail?.atchPath}${dailyDetail?.totMvmnPathFile}", context, "${dailyDetail?.schUnqNo}.GPX")
         }
     }
 
-    LaunchedEffect(refresh){
-        if (refresh){
+    LaunchedEffect(refresh) {
+        if (refresh) {
             val result = lastDaily?.let { walkViewModel.getDailyDetail(it) }
-            refresh = if (result == true){
+            refresh = if (result == true) {
                 false
-            }else{
+            } else {
                 false
             }
         }
@@ -177,33 +163,34 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
 
     Scaffold(
-        topBar = {BackTopBar(title = dailyDetail?.schTtl ?:"" , navController = navController )}
+        topBar = { BackTopBar(title = dailyDetail?.schTtl ?: "", navController = navController) }
     ) { paddingValue ->
 
         Crossfade(
             targetState = !isLoading && dailyDetail == null,
             label = ""
         ) {
-            when(it){
+            when (it) {
                 true -> ErrorScreen(onClick = { refresh = true })
                 false ->
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.primary)
-                    ){
-                        Column (
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.primary)
+                    ) {
+                        Column(
                             modifier = Modifier
                                 .verticalScroll(rememberScrollState())
                                 .padding(paddingValues = paddingValue)
                                 .fillMaxSize()
                                 .background(color = MaterialTheme.colorScheme.primary)
-                        ){
-                            Row (
-                                modifier= Modifier
+                        ) {
+                            Row(
+                                modifier = Modifier
                                     .padding(start = 20.dp, top = 20.dp)
                                     .fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
-                            ){
+                            ) {
                                 Icon(painter = painterResource(id = R.drawable.icon_calendar), contentDescription = "", tint = Color.Unspecified)
                                 Text(
                                     text = dailyDetail?.walkDptreDt ?: "",
@@ -290,20 +277,21 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             //}
 
                             // ----------- 맵 들어갈 자리 -------------------
-
+                            Log.wtf("WalkDetail", "[${dailyDetail}][${dailyDetail?.schUnqNo}]")
+                            GpxApp(File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX"))
                             // ----------- 맵 들어갈 자리 -------------------
 
                             Spacer(modifier = Modifier.padding(top = 20.dp))
 
-                            Row (modifier = Modifier
-                                .padding(start = 20.dp, end = 20.dp)
-                                .fillMaxWidth()
-                                , horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
-                            ){
-                                Column (
-                                    modifier= Modifier
+                            Row(
+                                modifier = Modifier
+                                    .padding(start = 20.dp, end = 20.dp)
+                                    .fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(
+                                    modifier = Modifier
                                         .weight(1f)
-                                ){
+                                ) {
                                     Text(
                                         text = "산책자",
                                         fontSize = 14.sp,
@@ -323,14 +311,16 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                     )
                                 }
 
-                                Spacer(modifier = Modifier
-                                    .size(1.dp, 40.dp)
-                                    .background(color = MaterialTheme.colorScheme.onSecondaryContainer))
+                                Spacer(
+                                    modifier = Modifier
+                                        .size(1.dp, 40.dp)
+                                        .background(color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                )
 
-                                Column (
-                                    modifier= Modifier
+                                Column(
+                                    modifier = Modifier
                                         .weight(1f)
-                                ){
+                                ) {
 
                                     Text(
                                         text = "산책 시간",
@@ -353,14 +343,16 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
                                 }
 
-                                Spacer(modifier = Modifier
-                                    .size(1.dp, 40.dp)
-                                    .background(color = MaterialTheme.colorScheme.onSecondaryContainer))
+                                Spacer(
+                                    modifier = Modifier
+                                        .size(1.dp, 40.dp)
+                                        .background(color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                )
 
-                                Column (
-                                    modifier= Modifier
+                                Column(
+                                    modifier = Modifier
                                         .weight(1f)
-                                ){
+                                ) {
 
                                     Text(
                                         text = "산책 거리",
@@ -397,8 +389,8 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                         .heightIn(max = 500.dp),
                                     state = rememberLazyListState(),
                                     verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ){
-                                    items(dailyDetail?.dailyLifePetList ?: emptyList()){ item ->
+                                ) {
+                                    items(dailyDetail?.dailyLifePetList ?: emptyList()) { item ->
                                         DetailLazyColItem(item)
                                     }
                                 }
@@ -409,14 +401,14 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             Spacer(modifier = Modifier.padding(top = 20.dp))
 
 
-                            Box (
+                            Box(
                                 modifier = Modifier
                                     .padding(horizontal = 20.dp)
                                     .fillMaxWidth()
                                     .background(color = MaterialTheme.colorScheme.onPrimaryContainer, shape = RoundedCornerShape(12.dp))
                                     .clip(RoundedCornerShape(12.dp))
-                            ){
-                                if ( !(dailyDetail?.schCn == " " || dailyDetail?.schCn =="") ){
+                            ) {
+                                if (!(dailyDetail?.schCn == " " || dailyDetail?.schCn == "")) {
                                     Text(
                                         modifier = Modifier
                                             .padding(16.dp)
@@ -430,7 +422,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                     )
                                 }
 
-                                if (dailyDetail?.dailyLifeSchHashTagList?.isNotEmpty() == true){
+                                if (dailyDetail?.dailyLifeSchHashTagList?.isNotEmpty() == true) {
                                     Text(
                                         modifier = Modifier
                                             .padding(16.dp)
@@ -454,8 +446,8 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                     .fillMaxWidth(),
                                 contentPadding = PaddingValues(horizontal = 10.dp),
                                 horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ){
-                                itemsIndexed(dailyDetail?.dailyLifeFileList?: emptyList()){ index, item ->
+                            ) {
+                                itemsIndexed(dailyDetail?.dailyLifeFileList ?: emptyList()) { index, item ->
                                     Box(
                                         modifier = Modifier
                                             .size(100.dp)
@@ -464,11 +456,11 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                                 curruntImage = index
                                                 showImage = true
                                             }
-                                    ){
+                                    ) {
                                         AsyncImage(
                                             model = ImageRequest.Builder(LocalContext.current)
                                                 .data(
-                                                    "http://carepet.hopto.org/img/"+
+                                                    "http://carepet.hopto.org/img/" +
                                                             item.filePathNm +
                                                             item.atchFileNm
                                                 )
@@ -476,8 +468,8 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                                 .build(),
                                             contentDescription = "",
                                             placeholder = null,
-                                            error= null,
-                                            modifier= Modifier.fillMaxSize(),
+                                            error = null,
+                                            modifier = Modifier.fillMaxSize(),
                                             contentScale = ContentScale.Crop,
                                             filterQuality = FilterQuality.Low
                                         )
@@ -493,23 +485,23 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     }
 
     AnimatedVisibility(
-        visible =  showImage,
+        visible = showImage,
         enter = scaleIn(transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.9f)).plus(fadeIn()),
         exit = scaleOut(transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.9f)).plus(fadeOut())
     ) {
         FullScreenImage(
             dailyDetail = dailyDetail!!,
             page = curruntImage,
-            onDismiss = {newValue -> showImage = newValue})
+            onDismiss = { newValue -> showImage = newValue })
     }
 
 }
 
 
 @Composable
-fun DetailLazyColItem(dailyDetail: DailyLifePet){
+fun DetailLazyColItem(dailyDetail: DailyLifePet) {
 
-    Box (
+    Box(
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .fillMaxWidth()
@@ -519,11 +511,11 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 shape = RoundedCornerShape(12.dp)
             )
-    ){
-        Row (
+    ) {
+        Row(
             modifier = Modifier.align(Alignment.CenterStart),
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             Spacer(modifier = Modifier.padding(start = 22.dp))
 
             CircleImageTopBar(size = 50, imageUri = dailyDetail.petImg)
@@ -538,15 +530,15 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
             )
         }
 
-        Column (
+        Column(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(end = 20.dp, top = 16.dp, bottom = 16.dp),
-        ){
-            Row (
+        ) {
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
+            ) {
                 Icon(painter = painterResource(id = R.drawable.icon_poop), contentDescription = "", tint = Color.Unspecified)
 
                 Text(
@@ -558,12 +550,12 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                     modifier = Modifier.padding(start = 4.dp, end = 8.dp)
                 )
 
-                Box (
+                Box(
                     modifier = Modifier.width(60.dp),
                     contentAlignment = Alignment.CenterEnd
-                ){
+                ) {
                     Text(
-                        text = dailyDetail.bwlMvmNmtm.toString()+"회",
+                        text = dailyDetail.bwlMvmNmtm.toString() + "회",
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -572,10 +564,10 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                 }
             }
             Spacer(modifier = Modifier.padding(top = 8.dp))
-            Row (
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
+            ) {
                 Icon(painter = painterResource(id = R.drawable.icon_pee), contentDescription = "", tint = Color.Unspecified)
 
                 Text(
@@ -587,12 +579,12 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                     modifier = Modifier.padding(start = 4.dp, end = 8.dp)
                 )
 
-                Box (
+                Box(
                     modifier = Modifier.width(60.dp),
                     contentAlignment = Alignment.CenterEnd
-                ){
+                ) {
                     Text(
-                        text = dailyDetail.urineNmtm.toString()+"회",
+                        text = dailyDetail.urineNmtm.toString() + "회",
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -601,10 +593,10 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                 }
             }
             Spacer(modifier = Modifier.padding(top = 8.dp))
-            Row (
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
+            ) {
                 Icon(painter = painterResource(id = R.drawable.icon_marking), contentDescription = "", tint = Color.Unspecified)
 
                 Text(
@@ -616,12 +608,12 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
                     modifier = Modifier.padding(start = 4.dp, end = 8.dp)
                 )
 
-                Box (
+                Box(
                     modifier = Modifier.width(60.dp),
                     contentAlignment = Alignment.CenterEnd
-                ){
+                ) {
                     Text(
-                        text = dailyDetail.relmIndctNmtm.toString()+"회",
+                        text = dailyDetail.relmIndctNmtm.toString() + "회",
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                         fontSize = 14.sp,
                         letterSpacing = (-0.7).sp,
@@ -634,7 +626,7 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet){
 }
 
 @Composable
-fun LoadingComposable(){
+fun LoadingComposable() {
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -655,14 +647,15 @@ fun LoadingComposable(){
             .background(design_login_bg.copy(alpha))
     )
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullScreenImage(
     dailyDetail: DailyDetailData,
-    page : Int,
+    page: Int,
     onDismiss: (Boolean) -> Unit
-){
-    var systemBarColor by remember{ mutableStateOf(Color.Black) }
+) {
+    var systemBarColor by remember { mutableStateOf(Color.Black) }
     val color = MaterialTheme.colorScheme.primary
 
     val systemUiController = rememberSystemUiController()
@@ -698,21 +691,20 @@ fun FullScreenImage(
                     systemBarColor = color
                     onDismiss(false)
                 }
-            )
-        ,
+            ),
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
-                    "http://carepet.hopto.org/img/"+
+                    "http://carepet.hopto.org/img/" +
                             (dailyDetail.dailyLifeFileList?.get(page)?.filePathNm ?: "") +
                             (dailyDetail.dailyLifeFileList?.get(page)?.atchFileNm ?: "")
                 )
                 .crossfade(true)
                 .build(),
             contentDescription = "",
-            modifier= Modifier
+            modifier = Modifier
                 .graphicsLayer(
                     scaleX = scale,
                     scaleY = scale,
@@ -736,7 +728,7 @@ fun FullScreenImage(
                 }
                 .align(Alignment.BottomCenter),
             contentAlignment = Alignment.Center
-        ){
+        ) {
             Text(
                 text = "사진 회전",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),

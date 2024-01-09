@@ -35,6 +35,7 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
 
     @Throws(XmlPullParserException::class, IOException::class)
     fun read(file: File) {
+        //if (!file.exists()) return
         val `in` = file.inputStream()
         `in`.use {
             val parser = Xml.newPullParser()

@@ -10,6 +10,7 @@
 package net.pettip.gps._app
 
 import android.location.Location
+import java.io.File
 
 /**
  * Returns the `location` object as a human readable string.
@@ -20,4 +21,8 @@ fun Location?.toText(): String {
     } else {
         "Unknown location"
     }
+}
+
+fun recent(): File? {
+    return null
 }
