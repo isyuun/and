@@ -91,42 +91,17 @@ fun GpxApp() {
 
 @Composable
 fun GpxApp(file: File?) {
-    val context = LocalContext.current
-    val tracks = Collections.synchronizedList(ArrayList<Track>())
-
-    file?.let { GPXParser(tracks).read(it) }
-
-    val isSystemInDarkTheme = isSystemInDarkTheme()
-    val mapOptions = remember {
-        NaverMapOptions()
-            .logoClickEnabled(true)
-            .mapType(NaverMap.MapType.Navi)
-            .nightModeEnabled(isSystemInDarkTheme)
-            .zoomControlEnabled(false)
-    }
-    val mapView = rememberMapViewWithLifecycle(context, mapOptions)
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        AndroidView(
-            factory = {
-                mapView.apply {
-                    getMapAsync { naverMap ->
-                        naverMapView(context = context, naverMap = naverMap, tracks = tracks, padding = 104.0.dp)
-                        //naverMap.takeSnapshot(false) {
-                        //    application.preview = it
-                        //}
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
-    }
+    GpxMap(file, Modifier.fillMaxSize())
 }
 
 @Composable
-fun GpxMap(file: File?) {
+fun GpxMap(
+    file: File?,
+    modifier: Modifier = Modifier
+        .padding(horizontal = 20.dp)
+        .fillMaxWidth()
+        .height(360.dp)
+) {
     val context = LocalContext.current
     val tracks = Collections.synchronizedList(ArrayList<Track>())
 
@@ -142,11 +117,7 @@ fun GpxMap(file: File?) {
     }
     val mapView = rememberMapViewWithLifecycle(context, mapOptions)
     Box(
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .fillMaxWidth()
-            .height(360.dp)
-        //.background(color = design_icon_bg)
+        modifier = modifier
     ) {
         AndroidView(
             factory = {
