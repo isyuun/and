@@ -276,9 +276,14 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             //    }
                             //}
 
-                            // ----------- 맵 들어갈 자리 -------------------
-                            Log.wtf("WalkDetail", "[${dailyDetail}][${dailyDetail?.schUnqNo}]")
-                            GpxApp(File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX"))
+                            // ----------- 맵 들어갈 자리 -------------------\
+                            AnimatedVisibility(
+                                visible = dailyDetail != null,
+                                enter = fadeIn(),
+                                exit = fadeOut()
+                            ) {
+                                GpxApp(File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX"))
+                            }
                             // ----------- 맵 들어갈 자리 -------------------
 
                             Spacer(modifier = Modifier.padding(top = 20.dp))
@@ -467,7 +472,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                                 .crossfade(true)
                                                 .build(),
                                             contentDescription = "",
-                                            placeholder = null,
+                                            placeholder = painterResource(id = R.drawable.img_blank),
                                             error = null,
                                             modifier = Modifier.fillMaxSize(),
                                             contentScale = ContentScale.Crop,
