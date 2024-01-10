@@ -21,6 +21,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import net.pettip.app.gpxs
 import net.pettip.data.pet.CurrentPetData
+import net.pettip.gpx.GPX_RELOAD_MINUTES
 import net.pettip.gpx.GPX_TICK_FORMAT
 import net.pettip.gpx.TRACK_ZERO_NUM
 import net.pettip.gpx.Track
@@ -96,8 +97,8 @@ open class gpsapplication3 : gpsapplication2(), SharedPreferences.OnSharedPrefer
     fun recent(): File? {
         if (service != null) return service?.recent()
         val file = sharedPreferences.getString(KEY_FOREGROUND_GPXFILE, "")?.let { File(it) }
-        Log.v(__CLASSNAME__, "${getMethodName()}[${GPX_TICK_FORMAT.format(file?.lastModified())}][${file}]")
-        return (if (file != null && file.exists()) file else null)
+        Log.v(__CLASSNAME__, "${getMethodName()}[${file?.exists()}][${file?.minutes()}][${file}]")
+        return (if (file != null && file.exists() && file.minutes() <= GPX_RELOAD_MINUTES) file else null)
     }
 
     fun reset() {

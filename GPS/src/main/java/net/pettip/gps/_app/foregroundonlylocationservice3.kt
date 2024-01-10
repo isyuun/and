@@ -18,8 +18,8 @@ import net.pettip.app.gpxs
 import net.pettip.gps.R
 import net.pettip.gpx.GPXWriter
 import net.pettip.gpx.GPX_DATE_FORMAT
-import net.pettip.gpx.GPX_INTERVAL_UPDATE_METERS
 import net.pettip.gpx.GPX_TICK_FORMAT
+import net.pettip.gpx.GPX_UPDATE_METERS
 import net.pettip.gpx.Track
 import net.pettip.gpx._distance
 import net.pettip.gpx._duration
@@ -60,7 +60,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         val trk2 = locationResult.lastLocation?.let { Track(it) }
         val dist = distance(trk1, trk2)
         val size = _tracks.size
-        val max = GPX_INTERVAL_UPDATE_METERS
+        val max = GPX_UPDATE_METERS
         val exit = (size > 0 && dist < max)
         Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[exit:$exit][$size][${max}m][${dist}m][${trk1?.toText()}, ${trk2?.toText()}], $trk1, $trk2")
         return exit

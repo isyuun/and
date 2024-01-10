@@ -11,6 +11,10 @@ package net.pettip.gps._app
 
 import android.location.Location
 import java.io.File
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 /**
  * Returns the `location` object as a human readable string.
@@ -23,6 +27,10 @@ fun Location?.toText(): String {
     }
 }
 
-fun recent(): File? {
-    return null
+fun File?.minutes(): Long {
+    val lastModifiedMillis = this?.lastModified()
+    val lastModifiedInstant = lastModifiedMillis?.let { Instant.ofEpochMilli(it) }
+    val lastModifiedDateTime = LocalDateTime.ofInstant(lastModifiedInstant, ZoneId.systemDefault())
+    val currentDateTime = LocalDateTime.now()
+    return ChronoUnit.MINUTES.between(lastModifiedDateTime, currentDateTime)
 }

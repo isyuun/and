@@ -116,7 +116,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
     val context = LocalContext.current
 
-    var gpxDownload by remember{ mutableStateOf(false) }
+    var gpxDownload by remember { mutableStateOf(false) }
     var imageLoading by remember { mutableStateOf(false) }
     var showImage by remember { mutableStateOf(false) }
     var refresh by remember { mutableStateOf(false) }
@@ -151,7 +151,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     LaunchedEffect(key1 = dailyDetail) {
         if (dailyDetail?.totMvmnPathFile != null) {
             val result = walkViewModel.downloadFile("${dailyDetail?.atchPath}${dailyDetail?.totMvmnPathFile}", context, "${dailyDetail?.schUnqNo}.GPX")
-            if (result){
+            if (result) {
                 gpxDownload = true
             }
         }
@@ -284,14 +284,14 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             //}
 
                             // ----------- 맵 들어갈 자리 -------------------
-                            AnimatedVisibility(
-                                visible = dailyDetail != null && gpxDownload,
-                                enter = fadeIn(),
-                                exit = fadeOut()
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(360.dp)
                             ) {
                                 val file = File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX")
                                 Log.wtf(__CLASSNAME__, "::GpxMap()${getMethodName()}[${file.exists()}][${file.length()}][${file}]")
-                                GpxMap(file)
+                                if (dailyDetail != null && gpxDownload && file.exists() && file.length() > 0) GpxMap(file)
                             }
                             // ----------- 맵 들어갈 자리 -------------------
 
