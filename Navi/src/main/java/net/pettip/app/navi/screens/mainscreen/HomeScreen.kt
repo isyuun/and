@@ -200,8 +200,8 @@ fun HomeScreen(
     LaunchedEffect(key1 = pagerState.currentPage, key2 = currentPetInfo){
         delay(100)
         if (currentPetInfo.isNotEmpty()){
-            viewModel.getWeekRecord(currentPetInfo[pagerState.currentPage].ownrPetUnqNo, getFormattedTodayDate())
             viewModel.updateSeletedPet(currentPetInfo[pagerState.currentPage])
+            viewModel.getWeekRecord(currentPetInfo[pagerState.currentPage].ownrPetUnqNo, getFormattedTodayDate())
 
             sharedViewModel.updateSelectPetTemp(currentPetInfo[pagerState.currentPage])
         }

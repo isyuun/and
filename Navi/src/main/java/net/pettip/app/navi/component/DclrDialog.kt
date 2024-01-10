@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -120,7 +121,8 @@ fun DclrDialog(
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(20.dp))
+                shape = RoundedCornerShape(20.dp)
+            )
         ){
             Column (
                 modifier = Modifier.fillMaxWidth()
@@ -250,24 +252,29 @@ fun DclrDialog(
                         modifier = Modifier
                             .weight(1f)
                             .background(design_sharp)
-                            .clickable {
+                            .clickable(
+                                enabled = !isLoading
+                            ) {
                                 if (selectDclr == null) {
                                     Toast
                                         .makeText(context, "신고사유를 선택해주세요", Toast.LENGTH_SHORT)
                                         .show()
-                                } else if (dclrCn.isNullOrBlank()){
+                                } else if (dclrCn.isNullOrBlank()) {
                                     Toast
                                         .makeText(context, "신고내용을 입력해주세요", Toast.LENGTH_SHORT)
                                         .show()
                                 } else {
                                     scope.launch {
+                                        isLoading = true
                                         val result = viewModel.dclrCreate()
                                         if (result) {
                                             onDismiss(false)
+                                            isLoading = false
                                             Toast
                                                 .makeText(context, "신고처리 되었습니다", Toast.LENGTH_SHORT)
                                                 .show()
-                                        }else{
+                                        } else {
+                                            isLoading = false
                                             Toast
                                                 .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
                                                 .show()

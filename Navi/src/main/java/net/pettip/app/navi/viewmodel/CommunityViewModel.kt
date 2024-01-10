@@ -139,6 +139,18 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _storyPage.value = newValue
     }
 
+    private val _eventPage = MutableStateFlow<Int>(1)
+    val eventPage:StateFlow<Int> = _eventPage.asStateFlow()
+    fun updateEventPage(newValue: Int){
+        _eventPage.value = newValue
+    }
+
+    private val _eventEndPage = MutableStateFlow<Int>(1)
+    val eventEndPage:StateFlow<Int> = _eventEndPage.asStateFlow()
+    fun updateEventEndPage(newValue: Int){
+        _eventEndPage.value = newValue
+    }
+
     private val _storyDetail = MutableStateFlow<DailyDetailRes?>(null)
     val storyDetail:StateFlow<DailyDetailRes?> = _storyDetail.asStateFlow()
     fun updateStoryDetail(newValue: DailyDetailRes?){

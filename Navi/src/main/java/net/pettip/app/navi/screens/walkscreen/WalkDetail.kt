@@ -283,7 +283,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             //    }
                             //}
 
-                            // ----------- 맵 들어갈 자리 -------------------\
+                            // ----------- 맵 들어갈 자리 -------------------
                             AnimatedVisibility(
                                 visible = dailyDetail != null && gpxDownload,
                                 enter = fadeIn(),

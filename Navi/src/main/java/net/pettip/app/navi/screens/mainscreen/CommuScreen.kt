@@ -428,6 +428,10 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
 
     val eventList by viewModel.eventList.collectAsState()
 
+    val lazyListState = rememberLazyListState()
+    val currentTab by viewModel.currentTab.collectAsState()
+    val page by viewModel.eventPage.collectAsState()
+
     val refreshing by viewModel.eventRefresh.collectAsState()
     var isLoading by remember{ mutableStateOf(false) }
     var isError by rememberSaveable { mutableStateOf( false) }
@@ -452,6 +456,24 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
         }
     }
 
+    LaunchedEffect(key1 = lazyListState.canScrollForward){
+        if (!lazyListState.canScrollForward && !refreshing && currentTab=="이벤트"){
+            if (eventList?.data?.paginate?.existNextPage == true){
+                if (!isLoading){
+                    isLoading = true
+
+                    val result = viewModel.getEventList(page + 1)
+                    isLoading = if (result){
+                        viewModel.updateEventPage(page + 1)
+                        false
+                    }else{
+                        viewModel.updateEventPage(page - 1)
+                        false
+                    }
+                }
+            }
+        }
+    }
 
     Box (
         Modifier
@@ -469,7 +491,7 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
             ErrorScreen(onClick = { viewModel.updateEventRefresh(true) })
         }else{
             LazyColumn(
-                state = rememberLazyListState(),
+                state = lazyListState,
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .pullRefresh(pullRefreshState)
@@ -497,6 +519,10 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
 
     val eventList by viewModel.endEventList.collectAsState()
 
+    val lazyListState = rememberLazyListState()
+    val currentTab by viewModel.currentTab.collectAsState()
+    val page by viewModel.eventEndPage.collectAsState()
+
     val refreshing by viewModel.endEventRefresh.collectAsState()
     var isLoading by remember{ mutableStateOf(false) }
     var isError by rememberSaveable { mutableStateOf( false) }
@@ -521,6 +547,25 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
         }
     }
 
+    LaunchedEffect(key1 = lazyListState.canScrollForward){
+        if (!lazyListState.canScrollForward && !refreshing && currentTab=="당첨자 발표"){
+            if (eventList?.data?.paginate?.existNextPage == true){
+                if (!isLoading){
+                    isLoading = true
+
+                    val result = viewModel.getEndEventList(page + 1)
+                    isLoading = if (result){
+                        viewModel.updateEventEndPage(page + 1)
+                        false
+                    }else{
+                        viewModel.updateEventEndPage(page - 1)
+                        false
+                    }
+                }
+            }
+        }
+    }
+
     Box (
         Modifier
             .fillMaxSize()
@@ -537,7 +582,7 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
             ErrorScreen(onClick = { viewModel.updateEndEventRefresh(true) })
         }else{
             LazyColumn(
-                state = rememberLazyListState(),
+                state = lazyListState,
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .pullRefresh(pullRefreshState)
