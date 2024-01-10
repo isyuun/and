@@ -98,6 +98,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         _start = System.currentTimeMillis()
         Log.wtf(__CLASSNAME__, "${getMethodName()}[$start][${lastLocation.toText()}][$lastLocation]")
         super.start()
+        this.write()
     }
 
     override fun stop() {

@@ -54,7 +54,6 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
         super.start()
         //sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${recent()}")
-        write()
     }
 
     override fun stop() {
@@ -62,7 +61,6 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
         super.stop()
         sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${recent()}]")
-        write()
     }
 
     internal fun reset() {
