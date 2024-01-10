@@ -5,6 +5,7 @@ package net.pettip.app.navi.screens.walkscreen
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -171,9 +172,9 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
 
     if (showDiagLog) {
         CustomDialogInPost(
-            onDismiss = { showDiagLog = false},
+            onDismiss = { showDiagLog = false },
             navController = navController,
-            title =  "글 작성을 그만하시겠습니까?",
+            title = "글 작성을 그만하시겠습니까?",
             text = "작성중인 글은 삭제됩니다",
             dismiss = "나가기", confirm = "더 작성할래요"
         )
@@ -258,11 +259,15 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
         )
 
 
+        var isTouch by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .verticalScroll(scrollState)
+                .verticalScroll(
+                    scrollState,
+                    enabled = !isTouch,
+                )
                 .background(color = MaterialTheme.colorScheme.primary)
         ) {
             Row(
@@ -301,7 +306,17 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
 
             var scale by remember { mutableStateOf(1f) }
 
-            application.file?.let { GpxMap(it) }
+            application.file?.let {
+                GpxMap(it) { _, event ->
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> isTouch = true
+                        MotionEvent.ACTION_UP -> isTouch = false
+                        else -> isTouch = true
+                    }
+                    //Log.v(__CLASSNAME__, "pointerInteropFilter()${getMethodName()}[isTouch:$isTouch][MotionEvent:$event]")
+                    false
+                }
+            }
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
@@ -1147,6 +1162,7 @@ class HashTagTransformationForDark() : VisualTransformation {
         )
     }
 }
+
 fun buildAnnotatedStringWithColorsForDark(text: String): AnnotatedString {
 
     val pattern = "#\\S+".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들

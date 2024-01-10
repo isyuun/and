@@ -1,5 +1,6 @@
 package net.pettip.app.navi.screens.walkscreen
 
+import android.view.MotionEvent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -61,6 +62,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -99,7 +101,7 @@ import java.io.File
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostController) {
 
@@ -177,6 +179,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
             targetState = !isLoading && dailyDetail == null,
             label = ""
         ) {
+            var isTouch by remember { mutableStateOf(false) }
             when (it) {
                 true -> ErrorScreen(onClick = { refresh = true })
                 false ->
@@ -187,7 +190,10 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                     ) {
                         Column(
                             modifier = Modifier
-                                .verticalScroll(rememberScrollState())
+                                .verticalScroll(
+                                    rememberScrollState(),
+                                    enabled = !isTouch,
+                                )
                                 .padding(paddingValues = paddingValue)
                                 .fillMaxSize()
                                 .background(color = MaterialTheme.colorScheme.primary)
@@ -208,6 +214,22 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                     modifier = Modifier.padding(start = 4.dp)
                                 )
                             }
+
+                            // ----------- 맵 들어갈 자리 -------------------
+                            Box {
+                                val file = File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX")
+                                Log.wtf(__CLASSNAME__, "::GpxMap()${getMethodName()}[${file.exists()}][${file.length()}][${file}]")
+                                if (dailyDetail != null && gpxDownload && file.exists() && file.length() > 0) GpxMap(file) { _, event ->
+                                    when (event.action) {
+                                        MotionEvent.ACTION_DOWN -> isTouch = true
+                                        MotionEvent.ACTION_UP -> isTouch = false
+                                        else -> isTouch = true
+                                    }
+                                    //Log.v(__CLASSNAME__, "pointerInteropFilter()${getMethodName()}[isTouch:$isTouch][MotionEvent:$event]")
+                                    false
+                                }
+                            }
+                            // ----------- 맵 들어갈 자리 -------------------
 
                             //Column {
                             //    Spacer(modifier = Modifier.padding(top= 20.dp))
@@ -282,18 +304,6 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             //        }
                             //    }
                             //}
-
-                            // ----------- 맵 들어갈 자리 -------------------
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(360.dp)
-                            ) {
-                                val file = File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX")
-                                Log.wtf(__CLASSNAME__, "::GpxMap()${getMethodName()}[${file.exists()}][${file.length()}][${file}]")
-                                if (dailyDetail != null && gpxDownload && file.exists() && file.length() > 0) GpxMap(file)
-                            }
-                            // ----------- 맵 들어갈 자리 -------------------
 
                             Spacer(modifier = Modifier.padding(top = 20.dp))
 

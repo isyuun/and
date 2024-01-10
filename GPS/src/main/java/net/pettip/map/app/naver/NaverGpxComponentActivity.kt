@@ -11,10 +11,13 @@
 
 package net.pettip.map.app.naver
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.view.MotionEvent
+import android.view.View
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -91,16 +94,18 @@ fun GpxApp() {
 
 @Composable
 fun GpxApp(file: File?) {
-    GpxMap(file, Modifier.fillMaxSize())
+    GpxMap(file, Modifier.fillMaxSize()) { _, _ -> false }
 }
 
+@SuppressLint("ClickableViewAccessibility")
 @Composable
 fun GpxMap(
     file: File?,
     modifier: Modifier = Modifier
         .padding(horizontal = 20.dp)
         .fillMaxWidth()
-        .height(360.dp)
+        .height(360.dp),
+    onTouch: (View, MotionEvent) -> Boolean
 ) {
     val context = LocalContext.current
     val tracks = Collections.synchronizedList(ArrayList<Track>())
@@ -127,6 +132,10 @@ fun GpxMap(
                         //naverMap.takeSnapshot(false) {
                         //    application.preview = it
                         //}
+
+                    }
+                    setOnTouchListener { view, event ->
+                        onTouch(view, event)
                     }
                 }
             },
