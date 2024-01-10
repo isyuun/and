@@ -99,45 +99,47 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         //Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[length:${file?.length()}][file:$file][uri:$uri]")
         if (success) {
-            Log.w(__CLASSNAME__, "${getMethodName()}::onCamera()[length:${file?.length()}][file:$file][uri:$uri]")
-            file?.length()?.let { size -> if (size > 0) this.file?.let { file -> this.uri?.let { uri -> onCamera(file, uri) } } }
+            file?.length()?.let { length -> if (length > 0) this.file?.let { file -> this.uri?.let { uri -> onCamera(file, uri) } } }
         }
     }
 
     override fun onStop() {
-        if (!camera) register()
         Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][file:$file][uri:$uri]")
+        /*if (camera) unregister() else */register()
         super.onStop()
     }
 
     override fun onStart() {
+        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][file:$file][uri:$uri]")
         unregister()
         camera = false
-        Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][file:$file][uri:$uri]")
         super.onStart()
     }
 
     private var observer: CameraContentObserver? = null
     private fun register() {
-        Log.i(__CLASSNAME__, "${getMethodName()}$observer")
+        if (!application.start) return
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][$observer]")
         observer = CameraContentObserver(contentResolver, this)
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][$observer]")
     }
 
     private fun unregister() {
+        if (!application.start) return
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][$observer]")
+        observer?.let { contentResolver.unregisterContentObserver(it) }
         observer?.unregister()
         observer = null
+        Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][$observer]")
     }
 
     override fun onCamera(file: File, uri: Uri) {
-        val exist = (this.file != null && this.file != file)
-        Log.i(__CLASSNAME__, "${getMethodName()}[exist:$exist][length:${file.length()}][file:$file][uri:$uri]")
+        if (!application.start) return
+        val exist = file.exists()
+        Log.i(__CLASSNAME__, "${getMethodName()}[ON][camera:$camera][exist:$exist][length:${file.length()}][file:$file][uri:$uri]")
         if (file.length() < 1) return
-        if (exist) {
-            val delete = this.file?.delete()
-            Log.e(__CLASSNAME__, "${getMethodName()}[exist:$exist][delete:$delete][file:$file][this.file:${this.file}]")
-        }
         if (file.exists() && file.length() > 0) {
-            Log.wtf(__CLASSNAME__, "${getMethodName()}[exist:$exist][length:${file.length()}][file:$file][uri:$uri]")
+            Log.wtf(__CLASSNAME__, "${getMethodName()}[OK][camera:$camera][exist:$exist][length:${file.length()}][file:$file][uri:$uri]")
             application.img(uri)
         }
         clear()

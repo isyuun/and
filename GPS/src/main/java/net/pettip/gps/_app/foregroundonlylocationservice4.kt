@@ -17,8 +17,6 @@ import android.net.Uri
 import android.os.IBinder
 import android.provider.MediaStore
 import androidx.exifinterface.media.ExifInterface
-import net.pettip.gps.app.GPSApplication
-import net.pettip.gps.app.ICameraContentListener
 import net.pettip.gpx.Track
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
@@ -33,7 +31,7 @@ import java.util.Collections
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
-open class foregroundonlylocationservice4() : foregroundonlylocationservice3(), ServiceConnection, ICameraContentListener {
+open class foregroundonlylocationservice4() : foregroundonlylocationservice3(), ServiceConnection {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -44,22 +42,25 @@ open class foregroundonlylocationservice4() : foregroundonlylocationservice3(), 
         Log.i(__CLASSNAME__, "${getMethodName()}...")
     }
 
-    //private var observer: CameraContentObserver? = null
-    //private fun register() {
-    //    Log.i(__CLASSNAME__, "${getMethodName()}$observer")
-    //    observer = CameraContentObserver(contentResolver, this)
-    //}
-    //private fun unregister() {
-    //    observer?.unregister()
-    //    observer = null
-    //}
-
     protected val _images = Collections.synchronizedList(ArrayList<Uri>()) // The list of Tracks
     internal val images
         get() = _images
 
+
+    private fun exist(uri: Uri): Boolean {
+        if (_images.size > 0 && _images.contains(uri)) return true
+        var ret = false
+        val file = path(uri)?.let { File(it) }
+        if (file != null) _images.forEach {
+            val _file = path(it)?.let { File(it) }
+            if (file == _file) ret = true
+        }
+        Log.w(__CLASSNAME__, "${getMethodName()}[$uri][$file][$ret]")
+        return ret
+    }
+
     internal fun img(uri: Uri) {
-        if (_images.size > 0 && _images.contains(uri)) return
+        if (exist(uri)) return
         _images.add(uri)
         val loc = lastLocation
         val img = _images.size
@@ -148,16 +149,5 @@ open class foregroundonlylocationservice4() : foregroundonlylocationservice3(), 
             e.printStackTrace()
         }
         return rotate
-    }
-
-    override fun camera() {}
-
-    override fun onCamera(file: File, uri: Uri) {
-        val camera = file.length() > 0 && !_images.contains(uri)
-        if (camera) {
-            Log.wtf(__CLASSNAME__, "${getMethodName()}[file.length() > 0:${(file.length() > 0)}][length:${file.length()}][file:$file][uri:$uri]")
-            img(uri)
-            (this.application as? GPSApplication)?.onCamera(file, uri)
-        }
     }
 }

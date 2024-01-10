@@ -224,7 +224,7 @@ class CameraContentObserver() : ContentObserver(Handler(Looper.getMainLooper()))
     }
 
     override fun onChange(selfChange: Boolean, uris: MutableCollection<Uri>, flags: Int) {
-        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[${uris.size}][$selfChange][uris:$uris][flags:$flags]")
+        Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[$selfChange][uris:$uris][flags:$flags][${uris.size}]")
         super.onChange(selfChange, uris, flags)
         uris.forEach { uri -> onCamera(uri) }
     }
