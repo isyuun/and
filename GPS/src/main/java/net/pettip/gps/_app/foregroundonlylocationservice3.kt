@@ -70,10 +70,11 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         val exit = exit(locationResult)
         Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit]$lastLocation$locationResult")
         lastLocation = locationResult.lastLocation
-        if (exit) return
-        super.onLocationResult(locationResult)
-        lastLocation?.let { _tracks.add(Track(it)) }
-        /*if (_tracks.size == 1) */this.write()
+        if (!exit) {
+            super.onLocationResult(locationResult)
+            lastLocation?.let { _tracks.add(Track(it)) }
+        }
+        this.write()
     }
 
     override fun onUnbind(intent: Intent): Boolean {

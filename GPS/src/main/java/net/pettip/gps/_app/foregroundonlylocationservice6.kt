@@ -54,6 +54,7 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
         super.start()
         //sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${recent()}")
+        write()
     }
 
     override fun stop() {
@@ -61,6 +62,7 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
         super.stop()
         sharedPreferences.edit().putString(KEY_FOREGROUND_GPXFILE, null).apply()
         Log.wtf(__CLASSNAME__, "${getMethodName()}[${recent()}]")
+        write()
     }
 
     internal fun reset() {
@@ -70,8 +72,8 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
 
     internal fun recent(): File? {
         val file = sharedPreferences.getString(KEY_FOREGROUND_GPXFILE, "")?.let { File(it) }
-        Log.v(__CLASSNAME__, "${getMethodName()}[${file?.exists()}][${file?.minutes()}][${file}]")
-        return (if (file != null && file.exists() && file.minutes() <= GPX_RELOAD_MINUTES) file else null)
+        Log.v(__CLASSNAME__, "${getMethodName()}[${file?.exists()}][${file?.minutes()}:$GPX_RELOAD_MINUTES][${file}]")
+        return (if (file != null && file.exists() && file.minutes() < GPX_RELOAD_MINUTES) file else null)
     }
 
     override fun write() {
