@@ -950,7 +950,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val r = (horizontal - 13.0.dp)
     val b = 68.0.dp
 
-
     val zc = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
     val co = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)
     val lb = mapView.findViewById<LocationButtonView>(com.naver.maps.map.R.id.navermap_location_button)
