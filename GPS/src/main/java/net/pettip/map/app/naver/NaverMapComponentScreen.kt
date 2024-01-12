@@ -98,6 +98,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -395,7 +396,8 @@ fun naverMapReturn(naverMap: NaverMap, camera: CameraPosition) {
 @Composable
 fun rememberMapViewWithLifecycle(
     context: Context,
-    mapOptions: NaverMapOptions = NaverMapOptions()
+    mapOptions: NaverMapOptions = NaverMapOptions(),
+    animate: Boolean = false
 ): MapView {
     val mapView = remember { MapView(context, mapOptions) }
 
@@ -406,6 +408,7 @@ fun rememberMapViewWithLifecycle(
         val observer = object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 lifecycleObserver.value.onStart()
+                if (animate) mapView.isVisible = true
             }
 
             override fun onResume(owner: LifecycleOwner) {
@@ -418,6 +421,7 @@ fun rememberMapViewWithLifecycle(
 
             override fun onStop(owner: LifecycleOwner) {
                 lifecycleObserver.value.onStop()
+                if (animate) mapView.isVisible = false
             }
 
             override fun onDestroy(owner: LifecycleOwner) {
@@ -945,7 +949,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var t: Dp
     val r = (horizontal - 13.0.dp)
     val b = 68.0.dp
-
 
     val zc = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_zoom_control)
     val co = mapView.findViewById<View>(com.naver.maps.map.R.id.navermap_compass)

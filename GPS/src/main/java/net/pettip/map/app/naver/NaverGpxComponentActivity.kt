@@ -120,7 +120,7 @@ fun GpxMap(
             .nightModeEnabled(isSystemInDarkTheme)
             .zoomControlEnabled(false)
     }
-    val mapView = rememberMapViewWithLifecycle(context, mapOptions)
+    val mapView = rememberMapViewWithLifecycle(context, mapOptions, true)
     Box(
         modifier = modifier
     ) {
@@ -132,7 +132,6 @@ fun GpxMap(
                         //naverMap.takeSnapshot(false) {
                         //    application.preview = it
                         //}
-
                     }
                     setOnTouchListener { view, event ->
                         onTouch(view, event)
