@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import net.pettip.app.navi.ui.theme.design_intro_bg
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

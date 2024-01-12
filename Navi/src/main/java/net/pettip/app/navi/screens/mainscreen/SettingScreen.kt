@@ -47,6 +47,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,6 +71,7 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomIndicator
+import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
@@ -84,6 +86,8 @@ import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.data.bbs.BbsNtc
 import net.pettip.data.bbs.BbsQna
 import net.pettip.data.user.BbsFaq
+import net.pettip.singleton.G
+import net.pettip.util.Log
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -92,16 +96,24 @@ fun SettingScreen(navController: NavHostController, viewModel:CommunityViewModel
     val pagerState = rememberPagerState(initialPage = 0)
     val coroutineScope = rememberCoroutineScope()
     var tabVisible by remember { mutableFloatStateOf(1f) }
+    val preUserId by viewModel.settingPreUserId.collectAsState()
+
+    LaunchedEffect(key1 = pagerState.currentPage){
+        when(pagerState.currentPage){
+            0 -> viewModel.updateSettingCurrentTab("공지사항")
+            1 -> viewModel.updateSettingCurrentTab("FAQ")
+            2 -> viewModel.updateSettingCurrentTab("1:1문의")
+        }
+    }
 
     LaunchedEffect(Unit){
-
-        if (viewModel.ntcList.value == null){
-            viewModel.updateNtcListClear()
-            viewModel.getNtcList(1)
-        }
-        if (viewModel.faqList.value ==null){
-            viewModel.updateFaqListClear()
-            viewModel.getFaqList(1)
+        if (preUserId != G.userId && preUserId != ""){
+            viewModel.updateNtcListInit(true)
+            viewModel.updateFaqListInit(true)
+            viewModel.updateQnaListInit(true)
+            viewModel.updateSettingPreUserId(G.userId)
+        }else{
+            viewModel.updateSettingPreUserId(G.userId)
         }
     }
 
@@ -153,8 +165,14 @@ fun SettingScreen(navController: NavHostController, viewModel:CommunityViewModel
 @Composable
 fun NotiScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
+    val ntcRes by viewModel.ntcRes.collectAsState()
     val ntcList by viewModel.ntcList.collectAsState()
+    val currentTab by viewModel.settingCurrentTab.collectAsState()
+    val page by viewModel.ntcListPage.collectAsState()
+    val init by viewModel.ntcListInit.collectAsState()
 
+    var isLoading by remember{ mutableStateOf(false) }
+    var isError by rememberSaveable{ mutableStateOf(false) }
     var refreshing by remember{ mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
@@ -162,18 +180,51 @@ fun NotiScreen(navController: NavHostController, viewModel: CommunityViewModel){
             refreshing = true
         })
 
+    val lazyListState = rememberLazyListState()
+
     LaunchedEffect(key1 = refreshing) {
         if (refreshing) {
 
             viewModel.updateNtcListClear()
-            //viewModel.updateNtcyPage(1)
-            viewModel.getNtcList(1)
-
-            delay(300)
+            viewModel.updateNtcListPage(1)
+            val result = viewModel.getNtcList(1)
+            isLoading = false
+            isError = !result
             refreshing = false
         }
     }
 
+    LaunchedEffect(key1 = init) {
+        if (init) {
+            isLoading = true
+
+            viewModel.updateNtcListClear()
+            viewModel.updateNtcListPage(1)
+            val result = viewModel.getNtcList(1)
+            isLoading = false
+            isError = !result
+            viewModel.updateNtcListInit(false)
+        }
+    }
+
+
+    LaunchedEffect(key1 = lazyListState.canScrollForward){
+        if (!lazyListState.canScrollForward && !refreshing && currentTab=="공지사항"){
+            if (ntcRes?.data?.paginate?.existNextPage == true){
+                if (!isLoading){
+                    isLoading = true
+                    val result = viewModel.getNtcList(page + 1)
+                    isLoading = if (result){
+                        viewModel.updateNtcListPage(page + 1)
+                        false
+                    }else{
+                        viewModel.updateNtcListPage(page - 1)
+                        false
+                    }
+                }
+            }
+        }
+    }
 
     Box (
         Modifier
@@ -181,81 +232,183 @@ fun NotiScreen(navController: NavHostController, viewModel: CommunityViewModel){
             .background(color = MaterialTheme.colorScheme.primary)
     ){
 
-        Crossfade(
-            targetState = ntcList?.data?.bbsNtcList?.isEmpty(),
-            label = "",
-        ) { ntcList?.data?.bbsNtcList?.isEmpty()
-            when(it){
-                true ->
-                    Box(modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ){
-                        LoadingAnimation1()
-                    }
-                false ->
-                    LazyColumn(
-                        state = rememberLazyListState(),
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .pullRefresh(pullRefreshState)
-                            .fillMaxWidth(),
-                        contentPadding = PaddingValues(vertical = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ){
-                        if (ntcList?.data?.bbsNtcList != null){
-                            items(ntcList?.data?.bbsNtcList ?: emptyList()){ item ->
-                                NotiItem(notiItemData = item, navController, viewModel)
-                            }
-                        }
-                    }
-
-                else ->
-                    Box(modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ){
-                        LoadingAnimation1()
-                    }
+        if (isLoading && ntcList.isEmpty()){
+            Box(modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                LoadingAnimation1()
             }
-
+        }else if (isError){
+            ErrorScreen(onClick = { refreshing = true })
+        }else{
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .pullRefresh(pullRefreshState)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ){
+                if (!ntcList.isNullOrEmpty()){
+                    items(ntcList){ item ->
+                        NotiItem(notiItemData = item, navController, viewModel)
+                    }
+                }
+            }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
                 CustomIndicator(state = pullRefreshState, refreshing = refreshing)
             }
         }
-
     }
-
 }
 
 @Composable
 fun FAQScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
-    val faqData by viewModel.faqList.collectAsState()
+    val faqRes by viewModel.faqRes.collectAsState()
+    val faqList by viewModel.faqList.collectAsState()
+    val init by viewModel.faqListInit.collectAsState()
+    val currentTab by viewModel.settingCurrentTab.collectAsState()
+    val page by viewModel.faqListPage.collectAsState()
+
+    var isLoading by remember{ mutableStateOf(false) }
+    var isError by rememberSaveable{ mutableStateOf(false) }
+    var refreshing by remember{ mutableStateOf(false) }
+    val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(key1 = init){
+        if (init){
+            isLoading = true
+
+            viewModel.updateFaqListClear()
+            val result = viewModel.getFaqList(1)
+            isLoading = false
+            isError = !result
+            viewModel.updateFaqListInit(false)
+        }
+    }
+
+    LaunchedEffect(key1 = refreshing){
+        if (refreshing){
+            isLoading = true
+
+            viewModel.updateFaqListClear()
+            val result = viewModel.getFaqList(1)
+            isLoading = false
+            isError = !result
+            refreshing = false
+        }
+    }
+
+    LaunchedEffect(key1 = lazyListState.canScrollForward){
+        if (!lazyListState.canScrollForward && !refreshing && currentTab=="FAQ"){
+            if (faqRes?.data?.paginate?.existNextPage == true){
+                if (!isLoading){
+                    isLoading = true
+                    val result = viewModel.getFaqList(page + 1)
+                    isLoading = if (result){
+                        viewModel.updateFaqListPage(page + 1)
+                        false
+                    }else{
+                        viewModel.updateFaqListPage(page - 1)
+                        false
+                    }
+                }
+            }
+        }
+    }
 
     Box (
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.primary)
     ){
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth(),
-            state = rememberLazyListState()
-        ){
-            items(faqData?.bbsFaqList?: emptyList()){ item ->
-                FAQItem(faqItemData = item)
+        if (isLoading && faqList.isEmpty()){
+            Box(modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                LoadingAnimation1()
+            }
+        } else if (isError){
+            ErrorScreen(onClick = { refreshing = true })
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                state = lazyListState
+            ){
+                if (!faqList.isNullOrEmpty()){
+                    items(faqList){ item ->
+                        FAQItem(faqItemData = item)
+                    }
+                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
-    val qnaRes by viewModel.qnaList.collectAsState()
+    val qnaRes by viewModel.qnaRes.collectAsState()
+    val qnaList by viewModel.qnaList.collectAsState()
+    val init by viewModel.qnaListInit.collectAsState()
+    val currentTab by viewModel.settingCurrentTab.collectAsState()
+    val page by viewModel.qnaListPage.collectAsState()
 
-    LaunchedEffect(Unit){
-        viewModel.updateQnaListClear()
-        viewModel.getQnaList(1)
+    var isLoading by remember{ mutableStateOf(false) }
+    var isError by rememberSaveable{ mutableStateOf(false) }
+    var refreshing by remember{ mutableStateOf(false) }
+    val lazyListState = rememberLazyListState()
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = refreshing,
+        onRefresh = {
+            refreshing = true
+        })
+
+    LaunchedEffect(key1 = init){
+        if (init){
+            isLoading = true
+
+            viewModel.updateQnaListClear()
+            val result = viewModel.getQnaList(1)
+            isLoading = false
+            isError = !result
+            viewModel.updateQnaListInit(false)
+        }
+    }
+
+    LaunchedEffect(key1 = refreshing){
+        if (refreshing){
+            isLoading = true
+
+            viewModel.updateQnaListClear()
+            val result = viewModel.getQnaList(1)
+            isLoading = false
+            isError = !result
+            refreshing = false
+        }
+    }
+
+    LaunchedEffect(key1 = lazyListState.canScrollForward){
+        if (!lazyListState.canScrollForward && !refreshing && currentTab=="1:1문의"){
+            if (qnaRes?.data?.paginate?.existNextPage == true){
+                if (!isLoading){
+                    isLoading = true
+                    val result = viewModel.getQnaList(page + 1)
+                    isLoading = if (result){
+                        viewModel.updateQnaListPage(page + 1)
+                        false
+                    }else{
+                        viewModel.updateQnaListPage(page - 1)
+                        false
+                    }
+                }
+            }
+        }
     }
 
     Column (
@@ -303,28 +456,48 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
             .height(1.dp)
             .background(color = design_textFieldOutLine))
 
-        if (qnaRes?.data?.bbsQnaList?.isEmpty() == true){
-            Box (
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ){
-                Text(
-                    text = stringResource(R.string.no_my_inquiry),
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 16.sp, letterSpacing = (-0.8).sp,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-        }else{
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                state = rememberLazyListState(),
-                //verticalArrangement = Arrangement.spacedBy(20.dp)
-            ){
-                items(qnaRes?.data?.bbsQnaList ?: emptyList()){ item ->
-                    InquiryItem(inquiryItemData = item, navController, viewModel)
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ){
+            if (isLoading && qnaList.isEmpty()){
+                Box(modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+                    LoadingAnimation1()
+                }
+            } else if (isError){
+                ErrorScreen(onClick = { refreshing = true })
+            } else {
+                if (qnaRes?.data?.bbsQnaList?.isEmpty() == true){
+                    Box (
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = stringResource(R.string.no_my_inquiry),
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }else{
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 20.dp),
+                        state = lazyListState,
+                        modifier = Modifier
+                            .pullRefresh(pullRefreshState)
+                        //verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ){
+                        items(qnaList){ item ->
+                            InquiryItem(inquiryItemData = item, navController, viewModel)
+                        }
+                    }
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+                        CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+                    }
                 }
             }
         }
@@ -479,8 +652,8 @@ fun InquiryItem(inquiryItemData: BbsQna, navController: NavHostController, viewM
                 if (currentTime - lastClickTime >= 500) {
                     lastClickTime = currentTime
                     scope.launch {
-                        viewModel.getQnaDetail(inquiryItemData.pstSn)
                         navController.navigate(Screen.InquiryDetail.route)
+                        viewModel.getQnaDetail(inquiryItemData.pstSn)
                     }
                 }
             }

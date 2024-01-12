@@ -36,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -94,10 +95,17 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
         }
     }
 
+    DisposableEffect(Unit){
+        onDispose {
+            viewModel.updateQnaDetail(null)
+        }
+    }
+
     LaunchedEffect(key1 = qnaDelete){
         if (qnaDelete){
             val result = viewModel.deleteQna()
             if (result){
+                viewModel.updateQnaListInit(true)
                 navController.popBackStack()
             }else{
                 Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()

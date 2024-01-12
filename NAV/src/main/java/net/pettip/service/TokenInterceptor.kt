@@ -18,13 +18,17 @@ class TokenInterceptor() : Interceptor {
         val refreshToken = G.refreshToken
 
         val requestBuilder = originalRequest.newBuilder()
-        if (token != null) {
+        if (!token.isNullOrBlank()) {
             // AccessToken이 있는 경우 Authorization 헤더를 추가
             requestBuilder.header("Authorization", token)
+        }else{
+            requestBuilder.header("Authorization", MySharedPreference.getAccessToken())
         }
-        if (refreshToken != null) {
+        if (refreshToken.isNullOrBlank()) {
             // RefreshToken이 있는 경우 Refresh 헤더를 추가
             requestBuilder.header("Refresh", refreshToken)
+        }else{
+            requestBuilder.header("Refresh", MySharedPreference.getRefreshToken())
         }
 
 

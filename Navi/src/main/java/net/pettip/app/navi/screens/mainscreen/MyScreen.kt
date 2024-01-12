@@ -36,6 +36,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -90,6 +91,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
@@ -98,20 +100,18 @@ import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.ui.theme.design_999999
 import net.pettip.app.navi.ui.theme.design_DDDDDD
 import net.pettip.app.navi.ui.theme.design_EFECFE
-import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_bg
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_text
-import net.pettip.app.navi.ui.theme.design_shadow
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.pet.PetDetailData
+import net.pettip.gps.app.GPSApplication
 import net.pettip.singleton.G
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -127,6 +127,8 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
     val bottomSheetState =
         androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    val application = GPSApplication.instance
+
     val context = LocalContext.current
     val density = LocalDensity.current.density
     val resourceId = context.resources.getIdentifier("navigation_bar_height", "dimen", "android")
@@ -137,6 +139,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
         0.dp
     }
 
+    var openLogoutDialog by remember{ mutableStateOf(false) }
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
 
@@ -145,6 +148,28 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
     val snackState = remember { SnackbarHostState() }
     var openDialog by remember { mutableStateOf(false) }
     var openTimePicker by remember { mutableStateOf(false) }
+    var logout by remember{ mutableStateOf(false) }
+
+    LaunchedEffect(key1 = logout){
+        if (logout){
+            application.stop()
+            openLogoutDialog = false
+            isLoading = true
+            viewModel.viewModelScope.launch {
+                val result = viewModel.logOut()
+                if (result){
+                    isLoading = false
+                    navController.navigate(Screen.Login.route){
+                        popUpTo(0)
+                    }
+                }else{
+                    isLoading = false
+                    logout = false
+                    Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     Scaffold (
         snackbarHost = {SnackbarHost(hostState = snackState, Modifier)}
@@ -153,6 +178,12 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
         LoadingDialog(
             loadingText = stringResource(R.string.logout_ing),
             loadingState = isLoading
+        )
+
+        LogoutDialog(
+            dialogState = openLogoutDialog,
+            onDismiss = {newValue -> openLogoutDialog = newValue},
+            onLogoutState = {newValue -> logout = newValue}
         )
 
         Column (
@@ -195,19 +226,25 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
 
                 Button(
                     onClick = {
-                        isLoading = true
-                        viewModel.viewModelScope.launch {
-                            val result = viewModel.logOut()
-                            if (result){
-                                isLoading = false
-                                navController.navigate(Screen.Login.route){
-                                    popUpTo(0)
+                        // 산책중인지 아닌지 여부체크
+                        if (application.start){
+                            openLogoutDialog = true
+                        }else{
+                            isLoading = true
+                            viewModel.viewModelScope.launch {
+                                val result = viewModel.logOut()
+                                if (result){
+                                    isLoading = false
+                                    navController.navigate(Screen.Login.route){
+                                        popUpTo(0)
+                                    }
+                                }else{
+                                    isLoading = false
+                                    Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
                                 }
-                            }else{
-                                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
-                                isLoading = true
                             }
                         }
+
                     },
                     modifier = Modifier
                         .padding(end = 20.dp)
@@ -840,12 +877,12 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
     val petName:String = petList.petNm
     val imageUri:String = petList.petRprsImgAddr?: ""
 
-    var isSeleted by rememberSaveable { mutableStateOf(false) }
+    var isSelected by rememberSaveable { mutableStateOf(false) }
 
     Button(
         onClick = {
-            isSeleted= !isSeleted
-            if (isSeleted) {
+            isSelected= !isSelected
+            if (isSelected) {
                 settingViewModel.selectedPet.add(petList)
             }else{
                 settingViewModel.selectedPet.remove(petList)
@@ -857,18 +894,18 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
             .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp)
         ,
         shape = RoundedCornerShape(12.dp),
-        colors = if(isSeleted) {
+        colors = if(isSelected) {
             ButtonDefaults.buttonColors(design_select_btn_bg)
         } else {
             ButtonDefaults.buttonColors(Color.Transparent)
         },
-        border = if(isSeleted) {
+        border = if(isSelected) {
             BorderStroke(1.dp, color = design_select_btn_text)
         } else {
             BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
         },
         contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-        elevation = if(isSeleted){
+        elevation = if(isSelected){
             ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
         } else {
             ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -916,7 +953,7 @@ fun MyBottomSheetItem(viewModel: SharedViewModel, settingViewModel: SettingViewM
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,
-                color = if (isSeleted) design_login_text else MaterialTheme.colorScheme.onPrimary
+                color = if (isSelected) design_login_text else MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -1016,6 +1053,96 @@ fun TimePickerDialog(
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 16.sp,color = MaterialTheme.colorScheme.onPrimary
                         )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LogoutDialog(
+    dialogState: Boolean,
+    onDismiss: (Boolean) -> Unit,
+    onLogoutState: (Boolean) -> Unit,
+) {
+    if (dialogState) {
+        AlertDialog(
+            onDismissRequest = { onDismiss(false) },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false
+            )
+        ) {
+            Box(modifier = Modifier
+                .padding(horizontal = 60.dp)
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(20.dp)
+                )
+            ){
+                Column (
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    Text(
+                        text = "앗! 현재 산책중이에요",
+                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                        fontSize = 18.sp, letterSpacing = (-0.8).sp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(start = 20.dp, top = 30.dp)
+                    )
+
+                    Text(
+                        text = "정말 로그아웃 하시겠어요?",
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 14.sp, letterSpacing = (-0.8).sp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(start = 20.dp, top = 30.dp)
+                    )
+
+                    Row (
+                        modifier = Modifier
+                            .padding(top = 30.dp)
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                    ){
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(MaterialTheme.colorScheme.onSecondary)
+                                .clickable {
+                                    onLogoutState(true)
+                                },
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = "로그아웃",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.padding(vertical = 16.dp)
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(design_intro_bg)
+                                .clickable {
+                                           onDismiss(false)
+                                }
+                            ,
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = "계속 산책하기",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                color = design_white,
+                                modifier = Modifier.padding(vertical = 16.dp)
+                            )
+                        }
                     }
                 }
             }

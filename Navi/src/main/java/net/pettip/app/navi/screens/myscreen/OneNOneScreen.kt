@@ -86,12 +86,13 @@ import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
+import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.data.cmm.CdDetail
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingViewModel){
+fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingViewModel, communityViewModel: CommunityViewModel){
 
     val inquiryKindList by settingViewModel.inquiryKindList.collectAsState()
     var expanded by remember{ mutableStateOf(false) }
@@ -121,6 +122,7 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
     }
 
     LaunchedEffect(Unit){
+        settingViewModel.clearSelectedImagesList()
         settingViewModel.updateSelectedImageList(listOf(dummyUri))
         settingViewModel.getCmmList("PST")
     }
@@ -365,6 +367,7 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                                       if(photoUpload){
                                           val qnaUpload = settingViewModel.qnaCreate()
                                           if (qnaUpload){
+                                              communityViewModel.updateQnaListInit(true)
                                               loadingText = "등록 성공!"
                                               delay(1000)
                                               isLoading = false
@@ -382,6 +385,7 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                                   }else{
                                       val qnaUpload = settingViewModel.qnaCreate()
                                       if (qnaUpload){
+                                          communityViewModel.updateQnaListInit(true)
                                           loadingText = "등록 성공!"
                                           delay(1000)
                                           isLoading = false

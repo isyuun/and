@@ -2,11 +2,9 @@
 
 package net.pettip.app.navi.screens.mainscreen
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,14 +13,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -34,10 +29,8 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -62,26 +55,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
@@ -89,17 +75,14 @@ import net.pettip.app.navi.component.CustomIndicator
 import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.component.StoryListItem
-import net.pettip.app.navi.ui.theme.design_B5B9BE
 import net.pettip.app.navi.ui.theme.design_alpha60_black
 import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.bbs.BbsAncmntWinner
 import net.pettip.data.bbs.BbsEvnt
 import net.pettip.singleton.G
-import net.pettip.util.Log
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -129,9 +112,9 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
 
     LaunchedEffect(Unit){
         if (preUserId != G.userId && preUserId != ""){
-            communityViewModel.updateStoryRefresh(true)
-            communityViewModel.updateEventRefresh(true)
-            communityViewModel.updateEndEventRefresh(true)
+            communityViewModel.updateStoryInit(true)
+            communityViewModel.updateEventInit(true)
+            communityViewModel.updateEndEventInit(true)
             communityViewModel.updatePreUserId(G.userId)
         }else{
             communityViewModel.updatePreUserId(G.userId)
@@ -200,6 +183,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
     var isError by rememberSaveable{ mutableStateOf(false) }
     //var refreshing by rememberSaveable{ mutableStateOf(false) }
     val refreshing by viewModel.storyRefresh.collectAsState()
+    val init by viewModel.storyInit.collectAsState()
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
@@ -254,13 +238,27 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
         }
     }
 
+    LaunchedEffect(key1 = init){
+        if (init){
+
+            isLoading = true
+
+            viewModel.viewModelScope.launch {
+                viewModel.updateStoryInit(false)
+                viewModel.updateStoryListClear()
+                viewModel.updateStoryPage(1)
+                val result = viewModel.getStoryList(1)
+                isLoading = false
+                isError = !result
+            }
+        }
+    }
+
     LaunchedEffect(key1 = lazyGridState.canScrollForward){
-        Log.d("LOG",page.toString())
         if (!lazyGridState.canScrollForward && !refreshing && currentTab=="스토리"){
             if (storyListRes?.data?.paginate?.existNextPage == true){
                 if (!isLoading){
                     isLoading = true
-
                     val result = viewModel.getStoryList(page + 1)
                     isLoading = if (result){
                         viewModel.updateStoryPage(page + 1)
@@ -427,11 +425,13 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
 fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
     val eventList by viewModel.eventList.collectAsState()
+    val eventRes by viewModel.eventRes.collectAsState()
 
     val lazyListState = rememberLazyListState()
     val currentTab by viewModel.currentTab.collectAsState()
     val page by viewModel.eventPage.collectAsState()
 
+    val init by viewModel.eventInit.collectAsState()
     val refreshing by viewModel.eventRefresh.collectAsState()
     var isLoading by remember{ mutableStateOf(false) }
     var isError by rememberSaveable { mutableStateOf( false) }
@@ -456,12 +456,26 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
         }
     }
 
+    LaunchedEffect(key1 = init) {
+        if (init) {
+
+            isLoading = true
+
+            viewModel.viewModelScope.launch {
+                viewModel.updateEventInit(false)
+                viewModel.updateEventListClear()
+                val result = viewModel.getEventList(1)
+                isLoading = false
+                isError = !result
+            }
+        }
+    }
+
     LaunchedEffect(key1 = lazyListState.canScrollForward){
         if (!lazyListState.canScrollForward && !refreshing && currentTab=="이벤트"){
-            if (eventList?.data?.paginate?.existNextPage == true){
+            if (eventRes?.data?.paginate?.existNextPage == true){
                 if (!isLoading){
                     isLoading = true
-
                     val result = viewModel.getEventList(page + 1)
                     isLoading = if (result){
                         viewModel.updateEventPage(page + 1)
@@ -481,7 +495,7 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
             .background(color = MaterialTheme.colorScheme.primary)
     ){
 
-        if (isLoading){
+        if (isLoading && eventList.isEmpty()){
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ){
@@ -499,8 +513,8 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
                 contentPadding = PaddingValues(vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(40.dp)
             ){
-                if (eventList?.data?.bbsEvntList != null){
-                    items(eventList?.data?.bbsEvntList ?: emptyList()){ item ->
+                if (!eventList.isNullOrEmpty()){
+                    items(eventList){ item ->
                         EventItem(eventItemData = item, navController, viewModel)
                     }
                 }
@@ -517,12 +531,14 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
 @Composable
 fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
-    val eventList by viewModel.endEventList.collectAsState()
+    val endEventRes by viewModel.endEventRes.collectAsState()
+    val endEventList by viewModel.endEventList.collectAsState()
 
     val lazyListState = rememberLazyListState()
     val currentTab by viewModel.currentTab.collectAsState()
     val page by viewModel.eventEndPage.collectAsState()
 
+    val init by viewModel.endEventInit.collectAsState()
     val refreshing by viewModel.endEventRefresh.collectAsState()
     var isLoading by remember{ mutableStateOf(false) }
     var isError by rememberSaveable { mutableStateOf( false) }
@@ -547,9 +563,24 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
         }
     }
 
+    LaunchedEffect(key1 = init) {
+        if (init) {
+
+            isLoading = true
+
+            viewModel.viewModelScope.launch {
+                viewModel.updateEndEventInit(false)
+                viewModel.updateEndEventListClear()
+                val result = viewModel.getEndEventList(1)
+                isLoading = false
+                isError = !result
+            }
+        }
+    }
+
     LaunchedEffect(key1 = lazyListState.canScrollForward){
         if (!lazyListState.canScrollForward && !refreshing && currentTab=="당첨자 발표"){
-            if (eventList?.data?.paginate?.existNextPage == true){
+            if (endEventRes?.data?.paginate?.existNextPage == true){
                 if (!isLoading){
                     isLoading = true
 
@@ -572,7 +603,7 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
             .background(color = MaterialTheme.colorScheme.primary)
     ){
 
-        if (isLoading){
+        if (isLoading && endEventList.isEmpty()){
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ){
@@ -590,8 +621,8 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
                 contentPadding = PaddingValues(vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(40.dp)
             ){
-                if (eventList?.data?.bbsAncmntWinnerList != null){
-                    items(eventList?.data?.bbsAncmntWinnerList ?: emptyList()){ item ->
+                if (!endEventList.isNullOrEmpty()){
+                    items(endEventList){ item ->
                         EndEventItem(eventItemData = item, navController, viewModel)
                     }
                 }
