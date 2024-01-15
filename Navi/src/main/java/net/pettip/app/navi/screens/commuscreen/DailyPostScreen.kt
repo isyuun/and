@@ -98,6 +98,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -840,6 +841,7 @@ fun buildAnnotatedStringWithColors(text: String): AnnotatedString {
     return annotatedText
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDialogInPost(
     onDismiss:(Boolean) -> Unit,
@@ -851,47 +853,84 @@ fun CustomDialogInPost(
 ){
     AlertDialog(
         onDismissRequest = { onDismiss(false) },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onDismiss(false)
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = design_button_bg
-                )
-            ) {
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ){
+        Box(modifier = Modifier
+            .padding(horizontal = 60.dp)
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(20.dp)
+            )
+        ){
+            Column (
+                modifier = Modifier.fillMaxWidth()
+            ){
                 Text(
-                    text = confirm,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_white
+                    text = title,
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    fontSize = 18.sp, letterSpacing = (-0.8).sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(start = 20.dp, top = 30.dp)
                 )
-            } },
-        title = { Text(text = title, fontFamily = FontFamily(Font(R.font.pretendard_bold)), fontSize = 20.sp,
-            color = MaterialTheme.colorScheme.onPrimary ) },
-        text = { Text(text = text, color = MaterialTheme.colorScheme.secondary, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-            fontSize = 14.sp) },
-        dismissButton = {
-            Button(
-                onClick = {
-                    onDismiss(false)
-                    navController.popBackStack()
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                border = BorderStroke(1.dp, color = design_login_text)
-            ) {
+
                 Text(
-                    text = dismiss,
+                    text = text,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = MaterialTheme.colorScheme.onPrimary
+                    fontSize = 14.sp, letterSpacing = (-0.8).sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(start = 20.dp, top = 30.dp)
                 )
+
+                Row (
+                    modifier = Modifier
+                        .padding(top = 30.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                ){
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(MaterialTheme.colorScheme.onSecondary)
+                            .clickable {
+                                onDismiss(false)
+                                navController.popBackStack()
+                            },
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = dismiss,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(design_intro_bg)
+                            .clickable {
+                                onDismiss(false)
+                            }
+                        ,
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = confirm,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = design_white,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+                }
             }
-        },
-        containerColor = MaterialTheme.colorScheme.primary
-    )
+        }
+    }
 }
 
 @Composable

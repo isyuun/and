@@ -16,9 +16,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.navigation.NavHostController
@@ -197,11 +200,14 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
         }
     }
 
+    // navigation animation 효과 때 디폴트 색상바꿀려면
+    // NavHost background 색상 변경하기
     NavHost(
         navController = navController,
         startDestination = "intro",
         enterTransition = { fadeIn(tween(700)) },
-        exitTransition = { fadeOut(tween(700)) }
+        exitTransition = { fadeOut(tween(700)) },
+        modifier = Modifier.background(color = MaterialTheme.colorScheme.primary)
     ) {
         composable(
             route = "intro",
@@ -359,7 +365,7 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
             InquiryDetail(navController = navController, viewModel = communityViewModel, settingViewModel = settingViewModel)
         }
         composable("oneNOneScreen") {
-            OneNOneScreen(navController = navController, settingViewModel = settingViewModel)
+            OneNOneScreen(navController = navController, settingViewModel = settingViewModel, communityViewModel = communityViewModel)
         }
         composable("settingScreen") {
             SettingScreen(navController = navController, viewModel = communityViewModel)

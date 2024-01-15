@@ -14,12 +14,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.pettip.data.CommonCodeModel
+import net.pettip.data.bbs.BbsAncmntWinner
 import net.pettip.data.bbs.BbsCmnt
 import net.pettip.data.bbs.BbsCmntCreateRes
 import net.pettip.data.bbs.BbsCmntRcmdtnReq
 import net.pettip.data.bbs.BbsCmntUpdateReq
 import net.pettip.data.bbs.BbsCmtCreateReq
 import net.pettip.data.bbs.BbsDetailRes
+import net.pettip.data.bbs.BbsEvnt
+import net.pettip.data.bbs.BbsNtc
+import net.pettip.data.bbs.BbsQna
 import net.pettip.data.bbs.BbsRcmdtnReq
 import net.pettip.data.bbs.EndEventListRes
 import net.pettip.data.bbs.EventListRes
@@ -56,6 +60,7 @@ import net.pettip.data.daily.Story
 import net.pettip.data.daily.StoryReq
 import net.pettip.data.daily.StoryRes
 import net.pettip.data.pet.CurrentPetData
+import net.pettip.data.user.BbsFaq
 import net.pettip.data.user.BbsReq
 import net.pettip.data.user.FAQData
 import net.pettip.data.user.FAQRes
@@ -92,19 +97,37 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _preUserId.value = newValue
     }
 
-    private val _storyRefresh = MutableStateFlow<Boolean>(true)
+    private val _storyInit = MutableStateFlow<Boolean>(true)
+    val storyInit: StateFlow<Boolean> = _storyInit.asStateFlow()
+    fun updateStoryInit(newValue: Boolean){
+        _storyInit.value = newValue
+    }
+
+    private val _eventInit = MutableStateFlow<Boolean>(true)
+    val eventInit: StateFlow<Boolean> = _eventInit.asStateFlow()
+    fun updateEventInit(newValue: Boolean){
+        _eventInit.value = newValue
+    }
+
+    private val _endEventInit = MutableStateFlow<Boolean>(true)
+    val endEventInit: StateFlow<Boolean> = _endEventInit.asStateFlow()
+    fun updateEndEventInit(newValue: Boolean){
+        _endEventInit.value = newValue
+    }
+
+    private val _storyRefresh = MutableStateFlow<Boolean>(false)
     val storyRefresh: StateFlow<Boolean> = _storyRefresh.asStateFlow()
     fun updateStoryRefresh(newValue: Boolean){
         _storyRefresh.value = newValue
     }
 
-    private val _eventRefresh = MutableStateFlow<Boolean>(true)
+    private val _eventRefresh = MutableStateFlow<Boolean>(false)
     val eventRefresh: StateFlow<Boolean> = _eventRefresh.asStateFlow()
     fun updateEventRefresh(newValue: Boolean){
         _eventRefresh.value = newValue
     }
 
-    private val _endEventRefresh = MutableStateFlow<Boolean>(true)
+    private val _endEventRefresh = MutableStateFlow<Boolean>(false)
     val endEventRefresh: StateFlow<Boolean> = _endEventRefresh.asStateFlow()
     fun updateEndEventRefresh(newValue: Boolean){
         _endEventRefresh.value = newValue
@@ -264,9 +287,21 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     val updateComment: StateFlow<String> = _updateComment.asStateFlow()
     fun updateUpdateComment(newValue: String) { _updateComment.value = newValue }
 
-    private val _eventList = MutableStateFlow<EventListRes?>(null)
-    val eventList: StateFlow<EventListRes?> = _eventList.asStateFlow()
-    fun updateEventListClear(){_eventList.value = null}
+    private val _eventRes = MutableStateFlow<EventListRes?>(null)
+    val eventRes: StateFlow<EventListRes?> = _eventRes.asStateFlow()
+    fun updateEventRes(newValue: EventListRes?){
+        _eventRes.value = newValue
+    }
+
+    private val _eventList = MutableStateFlow<List<BbsEvnt>>(emptyList())
+    val eventList: StateFlow<List<BbsEvnt>> = _eventList.asStateFlow()
+    fun updateEventListClear(){_eventList.value = emptyList()
+    }
+    fun updateEventList(newValue: List<BbsEvnt>){
+        val currentList = _eventList.value.toMutableList()
+        currentList.addAll(newValue)
+        _eventList.value = currentList
+    }
 
     private val _bbsDetail = MutableStateFlow<BbsDetailRes?>(null)
     val bbsDetail: StateFlow<BbsDetailRes?> = _bbsDetail.asStateFlow()
@@ -280,9 +315,18 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _eventCmntList.value = newValue
     }
 
-    private val _endEventList = MutableStateFlow<EndEventListRes?>(null)
-    val endEventList: StateFlow<EndEventListRes?> = _endEventList.asStateFlow()
-    fun updateEndEventListClear(){_endEventList.value = null}
+    private val _endEventRes = MutableStateFlow<EndEventListRes?>(null)
+    val endEventRes: StateFlow<EndEventListRes?> = _endEventRes.asStateFlow()
+    fun updateEndEventRes(newValue: EndEventListRes? ){_endEventRes.value = newValue}
+
+    private val _endEventList = MutableStateFlow<List<BbsAncmntWinner>>(emptyList())
+    val endEventList: StateFlow<List<BbsAncmntWinner>> = _endEventList.asStateFlow()
+    fun updateEndEventListClear(){_endEventList.value = emptyList() }
+    fun updateEndEventList(newValue: List<BbsAncmntWinner>){
+        val currentList = _endEventList.value.toMutableList()
+        currentList.addAll(newValue)
+        _endEventList.value = currentList
+    }
 
     private val _eventReplyCmnt = MutableStateFlow<BbsCmnt?>(null)
     val eventReplyCmnt:StateFlow<BbsCmnt?> = _eventReplyCmnt.asStateFlow()
@@ -308,24 +352,97 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _viewType.value = newValue
     }
     // ----------------- 게시판 ------------------------
-    private val _ntcList = MutableStateFlow<NtcListRes?>(null)
-    val ntcList: StateFlow<NtcListRes?> = _ntcList.asStateFlow()
-    fun updateNtcListClear(){_ntcList.value = null}
 
-    private val _faqList = MutableStateFlow<FAQData?>(null)
-    val faqList: StateFlow<FAQData?> = _faqList.asStateFlow()
-    fun updateFaqListClear(){_faqList.value = null}
+    private val _ntcRes = MutableStateFlow<NtcListRes?>(null)
+    val ntcRes: StateFlow<NtcListRes?> = _ntcRes.asStateFlow()
+    fun updateNtcRes(newValue: NtcListRes?){_ntcRes.value = newValue}
 
-    private val _qnaList = MutableStateFlow<QnaListRes?>(null)
-    val qnaList: StateFlow<QnaListRes?> = _qnaList.asStateFlow()
-    fun updateQnaListClear(){_qnaList.value = null}
+    private val _ntcList = MutableStateFlow<List<BbsNtc>>(emptyList())
+    val ntcList: StateFlow<List<BbsNtc>> = _ntcList.asStateFlow()
+    fun updateNtcListClear(){_ntcList.value = emptyList()
+    }
+    fun updateNtcList(newValue: List<BbsNtc>){
+        val currentList = _ntcList.value.toMutableList()
+        currentList.addAll(newValue)
+        _ntcList.value = currentList
+    }
+
+    private val _faqRes = MutableStateFlow<FAQRes?>(null)
+    val faqRes: StateFlow<FAQRes?> = _faqRes.asStateFlow()
+    fun updateFaqRes(newValue: FAQRes?){_faqRes.value = newValue}
+
+    private val _faqList = MutableStateFlow<List<BbsFaq>>(emptyList())
+    val faqList: StateFlow<List<BbsFaq>> = _faqList.asStateFlow()
+    fun updateFaqListClear(){_faqList.value = emptyList()
+    }
+    fun updateFaqList(newValue: List<BbsFaq>){
+        val currentList = _faqList.value.toMutableList()
+        currentList.addAll(newValue)
+        _faqList.value = currentList
+    }
+
+    private val _qnaRes = MutableStateFlow<QnaListRes?>(null)
+    val qnaRes: StateFlow<QnaListRes?> = _qnaRes.asStateFlow()
+    fun updateQnaRes(newValue: QnaListRes?){_qnaRes.value = newValue}
+
+    private val _qnaList = MutableStateFlow<List<BbsQna>>(emptyList())
+    val qnaList: StateFlow<List<BbsQna>> = _qnaList.asStateFlow()
+    fun updateQnaListClear(){_qnaList.value = emptyList()
+    }
+    fun updateQnaList(newValue: List<BbsQna>){
+        val currentList = _qnaList.value.toMutableList()
+        currentList.addAll(newValue)
+        _qnaList.value = currentList
+    }
+
+    private val _ntcListPage = MutableStateFlow<Int>(1)
+    val ntcListPage: StateFlow<Int> = _ntcListPage.asStateFlow()
+    fun updateNtcListPage(newValue: Int){_ntcListPage.value = newValue}
+
+    private val _faqListPage = MutableStateFlow<Int>(1)
+    val faqListPage: StateFlow<Int> = _faqListPage.asStateFlow()
+    fun updateFaqListPage(newValue: Int){_faqListPage.value = newValue}
+
+    private val _qnaListPage = MutableStateFlow<Int>(1)
+    val qnaListPage: StateFlow<Int> = _qnaListPage.asStateFlow()
+    fun updateQnaListPage(newValue: Int){_qnaListPage.value = newValue}
 
     private val _qnaDetail = MutableStateFlow<QnaDetailRes?>(null)
     val qnaDetail: StateFlow<QnaDetailRes?> = _qnaDetail.asStateFlow()
-    fun updateQnaDetail(newValue: QnaDetailRes){
+    fun updateQnaDetail(newValue: QnaDetailRes?){
         _qnaDetail.value = newValue
     }
 
+    private val _settingCurrentTab = MutableStateFlow<String>("공지사항")
+    val settingCurrentTab: StateFlow<String> = _settingCurrentTab.asStateFlow()
+    fun updateSettingCurrentTab(newValue: String){
+        _settingCurrentTab.value = newValue
+    }
+
+    private val _settingPreUserId = MutableStateFlow<String>("")
+    val settingPreUserId : StateFlow<String> = _settingPreUserId.asStateFlow()
+    fun updateSettingPreUserId(newValue: String){
+        _settingPreUserId.value = newValue
+    }
+
+
+    private val _ntcListInit = MutableStateFlow<Boolean>(true)
+    val ntcListInit : StateFlow<Boolean> = _ntcListInit.asStateFlow()
+    fun updateNtcListInit(newValue: Boolean){
+        _ntcListInit.value = newValue
+    }
+
+    private val _faqListInit = MutableStateFlow<Boolean>(true)
+    val faqListInit : StateFlow<Boolean> = _faqListInit.asStateFlow()
+    fun updateFaqListInit(newValue: Boolean){
+        _faqListInit.value = newValue
+    }
+
+    private val _qnaListInit = MutableStateFlow<Boolean>(true)
+    val qnaListInit : StateFlow<Boolean> = _qnaListInit.asStateFlow()
+    fun updateQnaListInit(newValue: Boolean){
+        _qnaListInit.value = newValue
+    }
     // ----------------- 게시판 ------------------------
 
     // ---------------------------Modify------------------------------
@@ -675,7 +792,8 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _eventList.value = body
+                            _eventRes.value = it
+                            updateEventList(it.data.bbsEvntList)
                             continuation.resume(true)
                         }
                     }else{
@@ -739,7 +857,8 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _endEventList.value = body
+                            _endEventRes.value = it
+                            updateEndEventList(it.data.bbsAncmntWinnerList)
                             continuation.resume(true)
                         }
                     }else{
@@ -952,7 +1071,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     suspend fun getNtcList(page:Int):Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val data = BbsReq(bbsSn = 7, page = page, pageSize = 30, recordSize = 30)
+        val data = BbsReq(bbsSn = 7, page = page, pageSize = 30, recordSize = 10)
 
         val call = apiService.getNtcList(data)
         return suspendCancellableCoroutine { continuation ->
@@ -961,7 +1080,8 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _ntcList.value = it
+                            _ntcRes.value = it
+                            updateNtcList(it.data.bbsNtcList)
                             continuation.resume(true)
                         }
                     }else{
@@ -1020,17 +1140,19 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _faqList.value = body.data
+                            _faqRes.value = it
+                            updateFaqList(it.data.bbsFaqList)
                             continuation.resume(true)
                         }
                     }else{
-                        _faqList.value = null
+                        val errorBodyString = response.errorBody()!!.string()
+
+                        _dm.value = errorBodyParse(errorBodyString)
                         continuation.resume(false)
                     }
                 }
 
                 override fun onFailure(call: Call<FAQRes>, t: Throwable) {
-                    _faqList.value = null
                     continuation.resume(false)
                 }
             })
@@ -1049,7 +1171,8 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
-                            _qnaList.value = it
+                            _qnaRes.value = it
+                            it.data.bbsQnaList?.let { it1 -> updateQnaList(it1) }
                             continuation.resume(true)
                         }
                     }else{
