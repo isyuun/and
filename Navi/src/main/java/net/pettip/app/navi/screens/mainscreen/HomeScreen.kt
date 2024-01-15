@@ -175,7 +175,6 @@ fun HomeScreen(
     var refreshing by remember{ mutableStateOf(false) }
 
     val selectedPet by sharedViewModel.selectPet.collectAsState()
-    val inviteCode by sharedViewModel.inviteCode.collectAsState()
 
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val pullRefreshState = rememberPullRefreshState(
@@ -197,6 +196,7 @@ fun HomeScreen(
         0.dp
     }
 
+
     LaunchedEffect(key1 = pagerState.currentPage, key2 = currentPetInfo){
         delay(100)
         if (currentPetInfo.isNotEmpty()){
@@ -213,14 +213,9 @@ fun HomeScreen(
         pagerState.animateScrollToPage(index)
     }
 
-    LaunchedEffect(key1 = G.toPost, key2 = G.inviteCode){
+    LaunchedEffect(key1 = G.toPost){
         if(G.toPost){
             navController.navigate(Screen.PostScreen.route)
-        }else if (G.inviteCode?.length == 6) {
-            sharedViewModel.updateInviteCode(G.inviteCode)
-            delay(400)
-            navController.navigate(Screen.SetKeyScreen.route)
-            G.inviteCode = null
         }
     }
 

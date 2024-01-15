@@ -144,7 +144,7 @@ fun UserCreateScreen(modifier:Modifier=Modifier, navController: NavHostControlle
                 onValueChange = {viewModel.updateUserID(it)},
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next),
                 modifier = Modifier
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)

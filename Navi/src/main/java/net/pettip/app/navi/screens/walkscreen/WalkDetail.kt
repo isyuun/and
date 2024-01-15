@@ -216,7 +216,10 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             }
 
                             // ----------- 맵 들어갈 자리 -------------------
-                            Box {
+                            Box (
+                                modifier = Modifier
+                                    .fillMaxWidth().height(360.dp)
+                            ){
                                 val file = File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX")
                                 Log.wtf(__CLASSNAME__, "::GpxMap()${getMethodName()}[${file.exists()}][${file.length()}][${file}]")
                                 if (dailyDetail != null && gpxDownload && file.exists() && file.length() > 0) GpxMap(file) { _, event ->

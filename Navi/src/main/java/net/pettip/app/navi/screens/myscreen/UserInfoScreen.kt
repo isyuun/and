@@ -115,8 +115,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     snackbarHostState.showSnackbar(
                         message = "회원탈퇴를 완료했습니다",
                         actionLabel = "확인",
-                        duration = SnackbarDuration.Short,
-                        withDismissAction = true
+                        duration = SnackbarDuration.Short
                     )
 
                     navController.navigate(Screen.Login.route){
@@ -128,8 +127,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     snackbarHostState.showSnackbar(
                         message = "회원탈퇴를 실패해습니다",
                         actionLabel = "확인",
-                        duration = SnackbarDuration.Short,
-                        withDismissAction = true
+                        duration = SnackbarDuration.Short
                     )
                 }
                 withDraw = false

@@ -188,7 +188,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     var showImage by remember{ mutableStateOf(false) }
     var isLoading by remember{ mutableStateOf(false) }
     var rcmdtnLoading by remember{ mutableStateOf(false) }
-    var cmntExpanded by remember{ mutableStateOf(true) }
+    var cmntExpanded by remember{ mutableStateOf(false) }
     var onReply by remember{ mutableStateOf(false) }
     var isModify by remember{ mutableStateOf(false) }
     var dclrDialogOpen by remember{ mutableStateOf(false) }
@@ -209,6 +209,11 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                 false
             }
         }
+    }
+
+    LaunchedEffect(Unit){
+        delay(400)
+        cmntExpanded = true
     }
 
     BackHandler {
@@ -379,8 +384,8 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
 
                         AnimatedVisibility(
                             visible = cmntExpanded && upCmntNo0.isNotEmpty(),
-                            enter = expandVertically(tween(durationMillis = 300)).plus(fadeIn()),
-                            exit = shrinkVertically(tween(durationMillis = 300)).plus(fadeOut())
+                            enter = expandVertically(tween(durationMillis = 700)).plus(fadeIn(tween(durationMillis = 500, delayMillis = 200))),
+                            exit = shrinkVertically(tween(durationMillis = 700)).plus(fadeOut())
                         ) {
                             LazyColumn(
                                 state = rememberLazyListState(),
@@ -423,6 +428,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                     modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
                                     verticalAlignment = Alignment.Bottom
                                 ){
+                                    // TODO: 펫없이 댓글 등록시 petNM 비어있음.
                                     Text(
                                         text = "${replyCmnt?.petNm} ${stringResource(id = R.string.to_comment_writing)}",
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -1313,7 +1319,7 @@ fun CommentListItem(
                                 verticalAlignment = Alignment.Bottom
                             ){
                                 Text(
-                                    text = comment.petNm,
+                                    text = comment.petNm?: "",
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
@@ -1481,7 +1487,7 @@ fun CommentListItem(
                         verticalAlignment = Alignment.Bottom
                     ){
                         Text(
-                            text = comment.petNm,
+                            text = comment.petNm ?: "",
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
@@ -1848,7 +1854,7 @@ fun CommentListItem2(
                                 verticalAlignment = Alignment.Bottom
                             ){
                                 Text(
-                                    text = comment.petNm,
+                                    text = comment.petNm ?: "",
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
@@ -2003,7 +2009,7 @@ fun CommentListItem2(
                     verticalAlignment = Alignment.Bottom
                 ){
                     Text(
-                        text = comment.petNm,
+                        text = comment.petNm ?: "",
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,

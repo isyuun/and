@@ -300,7 +300,29 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
                         scope.launch {
-                            viewModel.onLoginButtonClick( id, password, "EMAIL")
+                            isLoading = true
+                            val result = viewModel.onLoginButtonClick(userId = id, userPw = password, loginMethod = "EMAIL")
+                            if (result==0){
+                                isLoading = false
+                                MySharedPreference.setUserEmail(id)
+                                sharedViewModel.updateInit(true)
+                                sharedViewModel.updateDupleLogin(false)
+                                navController.navigate(Screen.MainScreen.route){
+                                    popUpTo(0)
+                                }
+                            }else if (result == 1){
+                                isLoading = false
+                                focusManager.clearFocus()
+                                snackbarHostState.showSnackbar(
+                                    message = "아이디 및 패스워드를 확인해주세요.",
+                                    actionLabel = "확인",
+                                    duration = SnackbarDuration.Short,
+                                    withDismissAction = false
+                                )
+                            }else{
+                                isLoading = false
+                                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }),
                     visualTransformation = PasswordVisualTransformation(),
@@ -388,7 +410,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.clickable {  navController.navigate(route = Screen.IdPwSearch.route+"/1") })
+                        modifier = Modifier.clickable {  navController.navigate(route = Screen.PwSearchScreen.route) })
 
                     Spacer(modifier = Modifier
                         .padding(horizontal = 9.dp)

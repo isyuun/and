@@ -148,7 +148,6 @@ fun MainScreen(
             }else{
                 homeViewModel.updatePetLoading(false)
             }
-
             sharedViewModel.updateInit(false)
         }
     }
@@ -340,7 +339,8 @@ fun MainScreen(
                                                         viewModel = walkViewModel,
                                                         modifier = Modifier
                                                             .align(Alignment.Center)
-                                                            .padding(start = 20.dp, end = 60.dp)
+                                                            .padding(start = 20.dp, end = 60.dp),
+                                                        changeIsSearching = {newValue -> isSearching = newValue}
                                                     )
                                                 }
 
@@ -422,7 +422,8 @@ fun MainScreen(
                                     isSearching = isSearching,
                                     dismiss = {newValue -> isSearching = newValue},
                                     navController = navController,
-                                    modeChange = {newValue -> calendarMode = newValue}
+                                    modeChange = {newValue -> calendarMode = newValue},
+                                    sharedViewModel = sharedViewModel
                                 )
                         }
                     }

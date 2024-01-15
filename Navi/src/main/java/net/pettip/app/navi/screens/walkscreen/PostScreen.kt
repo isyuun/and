@@ -132,7 +132,7 @@ import net.pettip.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
+fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navController: NavHostController) {
     val application = GPSApplication.instance
 
     var expanded by remember { mutableStateOf(false) }
@@ -167,6 +167,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
     var isLoading by remember { mutableStateOf(false) }
     var init by rememberSaveable { mutableStateOf(true) }
     var hashString by remember { mutableStateOf("") }
+    var loadingMsg by remember { mutableStateOf("게시글 업로드중..") }
 
     val scrollState = rememberScrollState()
 
@@ -254,7 +255,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
     ) { paddingValues ->
 
         LoadingDialog(
-            loadingText = "게시글 업로드중...",
+            loadingText = loadingMsg,
             loadingState = isLoading
         )
 
@@ -627,6 +628,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                         if (state.listOfSelectedImages.size <= 1 && file == null) {
                             var dailyUpload = viewModel.uploadDaily()
                             if (dailyUpload) {
+                                sharedViewModel.updateWalkUpload(true)
                                 navController.popBackStack()
                                 isLoading = false
                             } else {
@@ -643,6 +645,7 @@ fun PostScreen(viewModel: WalkViewModel, navController: NavHostController) {
                             if (photoUpload) {
                                 var dailyUpload = viewModel.uploadDaily()
                                 if (dailyUpload) {
+                                    sharedViewModel.updateWalkUpload(true)
                                     navController.popBackStack()
                                     viewModel.updateSelectedImageList(emptyList())
                                     isLoading = false

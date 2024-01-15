@@ -164,9 +164,9 @@ data class Cmnt(
     @SerializedName("nrcmdtnCnt")
     var nrcmdtnCnt: Int, // 0
     @SerializedName("petImg")
-    var petImg: String, // /mypet/20231103/74d93117e6cb4950b2b6cb44706ada6e.JPG
+    var petImg: String?, // /mypet/20231103/74d93117e6cb4950b2b6cb44706ada6e.JPG
     @SerializedName("petNm")
-    var petNm: String, // 수정
+    var petNm: String?, // 수정
     @SerializedName("petRelUnqNo")
     var petRelUnqNo: Int, // 157
     @SerializedName("rcmdtnCnt")

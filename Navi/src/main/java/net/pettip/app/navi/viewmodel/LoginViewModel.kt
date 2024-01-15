@@ -66,9 +66,25 @@ class LoginViewModel() : ViewModel() {
     val phoneNum: StateFlow<String> = _phoneNum.asStateFlow()
     fun updatePhoneNum(newValue: String) { _phoneNum.value = newValue }
 
+    private val _pwSearchEmail = MutableStateFlow<String>("")
+    val pwSearchEmail: StateFlow<String> = _pwSearchEmail.asStateFlow()
+    fun updatePwSearchEmail(newValue: String) { _pwSearchEmail.value = newValue }
+
     private val _certiNum = MutableStateFlow<String>("")
     val certiNum: StateFlow<String> = _certiNum.asStateFlow()
     fun updateCertiNum(newValue: String) { _certiNum.value = newValue }
+
+    private val _toPwChange = MutableStateFlow<Boolean>(false)
+    val toPwChange: StateFlow<Boolean> = _toPwChange.asStateFlow()
+    fun updateToPwChange(newValue: Boolean) { _toPwChange.value = newValue }
+
+    private val _timer = MutableStateFlow<Int>(5*60)
+    val timer: StateFlow<Int> = _timer.asStateFlow()
+    fun updateTimer(newValue: Int) { _timer.value = newValue }
+
+    private val _countTime = MutableStateFlow<Boolean>(false)
+    val countTime: StateFlow<Boolean> = _countTime.asStateFlow()
+    fun updateCountTime(newValue: Boolean) { _countTime.value = newValue }
     // 아이디, 비밀번호 찾기
 
     private val _allCheck = MutableStateFlow<Boolean>(false)

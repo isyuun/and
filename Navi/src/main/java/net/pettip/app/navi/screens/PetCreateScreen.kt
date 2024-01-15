@@ -139,6 +139,7 @@ import net.pettip.data.SCD
 import net.pettip.data.SggList
 import net.pettip.data.UmdList
 import net.pettip.data.pet.PetListData
+import net.pettip.singleton.MySharedPreference
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -238,6 +239,7 @@ fun PetCreateScreen(
                                             snsLogin
                                         )
                                     if (loginSuccess == 0) {
+                                        MySharedPreference.setUserEmail(userId)
                                         sharedViewModel.updateInit(true)
                                         navController.navigate(Screen.MainScreen.route) {
                                             popUpTo(0)
@@ -902,6 +904,7 @@ fun PetCreateScreen(
                             if (userCreateSuccess){
                                 val loginSuccess = loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)
                                 if (loginSuccess == 0){
+                                    MySharedPreference.setUserEmail(userId)
                                     val petCreateSuccess = viewModel.createPet(context)
                                     if(petCreateSuccess){
                                         isLoading = false

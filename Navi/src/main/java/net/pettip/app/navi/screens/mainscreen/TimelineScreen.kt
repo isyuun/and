@@ -111,6 +111,7 @@ import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_shadow
 import net.pettip.app.navi.ui.theme.design_white
+import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.app.navi.viewmodel.getLastSegmentAfterSlash
 import net.pettip.data.daily.LifeTimeLineItem
@@ -130,7 +131,14 @@ import org.apache.commons.lang3.mutable.Mutable
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boolean) -> Unit, navController: NavHostController, modeChange: (Boolean)->Unit) {
+fun TimelineScreen(
+    viewModel: WalkViewModel,
+    isSearching: Boolean,
+    dismiss: (Boolean) -> Unit,
+    navController: NavHostController,
+    modeChange: (Boolean)->Unit,
+    sharedViewModel: SharedViewModel
+) {
 
     val petList by viewModel.petInfo.collectAsState()
     val selectedPet by viewModel.selectedPet.collectAsState()
@@ -142,6 +150,7 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
     val refresh by viewModel.timeLineRefresh.collectAsState()
     val preUserId by viewModel.preUserId.collectAsState()
     val dailyLifeTimeLineList by viewModel.dailyLifeTimeLineList.collectAsState()
+    val walkUpload by sharedViewModel.walkUpload.collectAsState()
 
 
     var isLoading by rememberSaveable { mutableStateOf(false) }
@@ -151,6 +160,13 @@ fun TimelineScreen(viewModel: WalkViewModel, isSearching: Boolean, dismiss: (Boo
 
     var previousSortType: String? by remember { mutableStateOf(null) }
     var previousSelectedPet: MutableList<PetDetailData>? by remember { mutableStateOf(null) }
+
+    LaunchedEffect(key1= walkUpload){
+        if (walkUpload){
+            sharedViewModel.updateWalkUpload(false)
+            viewModel.updateTimeLineRefresh(true)
+        }
+    }
 
     LaunchedEffect(dateLazyState.canScrollForward) {
         if (!dateLazyState.canScrollForward && !isLoadingNextPage && dailyLifeTimeLineList != null){

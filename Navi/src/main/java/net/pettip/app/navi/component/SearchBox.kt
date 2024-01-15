@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -42,7 +43,7 @@ import net.pettip.app.navi.viewmodel.WalkViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBox(viewModel:WalkViewModel, modifier: Modifier){
+fun SearchBox(viewModel:WalkViewModel, modifier: Modifier, changeIsSearching:(Boolean)->Unit){
 
     val searchText by viewModel.searchText.collectAsState()
 
@@ -52,7 +53,16 @@ fun SearchBox(viewModel:WalkViewModel, modifier: Modifier){
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next),
+            imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                viewModel.viewModelScope.launch {
+                    viewModel.dailyLifeTimeLineListClear()
+                    viewModel.getTimeLineList()
+                    changeIsSearching(false)
+                }
+            }
+        ),
         modifier = modifier
             .fillMaxWidth()
             .height(44.dp),

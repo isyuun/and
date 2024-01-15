@@ -81,6 +81,10 @@ class SharedViewModel:ViewModel(){
     val nickName:StateFlow<String> = _nickName.asStateFlow()
     fun updateNickName(newValue: String){ _nickName.value = newValue}
 
+    private val _walkUpload = MutableStateFlow<Boolean>(false) // 산책 업로드시 true
+    val walkUpload:StateFlow<Boolean> = _walkUpload.asStateFlow()
+    fun updateWalkUpload(newValue: Boolean){ _walkUpload.value = newValue }
+
     private val _init = MutableStateFlow<Boolean>(true)
     val init:StateFlow<Boolean> = _init.asStateFlow()
     fun updateInit(newValue: Boolean){ _init.value = newValue }

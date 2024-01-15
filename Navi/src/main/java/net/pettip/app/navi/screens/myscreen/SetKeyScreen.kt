@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -73,6 +76,8 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
     val dm by settingViewModel.detailMessage.collectAsState()
     val otp by settingViewModel.otpValue.collectAsState()
 
+    var sendCode by remember{ mutableStateOf(false) }
+
     DisposableEffect(Unit){
         onDispose {
             settingViewModel.updateDetailMessage()
@@ -83,6 +88,22 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
         if (!dm.isNullOrEmpty()){
             Toast.makeText(context, dm, Toast.LENGTH_SHORT).show()
             settingViewModel.updateDetailMessage()
+        }
+    }
+
+    LaunchedEffect(key1 = sendCode){
+        if (sendCode){
+            settingViewModel.viewModelScope.launch {
+                val result = settingViewModel.setInviteCode()
+                if (result){
+                    MySharedPreference.setLastInviteCode(otp)
+                    settingViewModel.updateCurrentPetInfo()
+                    settingViewModel.updatePetInfo()
+                    navController.popBackStack()
+                }else{
+                    sendCode = false
+                }
+            }
         }
     }
 
@@ -134,7 +155,11 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
 
                 Spacer(modifier = Modifier.padding(top = 20.dp))
 
-                SetKeyTemp(settingViewModel = settingViewModel, sharedViewModel = sharedViewModel)
+                SetKeyTemp(
+                    settingViewModel = settingViewModel,
+                    sharedViewModel = sharedViewModel,
+                    onSendCode = {newValue -> sendCode = newValue}
+                )
 
                 Spacer(modifier = Modifier.padding(top = 40.dp))
 
@@ -177,7 +202,7 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
 
 @OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
 @Composable
-fun SetKeyTemp(settingViewModel: SettingViewModel, sharedViewModel: SharedViewModel){
+fun SetKeyTemp(settingViewModel: SettingViewModel, sharedViewModel: SharedViewModel, onSendCode:(Boolean)->Unit){
 
     val context = LocalContext.current
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -205,7 +230,11 @@ fun SetKeyTemp(settingViewModel: SettingViewModel, sharedViewModel: SharedViewMo
             }
         },
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {onSendCode(true)}
         ),
         decorationBox = {
             Row (

@@ -50,6 +50,7 @@ import net.pettip.app.navi.screens.LoginScreen
 import net.pettip.app.navi.screens.PetCreateScreen
 import net.pettip.app.navi.screens.PetKindContent
 import net.pettip.app.navi.screens.PwFindScreen
+import net.pettip.app.navi.screens.PwSearchScreen
 import net.pettip.app.navi.screens.UserCreateScreen
 import net.pettip.app.navi.screens.commuscreen.DailyPostScreen
 import net.pettip.app.navi.screens.commuscreen.EventDetail
@@ -103,7 +104,7 @@ class MainActivity : ComponentActivity() {
                     intent.setAction("")
                     intent.setData(null)
                     intent.setFlags(0)
-                    Log.d("LOG", "data :$lastPathSegment")
+                    Log.d("LOG", "data onCreate :$lastPathSegment")
                 }
             }
         }
@@ -143,7 +144,7 @@ class MainActivity : ComponentActivity() {
                     intent.setAction("")
                     intent.setData(null)
                     intent.setFlags(0)
-                    Log.d("LOG", "data :$lastPathSegment")
+                    Log.d("LOG", "data newIntent:$lastPathSegment")
                 }
             }
         }
@@ -190,9 +191,9 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
         }
     }
 
-    LaunchedEffect(key1 = G.inviteCode){
+    LaunchedEffect(key1 = G.inviteCode, key2 = init){
         delay(400)
-        if (G.inviteCode?.length == 6 && !init ) {
+        if (G.inviteCode?.length == 6 && !init && MySharedPreference.getIsLogin()) {
             sharedViewModel.updateInviteCode(G.inviteCode)
             delay(400)
             navController.navigate(Screen.SetKeyScreen.route)
@@ -276,7 +277,7 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
         }
 
         composable("postScreen") {
-            PostScreen(walkViewModel, navController)
+            PostScreen(walkViewModel, sharedViewModel, navController)
         }
 
         composable("easyRegScreen") {
@@ -416,6 +417,9 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
         composable("dailyPostScreen") {
             DailyPostScreen(viewModel = communityViewModel, sharedViewModel = sharedViewModel, navController = navController)
         }
+        composable("pwSearchScreen"){
+            PwSearchScreen(navController = navController, viewModel = viewModel)
+        }
     }
 
     if (G.dupleLogin) {
@@ -468,6 +472,7 @@ sealed class Screen(val route: String) {
     object WalkDetailContent : Screen("walkDetailContent")
     object DailyPostScreen : Screen("dailyPostScreen")
     object WalkScreen : Screen("walkScreen")
+    object PwSearchScreen : Screen("pwSearchScreen")
 
 }
 
