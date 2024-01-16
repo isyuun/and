@@ -325,8 +325,8 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
 
                             AnimatedVisibility(
                                 visible = cmntExpanded && upCmntNo0.isNotEmpty(),
-                                enter = expandVertically(tween(durationMillis = 300)).plus(fadeIn()),
-                                exit = shrinkVertically(tween(durationMillis = 300)).plus(fadeOut())
+                                enter = expandVertically(tween(durationMillis = 700)).plus(fadeIn(tween(durationMillis = 500, delayMillis = 200))),
+                                exit = shrinkVertically(tween(durationMillis = 700)).plus(fadeOut())
                             ) {
                                 LazyColumn(
                                     state = rememberLazyListState(),
@@ -1164,7 +1164,9 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
         }
 
         AnimatedVisibility(
-            visible = step2Expand && step2CmntList.isNotEmpty()
+            visible = step2Expand && step2CmntList.isNotEmpty(),
+            enter = expandVertically(tween(durationMillis = 700)).plus(fadeIn(tween(durationMillis = 500, delayMillis = 200))),
+            exit = shrinkVertically(tween(durationMillis = 700)).plus(fadeOut(tween(durationMillis = 500, delayMillis = 200)))
         ) {
             LazyColumn(
                 state = rememberLazyListState(),

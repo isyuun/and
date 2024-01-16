@@ -39,8 +39,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.delay
 import net.pettip.BuildConfig
+import net.pettip.app.navi.component.WebViewScreen
 import net.pettip.app.navi.screens.EasyRegScreen
 import net.pettip.app.navi.screens.IdFindScreen
 import net.pettip.app.navi.screens.IdPwSearchScreen
@@ -92,6 +95,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        Log.d("LOG","onCreate 진입")
+
         val intentData: Uri? = intent.data
         if (intentData != null) {
             val pathSegments: List<String>? = intentData.pathSegments
@@ -107,6 +112,11 @@ class MainActivity : ComponentActivity() {
                     Log.d("LOG", "data onCreate :$lastPathSegment")
                 }
             }
+        }else{
+            val page = intent?.getStringExtra("page")
+            val seqNo = intent?.getStringExtra("seqNo")
+            G.pushPage = page
+            G.pushSeqNo = seqNo
         }
 
         setContent {
@@ -132,8 +142,12 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
+        Log.d("LOG","newIntent 진입")
+
         val intentData: Uri? = intent?.data
         if (intentData != null) {
+
+            Log.d("LOG", "onNewIntent if")
             val pathSegments: List<String>? = intentData.pathSegments
             val lastPathSegment: String? = pathSegments?.lastOrNull()
 
@@ -141,12 +155,18 @@ class MainActivity : ComponentActivity() {
                 if (!lastPathSegment.isNullOrBlank() && lastPathSegment.length == 6) {
                     G.inviteCode = lastPathSegment
                     intent.replaceExtras(Bundle())
-                    intent.setAction("")
-                    intent.setData(null)
-                    intent.setFlags(0)
+                    intent.action = ""
+                    intent.data = null
+                    intent.flags = 0
                     Log.d("LOG", "data newIntent:$lastPathSegment")
                 }
             }
+        }else{
+            val page = intent?.getStringExtra("page")
+            val seqNo = intent?.getStringExtra("seqNo")
+            G.pushPage = page
+            G.pushSeqNo = seqNo
+            Log.d("LOG","${page} : ${seqNo}")
         }
     }
 }
@@ -176,6 +196,16 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
     var count by remember { mutableIntStateOf(3) }
     val init by sharedViewModel.init.collectAsState()
 
+    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+        if (!task.isSuccessful) {
+            return@OnCompleteListener
+        }
+        // Get new FCM registration token
+        val token = task.result
+        // Log and toast
+        Log.d("LOG", token)
+    })
+
     LaunchedEffect(key1 = G.dupleLogin) {
         if (G.dupleLogin) {
             sharedViewModel.updateDupleLogin(true)
@@ -198,6 +228,19 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
             delay(400)
             navController.navigate(Screen.SetKeyScreen.route)
             G.inviteCode = null
+        }
+    }
+
+    LaunchedEffect(key1 = G.pushSeqNo, key2 = init){
+        delay(400)
+        if (G.pushPage != null && !init && MySharedPreference.getIsLogin()) {
+            Log.d("LOG","${G.pushPage} : ${G.pushSeqNo}")
+            delay(400)
+            navController.navigate(Screen.StoryDetail.route)
+            communityViewModel.updateLastPstSn(G.pushSeqNo?.toInt())
+            G.pushSeqNo?.toInt()?.let { communityViewModel.getStoryDetail(it) }
+            G.pushPage = null
+            G.pushSeqNo = null
         }
     }
 
@@ -420,6 +463,9 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
         composable("pwSearchScreen"){
             PwSearchScreen(navController = navController, viewModel = viewModel)
         }
+        composable("webViewScreen/{page}", arguments = listOf(navArgument("page") { type = NavType.IntType })){backStackEntry ->
+            WebViewScreen(backStackEntry.arguments?.getInt("page")?:1)
+        }
     }
 
     if (G.dupleLogin) {
@@ -473,6 +519,7 @@ sealed class Screen(val route: String) {
     object DailyPostScreen : Screen("dailyPostScreen")
     object WalkScreen : Screen("walkScreen")
     object PwSearchScreen : Screen("pwSearchScreen")
+    object WebViewScreen : Screen("webViewScreen")
 
 }
 

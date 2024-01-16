@@ -304,7 +304,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
-            BottomInfo()
+            BottomInfo(navController)
 
             Spacer(modifier = Modifier.padding(top = 80.dp))
 
@@ -1405,7 +1405,7 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
 
 
 @Composable
-fun BottomInfo(){
+fun BottomInfo(navController: NavHostController){
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -1421,7 +1421,10 @@ fun BottomInfo(){
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.6).sp,
-                color = MaterialTheme.colorScheme.secondary
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.clickable {
+                    navController.navigate("webViewScreen/1")
+                }
             )
 
             Spacer(
@@ -1434,9 +1437,12 @@ fun BottomInfo(){
             Text(
                 text = stringResource(R.string.privacy_policy),
                 fontSize = 12.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.6).sp,
-                color = MaterialTheme.colorScheme.secondary
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.clickable {
+                    navController.navigate("webViewScreen/2")
+                }
             )
 
             Spacer(
@@ -1451,7 +1457,10 @@ fun BottomInfo(){
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.6).sp,
-                color = MaterialTheme.colorScheme.secondary
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.clickable {
+                    navController.navigate("webViewScreen/3")
+                }
             )
         }
         

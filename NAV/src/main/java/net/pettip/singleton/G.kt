@@ -20,4 +20,8 @@ object G {
     // true면 PostScreen으로 이동
     var toPost by mutableStateOf(false)
     var dupleLogin by mutableStateOf(false)
+
+    // 푸쉬로 받은 데이터
+    var pushPage by mutableStateOf<String?>(null)
+    var pushSeqNo by mutableStateOf<String?>(null)
 }

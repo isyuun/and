@@ -1729,7 +1729,9 @@ fun CommentListItem(
         }
 
         AnimatedVisibility(
-            visible = step2Expand && step2CmntList.isNotEmpty()
+            visible = step2Expand && step2CmntList.isNotEmpty(),
+            enter = expandVertically(tween(durationMillis = 700)).plus(fadeIn(tween(durationMillis = 500, delayMillis = 200))),
+            exit = shrinkVertically(tween(durationMillis = 700)).plus(fadeOut(tween(durationMillis = 500, delayMillis = 200)))
         ) {
             LazyColumn(
                 state = rememberLazyListState(),

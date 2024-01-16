@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.PendingIntent.FLAG_MUTABLE
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -28,7 +29,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
             // Check if data needs to be processed by long running job
-            handleNow(remoteMessage)
+            // handleNow(remoteMessage)
         }
 
         // Check if message contains a notification payload.
@@ -56,10 +57,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         MySharedPreference.setFcmToken(token)
     }
     private fun handleNow(remoteMessage: RemoteMessage) {
-        val page = remoteMessage.data["page"]
-        val schUnqNo = remoteMessage.data["schUnqNo"]
-        MySharedPreference.setFcmDataPage(page?:"")
-        MySharedPreference.setFcmDataSchUnqNo(schUnqNo?:"")
+
         Log.d(TAG, "handleNow")
     }
 
@@ -71,12 +69,19 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     @SuppressLint("ServiceCast")
     private fun sendNotification(remoteMessage: RemoteMessage) {
 
-        val intent = Intent(this, MyFirebaseMessagingService::class.java).apply {
+        val page = remoteMessage.data["page"]
+        val seqNo = remoteMessage.data["seqNo"]
+
+        Log.d("LOG","${page} : ${seqNo}")
+
+        val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(FLAG_ACTIVITY_CLEAR_TOP)
+            putExtra("page",page)
+            putExtra("seqNo",seqNo)
         }
 
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent, FLAG_IMMUTABLE
+            this, 0, intent, FLAG_MUTABLE
         )
 
 
