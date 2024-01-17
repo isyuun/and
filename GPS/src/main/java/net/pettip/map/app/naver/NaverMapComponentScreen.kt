@@ -845,13 +845,12 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     source.isCompassEnabled = true
 
     val isSystemInDarkTheme = isSystemInDarkTheme()
-    val config = LocalConfiguration.current
     val mapOptions = remember {
         NaverMapOptions()
             .logoClickEnabled(true)
             .mapType(NaverMap.MapType.Navi)
             .nightModeEnabled(isSystemInDarkTheme)
-            .zoomControlEnabled(config.orientation == Configuration.ORIENTATION_PORTRAIT)
+            .zoomControlEnabled(true)
             .compassEnabled(source.isCompassEnabled)
             .locationButtonEnabled(true)
             .zoomGesturesEnabled(true)
@@ -1200,6 +1199,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     /** BOTTOM */
     Log.i(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
     Log.d(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[${stringResource(id = R.string.departure)}][${stringResource(id = R.string.arrival)}]")
+    val configuration = LocalConfiguration.current
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {
@@ -1260,7 +1260,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .sizeIn(maxHeight = 360.0.dp)
+                            .sizeIn(
+                                maxHeight = if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 360.0.dp else 160.0.dp
+                            )
                             .padding(bottom = 10.0.dp)
                     ) {
                         items(pets) { pet ->
@@ -1279,24 +1281,6 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 )
                             }
                         }
-                    }
-                    R.string.walk_check_select
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { checkedSel = !checkedSel },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End,
-                    ) {
-                        //Checkbox(
-                        //    checked = checkedSel,
-                        //    onCheckedChange = { checkedSel = it },
-                        //)
-                        //Text(
-                        //    text = stringResource(id = R.string.walk_check_select),
-                        //    fontSize = 14.sp,
-                        //    letterSpacing = (-0.7).sp
-                        //)
                     }
                     /** walk */
                     Button(
