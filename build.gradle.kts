@@ -55,18 +55,26 @@ subprojects {
             }
             buildTypes {
                 getByName("debug") {
-                    signingConfig = signingConfigs.getByName("debug")
-                    proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
                     //isMinifyEnabled = true
+                    //isShrinkResources = true
                     //isDebuggable = true
                     //manifestPlaceholders["enableCrashlytics"] = "false"
+                    signingConfig = signingConfigs.getByName("debug")
+                    proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
+                    ndk {
+                        debugSymbolLevel = "FULL"
+                    }
                 }
                 getByName("release") {
-                    signingConfig = signingConfigs.getByName("release")
-                    proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
                     isMinifyEnabled = true
+                    isShrinkResources = true
                     //isDebuggable = false
                     //manifestPlaceholders["enableCrashlytics"] = "true"
+                    signingConfig = signingConfigs.getByName("release")
+                    proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "retrofit2.pro", "proguard.cfg")
+                    ndk {
+                        debugSymbolLevel = "FULL"
+                    }
                 }
             }
         }
