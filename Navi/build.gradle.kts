@@ -1,5 +1,3 @@
-import java.util.Properties
-
 //import org.jetbrains.kotlin.base.kapt3.KaptOptions
 //import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
@@ -21,8 +19,8 @@ android {
         applicationId = "net.pettip.app.navi"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
