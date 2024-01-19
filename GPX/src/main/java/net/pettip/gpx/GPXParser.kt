@@ -19,6 +19,7 @@ import org.joda.time.format.ISODateTimeFormat
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.File
+import java.io.FileInputStream
 import java.io.IOException
 
 /**
@@ -35,8 +36,12 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
 
     @Throws(XmlPullParserException::class, IOException::class)
     fun read(file: File) {
+        read(file.inputStream())
+    }
+
+    @Throws(XmlPullParserException::class, IOException::class)
+    fun read(`in`: FileInputStream) {
         try {
-            val `in` = file.inputStream()
             `in`.use {
                 val parser = Xml.newPullParser()
                 parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true)

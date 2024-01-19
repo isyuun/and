@@ -98,6 +98,7 @@ import net.pettip.map.app.naver.GpxMap
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
+import java.io.FileInputStream
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
@@ -216,21 +217,40 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             }
 
                             // ----------- 맵 들어갈 자리 -------------------
-                            Box (
-                                modifier = Modifier
-                                    .fillMaxWidth().height(360.dp)
-                            ){
-                                val file = File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX")
-                                Log.wtf(__CLASSNAME__, "::GpxMap()${getMethodName()}[${file.exists()}][${file.length()}][${file}]")
-                                if (dailyDetail != null && gpxDownload && file.exists() && file.length() > 0) GpxMap(file) { _, event ->
-                                    when (event.action) {
-                                        MotionEvent.ACTION_DOWN -> isTouch = true
-                                        MotionEvent.ACTION_UP -> isTouch = false
-                                        else -> isTouch = true
-                                    }
-                                    //Log.v(__CLASSNAME__, "pointerInteropFilter()${getMethodName()}[isTouch:$isTouch][MotionEvent:$event]")
-                                    false
+                            val file: File? = try {
+                                File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX")
+                                //File("")  //test
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                null
+                            }
+                            Log.wtf(__CLASSNAME__, "::GpxMap()${getMethodName()}[${file?.exists()}][${file?.length()}][${file}]")
+                            val `in`: FileInputStream? = file?.let { f ->
+                                try {
+                                    if (f.exists() && f.length() > 0) f.inputStream() else null
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    null
                                 }
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(360.dp)
+                            ) {
+                                if (dailyDetail != null && gpxDownload)
+                                    `in`?.let { i ->
+                                        if (i.available() > 0)
+                                            GpxMap(i) { _, event ->
+                                                isTouch = when (event.action) {
+                                                    MotionEvent.ACTION_DOWN -> true
+                                                    MotionEvent.ACTION_UP -> false
+                                                    else -> true
+                                                }
+                                                //Log.v(__CLASSNAME__, "pointerInteropFilter()${getMethodName()}[isTouch:$isTouch][MotionEvent:$event]")
+                                                false
+                                            }
+                                    }
                             }
                             // ----------- 맵 들어갈 자리 -------------------
 

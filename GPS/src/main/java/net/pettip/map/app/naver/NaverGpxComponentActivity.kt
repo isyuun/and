@@ -43,6 +43,7 @@ import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
+import java.io.FileInputStream
 import java.util.Collections
 
 /**
@@ -89,18 +90,31 @@ fun GpxApp() {
     val application = GPSApplication.instance
     val file = (LocalContext.current as? ComponentActivity)?.intent?.getStringExtra(KEY_FOREGROUND_GPXFILE)?.let { File(it) }
     Log.wtf(__CLASSNAME__, "${getMethodName()}[$application][${application.service}][$file]")
-    GpxApp(file = file)
+    file?.let { GpxApp(file = it) }
 }
 
 @Composable
-fun GpxApp(file: File?) {
+fun GpxApp(file: File) {
     GpxMap(file, Modifier.fillMaxSize()) { _, _ -> false }
 }
 
 @SuppressLint("ClickableViewAccessibility")
 @Composable
 fun GpxMap(
-    file: File?,
+    file: File,
+    modifier: Modifier = Modifier
+        .padding(horizontal = 20.dp)
+        .fillMaxWidth()
+        .height(360.dp),
+    onTouch: (View, MotionEvent) -> Boolean
+) {
+    GpxMap(file.inputStream(), modifier) { view, event -> onTouch(view, event) }
+}
+
+@SuppressLint("ClickableViewAccessibility")
+@Composable
+fun GpxMap(
+    `in`: FileInputStream,
     modifier: Modifier = Modifier
         .padding(horizontal = 20.dp)
         .fillMaxWidth()
@@ -110,7 +124,7 @@ fun GpxMap(
     val context = LocalContext.current
     val tracks = Collections.synchronizedList(ArrayList<Track>())
 
-    file?.let { GPXParser(tracks).read(it) }
+    `in`.let { GPXParser(tracks).read(it) }
 
     val isSystemInDarkTheme = isSystemInDarkTheme()
     val mapOptions = remember {
