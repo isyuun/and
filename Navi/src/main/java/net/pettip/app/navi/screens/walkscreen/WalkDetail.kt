@@ -232,24 +232,6 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                     .height(360.dp)
                             ) {
                                 if (dailyDetail != null && gpxDownload) {
-                                    //val file: File? = try {
-                                    //    File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX")
-                                    //    //File("")  //test
-                                    //} catch (e: Exception) {
-                                    //    e.printStackTrace()
-                                    //    null
-                                    //}
-                                    //Log.wtf(__CLASSNAME__, "::GpxMap()${getMethodName()}[${file?.exists()}][${file?.length()}][${file}]")
-                                    //val `in`: FileInputStream? = file?.let { f ->
-                                    //    try {
-                                    //        if (f.exists() && f.length() > 0) f.inputStream() else null
-                                    //    } catch (e: Exception) {
-                                    //        e.printStackTrace()
-                                    //        null
-                                    //    }
-                                    //}
-                                    //val `in`= gpxInputStream
-                                    //Log.v(__CLASSNAME__, "GpxMap()${getMethodName()}[${gpxInputStream?.available()}][${`in`?.available()}]")
                                     gpxInputStream?.let { i ->
                                         if (i.available() > 0)
                                             GpxMap(i) { _, event ->
