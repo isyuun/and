@@ -251,6 +251,9 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
 
     private val _gpxInputStream = MutableStateFlow<InputStream?>(null)
     val gpxInputStream: StateFlow<InputStream?> = _gpxInputStream.asStateFlow()
+    fun updateGpxInputStream(newValue: InputStream?){
+        _gpxInputStream.value = newValue
+    }
 
     //------------------------------------------------------------------------------//
     private val _walkMemo = MutableStateFlow<String>("")

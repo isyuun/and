@@ -112,6 +112,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     DisposableEffect(Unit) {
         onDispose {
             walkViewModel.updateDailyDetail(null)
+            walkViewModel.updateGpxInputStream(null)
         }
     }
 
@@ -124,6 +125,8 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     val context = LocalContext.current
 
     var gpxDownload by remember { mutableStateOf(false) }
+    var gpxDownloading by remember { mutableStateOf(false) }
+
     var imageLoading by remember { mutableStateOf(false) }
     var showImage by remember { mutableStateOf(false) }
     var refresh by remember { mutableStateOf(false) }
@@ -157,12 +160,16 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
 
     LaunchedEffect(key1 = dailyDetail) {
-        if (!dailyDetail?.totMvmnPathFileSn.isNullOrEmpty() && !gpxDownload){
+        if (!dailyDetail?.totMvmnPathFileSn.isNullOrEmpty() && !gpxDownload && !gpxDownloading){
             dailyDetail?.totMvmnPathFileSn?.let {
+                gpxDownloading = true
                 walkViewModel.viewModelScope.launch {
                     val result = walkViewModel.saveGpxFileToStream(totMvmnPathFileSn = it, context = context, fileName = "${dailyDetail?.schUnqNo}.GPX")
                     if (result){
                         gpxDownload = true
+                        gpxDownloading = false
+                    }else{
+                        gpxDownloading = false
                     }
                 }
             }
