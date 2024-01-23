@@ -155,7 +155,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     }
 
     LaunchedEffect(key1 = dailyDetail) {
-        if (!dailyDetail?.totMvmnPathFileSn.isNullOrEmpty()){
+        if (!dailyDetail?.totMvmnPathFileSn.isNullOrEmpty() && !gpxDownload){
             dailyDetail?.totMvmnPathFileSn?.let {
                 walkViewModel.viewModelScope.launch {
                     val result = walkViewModel.saveGpxFileToStream(totMvmnPathFileSn = it, context = context, fileName = "${dailyDetail?.schUnqNo}.GPX")
