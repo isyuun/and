@@ -117,6 +117,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     val isLoading by walkViewModel.isLoading.collectAsState()
     val dailyDetail by walkViewModel.dailyDetail.collectAsState()
     val lastDaily by walkViewModel.lastDaily.collectAsState()
+    val gpxInputStream by walkViewModel.gpxInputStream.collectAsState()
 
 
     val context = LocalContext.current
@@ -157,7 +158,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
         if (!dailyDetail?.totMvmnPathFileSn.isNullOrEmpty()){
             dailyDetail?.totMvmnPathFileSn?.let {
                 walkViewModel.viewModelScope.launch {
-                    val result = walkViewModel.saveGpxFile(totMvmnPathFileSn = it, context = context, fileName = "${dailyDetail?.schUnqNo}.GPX")
+                    val result = walkViewModel.saveGpxFileToStream(totMvmnPathFileSn = it, context = context, fileName = "${dailyDetail?.schUnqNo}.GPX")
                     if (result){
                         gpxDownload = true
                     }

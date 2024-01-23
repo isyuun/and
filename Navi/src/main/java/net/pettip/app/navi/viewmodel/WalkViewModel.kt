@@ -249,6 +249,9 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         _photoRes.value = newValue
     }
 
+    private val _gpxInputStream = MutableStateFlow<InputStream?>(null)
+    val gpxInputStream: StateFlow<InputStream?> = _gpxInputStream.asStateFlow()
+
     //------------------------------------------------------------------------------//
     private val _walkMemo = MutableStateFlow<String>("")
     val walkMemo: StateFlow<String> = _walkMemo.asStateFlow()
@@ -442,6 +445,25 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
                     // saveInputStreamToFile도 코루틴 내에서 호출
                     saveInputStreamToFile(inputStream, context, fileName)
                 }
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun saveGpxFileToStream(totMvmnPathFileSn: String, context: Context, fileName: String): Boolean {
+        return try {
+            val apiService = RetrofitClientServer.instance
+            val data = GpxDownRes(totMvmnPathFileSn)
+
+            val call = apiService.getGpxFile(data)
+            val response = call.awaitResponse()
+
+            if (response.isSuccessful) {
+                _gpxInputStream.value = response.body()?.byteStream()
                 true
             } else {
                 false
