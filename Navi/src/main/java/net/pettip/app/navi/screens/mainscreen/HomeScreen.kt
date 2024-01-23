@@ -24,6 +24,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -787,7 +788,7 @@ fun ProfileContent(
             onDismissRequest = { openBottomSheet = false },
             sheetState = bottomSheetState,
             containerColor = Color.Transparent,
-            dragHandle = null
+            dragHandle = null,
         ) {
             Column {
                 BottomSheetContent(viewModel = viewModel, navController = navController) { newValue ->
@@ -1157,7 +1158,8 @@ fun BottomSheetContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(max = 300.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(vertical = 10.dp)
             ){
                 items(petList){ petList ->
                     BottomSheetItem(viewModel = viewModel, petList)
@@ -1255,40 +1257,44 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
 
     val selectPet by viewModel.selectPetManage.collectAsState()
 
-    Button(
-        onClick = {
-            viewModel.updateSelectPetManage(petList)
-            viewModel.updateProfilePet(petList)
-            //viewModel.updatePetListSelectIndex(index.toString())
-                  },
+    Box (
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp)
             .fillMaxWidth()
             .wrapContentHeight()
-            .shadow(ambientColor = design_shadow, elevation = 0.dp)
-        ,
-        shape = RoundedCornerShape(12.dp),
-        colors = if(petList == selectPet) {
-            ButtonDefaults.buttonColors(design_select_btn_bg)
-        } else {
-            ButtonDefaults.buttonColors(Color.Transparent)
-        },
-        border = if(petList == selectPet) {
-            BorderStroke(1.dp, color = design_select_btn_text)
-        } else {
-            BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer)
-        },
-        contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-        elevation = if(petList == selectPet){
-            ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
-        } else {
-            ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-        }
-
-    ) {
+            .shadow(
+                color = MaterialTheme.colorScheme.surface,
+                offsetX = 2.dp,
+                offsetY = 2.dp,
+                spread = 2.dp,
+                blurRadius = 2.dp,
+                borderRadius = 12.dp
+            )
+            .clickable {
+                viewModel.updateSelectPetManage(petList)
+                viewModel.updateProfilePet(petList)
+            }
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                color = if(petList == selectPet) {
+                   design_select_btn_bg
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
+                shape = RoundedCornerShape(12.dp)
+            )
+            .border(
+                border = if(petList == selectPet) {
+                    BorderStroke(1.dp, color = design_select_btn_text)
+                } else {
+                    BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                },
+                shape = RoundedCornerShape(12.dp)
+            )
+    ){
         Row (
             modifier= Modifier
-                .padding(vertical = 14.dp)
+                .padding(14.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ){
@@ -1401,6 +1407,153 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
             }
         }
     }
+
+    //Button(
+    //    onClick = {
+    //        viewModel.updateSelectPetManage(petList)
+    //        viewModel.updateProfilePet(petList)
+    //        //viewModel.updatePetListSelectIndex(index.toString())
+    //              },
+    //    modifier = Modifier
+    //        .padding(start = 20.dp, end = 20.dp)
+    //        .fillMaxWidth()
+    //        .wrapContentHeight()
+    //        .shadow(ambientColor = design_shadow, elevation = 0.dp)
+    //    ,
+    //    shape = RoundedCornerShape(12.dp),
+    //    colors = if(petList == selectPet) {
+    //        ButtonDefaults.buttonColors(design_select_btn_bg)
+    //    } else {
+    //        ButtonDefaults.buttonColors(Color.Transparent)
+    //    },
+    //    border = if(petList == selectPet) {
+    //        BorderStroke(1.dp, color = design_select_btn_text)
+    //    } else {
+    //        BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer)
+    //    },
+    //    contentPadding = PaddingValues(start = 14.dp,end=14.dp),
+    //    elevation = if(petList == selectPet){
+    //        ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
+    //    } else {
+    //        ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+    //    },
+    //    interactionSource = remember{ MutableInteractionSource() }
+    //) {
+    //    Row (
+    //        modifier= Modifier
+    //            .padding(vertical = 14.dp)
+    //            .fillMaxWidth(),
+    //        verticalAlignment = Alignment.CenterVertically
+    //    ){
+    //        Box(
+    //            modifier = Modifier
+    //                .size(46.dp)
+    //                .border(
+    //                    shape = CircleShape,
+    //                    border =
+    //                    BorderStroke(
+    //                        2.dp,
+    //                        color = if (petList == selectPet) MaterialTheme.colorScheme.tertiary else design_white
+    //                    )
+    //                )
+    //                .shadow(
+    //                    color = MaterialTheme.colorScheme.onSurface,
+    //                    offsetY = 10.dp,
+    //                    offsetX = 10.dp,
+    //                    spread = 4.dp,
+    //                    blurRadius = 3.dp,
+    //                    borderRadius = 90.dp
+    //                )
+    //                .clip(CircleShape)
+    //        ) {
+    //            AsyncImage(
+    //                model = ImageRequest.Builder(LocalContext.current)
+    //                    .data(imageUri)
+    //                    .crossfade(true)
+    //                    .build(),
+    //                contentDescription = "",
+    //                placeholder = painterResource(id = R.drawable.profile_default),
+    //                error= painterResource(id = R.drawable.profile_default),
+    //                modifier= Modifier.fillMaxSize(),
+    //                contentScale = ContentScale.Crop
+    //            )
+    //
+    //        }
+    //
+    //        Column (
+    //            modifier = Modifier
+    //                .padding(start = 8.dp)
+    //                .background(Color.Transparent)
+    //        ){
+    //            Row (
+    //                verticalAlignment = Alignment.CenterVertically
+    //            ){
+    //                Text(
+    //                    text = petName,
+    //                    fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+    //                    fontSize = 16.sp,
+    //                    letterSpacing = (-0.8).sp,
+    //                    color = if (petList == selectPet) design_login_text else MaterialTheme.colorScheme.onPrimary
+    //                )
+    //
+    //                Text(
+    //                    text = if(petList.mngrType == "C") "~${petList.endDt}" else "",
+    //                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+    //                    fontSize = 12.sp,
+    //                    letterSpacing = (-0.8).sp,
+    //                    color = MaterialTheme.colorScheme.secondary,
+    //                    modifier = Modifier.padding(start = 6.dp)
+    //                )
+    //            }
+    //
+    //            Row (
+    //                modifier = Modifier
+    //                    .background(Color.Transparent),
+    //                verticalAlignment = Alignment.CenterVertically
+    //            ){
+    //                Text(
+    //                    text = petKind,
+    //                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+    //                    fontSize = 12.sp,
+    //                    letterSpacing = (-0.8).sp,
+    //                    color = MaterialTheme.colorScheme.secondary
+    //                )
+    //
+    //                Spacer(
+    //                    modifier = Modifier
+    //                        .padding(horizontal = 4.dp)
+    //                        .size(2.dp, 8.dp)
+    //                        .background(color = MaterialTheme.colorScheme.secondary)
+    //                )
+    //
+    //                Text(
+    //                    text = petAge,
+    //                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+    //                    fontSize = 12.sp,
+    //                    letterSpacing = (-0.8).sp,
+    //                    color = MaterialTheme.colorScheme.secondary
+    //                )
+    //
+    //                Spacer(
+    //                    modifier = Modifier
+    //                        .padding(horizontal = 4.dp)
+    //                        .size(2.dp, 8.dp)
+    //                        .background(color = MaterialTheme.colorScheme.secondary)
+    //                )
+    //
+    //                Text(
+    //                    text = petGender,
+    //                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+    //                    fontSize = 12.sp,
+    //                    letterSpacing = (-0.8).sp,
+    //                    color = MaterialTheme.colorScheme.secondary
+    //                )
+    //
+    //            }
+    //
+    //        }
+    //    }
+    //}
 }
 
 

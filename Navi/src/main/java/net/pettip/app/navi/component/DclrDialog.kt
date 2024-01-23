@@ -50,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -128,7 +129,7 @@ fun DclrDialog(
                 modifier = Modifier.fillMaxWidth()
             ){
                 Text(
-                    text = "신고사유",
+                    text = stringResource(R.string.dclr_reason),
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 16.sp, letterSpacing = (-0.8).sp,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -151,7 +152,7 @@ fun DclrDialog(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     Text(
-                        text = selectDclr?.cdNm?:"문의유형을 선택해주세요",
+                        text = selectDclr?.cdNm?: stringResource(id = R.string.inquiry_type_select),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -187,7 +188,7 @@ fun DclrDialog(
                 }
 
                 Text(
-                    text = "신고내용",
+                    text = stringResource(R.string.dclr_memo),
                     fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                     fontSize = 16.sp, letterSpacing = (-0.8).sp,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -205,7 +206,7 @@ fun DclrDialog(
                         .padding(start = 20.dp, end = 20.dp)
                         .fillMaxWidth()
                         .height(150.dp),
-                    placeholder = { Text(text = "신고내용을 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                    placeholder = { Text(text = stringResource(R.string.place_holder_dclrcn), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                         focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -240,7 +241,7 @@ fun DclrDialog(
                         contentAlignment = Alignment.Center
                     ){
                         Text(
-                            text = "취소",
+                            text = stringResource(id = R.string.cancel_kor),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
                             color = MaterialTheme.colorScheme.onPrimary,
@@ -257,11 +258,11 @@ fun DclrDialog(
                             ) {
                                 if (selectDclr == null) {
                                     Toast
-                                        .makeText(context, "신고사유를 선택해주세요", Toast.LENGTH_SHORT)
+                                        .makeText(context, R.string.select_dclr_reason, Toast.LENGTH_SHORT)
                                         .show()
                                 } else if (dclrCn.isNullOrBlank()) {
                                     Toast
-                                        .makeText(context, "신고내용을 입력해주세요", Toast.LENGTH_SHORT)
+                                        .makeText(context, R.string.place_holder_dclrcn, Toast.LENGTH_SHORT)
                                         .show()
                                 } else {
                                     scope.launch {
@@ -271,12 +272,12 @@ fun DclrDialog(
                                             onDismiss(false)
                                             isLoading = false
                                             Toast
-                                                .makeText(context, "신고처리 되었습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.report_processed, Toast.LENGTH_SHORT)
                                                 .show()
                                         } else {
                                             isLoading = false
                                             Toast
-                                                .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                 .show()
                                         }
                                     }
@@ -286,7 +287,225 @@ fun DclrDialog(
                         contentAlignment = Alignment.Center
                     ){
                         Text(
-                            text = "신고",
+                            text = stringResource(R.string.reporting),
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = design_white,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EventDclrDialog(
+    viewModel : CommunityViewModel,
+    expanded : Boolean,
+    expandChange: (Boolean) -> Unit,
+    onDismiss: (Boolean) -> Unit,
+){
+    val dclrCn by viewModel.dclrCn.collectAsState()
+    val dclrList by viewModel.dclrList.collectAsState()
+    val selectDclr by viewModel.selectDclr.collectAsState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var isLoading by remember{ mutableStateOf(false) }
+
+    LaunchedEffect(Unit){
+        viewModel.getDclrList()
+    }
+
+    DisposableEffect(Unit){
+        onDispose {
+            viewModel.updateDclrCn("")
+            viewModel.updateSelectDclr(null)
+            viewModel.updateDclrList(null)
+            viewModel.updateSelectEventCmnt(null)
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = { onDismiss(false) },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Box(modifier = Modifier
+            .padding(horizontal = 40.dp)
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(20.dp)
+            )
+        ){
+            Column (
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Text(
+                    text = stringResource(id = R.string.dclr_reason),
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(start = 20.dp, top = 20.dp)
+                )
+
+                Row (
+                    modifier = Modifier
+                        .padding(start = 20.dp, end = 20.dp, top = 8.dp)
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .border(
+                            width = 1.dp,
+                            color = if (expanded) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable { expandChange(!expanded) },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text(
+                        text = selectDclr?.cdNm?: stringResource(id = R.string.inquiry_type_select),
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+
+                    Icon(
+                        imageVector = if(expanded){
+                            Icons.Default.KeyboardArrowUp
+                        }else{
+                            Icons.Default.KeyboardArrowDown
+                        },
+                        contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(end = 16.dp))
+                }
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 400.dp)
+                        .background(color = Color.Transparent),
+                    //verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    itemsIndexed(dclrList?.data?.get(0)?.cdDetailList?: emptyList()){ index,item ->
+                        AnimatedVisibility(
+                            visible = expanded,
+                            enter = slideInHorizontally(tween(delayMillis = 50*index))+ fadeIn(tween(delayMillis = 50*index)),
+                            exit = slideOutHorizontally()+ fadeOut()
+                        ) {
+                            DclrItem(viewModel = viewModel, dclrData = item, onClick = expandChange)
+                        }
+                    }
+                }
+
+                Text(
+                    text = stringResource(id = R.string.dclr_memo),
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 8.dp)
+                )
+
+                CustomTextField(
+                    value = dclrCn,
+                    onValueChange = { viewModel.updateDclrCn(it) },
+                    singleLine = false,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done),
+                    modifier = Modifier
+                        .padding(start = 20.dp, end = 20.dp)
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    placeholder = { Text(text = stringResource(id = R.string.place_holder_dclrcn), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                        focusedContainerColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                        cursorColor = design_intro_bg.copy(alpha = 0.5f)
+                    ),
+                    textStyle = TextStyle(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        fontSize = 16.sp, letterSpacing = (-0.4).sp
+                    ),
+                    shape = RoundedCornerShape(4.dp),
+                    innerPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp)
+                )
+
+                Row (
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                ){
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(MaterialTheme.colorScheme.onSecondary)
+                            .clickable { onDismiss(false) },
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = stringResource(id = R.string.cancel_kor),
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(design_sharp)
+                            .clickable(
+                                enabled = !isLoading
+                            ) {
+                                if (selectDclr == null) {
+                                    Toast
+                                        .makeText(context, R.string.select_dclr_reason, Toast.LENGTH_SHORT)
+                                        .show()
+                                } else if (dclrCn.isNullOrBlank()) {
+                                    Toast
+                                        .makeText(context, R.string.place_holder_dclrcn, Toast.LENGTH_SHORT)
+                                        .show()
+                                } else {
+                                    scope.launch {
+                                        isLoading = true
+                                        val result = viewModel.eventDclrCreate()
+                                        if (result) {
+                                            onDismiss(false)
+                                            isLoading = false
+                                            Toast
+                                                .makeText(context, R.string.report_processed, Toast.LENGTH_SHORT)
+                                                .show()
+                                        } else {
+                                            isLoading = false
+                                            Toast
+                                                .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
+                                                .show()
+                                        }
+                                    }
+                                }
+                            }
+                        ,
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = stringResource(id = R.string.reporting),
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             fontSize = 14.sp, letterSpacing = (-0.7).sp,
                             color = design_white,

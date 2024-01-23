@@ -1021,7 +1021,7 @@ fun WeightCNDDialog(
                             .clickable {
                                 if (petWeightList?.size == 1) {
                                     Toast
-                                        .makeText(context, "삭제 할 수 없습니다", Toast.LENGTH_SHORT)
+                                        .makeText(context, R.string.unable_delete, Toast.LENGTH_SHORT)
                                         .show()
                                 } else {
                                     scope.launch {
@@ -1032,7 +1032,7 @@ fun WeightCNDDialog(
                                             onDismiss(false)
                                             refresh(true)
                                             Toast
-                                                .makeText(context, "삭제되었습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.delete_success, Toast.LENGTH_SHORT)
                                                 .show()
                                         } else {
                                             Toast
@@ -1069,7 +1069,7 @@ fun WeightCNDDialog(
                                             onDismiss(false)
                                             refresh(true)
                                             Toast
-                                                .makeText(context, "수정되었습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.modify_success, Toast.LENGTH_SHORT)
                                                 .show()
                                         } else {
                                             Toast
@@ -1079,7 +1079,7 @@ fun WeightCNDDialog(
                                     }
                                 } else {
                                     Toast
-                                        .makeText(context, "올바른 체중을 입력해주세요", Toast.LENGTH_SHORT)
+                                        .makeText(context, R.string.invalid_pet_weight, Toast.LENGTH_SHORT)
                                         .show()
                                 }
 
@@ -1351,11 +1351,11 @@ fun WeightDialog(
                                 .clickable {
                                     if (pickDate == "") {
                                         Toast
-                                            .makeText(context, "날짜를 입력해주세요", Toast.LENGTH_SHORT)
+                                            .makeText(context, R.string.enter_date, Toast.LENGTH_SHORT)
                                             .show()
                                     } else if (!isValidFloat(petWeight)) {
                                         Toast
-                                            .makeText(context, "올바른 체중을 입력해주세요", Toast.LENGTH_SHORT)
+                                            .makeText(context, R.string.invalid_pet_weight, Toast.LENGTH_SHORT)
                                             .show()
                                     } else {
                                         scope.launch {
@@ -1364,7 +1364,7 @@ fun WeightDialog(
                                                 onDismiss(false)
                                                 refresh(true)
                                                 Toast
-                                                    .makeText(context, "등록되었습니다", Toast.LENGTH_SHORT)
+                                                    .makeText(context, R.string.registration_success, Toast.LENGTH_SHORT)
                                                     .show()
                                             } else {
                                                 Toast

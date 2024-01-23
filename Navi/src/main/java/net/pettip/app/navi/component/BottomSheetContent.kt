@@ -3,6 +3,7 @@ package net.pettip.app.navi.component
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -86,7 +88,7 @@ fun CustomBottomSheet(title:String, btnText:String, viewModel: SharedViewModel, 
 
         if (petList[0].ownrPetUnqNo == ""){
             Text(
-                text = "등록된 반려동물이 없어요",
+                text = stringResource(R.string.no_registed_pet),
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 16.sp, letterSpacing = (-0.8).sp,
                 color = design_login_text,
@@ -142,31 +144,38 @@ fun BottomSheetItem(viewModel: SharedViewModel, petList : CurrentPetData){
 
     val selectedPetTemp by viewModel.selectPetTemp.collectAsState()
 
-    Button(
-        onClick = { viewModel.updateSelectPetTemp(petList) },
+    Box (
         modifier = Modifier
             .size(width = screenWidth / 3, height = screenWidth / 3 - 9.dp)
-            .shadow(ambientColor = design_shadow, elevation = 0.dp)
-        ,
-        shape = RoundedCornerShape(12.dp),
-        colors = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) {
-            ButtonDefaults.buttonColors(design_select_btn_bg)
-        } else {
-            ButtonDefaults.buttonColors(Color.Transparent)
-        },
-        border = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) {
-            BorderStroke(1.dp, color = design_select_btn_text)
-        } else {
-            BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer)
-        },
-        contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-        elevation = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo){
-            ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
-        } else {
-            ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-        }
-
-    ) {
+            .shadow(
+                color = MaterialTheme.colorScheme.surface,
+                offsetX = 2.dp,
+                offsetY = 2.dp,
+                spread = 2.dp,
+                blurRadius = 2.dp,
+                borderRadius = 12.dp
+            )
+            .clickable {
+                viewModel.updateSelectPetTemp(petList)
+            }
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                color = if (petList.ownrPetUnqNo == selectedPetTemp?.ownrPetUnqNo) {
+                    design_select_btn_bg
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
+                shape = RoundedCornerShape(12.dp)
+            )
+            .border(
+                border = if (petList.ownrPetUnqNo == selectedPetTemp?.ownrPetUnqNo) {
+                    BorderStroke(1.dp, color = design_select_btn_text)
+                } else {
+                    BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                },
+                shape = RoundedCornerShape(12.dp)
+            )
+    ){
         Column (
             modifier= Modifier
                 .fillMaxSize(),
@@ -176,9 +185,12 @@ fun BottomSheetItem(viewModel: SharedViewModel, petList : CurrentPetData){
             Box(
                 modifier = Modifier
                     .size(46.dp)
-                    .border(shape = CircleShape, border = BorderStroke(2.dp,
-                        color = if (petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) MaterialTheme.colorScheme.primary else design_white
-                    ))
+                    .border(
+                        shape = CircleShape, border = BorderStroke(
+                            2.dp,
+                            color = if (petList.ownrPetUnqNo == selectedPetTemp?.ownrPetUnqNo) MaterialTheme.colorScheme.primary else design_white
+                        )
+                    )
                     //.shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
                     .shadow(
                         color = MaterialTheme.colorScheme.onSurface,
@@ -215,4 +227,78 @@ fun BottomSheetItem(viewModel: SharedViewModel, petList : CurrentPetData){
             )
         }
     }
+    //
+    //Button(
+    //    onClick = { viewModel.updateSelectPetTemp(petList) },
+    //    modifier = Modifier
+    //        .size(width = screenWidth / 3, height = screenWidth / 3 - 9.dp)
+    //        .shadow(ambientColor = design_shadow, elevation = 0.dp)
+    //    ,
+    //    shape = RoundedCornerShape(12.dp),
+    //    colors = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) {
+    //        ButtonDefaults.buttonColors(design_select_btn_bg)
+    //    } else {
+    //        ButtonDefaults.buttonColors(Color.Transparent)
+    //    },
+    //    border = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) {
+    //        BorderStroke(1.dp, color = design_select_btn_text)
+    //    } else {
+    //        BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer)
+    //    },
+    //    contentPadding = PaddingValues(start = 14.dp,end=14.dp),
+    //    elevation = if(petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo){
+    //        ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
+    //    } else {
+    //        ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+    //    }
+    //
+    //) {
+    //    Column (
+    //        modifier= Modifier
+    //            .fillMaxSize(),
+    //        horizontalAlignment = Alignment.CenterHorizontally,
+    //        verticalArrangement = Arrangement.Center
+    //    ){
+    //        Box(
+    //            modifier = Modifier
+    //                .size(46.dp)
+    //                .border(shape = CircleShape, border = BorderStroke(2.dp,
+    //                    color = if (petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) MaterialTheme.colorScheme.primary else design_white
+    //                ))
+    //                //.shadow(elevation = 10.dp, shape = CircleShape, spotColor = Color.Gray)
+    //                .shadow(
+    //                    color = MaterialTheme.colorScheme.onSurface,
+    //                    offsetY = 10.dp,
+    //                    offsetX = 10.dp,
+    //                    spread = 4.dp,
+    //                    blurRadius = 3.dp,
+    //                    borderRadius = 90.dp
+    //                )
+    //                .clip(CircleShape)
+    //        ) {
+    //            AsyncImage(
+    //                model = ImageRequest.Builder(LocalContext.current)
+    //                    .data(imageUri)
+    //                    .crossfade(true)
+    //                    .build(),
+    //                contentDescription = "",
+    //                placeholder = painterResource(id = R.drawable.profile_default),
+    //                error= painterResource(id = R.drawable.profile_default),
+    //                modifier= Modifier.fillMaxSize(),
+    //                contentScale = ContentScale.Crop
+    //            )
+    //
+    //        }
+    //
+    //        Spacer(modifier = Modifier.padding(top = 8.dp))
+    //
+    //        Text(
+    //            text = petName,
+    //            fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+    //            fontSize = 16.sp,
+    //            letterSpacing = (-0.8).sp,
+    //            color = if (petList.ownrPetUnqNo==selectedPetTemp?.ownrPetUnqNo) design_login_text else MaterialTheme.colorScheme.onPrimary
+    //        )
+    //    }
+    //}
 }

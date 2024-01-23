@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -62,7 +63,7 @@ fun PermissionScreen(permissionState: MultiplePermissionsState, onCheck:(Boolean
     ){
         Column {
             Text(
-                text = "펫팁 권한 안내",
+                text = stringResource(R.string.pettip_permissions_notice),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 24.sp, color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
@@ -71,7 +72,7 @@ fun PermissionScreen(permissionState: MultiplePermissionsState, onCheck:(Boolean
             )
 
             Text(
-                text = "펫팁은 아래 권한들을 필요로 합니다.\n서비스 사용 중 앱에서 요청 시 허용해주세요.",
+                text = stringResource(R.string.pettip_permissions_sub_notice),
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimary,
                 lineHeight = 16.sp,
@@ -88,23 +89,23 @@ fun PermissionScreen(permissionState: MultiplePermissionsState, onCheck:(Boolean
                 .background(MaterialTheme.colorScheme.outline))
 
             Text(
-                text = "필수 접근 권한",
+                text = stringResource(R.string.required_access_permissons),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 16.sp, letterSpacing = (-0.8).sp,
                 color = design_intro_bg
             )
 
-            MediumText(text = "위치")
+            MediumText(text = stringResource(R.string.location))
 
-            RegularText(text = "우리 앱은 현재 위치 기반 서비스를 제공합니다. 정확한 서비스를 위해 위치에 접근할 필요가 있습니다.")
+            RegularText(text = stringResource(R.string.location_text))
 
-            MediumText(text = "저장용량")
+            MediumText(text = stringResource(R.string.storage))
 
-            RegularText(text = "앱은 사진, 동영상 등의 미디어를 저장하고 관리합니다. 저장소에 접근하여 파일을 저장하고 불러오기 위해 권한이 필요합니다.")
+            RegularText(text = stringResource(R.string.storage_text))
 
-            MediumText(text = "알림")
+            MediumText(text = stringResource(R.string.push))
 
-            RegularText(text = "우리 앱은 중요한 알림을 통해 사용자에게 정보를 전달합니다. 알림을 표시하기 위해 권한이 필요합니다.")
+            RegularText(text = stringResource(R.string.push_text))
 
             Spacer(modifier = Modifier
                 .padding(top = 20.dp, bottom = 20.dp)
@@ -113,32 +114,32 @@ fun PermissionScreen(permissionState: MultiplePermissionsState, onCheck:(Boolean
                 .background(design_textFieldOutLine))
 
             Text(
-                text = "선택 접근 권한",
+                text = stringResource(R.string.optional_access_permissons),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 16.sp, letterSpacing = (-0.8).sp,
                 color = MaterialTheme.colorScheme.onPrimary
             )
 
-            MediumText(text = "신체활동")
+            MediumText(text = stringResource(R.string.physical_activity))
 
-            RegularText(text = "당사 앱은 건강 및 신체활동을 기록하는 서비스를 제공합니다. 신체활동 데이터를 수집하기 위해 신체활동 권한이 필요합니다.")
+            RegularText(text = stringResource(R.string.physical_activty_text))
 
-            MediumText(text = "카메라")
+            MediumText(text = stringResource(R.string.camera))
 
-            RegularText(text = "당사 앱은 사진 및 비디오 촬영 기능을 제공합니다. 사진 및 비디오를 촬영하고 저장하기 위해 카메라에 접근하는 권한이 필요합니다.")
+            RegularText(text = stringResource(R.string.camera_text))
         }
 
         Button(
             onClick = { permissionState.launchMultiplePermissionRequest() },
             modifier = Modifier
-                .padding(top = 20.dp,bottom = 20.dp)
+                .padding(top = 20.dp, bottom = 20.dp)
                 .fillMaxWidth()
                 .height(48.dp), shape = RoundedCornerShape(12.dp),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
             colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
         )
         {
-            Text(text = "확인", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+            Text(text = stringResource(id = R.string.confirm), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
         }
 
     }

@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -132,13 +133,13 @@ fun MonthCalendar(walkViewModel: WalkViewModel, sharedViewModel: SharedViewModel
                     .padding(14.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ){
-                Text(text = "일", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_sharp)
-                Text(text = "월", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
-                Text(text = "화", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
-                Text(text = "수", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
-                Text(text = "목", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
-                Text(text = "금", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
-                Text(text = "토", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
+                Text(text = stringResource(id = R.string.sunday), fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_sharp)
+                Text(text = stringResource(id = R.string.monday), fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
+                Text(text = stringResource(id = R.string.tuesday), fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
+                Text(text = stringResource(id = R.string.wednesday), fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
+                Text(text = stringResource(id = R.string.thursday), fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
+                Text(text = stringResource(id = R.string.friday), fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
+                Text(text = stringResource(id = R.string.saturday), fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)), color = design_white)
             }
 
             CalendarMonthItem(walkViewModel = walkViewModel, selectPet = selectPet)
@@ -182,7 +183,7 @@ fun RunCountData(walkViewModel: WalkViewModel){
                 .weight(1f)
         ){
             Text(
-                text = "횟수",
+                text = stringResource(R.string.times),
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
@@ -191,7 +192,7 @@ fun RunCountData(walkViewModel: WalkViewModel){
             )
 
             Text(
-                text = (runCountData?.runCnt ?: 0).toString() + "회",
+                text = (runCountData?.runCnt ?: 0).toString() + stringResource(R.string.unit),
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 letterSpacing = 0.sp,
@@ -210,7 +211,7 @@ fun RunCountData(walkViewModel: WalkViewModel){
         ){
 
             Text(
-                text = "산책 시간",
+                text = stringResource(id = R.string.story_walk_time),
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
@@ -240,7 +241,7 @@ fun RunCountData(walkViewModel: WalkViewModel){
         ){
 
             Text(
-                text = "산책 거리",
+                text = stringResource(id = R.string.story_walk_dist),
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,

@@ -36,7 +36,7 @@ data class LifeTimeLineItem(
     @SerializedName("runTit")
     val runTit: String,
     @SerializedName("runCmn")
-    val runCmn: String,
+    val runCmn: String?,
     @SerializedName("walkDptreDt")
     val walkDptreDt: String,
     @SerializedName("walkDptreTime")
@@ -52,7 +52,9 @@ data class LifeTimeLineItem(
     @SerializedName("runNcknm")
     val runNcknm: String,
     @SerializedName("runFile")
-    val runFile: String?
+    val runFile: String?,
+    @SerializedName("bldYn")
+    val bldYn: String?
 )
 
 data class PetItem(

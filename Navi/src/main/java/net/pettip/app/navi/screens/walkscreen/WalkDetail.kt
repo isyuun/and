@@ -80,10 +80,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
@@ -152,10 +154,14 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     }
 
     LaunchedEffect(key1 = dailyDetail) {
-        if (dailyDetail?.totMvmnPathFile != null) {
-            val result = walkViewModel.downloadFile("${dailyDetail?.atchPath}${dailyDetail?.totMvmnPathFile}", context, "${dailyDetail?.schUnqNo}.GPX")
-            if (result) {
-                gpxDownload = true
+        if (!dailyDetail?.totMvmnPathFileSn.isNullOrEmpty()){
+            dailyDetail?.totMvmnPathFileSn?.let {
+                walkViewModel.viewModelScope.launch {
+                    val result = walkViewModel.saveGpxFile(totMvmnPathFileSn = it, context = context, fileName = "${dailyDetail?.schUnqNo}.GPX")
+                    if (result){
+                        gpxDownload = true
+                    }
+                }
             }
         }
     }
@@ -508,7 +514,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                         AsyncImage(
                                             model = ImageRequest.Builder(LocalContext.current)
                                                 .data(
-                                                    "http://carepet.hopto.org/img/" +
+                                                    dailyDetail?.atchPath+
                                                             item.filePathNm +
                                                             item.atchFileNm
                                                 )
@@ -745,7 +751,7 @@ fun FullScreenImage(
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
-                    "http://carepet.hopto.org/img/" +
+                   (dailyDetail.atchPath) +
                             (dailyDetail.dailyLifeFileList?.get(page)?.filePathNm ?: "") +
                             (dailyDetail.dailyLifeFileList?.get(page)?.atchFileNm ?: "")
                 )

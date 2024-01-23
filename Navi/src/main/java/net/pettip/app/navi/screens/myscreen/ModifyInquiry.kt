@@ -418,11 +418,11 @@ fun ModifyInquiryScreen(
                     }
 
                     if (settingViewModel.inquiryKind.value ==null){
-                        Toast.makeText(context, "문의 유형을 선택해주세요", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.select_inquiry_kind, Toast.LENGTH_SHORT).show()
                     }else if(settingViewModel.title.value == ""){
-                        Toast.makeText(context, "제목을 입력해주세요", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.place_holder_title, Toast.LENGTH_SHORT).show()
                     }else if(settingViewModel.inquiryMain.value ==""){
-                        Toast.makeText(context, "내용을 입력해주세요", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.enter_memo, Toast.LENGTH_SHORT).show()
                     }else{
                         scope.launch {
                             isLoading = true
@@ -434,8 +434,8 @@ fun ModifyInquiryScreen(
                                 }else{
                                     isLoading=false
                                     snackState.showSnackbar(
-                                        message = "일상생활 수정에 실패했습니다. 다시 시도해주세요",
-                                        actionLabel = "확인",
+                                        message = context.getString(R.string.inquiry_modify_fail_retry),
+                                        actionLabel = context.getString(R.string.confirm),
                                         duration = SnackbarDuration.Short,
                                         withDismissAction = false
                                     )
@@ -451,8 +451,8 @@ fun ModifyInquiryScreen(
                                     }else{
                                         isLoading = false
                                         snackState.showSnackbar(
-                                            message = "일상생활 수정에 실패했습니다. 다시 시도해주세요",
-                                            actionLabel = "확인",
+                                            message = context.getString(R.string.inquiry_modify_fail_retry),
+                                            actionLabel = context.getString(R.string.confirm),
                                             duration = SnackbarDuration.Short,
                                             withDismissAction = false
                                         )
@@ -460,8 +460,8 @@ fun ModifyInquiryScreen(
                                 }else{
                                     isLoading = false
                                     snackState.showSnackbar(
-                                        message = "사진 전송에 실패했습니다. 다시 시도해주세요",
-                                        actionLabel = "확인",
+                                        message = context.getString(R.string.upload_photo_fail_retry),
+                                        actionLabel = context.getString(R.string.confirm),
                                         duration = SnackbarDuration.Short,
                                         withDismissAction = false
                                     )

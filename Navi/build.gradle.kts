@@ -27,6 +27,7 @@ android {
             useSupportLibrary = true
         }
 
+        resValue("string", "app_key", "kakao55dcd3a241d864c2399f6ca1e466d57d")
     }
 
     compileOptions {

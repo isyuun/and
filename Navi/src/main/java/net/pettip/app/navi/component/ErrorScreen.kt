@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -73,7 +74,7 @@ fun ErrorScreen(
         )
 
         Text(
-            text = "일시적인 오류입니다.",
+            text = stringResource(id = R.string.error_msg_temp_error),
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 24.sp, letterSpacing = (-1.2).sp,
             color = MaterialTheme.colorScheme.onPrimary,
@@ -81,7 +82,7 @@ fun ErrorScreen(
         )
 
         Text(
-            text = "새로 고침을 눌러 페이지를 다시 불러올 수 있습니다.\n문제가 반복된다면 문의하기를 눌러주세요.",
+            text = stringResource(id = R.string.error_msg_refresh),
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 14.sp, letterSpacing = (-0.7).sp,
             color = MaterialTheme.colorScheme.onPrimary,
@@ -120,7 +121,7 @@ fun ErrorScreen(
                 )
 
                 Text(
-                    text = "페이지 새로고침",
+                    text = stringResource(R.string.page_refresh),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp, letterSpacing = (-0.7).sp,
                     color = design_white,

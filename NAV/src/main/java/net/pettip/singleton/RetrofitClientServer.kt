@@ -14,6 +14,7 @@
 package net.pettip.singleton
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pettip.DEBUG
 import net.pettip.service.ApiService
 import net.pettip.service.RetryInterceptor
 import net.pettip.service.TokenInterceptor
@@ -46,12 +47,20 @@ object RetrofitClientServer {
     }
 
     private val okHttpClient: OkHttpClient by lazy {
-        OkHttpClient.Builder()
-            .addInterceptor(tokenInterceptor)
-            .addInterceptor(loggingInterceptor)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .build()
+        if (DEBUG){
+            OkHttpClient.Builder()
+                .addInterceptor(tokenInterceptor)
+                .addInterceptor(loggingInterceptor)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build()
+        }else{
+            OkHttpClient.Builder()
+                .addInterceptor(tokenInterceptor)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build()
+        }
     }
 
 }

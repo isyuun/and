@@ -1,5 +1,6 @@
 package net.pettip.app.navi.screens
 
+import android.util.Base64
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import net.pettip.app.navi.Screen
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.singleton.MySharedPreference
+import net.pettip.util.Log
 
 private const val SplashWaitTime:Long = 2000
 
@@ -29,7 +31,6 @@ fun IntroScreen(modifier: Modifier = Modifier, navController: NavHostController,
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(color = design_intro_bg)
-
 
     LaunchedEffect(Unit) {
         delay(SplashWaitTime)
@@ -63,4 +64,3 @@ fun IntroScreen(modifier: Modifier = Modifier, navController: NavHostController,
         
     }
 }
-

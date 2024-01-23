@@ -86,6 +86,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -175,9 +176,10 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
         CustomDialogInPost(
             onDismiss = { showDiagLog = false },
             navController = navController,
-            title = "글 작성을 그만하시겠습니까?",
-            text = "작성중인 글은 삭제됩니다",
-            dismiss = "나가기", confirm = "더 작성할래요"
+            title = stringResource(id = R.string.daily_dialog_title),
+            text = stringResource(id = R.string.daily_dialog_text),
+            dismiss = stringResource(id = R.string.daily_dialog_dismiss),
+            confirm = stringResource(id = R.string.daily_dialog_confirm)
         )
     }
 
@@ -197,7 +199,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
 
     LaunchedEffect(key1 = state.listOfSelectedImages) {
         if (state.listOfSelectedImages.size > 6) {
-            Toast.makeText(context, "최대 5장까지 가능합니다", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -293,7 +295,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             }
 
             Text(
-                text = "즐거운 산책 완료!",
+                text = stringResource(R.string.phost_screen_top_title),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 24.sp,
                 letterSpacing = (-1.2).sp,
@@ -326,7 +328,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
             Text(
-                text = "산책 사진",
+                text = stringResource(R.string.walk_image),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -356,7 +358,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
             Text(
-                text = "제목",
+                text = stringResource(id = R.string.title),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -386,7 +388,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                     },
                 placeholder = {
                     Text(
-                        text = "제목을 입력해주세요",
+                        text = stringResource(id = R.string.place_holder_title),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp
                     )
@@ -470,7 +472,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "산책 메모",
+                text = stringResource(R.string.walk_memo),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -493,7 +495,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                     .heightIn(min = 120.dp),
                 placeholder = {
                     Text(
-                        text = "오늘 산책 중 재미있던 일을 기록 해 주세요.",
+                        text = stringResource(R.string.place_holder_walk_memo),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp
                     )
@@ -521,7 +523,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
-                text = "해시 태그",
+                text = stringResource(id = R.string.hashtag),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -544,7 +546,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                     .heightIn(min = 40.dp),
                 placeholder = {
                     Text(
-                        text = "해쉬태그를 남겨주세요. ex) #댕댕이",
+                        text = stringResource(id = R.string.place_holder_hashtag),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp
                     )
@@ -573,7 +575,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
             Text(
-                text = "오늘 산책 스토리에 올리기",
+                text = stringResource(R.string.upload_walk_to_story),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
@@ -600,7 +602,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                 )
 
                 Text(
-                    text = "산책기록과 사진이 스토리에 공유됩니다.",
+                    text = stringResource(R.string.share_to_story),
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -634,8 +636,8 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                             } else {
                                 isLoading = false
                                 snackState.showSnackbar(
-                                    message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
-                                    actionLabel = "확인",
+                                    message = context.getString(R.string.daily_create_fail_retry),
+                                    actionLabel = context.getString(R.string.confirm),
                                     duration = SnackbarDuration.Short,
                                     withDismissAction = false
                                 )
@@ -652,8 +654,8 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                                 } else {
                                     isLoading = false
                                     snackState.showSnackbar(
-                                        message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
-                                        actionLabel = "확인",
+                                        message = context.getString(R.string.daily_create_fail_retry),
+                                        actionLabel = context.getString(R.string.confirm),
                                         duration = SnackbarDuration.Short,
                                         withDismissAction = false
                                     )
@@ -661,8 +663,8 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                             } else {
                                 isLoading = false
                                 snackState.showSnackbar(
-                                    message = "사진전송에 실패했습니다. 다시 시도해주세요",
-                                    actionLabel = "확인",
+                                    message = context.getString(R.string.upload_photo_fail_retry),
+                                    actionLabel = context.getString(R.string.confirm),
                                     duration = SnackbarDuration.Short,
                                     withDismissAction = false
                                 )
@@ -679,7 +681,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             )
             {
                 Text(
-                    text = "산책 완료",
+                    text = stringResource(id = R.string.walk_complete),
                     color = design_white,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular))
@@ -700,7 +702,7 @@ fun BwlMvmNmtmContent(walkViewModel: WalkViewModel, pet: List<Pet>, selectPet: L
             .fillMaxWidth()
     ) {
         Text(
-            text = "같이 산책한 아이들",
+            text = stringResource(R.string.with_pets),
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 20.sp,
             letterSpacing = (-1.0).sp,
@@ -768,20 +770,20 @@ fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: Pet, selectPet:
             Spacer(modifier = Modifier.padding(top = 4.dp))
             PlusMinusItem(
                 walkViewModel = walkViewModel,
-                s = "대변",
+                s = stringResource(R.string.poo),
                 icon = R.drawable.icon_poop, bwlCount
             ) { newValue -> bwlCount += newValue }
 
             PlusMinusItem(
                 walkViewModel = walkViewModel,
-                s = "소변",
+                s = stringResource(R.string.pee),
                 icon = R.drawable.icon_pee,
                 peeCount
             ) { newValue -> peeCount += newValue }
 
             PlusMinusItem(
                 walkViewModel = walkViewModel,
-                s = "마킹",
+                s = stringResource(R.string.marking),
                 icon = R.drawable.icon_marking,
                 markCount
             ) { newValue -> markCount += newValue }
@@ -915,7 +917,7 @@ fun PhotoItem(uri: Uri, index: Int, onClick: () -> Unit) {
                         .align(Alignment.BottomCenter)
                 ) {
                     Text(
-                        text = "대표이미지",
+                        text = stringResource(id = R.string.main_image),
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.6).sp,
@@ -1044,7 +1046,7 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
                 .weight(1f)
         ) {
             Text(
-                text = "산책시간",
+                text = stringResource(id = R.string.walk_time),
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,
@@ -1074,7 +1076,7 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
         ) {
 
             Text(
-                text = "산책거리",
+                text = stringResource(id = R.string.walk_distance),
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 letterSpacing = (-0.7).sp,

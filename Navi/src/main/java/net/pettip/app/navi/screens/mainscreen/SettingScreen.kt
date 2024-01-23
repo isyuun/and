@@ -134,7 +134,7 @@ fun SettingScreen(navController: NavHostController, viewModel:CommunityViewModel
             ) {
                 MyScreenTabItems.forEachIndexed { index, item ->
                     Tab(
-                        text = { Text(text = item.title, fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary,
+                        text = { Text(text = stringResource(id = item.title), fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary,
                             fontFamily =
                             if(index == pagerState.currentPage) FontFamily(Font(R.font.pretendard_bold))
                             else FontFamily(Font(R.font.pretendard_regular))
@@ -720,13 +720,13 @@ data class FAQItemData(val title:String, val sub:String)
 data class InquiryItemData(val complete:Boolean)
 
 data class MyScreenTabItem(
-    val title: String,
+    val title: Int,
     val screen: @Composable (NavHostController, CommunityViewModel) -> Unit // navController를 매개변수로 추가
 )
 
 val MyScreenTabItems = listOf(
     MyScreenTabItem(
-        title = "공지사항",
+        title = R.string.announcement,
         screen = { navController, viewModel ->
             NotiScreen(
                 navController = navController,
@@ -734,14 +734,14 @@ val MyScreenTabItems = listOf(
 
             ) }),
     MyScreenTabItem(
-        title = "FAQ",
+        title = R.string.faq_title,
         screen = { navController, viewModel ->
             FAQScreen(
                 navController = navController,
                 viewModel = viewModel
             ) }),
     MyScreenTabItem(
-        title = "1:1문의",
+        title = R.string.qna_title,
         screen = { navController, viewModel ->
             InquiryScreen(
                 navController = navController,

@@ -621,8 +621,8 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                 } else {
                                     isLoading = false
                                     snackState.showSnackbar(
-                                        message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
-                                        actionLabel = "확인",
+                                        message = context.getString(R.string.daily_create_fail_retry),
+                                        actionLabel = context.getString(R.string.confirm),
                                         duration = SnackbarDuration.Short,
                                         withDismissAction = false
                                     )
@@ -641,8 +641,8 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                     } else {
                                         isLoading = false
                                         snackState.showSnackbar(
-                                            message = "일상생활 등록에 실패했습니다. 다시 시도해주세요",
-                                            actionLabel = "확인",
+                                            message = context.getString(R.string.daily_create_fail_retry),
+                                            actionLabel = context.getString(R.string.confirm),
                                             duration = SnackbarDuration.Short,
                                             withDismissAction = false
                                         )
@@ -650,8 +650,8 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                 } else {
                                     isLoading = false
                                     snackState.showSnackbar(
-                                        message = "사진전송에 실패했습니다. 다시 시도해주세요",
-                                        actionLabel = "확인",
+                                        message = context.getString(R.string.upload_photo_fail_retry),
+                                        actionLabel = context.getString(R.string.confirm),
                                         duration = SnackbarDuration.Short,
                                         withDismissAction = false
                                     )
@@ -765,41 +765,6 @@ fun PlusBox(galleyLauncher: ManagedActivityResultLauncher<String, List<@JvmSuppr
                 tint = Color.Unspecified
             )
         }
-    }
-}
-
-
-@Composable
-fun OnDialog(onDismiss: () -> Unit, navController: NavHostController) {
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onDismiss()
-                    navController.popBackStack()
-                },
-            ) {
-                Text(text = stringResource(R.string.out))
-            }
-        },
-        title = { Text(text = "포스트 작성을 그만하시겠어요?") },
-        text = { Text(text = "작성중인 글은 삭제됩니다", color = design_skip) },
-        dismissButton = {
-            Button(onClick = { onDismiss() }) {
-                Text(text = "더 작성할래요")
-            }
-        },
-        containerColor = design_white
-    )
-}
-
-class HashTagTransformation() : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        return TransformedText(
-            buildAnnotatedStringWithColors(text.toString()),
-            OffsetMapping.Identity
-        )
     }
 }
 

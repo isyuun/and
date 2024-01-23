@@ -54,7 +54,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -105,16 +104,13 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.CircleImageTopBar
 import net.pettip.app.navi.component.ErrorScreen
+import net.pettip.app.navi.component.EventDclrDialog
 import net.pettip.app.navi.component.LoadingAnimation3
 import net.pettip.app.navi.screens.myscreen.CustomDialogDelete
-import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_bg
 import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_sharp
 import net.pettip.app.navi.ui.theme.design_skip
-import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.data.bbs.BbsCmnt
@@ -142,13 +138,18 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
     val upCmntNo0:List<BbsCmnt> = cmntList?.filter { cmnt ->
         cmnt.upCmntNo == cmnt.pstCmntNo } ?: emptyList()
 
+    var expanded by remember{ mutableStateOf(false) }
+    var dclrDialogOpen by remember{ mutableStateOf(false) }
+
     var refresh by remember{ mutableStateOf(false) }
     var isLoading by remember{ mutableStateOf(false) }
     var onReply by remember{ mutableStateOf(false) }
     var replyText by remember{ mutableStateOf("") }
     var rcmdtnLoading by remember { mutableStateOf(false) }
-
     var back by remember { mutableStateOf(false) }
+
+    val lazyListState = rememberLazyListState()
+    val verticalScrollState = rememberScrollState()
 
     LaunchedEffect(key1 = back){
         if (back){
@@ -238,6 +239,15 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
         }
     ) { paddingValues ->
 
+        if (dclrDialogOpen){
+            EventDclrDialog(
+                viewModel = viewModel,
+                expanded = expanded,
+                expandChange = {newValue -> expanded = newValue},
+                onDismiss ={newValue -> dclrDialogOpen = newValue}
+            )
+        }
+
         Crossfade(
             targetState = detailLoading,
             label = "",
@@ -259,7 +269,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                 .padding(paddingValues)
                                 .fillMaxSize()
                                 .background(color = MaterialTheme.colorScheme.primary)
-                                .verticalScroll(rememberScrollState())
+                                .verticalScroll(verticalScrollState)
                         ) {
                             AsyncImage(
                                 onLoading = { },
@@ -329,14 +339,20 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                 exit = shrinkVertically(tween(durationMillis = 700)).plus(fadeOut())
                             ) {
                                 LazyColumn(
-                                    state = rememberLazyListState(),
+                                    state = lazyListState,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .heightIn(max = 1000.dp),
                                     contentPadding = PaddingValues(top = 18.dp, bottom = 20.dp)
                                 ){
                                     itemsIndexed(upCmntNo0){ index, item ->
-                                        EventCommentListItem(comment = item, viewModel = viewModel, onReply, onReplyChange = {newValue -> onReply = newValue})
+                                        EventCommentListItem(
+                                            comment = item,
+                                            viewModel = viewModel,
+                                            onReply = onReply,
+                                            onReplyChange = {newValue -> onReply = newValue},
+                                            dclrDialogOpen = {newValue -> dclrDialogOpen = newValue }
+                                        )
 
                                         if(index != (upCmntNo0?.size?.minus(1) ?: 0)){
                                             Spacer(modifier = Modifier
@@ -550,7 +566,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                                 } else {
                                                     rcmdtnLoading = false
                                                     Toast
-                                                        .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                        .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                         .show()
                                                 }
                                             }
@@ -646,7 +662,13 @@ open class CoilImageGetter(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onReply: Boolean, onReplyChange: (Boolean)->Unit){
+fun EventCommentListItem(
+    comment: BbsCmnt,
+    viewModel: CommunityViewModel,
+    onReply: Boolean,
+    onReplyChange: (Boolean)->Unit,
+    dclrDialogOpen:(Boolean) ->Unit
+){
 
     val cmntList by viewModel.eventCmntList.collectAsState()
     val step2CmntList:List<BbsCmnt> = cmntList?.filter { cmnt ->
@@ -663,6 +685,8 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
     var updateComment by remember{ mutableStateOf(comment.cmntCn) }
     var updateLoading by remember { mutableStateOf(false) }
     var rcmdtnLoading by remember { mutableStateOf(false) }
+
+    val lazyListState = rememberLazyListState()
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -858,12 +882,12 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                             updateComment = ""
                                             updateLoading = false
                                             Toast
-                                                .makeText(context, "댓글이 수정되었습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.comment_modify_toast, Toast.LENGTH_SHORT)
                                                 .show()
                                         } else {
                                             updateLoading = false
                                             Toast
-                                                .makeText(context, "댓글 수정에 실패했습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.comment_modify_fail, Toast.LENGTH_SHORT)
                                                 .show()
                                         }
                                     }
@@ -896,7 +920,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
         if (commentDelete){
             val result = viewModel.bbsDeleteComment(comment.pstCmntNo?:0)
             if (!result){
-                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -971,7 +995,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                                             } else {
                                                                 rcmdtnLoading = false
                                                                 Toast
-                                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                                    .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                                     .show()
                                                             }
                                                         }
@@ -1074,7 +1098,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                                                 } else {
                                                                     rcmdtnLoading = false
                                                                     Toast
-                                                                        .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                                        .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                                         .show()
                                                                 }
                                                             }
@@ -1106,7 +1130,10 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                                             modifier = Modifier
                                                 .padding(start = 12.dp)
                                                 .clickable(
-                                                    onClick = { },
+                                                    onClick = {
+                                                        viewModel.updateSelectEventCmnt(comment)
+                                                        dclrDialogOpen(true)
+                                                    },
                                                     indication = rememberRipple(
                                                         bounded = true,
                                                         radius = 8.dp,
@@ -1169,7 +1196,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
             exit = shrinkVertically(tween(durationMillis = 700)).plus(fadeOut(tween(durationMillis = 500, delayMillis = 200)))
         ) {
             LazyColumn(
-                state = rememberLazyListState(),
+                state = lazyListState,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(max = 1000.dp),
@@ -1177,7 +1204,11 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ){
                 itemsIndexed(step2CmntList){ index, item ->
-                    BbsCommentListItem2(comment = item, viewModel = viewModel)
+                    BbsCommentListItem2(
+                        comment = item,
+                        viewModel = viewModel,
+                        dclrDialogOpen = {newValue -> dclrDialogOpen(newValue)}
+                    )
                 }
             }
         }
@@ -1191,6 +1222,7 @@ fun EventCommentListItem(comment: BbsCmnt, viewModel: CommunityViewModel, onRepl
 fun BbsCommentListItem2(
     comment: BbsCmnt,
     viewModel: CommunityViewModel,
+    dclrDialogOpen: (Boolean)-> Unit,
     ){
     val eventDetail by viewModel.bbsDetail.collectAsState()
     var expand by remember { mutableStateOf(false) }
@@ -1207,7 +1239,7 @@ fun BbsCommentListItem2(
         if (commentDelete){
             val result = viewModel.bbsDeleteComment(comment.pstCmntNo?:0)
             if (!result){
-                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
             }
         }
         commentDelete = false
@@ -1392,11 +1424,11 @@ fun BbsCommentListItem2(
                                             updateComment = ""
                                             updateLoading = false
                                             Toast
-                                                .makeText(context, "댓글이 수정되었습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.comment_modify_toast, Toast.LENGTH_SHORT)
                                                 .show()
                                         } else {
                                             Toast
-                                                .makeText(context, "댓글 수정에 실패했습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.comment_modify_fail, Toast.LENGTH_SHORT)
                                                 .show()
                                         }
                                     }
@@ -1491,7 +1523,7 @@ fun BbsCommentListItem2(
                                                     } else {
                                                         rcmdtnLoading = false
                                                         Toast
-                                                            .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                            .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                             .show()
                                                     }
                                                 }
@@ -1567,7 +1599,7 @@ fun BbsCommentListItem2(
                                                             } else {
                                                                 rcmdtnLoading = false
                                                                 Toast
-                                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                                    .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                                     .show()
                                                             }
                                                         }
@@ -1598,7 +1630,10 @@ fun BbsCommentListItem2(
                                         modifier = Modifier
                                             .padding(start = 12.dp)
                                             .clickable(
-                                                onClick = { },
+                                                onClick = {
+                                                    viewModel.updateSelectEventCmnt(comment)
+                                                    dclrDialogOpen(true)
+                                                },
                                                 indication = rememberRipple(
                                                     bounded = true,
                                                     radius = 8.dp,

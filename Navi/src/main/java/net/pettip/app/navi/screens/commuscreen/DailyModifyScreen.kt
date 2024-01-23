@@ -670,8 +670,8 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                                 }else{
                                     isLoading = false
                                     snackState.showSnackbar(
-                                        message = "일상생활 수정에 실패했습니다. 다시 시도해주세요",
-                                        actionLabel = "확인",
+                                        message = context.getString(R.string.daily_modify_fail_retry),
+                                        actionLabel = context.getString(R.string.confirm),
                                         duration = SnackbarDuration.Short,
                                         withDismissAction = false
                                     )
@@ -686,8 +686,8 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                                     }else{
                                         isLoading = false
                                         snackState.showSnackbar(
-                                            message = "일상생활 수정에 실패했습니다. 다시 시도해주세요",
-                                            actionLabel = "확인",
+                                            message = context.getString(R.string.daily_modify_fail_retry),
+                                            actionLabel = context.getString(R.string.confirm),
                                             duration = SnackbarDuration.Short,
                                             withDismissAction = false
                                         )
@@ -695,8 +695,8 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                                 }else{
                                     isLoading = false
                                     snackState.showSnackbar(
-                                        message = "사진 전송에 실패했습니다. 다시 시도해주세요",
-                                        actionLabel = "확인",
+                                        message = context.getString(R.string.upload_photo_fail_retry),
+                                        actionLabel = context.getString(R.string.confirm),
                                         duration = SnackbarDuration.Short,
                                         withDismissAction = false
                                     )

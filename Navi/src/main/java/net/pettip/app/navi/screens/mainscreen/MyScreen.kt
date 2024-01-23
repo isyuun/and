@@ -165,7 +165,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                 }else{
                     isLoading = false
                     logout = false
-                    Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -240,7 +240,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                                     }
                                 }else{
                                     isLoading = false
-                                    Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
@@ -1086,7 +1086,7 @@ fun LogoutDialog(
                     modifier = Modifier.fillMaxWidth()
                 ){
                     Text(
-                        text = "앗! 현재 산책중이에요",
+                        text = stringResource(R.string.logout_walking_title),
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 18.sp, letterSpacing = (-0.8).sp,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -1094,7 +1094,7 @@ fun LogoutDialog(
                     )
 
                     Text(
-                        text = "정말 로그아웃 하시겠어요?",
+                        text = stringResource(R.string.logout_walking_memo),
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.8).sp,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -1117,7 +1117,7 @@ fun LogoutDialog(
                             contentAlignment = Alignment.Center
                         ){
                             Text(
-                                text = "로그아웃",
+                                text = stringResource(id = R.string.logout),
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                                 color = MaterialTheme.colorScheme.onPrimary,
@@ -1130,13 +1130,13 @@ fun LogoutDialog(
                                 .weight(1f)
                                 .background(design_intro_bg)
                                 .clickable {
-                                           onDismiss(false)
+                                    onDismiss(false)
                                 }
                             ,
                             contentAlignment = Alignment.Center
                         ){
                             Text(
-                                text = "계속 산책하기",
+                                text = stringResource(R.string.keep_walk),
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp, letterSpacing = (-0.7).sp,
                                 color = design_white,

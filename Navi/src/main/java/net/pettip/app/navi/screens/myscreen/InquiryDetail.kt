@@ -108,7 +108,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                 viewModel.updateQnaListInit(true)
                 navController.popBackStack()
             }else{
-                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
             }
         }
     }

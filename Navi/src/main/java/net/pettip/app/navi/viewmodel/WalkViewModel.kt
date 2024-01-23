@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import net.pettip.app.navi.screens.mainscreen.getFormattedTodayDate
+import net.pettip.data.cmm.CmmRes
 import net.pettip.data.daily.DailyCreateReq
 import net.pettip.data.daily.DailyCreateRes
 import net.pettip.data.daily.DailyDetailData
@@ -28,6 +30,7 @@ import net.pettip.data.daily.DailyDetailRes
 import net.pettip.data.daily.DailyLifeWalk
 import net.pettip.data.daily.DailyMonthData
 import net.pettip.data.daily.DailyMonthRes
+import net.pettip.data.daily.GpxDownRes
 import net.pettip.data.daily.LifeTimeLineItem
 import net.pettip.data.daily.Paginate
 import net.pettip.data.daily.Pet
@@ -45,9 +48,11 @@ import net.pettip.util.Log
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.awaitResponse
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -422,48 +427,29 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         }
     }
 
-    suspend fun downloadFile(fileUrl: String, context: Context, fileName: String): Boolean {
-        return withContext(Dispatchers.IO) {
-            val url = URL(fileUrl)
-            val fileDir = context.filesDir
-            val file = File(fileDir, fileName)
-            val connection = url.openConnection() as HttpURLConnection
+    suspend fun saveGpxFile(totMvmnPathFileSn: String, context: Context, fileName: String): Boolean {
+        return try {
+            val apiService = RetrofitClientServer.instance
+            val data = GpxDownRes(totMvmnPathFileSn)
 
-            try {
-                connection.connect()
+            val call = apiService.getGpxFile(data)
+            val response = call.awaitResponse()
 
-                if (connection.responseCode != HttpURLConnection.HTTP_OK) {
-                    throw IOException("HTTP error code: ${connection.responseCode}")
+            if (response.isSuccessful) {
+                val inputStream: InputStream? = response.body()?.byteStream()
+
+                if (inputStream != null) {
+                    // saveInputStreamToFile도 코루틴 내에서 호출
+                    saveInputStreamToFile(inputStream, context, fileName)
                 }
-
-                // 파일을 다운로드하고 지정된 경로에 저장
-                val inputStream: InputStream = BufferedInputStream(url.openStream())
-                val outputStream: OutputStream = FileOutputStream(file)
-
-                try {
-                    val buffer = ByteArray(1024)
-                    var bytesRead: Int
-
-                    while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                        outputStream.write(buffer, 0, bytesRead)
-                    }
-                } finally {
-                    inputStream.close()
-                    outputStream.close()
-                }
-
-                // 파일 다운로드 성공 시 true 반환
                 true
-            } catch (e: Exception) {
-                // 파일 다운로드 실패 시 false 반환
+            } else {
                 false
-            } finally {
-                connection.disconnect()
             }
+        } catch (e: Exception) {
+            false
         }
     }
-
-
 
     suspend fun getMonthData(ownrPetUnqNo: String, searchMonth: String): Boolean {
         val apiService = RetrofitClientServer.instance
@@ -561,7 +547,7 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
             rlsYn =  if (_postStory.value) "Y" else "N", // 공개 여부
             schCdList = _schCdList.value,
             schTtl = _walkTitle.value,
-            schCn = _walkMemo.value,
+            schCn = _walkMemo.value.ifBlank { null },
             totClr = 300f,
             totDstnc = application._distance?: 0.0f,
             walkDptreDt = formatTimestampToCustomString(application.tracks?.first()?.time?:0),
@@ -754,4 +740,36 @@ fun getCurrentYearMonthKr(): String {
     val currentYearMonth = YearMonth.now()
     val formatter = DateTimeFormatter.ofPattern("yyyy년 M월", Locale.getDefault())
     return currentYearMonth.format(formatter)
+}
+
+suspend fun saveInputStreamToFile(
+    inputStream: InputStream?,
+    context: Context,
+    fileName: String
+): Boolean {
+    return withContext(Dispatchers.IO) {
+        try {
+            if (inputStream != null) {
+                val fileDir = context.filesDir
+                val file = File(fileDir, fileName)
+                val outputStream = FileOutputStream(file)
+                val buffer = ByteArray(1024)
+                var bytesRead: Int
+
+                try {
+                    while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                        outputStream.write(buffer, 0, bytesRead)
+                    }
+                } finally {
+                    inputStream.close()
+                    outputStream.close()
+                }
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

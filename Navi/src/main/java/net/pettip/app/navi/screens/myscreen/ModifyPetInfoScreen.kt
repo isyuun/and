@@ -79,6 +79,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
@@ -169,9 +170,9 @@ fun ModifyPetInfoScreen(
             viewModel.updatePetName(selectPet.petNm)
             viewModel.updatePetDorC(
                 if (profilePet?.petTypCd=="002"){
-                    "고양이"
+                    context.getString(R.string.cat)
                 }else{
-                    "강아지"
+                    context.getString(R.string.dog)
                 }
             )
             viewModel.updatePetKind(
@@ -249,8 +250,8 @@ fun ModifyPetInfoScreen(
                         )
                     )
                     viewModel.updatePetWght("")
-                    viewModel.updatePetGender("남아")
-                    viewModel.updatePetNtr("했어요")
+                    viewModel.updatePetGender(context.getString(R.string.male))
+                    viewModel.updatePetNtr(context.getString(R.string.did))
                     viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
                     viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
                     viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
@@ -290,8 +291,8 @@ fun ModifyPetInfoScreen(
                 )
             )
             viewModel.updatePetWght("")
-            viewModel.updatePetGender("남아")
-            viewModel.updatePetNtr("했어요")
+            viewModel.updatePetGender(context.getString(R.string.male))
+            viewModel.updatePetNtr(context.getString(R.string.did))
             viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
             viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
             viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
@@ -353,9 +354,9 @@ fun ModifyPetInfoScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp)){
 
                 Button(
-                    enabled = petDorC != "강아지",
+                    enabled = petDorC != stringResource(id = R.string.dog),
                     onClick = {
-                        viewModel.updatePetDorC("강아지")
+                        viewModel.updatePetDorC(context.getString(R.string.dog))
                         viewModel.updatePetKind(
                             PetListData(
                                 petDogSzCd = "",
@@ -372,18 +373,18 @@ fun ModifyPetInfoScreen(
                         .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp)
                     ,
                     shape = RoundedCornerShape(12.dp),
-                    colors = if("강아지" == petDorC) {
+                    colors = if(stringResource(id = R.string.dog) == petDorC) {
                         ButtonDefaults.buttonColors(containerColor = design_select_btn_bg, disabledContainerColor = design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
-                    border = if("강아지" == petDorC) {
+                    border = if(stringResource(id = R.string.dog) == petDorC) {
                         BorderStroke(1.dp, color = design_select_btn_text)
                     } else {
                         BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
                     },
                     contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-                    elevation = if("강아지" == petDorC){
+                    elevation = if(stringResource(id = R.string.dog) == petDorC){
                         ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     } else {
                         ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -392,7 +393,7 @@ fun ModifyPetInfoScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.dog),
-                        color = if("강아지" == petDorC) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
+                        color = if(stringResource(id = R.string.dog) == petDorC) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
                     )
@@ -401,9 +402,9 @@ fun ModifyPetInfoScreen(
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
                 Button(
-                    enabled = petDorC != "고양이",
+                    enabled = petDorC != stringResource(id = R.string.cat),
                     onClick = {
-                        viewModel.updatePetDorC("고양이")
+                        viewModel.updatePetDorC(context.getString(R.string.cat))
                         viewModel.updatePetKind(
                             PetListData(
                                 petDogSzCd = "",
@@ -419,18 +420,18 @@ fun ModifyPetInfoScreen(
                         .height(48.dp)
                         .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = if("고양이" == petDorC) {
+                    colors = if(stringResource(id = R.string.cat) == petDorC) {
                         ButtonDefaults.buttonColors(containerColor = design_select_btn_bg, disabledContainerColor = design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
-                    border = if("고양이" == petDorC) {
+                    border = if(stringResource(id = R.string.cat) == petDorC) {
                         BorderStroke(1.dp, color = design_select_btn_text)
                     } else {
                         BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
                     },
                     contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-                    elevation = if("고양이" == petDorC){
+                    elevation = if(stringResource(id = R.string.cat) == petDorC){
                         ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     } else {
                         ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -438,7 +439,7 @@ fun ModifyPetInfoScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.cat),
-                        color = if("고양이" == petDorC) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
+                        color = if(stringResource(id = R.string.cat) == petDorC) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
                     )
@@ -757,25 +758,25 @@ fun ModifyPetInfoScreen(
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp)){
                 Button(
-                    onClick = { viewModel.updatePetGender("남아") },
+                    onClick = { viewModel.updatePetGender(context.getString(R.string.male)) },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
                         .shadow(ambientColor = design_shadow, elevation = 0.dp)
                     ,
                     shape = RoundedCornerShape(12.dp),
-                    colors = if("남아" == petGender) {
+                    colors = if(stringResource(id = R.string.male) == petGender) {
                         ButtonDefaults.buttonColors(design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
-                    border = if("남아" == petGender) {
+                    border = if(stringResource(id = R.string.male) == petGender) {
                         BorderStroke(1.dp, color = design_select_btn_text)
                     } else {
                         BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
                     },
                     contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-                    elevation = if("남아" == petGender){
+                    elevation = if(stringResource(id = R.string.male) == petGender){
                         ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     } else {
                         ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -784,7 +785,7 @@ fun ModifyPetInfoScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.male),
-                        color = if("남아" == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
+                        color = if(stringResource(id = R.string.male) == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
                     )
@@ -793,24 +794,24 @@ fun ModifyPetInfoScreen(
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
                 Button(
-                    onClick = { viewModel.updatePetGender("여아") },
+                    onClick = { viewModel.updatePetGender(context.getString(R.string.female)) },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
                         .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = if("여아" == petGender) {
+                    colors = if(stringResource(id = R.string.female) == petGender) {
                         ButtonDefaults.buttonColors(design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
-                    border = if("여아" == petGender) {
+                    border = if(stringResource(id = R.string.female) == petGender) {
                         BorderStroke(1.dp, color = design_select_btn_text)
                     } else {
                         BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
                     },
                     contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-                    elevation = if("여아" == petGender){
+                    elevation = if(stringResource(id = R.string.female) == petGender){
                         ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     } else {
                         ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -818,7 +819,7 @@ fun ModifyPetInfoScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.female),
-                        color = if("여아" == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
+                        color = if(stringResource(id = R.string.female) == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
                     )
@@ -827,24 +828,24 @@ fun ModifyPetInfoScreen(
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
                 Button(
-                    onClick = { viewModel.updatePetGender("모름") },
+                    onClick = { viewModel.updatePetGender(context.getString(R.string.type_uk)) },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
                         .shadow(ambientColor = design_shadow, elevation = 0.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = if("모름" == petGender) {
+                    colors = if(stringResource(id = R.string.type_uk) == petGender) {
                         ButtonDefaults.buttonColors(design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
-                    border = if("모름" == petGender) {
+                    border = if(stringResource(id = R.string.type_uk) == petGender) {
                         BorderStroke(1.dp, color = design_select_btn_text)
                     } else {
                         BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
                     },
                     contentPadding = PaddingValues(start = 14.dp,end=14.dp),
-                    elevation = if("모름" == petGender){
+                    elevation = if(stringResource(id = R.string.type_uk) == petGender){
                         ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     } else {
                         ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -852,7 +853,7 @@ fun ModifyPetInfoScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.type_uk),
-                        color = if("모름" == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
+                        color = if(stringResource(id = R.string.type_uk) == petGender) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
                     )
@@ -869,24 +870,24 @@ fun ModifyPetInfoScreen(
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp)) {
                 Button(
-                    onClick = { viewModel.updatePetNtr("했어요") },
+                    onClick = { viewModel.updatePetNtr(context.getString(R.string.did)) },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
                         .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = if ("했어요" == petNtr) {
+                    colors = if (stringResource(id = R.string.did) == petNtr) {
                         ButtonDefaults.buttonColors(design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
-                    border = if ("했어요" == petNtr) {
+                    border = if (stringResource(id = R.string.did) == petNtr) {
                         BorderStroke(1.dp, color = design_select_btn_text)
                     } else {
                         BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
                     },
                     contentPadding = PaddingValues(start = 14.dp, end = 14.dp),
-                    elevation = if ("했어요" == petNtr) {
+                    elevation = if (stringResource(id = R.string.did) == petNtr) {
                         ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     } else {
                         ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -895,7 +896,7 @@ fun ModifyPetInfoScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.did),
-                        color = if ("했어요" == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
+                        color = if (stringResource(id = R.string.did) == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
                     )
@@ -904,24 +905,24 @@ fun ModifyPetInfoScreen(
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
                 Button(
-                    onClick = { viewModel.updatePetNtr("안했어요") },
+                    onClick = { viewModel.updatePetNtr(context.getString(R.string.didnot)) },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
                         .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = if ("안했어요" == petNtr) {
+                    colors = if (stringResource(id = R.string.didnot) == petNtr) {
                         ButtonDefaults.buttonColors(design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
-                    border = if ("안했어요" == petNtr) {
+                    border = if (stringResource(id = R.string.didnot) == petNtr) {
                         BorderStroke(1.dp, color = design_select_btn_text)
                     } else {
                         BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
                     },
                     contentPadding = PaddingValues(start = 14.dp, end = 14.dp),
-                    elevation = if ("안했어요" == petNtr) {
+                    elevation = if (stringResource(id = R.string.didnot) == petNtr) {
                         ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     } else {
                         ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -929,7 +930,7 @@ fun ModifyPetInfoScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.didnot),
-                        color = if ("안했어요" == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
+                        color = if (stringResource(id = R.string.didnot) == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
                     )
@@ -938,24 +939,24 @@ fun ModifyPetInfoScreen(
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
                 Button(
-                    onClick = { viewModel.updatePetNtr("모름") },
+                    onClick = { viewModel.updatePetNtr(context.getString(R.string.type_uk)) },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
                         .shadow(ambientColor = MaterialTheme.colorScheme.onSurface, elevation = 0.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = if ("모름" == petNtr) {
+                    colors = if (stringResource(id = R.string.type_uk) == petNtr) {
                         ButtonDefaults.buttonColors(design_select_btn_bg)
                     } else {
                         ButtonDefaults.buttonColors(Color.Transparent)
                     },
-                    border = if ("모름" == petNtr) {
+                    border = if (stringResource(id = R.string.type_uk) == petNtr) {
                         BorderStroke(1.dp, color = design_select_btn_text)
                     } else {
                         BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
                     },
                     contentPadding = PaddingValues(start = 14.dp, end = 14.dp),
-                    elevation = if ("모름" == petNtr) {
+                    elevation = if (stringResource(id = R.string.type_uk) == petNtr) {
                         ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     } else {
                         ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -963,7 +964,7 @@ fun ModifyPetInfoScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.type_uk),
-                        color = if ("모름" == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
+                        color = if (stringResource(id = R.string.type_uk) == petNtr) design_select_btn_text else MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
                     )
@@ -991,7 +992,7 @@ fun ModifyPetInfoScreen(
                                 navController.popBackStack()
                             }else{
                                 isLoading = false
-                                Toast.makeText(context, "수정에 실패했습니다", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, R.string.petinfo_modify_fail_toast, Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -1078,8 +1079,8 @@ fun BackTopBarInModify(title: String, navController: NavHostController, backVisi
                                     )
                                 )
                                 viewModel.updatePetWght("")
-                                viewModel.updatePetGender("남아")
-                                viewModel.updatePetNtr("했어요")
+                                viewModel.updatePetGender(context.getString(R.string.male))
+                                viewModel.updatePetNtr(context.getString(R.string.did))
                                 viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
                                 viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
                                 viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
@@ -1107,6 +1108,7 @@ fun BackTopBarInModify(title: String, navController: NavHostController, backVisi
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDialogDelete(
     onDismiss:(Boolean) -> Unit,
@@ -1118,56 +1120,137 @@ fun CustomDialogDelete(
 ){
     AlertDialog(
         onDismissRequest = { onDismiss(false) },
-        confirmButton = {
-            Button(
-                onClick = {
-                    valueChange(true)
-                    onDismiss(false)
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = design_button_bg
-                )
-            ) {
-                Text(
-                    text = confirm,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = design_white
-                )
-            } },
-        title = {
-            Text(
-                text = title,
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                color = MaterialTheme.colorScheme.onPrimary
-            ) },
-        text = {
-            Text(
-                text = text,
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                color = MaterialTheme.colorScheme.secondary
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ){
+        Box(modifier = Modifier
+            .padding(horizontal = 60.dp)
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(20.dp)
             )
-               },
-        dismissButton = {
-            Button(
-                onClick = {
-                    onDismiss(false)
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                border = BorderStroke(1.dp, color = design_login_text)
-            ) {
+        ){
+            Column (
+                modifier = Modifier.fillMaxWidth()
+            ){
                 Text(
-                    text = dismiss,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    color = MaterialTheme.colorScheme.onPrimary
+                    text = title,
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    fontSize = 18.sp, letterSpacing = (-0.8).sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(start = 20.dp, top = 30.dp)
                 )
+
+                Text(
+                    text = text,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 14.sp, letterSpacing = (-0.8).sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(start = 20.dp, top = 30.dp)
+                )
+
+                Row (
+                    modifier = Modifier
+                        .padding(top = 30.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                ){
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(MaterialTheme.colorScheme.onSecondary)
+                            .clickable {
+                                onDismiss(false)
+                            },
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = dismiss,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(design_intro_bg)
+                            .clickable {
+                                valueChange(true)
+                                onDismiss(false)
+                            }
+                        ,
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = confirm,
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = design_white,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    }
+                }
             }
-        },
-        containerColor = MaterialTheme.colorScheme.primary
-    )
+        }
+    }
+
+    //AlertDialog(
+    //    onDismissRequest = { onDismiss(false) },
+    //    confirmButton = {
+    //        Button(
+    //            onClick = {
+    //                valueChange(true)
+    //                onDismiss(false)
+    //            },
+    //            shape = RoundedCornerShape(12.dp),
+    //            colors = ButtonDefaults.buttonColors(
+    //                containerColor = design_button_bg
+    //            )
+    //        ) {
+    //            Text(
+    //                text = confirm,
+    //                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+    //                color = design_white
+    //            )
+    //        } },
+    //    title = {
+    //        Text(
+    //            text = title,
+    //            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+    //            color = MaterialTheme.colorScheme.onPrimary
+    //        ) },
+    //    text = {
+    //        Text(
+    //            text = text,
+    //            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+    //            color = MaterialTheme.colorScheme.secondary
+    //        )
+    //           },
+    //    dismissButton = {
+    //        Button(
+    //            onClick = {
+    //                onDismiss(false)
+    //            },
+    //            shape = RoundedCornerShape(12.dp),
+    //            colors = ButtonDefaults.buttonColors(
+    //                containerColor = MaterialTheme.colorScheme.onSecondary
+    //            ),
+    //            border = BorderStroke(1.dp, color = design_login_text)
+    //        ) {
+    //            Text(
+    //                text = dismiss,
+    //                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+    //                color = MaterialTheme.colorScheme.onPrimary
+    //            )
+    //        }
+    //    },
+    //    containerColor = MaterialTheme.colorScheme.primary
+    //)
 }
 
 @SuppressLint("SimpleDateFormat")

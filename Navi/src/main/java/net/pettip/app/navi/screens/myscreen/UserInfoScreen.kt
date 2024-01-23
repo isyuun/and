@@ -113,8 +113,8 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     MySharedPreference.setIsLogin(false)
 
                     snackbarHostState.showSnackbar(
-                        message = "회원탈퇴를 완료했습니다",
-                        actionLabel = "확인",
+                        message = context.getString(R.string.withdraw_success),
+                        actionLabel = context.getString(R.string.confirm),
                         duration = SnackbarDuration.Short
                     )
 
@@ -125,8 +125,8 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
                 }else{
                     snackbarHostState.showSnackbar(
-                        message = "회원탈퇴를 실패해습니다",
-                        actionLabel = "확인",
+                        message = context.getString(R.string.withdraw_fail),
+                        actionLabel = context.getString(R.string.confirm),
                         duration = SnackbarDuration.Short
                     )
                 }
@@ -213,16 +213,16 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                         settingViewModel.updateUserNickNamePass(nickName)
                                         focusManager.clearFocus()
                                         snackbarHostState.showSnackbar(
-                                            message = "사용하실 수 있는 닉네임입니다",
-                                            actionLabel = "확인",
+                                            message = context.getString(R.string.available_nickname),
+                                            actionLabel = context.getString(R.string.confirm),
                                             duration = SnackbarDuration.Short,
                                             withDismissAction = true
                                         )
                                     }else{
                                         focusManager.clearFocus()
                                         snackbarHostState.showSnackbar(
-                                            message = "이미 사용중인 닉네임입니다",
-                                            actionLabel = "확인",
+                                            message = context.getString(R.string.already_use_nickname),
+                                            actionLabel = context.getString(R.string.confirm),
                                             duration = SnackbarDuration.Short,
                                             withDismissAction = true
                                         )
@@ -295,119 +295,120 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
             //
             //Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            Row {
-                Text(text = stringResource(R.string.password_change), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    modifier= Modifier
-                        .padding(start = 20.dp)
-                        .alignByBaseline(),
-                    color = MaterialTheme.colorScheme.onPrimary)
-
-                if (loginMethod!="EMAIL"){
-
-                    Text(text = stringResource(R.string.pw_change_easylogin_guide),
-                        fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                        letterSpacing = (-0.6).sp,
-                        modifier= Modifier
-                            .padding(start = 8.dp)
-                            .alignByBaseline(),
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
-
-            CustomTextField(
-                enabled = loginMethod == "EMAIL",
-                value = userPw,
-                onValueChange = {settingViewModel.updateUserPw(it)},
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Next),
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier
-                    .padding(start = 20.dp, top = 8.dp, end = 20.dp)
-                    .fillMaxWidth()
-                    .height(48.dp),
-                placeholder = { Text(text = stringResource(R.string.place_holder_password), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                    focusedContainerColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
-                ),
-                textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 16.sp, letterSpacing = (-0.4).sp
-                ),
-                shape = RoundedCornerShape(4.dp),
-                innerPadding = PaddingValues(start=16.dp)
-            )
-
-            CustomTextField(
-                enabled = loginMethod == "EMAIL",
-                value = userPwCheck,
-                onValueChange = {settingViewModel.updateUserPwCheck(it)},
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Next),
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier
-                    .padding(start = 20.dp, top = 8.dp, end = 20.dp)
-                    .fillMaxWidth()
-                    .height(48.dp),
-                placeholder = { Text(text = stringResource(R.string.place_holder_password_confirm), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                    focusedContainerColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = design_intro_bg.copy(alpha = 0.5f)
-                ),
-                textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 16.sp, letterSpacing = (-0.4).sp
-                ),
-                shape = RoundedCornerShape(4.dp),
-                innerPadding = PaddingValues(start=16.dp)
-            )
+            //Row {
+            //    Text(text = stringResource(R.string.password_change), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //        modifier= Modifier
+            //            .padding(start = 20.dp)
+            //            .alignByBaseline(),
+            //        color = MaterialTheme.colorScheme.onPrimary)
+            //
+            //    if (loginMethod!="EMAIL"){
+            //
+            //        Text(text = stringResource(R.string.pw_change_easylogin_guide),
+            //            fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            //            letterSpacing = (-0.6).sp,
+            //            modifier= Modifier
+            //                .padding(start = 8.dp)
+            //                .alignByBaseline(),
+            //            color = MaterialTheme.colorScheme.secondary
+            //        )
+            //    }
+            //}
+            //
+            //CustomTextField(
+            //    enabled = loginMethod == "EMAIL",
+            //    value = userPw,
+            //    onValueChange = {settingViewModel.updateUserPw(it)},
+            //    singleLine = true,
+            //    keyboardOptions = KeyboardOptions(
+            //        keyboardType = KeyboardType.Password,
+            //        imeAction = ImeAction.Next),
+            //    visualTransformation = PasswordVisualTransformation(),
+            //    modifier = Modifier
+            //        .padding(start = 20.dp, top = 8.dp, end = 20.dp)
+            //        .fillMaxWidth()
+            //        .height(48.dp),
+            //    placeholder = { Text(text = stringResource(R.string.place_holder_password), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+            //    colors = OutlinedTextFieldDefaults.colors(
+            //        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+            //        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+            //        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            //        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+            //        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+            //        focusedContainerColor = MaterialTheme.colorScheme.primary,
+            //        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+            //        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+            //        cursorColor = design_intro_bg.copy(alpha = 0.5f)
+            //    ),
+            //    textStyle = TextStyle(
+            //        color = MaterialTheme.colorScheme.onPrimary,
+            //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //        fontSize = 16.sp, letterSpacing = (-0.4).sp
+            //    ),
+            //    shape = RoundedCornerShape(4.dp),
+            //    innerPadding = PaddingValues(start=16.dp)
+            //)
+            //
+            //CustomTextField(
+            //    enabled = loginMethod == "EMAIL",
+            //    value = userPwCheck,
+            //    onValueChange = {settingViewModel.updateUserPwCheck(it)},
+            //    singleLine = true,
+            //    keyboardOptions = KeyboardOptions(
+            //        keyboardType = KeyboardType.Password,
+            //        imeAction = ImeAction.Next),
+            //    visualTransformation = PasswordVisualTransformation(),
+            //    modifier = Modifier
+            //        .padding(start = 20.dp, top = 8.dp, end = 20.dp)
+            //        .fillMaxWidth()
+            //        .height(48.dp),
+            //    placeholder = { Text(text = stringResource(R.string.place_holder_password_confirm), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+            //    colors = OutlinedTextFieldDefaults.colors(
+            //        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+            //        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+            //        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            //        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+            //        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+            //        focusedContainerColor = MaterialTheme.colorScheme.primary,
+            //        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+            //        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+            //        cursorColor = design_intro_bg.copy(alpha = 0.5f)
+            //    ),
+            //    textStyle = TextStyle(
+            //        color = MaterialTheme.colorScheme.onPrimary,
+            //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //        fontSize = 16.sp, letterSpacing = (-0.4).sp
+            //    ),
+            //    shape = RoundedCornerShape(4.dp),
+            //    innerPadding = PaddingValues(start=16.dp)
+            //)
 
             Button(
                 onClick = {
                     scope.launch {
+                        focusManager.clearFocus()
                         if (G.userNickName == nickName){
                             Log.d("userInfo","변경안함")
                         }else if( nickName != passedNick ){
                             snackbarHostState.showSnackbar(
-                                message = "닉네임 중복확인을 해주세요",
-                                actionLabel = "확인",
+                                message = context.getString(R.string.check_duplicate_nickname),
+                                actionLabel = context.getString(R.string.confirm),
                                 duration = SnackbarDuration.Short,
                                 withDismissAction = true
                             )
-                        }else if (nickName == passedNick){
+                        }else{
                             val result = settingViewModel.resetNickName()
                             if (result){
                                 snackbarHostState.showSnackbar(
-                                    message = "닉네임을 변경했습니다",
-                                    actionLabel = "확인",
+                                    message = context.getString(R.string.change_nickname),
+                                    actionLabel = context.getString(R.string.confirm),
                                     duration = SnackbarDuration.Short,
                                     withDismissAction = true
                                 )
                             }else{
                                 snackbarHostState.showSnackbar(
-                                    message = "닉네임 변경에 실패했습니다",
-                                    actionLabel = "확인",
+                                    message = context.getString(R.string.change_nickname_fail),
+                                    actionLabel = context.getString(R.string.confirm),
                                     duration = SnackbarDuration.Short,
                                     withDismissAction = true
                                 )

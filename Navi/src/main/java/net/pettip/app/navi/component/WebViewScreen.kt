@@ -15,18 +15,19 @@ import androidx.compose.ui.viewinterop.AndroidView
  */
 @Composable
 fun WebViewScreen(page:Int){
-    val url1 = "https://m.naver.com/"
+    val url1 = "http://carepet.hopto.org/terms"
     val url2 = "https://www.google.co.kr/?hl=ko"
-    val url3 = "https://www.youtube.com/"
+    val url3 = "http://carepet.hopto.org"
     AndroidView(
         factory = { context ->
             WebView(context).apply {
-                settings.javaScriptEnabled = true
                 webViewClient = WebViewClient()
+                settings.javaScriptEnabled = true
 
                 settings.loadWithOverviewMode = true
                 settings.useWideViewPort = true
                 settings.setSupportZoom(true)
+
             }
         },
         update = { webView ->

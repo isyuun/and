@@ -273,7 +273,7 @@ fun SetKeyTemp(settingViewModel: SettingViewModel, sharedViewModel: SharedViewMo
                                             settingViewModel.updateOtpValue(clipboardText)
                                         } else {
                                             Toast
-                                                .makeText(context, "복사된 초대코드가 없습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.no_copied_invitation_code, Toast.LENGTH_SHORT)
                                                 .show()
                                         }
                                     }

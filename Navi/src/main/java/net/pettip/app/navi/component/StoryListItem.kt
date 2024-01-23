@@ -86,7 +86,8 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
             .onGloballyPositioned { sizeImage = it.size }
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(bounded = false)
+                indication = rememberRipple(bounded = false),
+                enabled = data.bldYn != "Y"
             ) {
                 val currentTime = System.currentTimeMillis()
                 if (currentTime - lastClickTime >= 500) {

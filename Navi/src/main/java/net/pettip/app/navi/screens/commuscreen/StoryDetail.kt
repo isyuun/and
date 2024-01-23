@@ -2,7 +2,6 @@ package net.pettip.app.navi.screens.commuscreen
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -35,7 +34,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,7 +60,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
@@ -71,7 +68,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -114,7 +110,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewModelScope
@@ -134,14 +129,10 @@ import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.screens.mainscreen.calculateCurrentOffsetForPage
 import net.pettip.app.navi.screens.mainscreen.metersToKilometers
 import net.pettip.app.navi.screens.myscreen.CustomDialogDelete
-import net.pettip.app.navi.screens.myscreen.isValidFloat
 import net.pettip.app.navi.screens.walkscreen.FullScreenImage
 import net.pettip.app.navi.ui.theme.design_DDDDDD
-import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_bg
 import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_sharp
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
@@ -154,7 +145,6 @@ import net.pettip.singleton.G
 import net.pettip.util.Log
 import java.text.SimpleDateFormat
 import java.util.Locale
-import java.util.Properties
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -194,6 +184,8 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     var dclrDialogOpen by remember{ mutableStateOf(false) }
     var expanded by remember{ mutableStateOf(false) }
     var refresh by remember{ mutableStateOf(false) }
+
+    val lazyListState = rememberLazyListState()
 
     var replyText by remember{ mutableStateOf("") }
     val context = LocalContext.current
@@ -349,7 +341,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(80.dp),
+                                            .height(76.dp),
                                         contentAlignment = Alignment.Center
                                     ){
                                         LoadingAnimation1(circleColor = design_intro_bg)
@@ -388,7 +380,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                             exit = shrinkVertically(tween(durationMillis = 700)).plus(fadeOut())
                         ) {
                             LazyColumn(
-                                state = rememberLazyListState(),
+                                state = lazyListState,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .heightIn(max = 1000.dp),
@@ -397,9 +389,11 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                 itemsIndexed(upCmntNo0){ index, item ->
                                     CommentListItem(
                                         comment = item,
-                                        viewModel = viewModel, onReply,
+                                        viewModel = viewModel,
+                                        onReply = onReply,
                                         onReplyChange = {newValue -> onReply = newValue},
-                                        dclrDialogOpen = {newValue -> dclrDialogOpen = newValue })
+                                        dclrDialogOpen = {newValue -> dclrDialogOpen = newValue }
+                                    )
 
                                     if(index != (upCmntNo0?.size?.minus(1) ?: 0)){
                                         Spacer(modifier = Modifier
@@ -428,7 +422,6 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                     modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
                                     verticalAlignment = Alignment.Bottom
                                 ){
-                                    // TODO: 펫없이 댓글 등록시 petNM 비어있음.
                                     Text(
                                         text = "${replyCmnt?.petNm} ${stringResource(id = R.string.to_comment_writing)}",
                                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -532,7 +525,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                                     } else {
                                                         isLoading = false
                                                         Toast
-                                                            .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
+                                                            .makeText(context, R.string.comment_create_fail, Toast.LENGTH_SHORT)
                                                             .show()
                                                     }
                                                 } else {
@@ -543,7 +536,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                                     } else {
                                                         isLoading = false
                                                         Toast
-                                                            .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
+                                                            .makeText(context, R.string.comment_create_fail, Toast.LENGTH_SHORT)
                                                             .show()
                                                     }
                                                 }
@@ -586,7 +579,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                             } else {
                                                 rcmdtnLoading = true
                                                 Toast
-                                                    .makeText(context, "좋아요 실패", Toast.LENGTH_SHORT)
+                                                    .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                     .show()
                                             }
                                         }
@@ -617,7 +610,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                                             } else {
                                                 rcmdtnLoading = true
                                                 Toast
-                                                    .makeText(context, "싫어요 실패", Toast.LENGTH_SHORT)
+                                                    .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                     .show()
                                             }
                                         }
@@ -687,7 +680,7 @@ fun StoryDetailTopContent(
         CustomDialogDelete(
             onDismiss = { newValue -> deleteDialog = newValue },
             confirm = stringResource(id = R.string.delete),
-            dismiss = stringResource(id = R.string.remove),
+            dismiss = stringResource(id = R.string.cancel_kor),
             title = stringResource(R.string.story_delete),
             text = stringResource(id = R.string.delete_confirm),
             valueChange = { newValue -> storyDelete = newValue}
@@ -715,7 +708,7 @@ fun StoryDetailTopContent(
             if (!result){
                 Log.d("LOG","결과 진입")
                 loading = false
-                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,  R.string.retry, Toast.LENGTH_SHORT).show()
             }else{
 
                 viewModel.updateStoryListClear()
@@ -839,12 +832,12 @@ fun StoryDetailTopContent(
                                             if (result) {
                                                 rlsUpdateLoading = false
                                                 Toast
-                                                    .makeText(context, "공개처리 되었습니다", Toast.LENGTH_SHORT)
+                                                    .makeText(context, R.string.make_public, Toast.LENGTH_SHORT)
                                                     .show()
                                             } else {
                                                 rlsUpdateLoading = false
                                                 Toast
-                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                    .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                     .show()
                                             }
                                         }
@@ -890,12 +883,12 @@ fun StoryDetailTopContent(
                                         if (result) {
                                             rlsUpdateLoading = false
                                             Toast
-                                                .makeText(context, "비공개처리 되었습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.make_private, Toast.LENGTH_SHORT)
                                                 .show()
                                         } else {
                                             rlsUpdateLoading = false
                                             Toast
-                                                .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                 .show()
                                         }
                                     }
@@ -1228,6 +1221,8 @@ fun CommentListItem(
     var updateLoading by remember { mutableStateOf(false) }
     var rcmdtnLoading by remember { mutableStateOf(false) }
 
+    val lazyListState = rememberLazyListState()
+
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
@@ -1376,6 +1371,26 @@ fun CommentListItem(
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                viewModel.viewModelScope.launch {
+                                    updateLoading = true
+                                    val result = viewModel.updateComment(updateComment, comment.cmntNo)
+                                    if (result) {
+                                        updateComment = ""
+                                        updateLoading = false
+                                        Toast
+                                            .makeText(context, R.string.comment_modify_toast, Toast.LENGTH_SHORT)
+                                            .show()
+                                    } else {
+                                        updateLoading = false
+                                        Toast
+                                            .makeText(context, R.string.comment_modify_fail, Toast.LENGTH_SHORT)
+                                            .show()
+                                    }
+                                }
+                            }
+                        ),
                         modifier = Modifier
                             .weight(1f),
                         colors = TextFieldDefaults.colors(
@@ -1420,12 +1435,12 @@ fun CommentListItem(
                                             updateComment = ""
                                             updateLoading = false
                                             Toast
-                                                .makeText(context, "댓글이 수정되었습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.comment_modify_toast, Toast.LENGTH_SHORT)
                                                 .show()
                                         } else {
                                             updateLoading = false
                                             Toast
-                                                .makeText(context, "댓글 수정에 실패했습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.comment_modify_fail, Toast.LENGTH_SHORT)
                                                 .show()
                                         }
                                     }
@@ -1458,7 +1473,7 @@ fun CommentListItem(
         if (commentDelete){
             val result = viewModel.deleteComment(comment.cmntNo)
             if (!result){
-                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -1533,7 +1548,7 @@ fun CommentListItem(
                                                             } else {
                                                                 rcmdtnLoading = false
                                                                 Toast
-                                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                                    .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                                     .show()
                                                             }
                                                         }
@@ -1636,7 +1651,7 @@ fun CommentListItem(
                                                                 } else {
                                                                     rcmdtnLoading = true
                                                                     Toast
-                                                                        .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                                        .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                                         .show()
                                                                 }
                                                             }
@@ -1715,7 +1730,7 @@ fun CommentListItem(
                 )
 
                 if (step2CmntList.isNotEmpty()){
-                    Text(text = if(!step2Expand) "└ ${stringResource(id = R.string.reply)} ${step2CmntList.size}개" else stringResource(id = R.string.reply_collapse),
+                    Text(text = if(!step2Expand) "└ ${stringResource(id = R.string.reply)} ${step2CmntList.size}${stringResource(id = R.string.unit_gea)}" else stringResource(id = R.string.reply_collapse),
                         style = TextStyle(color = MaterialTheme.colorScheme.secondary,fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 12.sp,
                         letterSpacing = (-0.6).sp),
@@ -1734,7 +1749,7 @@ fun CommentListItem(
             exit = shrinkVertically(tween(durationMillis = 700)).plus(fadeOut(tween(durationMillis = 500, delayMillis = 200)))
         ) {
             LazyColumn(
-                state = rememberLazyListState(),
+                state = lazyListState,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(max = 1000.dp),
@@ -1742,7 +1757,11 @@ fun CommentListItem(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ){
                 itemsIndexed(step2CmntList){ index, item ->
-                    CommentListItem2(comment = item, viewModel = viewModel)
+                    CommentListItem2(
+                        comment = item,
+                        viewModel = viewModel,
+                        dclrDialogOpen = {newValue -> dclrDialogOpen(newValue)}
+                    )
                 }
             }
         }
@@ -1754,8 +1773,8 @@ fun CommentListItem(
 fun CommentListItem2(
     comment: Cmnt,
     viewModel: CommunityViewModel,
-
-){
+    dclrDialogOpen: (Boolean)->Unit,
+    ){
     val storyDetail by viewModel.storyDetail.collectAsState()
     val atchPath = storyDetail?.data?.atchPath ?: ""
     var expand by remember { mutableStateOf(false) }
@@ -1772,7 +1791,7 @@ fun CommentListItem2(
         if (commentDelete){
             val result = viewModel.deleteComment(comment.cmntNo)
             if (!result){
-                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
             }
         }
         commentDelete = false
@@ -1957,11 +1976,11 @@ fun CommentListItem2(
                                             updateComment = ""
                                             updateLoading = false
                                             Toast
-                                                .makeText(context, "댓글이 수정되었습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.comment_modify_toast, Toast.LENGTH_SHORT)
                                                 .show()
                                         } else {
                                             Toast
-                                                .makeText(context, "댓글 수정에 실패했습니다", Toast.LENGTH_SHORT)
+                                                .makeText(context, R.string.comment_modify_fail, Toast.LENGTH_SHORT)
                                                 .show()
                                         }
                                     }
@@ -2056,7 +2075,7 @@ fun CommentListItem2(
                                                     } else {
                                                         rcmdtnLoading = true
                                                         Toast
-                                                            .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                            .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                             .show()
                                                     }
                                                 }
@@ -2132,7 +2151,7 @@ fun CommentListItem2(
                                                             } else {
                                                                 rcmdtnLoading = true
                                                                 Toast
-                                                                    .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                                                                    .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
                                                                     .show()
                                                             }
                                                         }
@@ -2163,7 +2182,10 @@ fun CommentListItem2(
                                         modifier = Modifier
                                             .padding(start = 12.dp)
                                             .clickable(
-                                                onClick = { },
+                                                onClick = {
+                                                    viewModel.updateSelectCmnt(comment)
+                                                    dclrDialogOpen(true)
+                                                },
                                                 indication = rememberRipple(
                                                     bounded = true,
                                                     radius = 8.dp,

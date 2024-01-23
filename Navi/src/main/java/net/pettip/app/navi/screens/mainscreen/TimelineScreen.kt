@@ -519,12 +519,13 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
     var lastClickTime by remember { mutableStateOf(System.currentTimeMillis()) }
     val searchText by viewModel.searchText.collectAsState()
 
-
     Column (
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .fillMaxWidth()
-            .clickable {
+            .clickable (
+                enabled = timeData.bldYn != "Y"
+            ){
                 val currentTime = System.currentTimeMillis()
                 if (currentTime - lastClickTime >= 300) {
                     lastClickTime = currentTime
@@ -634,7 +635,7 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
                     )
 
                     Text(
-                        text = timeData.runCmn,
+                        text = timeData.runCmn?: "",
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp, lineHeight = 18.sp,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -864,7 +865,8 @@ fun TopPetItem(petList: PetDetailData, viewModel: WalkViewModel){
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,
                 color = if (isSelected) design_login_text else MaterialTheme.colorScheme.onPrimary,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
             )
         }
     }

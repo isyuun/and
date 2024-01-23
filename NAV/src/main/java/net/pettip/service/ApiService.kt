@@ -14,6 +14,7 @@ import net.pettip.data.bbs.BbsCmtCreateReq
 import net.pettip.data.bbs.BbsDetailRes
 import net.pettip.data.bbs.BbsRcmdtnReq
 import net.pettip.data.bbs.EndEventListRes
+import net.pettip.data.bbs.EventDclrCreateReq
 import net.pettip.data.bbs.EventListRes
 import net.pettip.data.bbs.NtcListRes
 import net.pettip.data.bbs.QnaDetailRes
@@ -40,6 +41,7 @@ import net.pettip.data.daily.DailyRcmdtn
 import net.pettip.data.daily.DailyRlsYnReq
 import net.pettip.data.daily.DailyUpdateReq
 import net.pettip.data.daily.DclrCreateReq
+import net.pettip.data.daily.GpxDownRes
 import net.pettip.data.daily.PhotoRes
 import net.pettip.data.daily.RTStoryListRes
 import net.pettip.data.daily.RlsDailyReq
@@ -143,6 +145,9 @@ interface ApiService {
 
     @POST("api/v1/bbs/rcmdtn")
     fun bbsRcmdtn(@Body data: BbsRcmdtnReq): Call<BbsDetailRes>
+
+    @POST("api/v1/bbs/dclr/create")
+    fun eventDclrCreate(@Body data: EventDclrCreateReq): Call<commonRes>
     // --------------------- 게시판 ----------------------- //
 
 
@@ -232,6 +237,9 @@ interface ApiService {
 
     @POST("api/v1/daily-life/timeline/list")
     fun getTimeList(@Body data: TimeLineReq): Call<TimeLineRes>
+
+    @POST("api/v1/daily-life/location/file")
+    fun getGpxFile(@Body data: GpxDownRes): Call<ResponseBody>
 
     // --------------------- 일상생활 ----------------------- //
 

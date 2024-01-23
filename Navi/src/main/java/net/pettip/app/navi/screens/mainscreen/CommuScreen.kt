@@ -136,7 +136,7 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
             ) {
                 CommunityTabItems.forEachIndexed { index, commuTabItem ->
                     Tab(
-                        text = { Text(text = commuTabItem.title, fontSize = 16.sp,color = MaterialTheme.colorScheme.onPrimary,
+                        text = { Text(text = stringResource(id = commuTabItem.title), fontSize = 16.sp,color = MaterialTheme.colorScheme.onPrimary,
                             fontFamily =
                             if(index == pagerState.currentPage) FontFamily(Font(R.font.pretendard_bold))
                             else FontFamily(Font(R.font.pretendard_regular))
@@ -307,8 +307,6 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-
-
 
                     Spacer(modifier = Modifier.padding(start = 20.dp))
 
@@ -798,27 +796,27 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
 }
 
 data class CommunityTabItem(
-    val title: String,
+    val title: Int,
     val screen: @Composable (NavHostController, CommunityViewModel) -> Unit // navController를 매개변수로 추가
 )
 
 val CommunityTabItems = listOf(
     CommunityTabItem(
-        title = "스토리",
+        title = R.string.title_story,
         screen = { navController, viewModel ->
             StoryScreen(
                 navController = navController,
                 viewModel = viewModel
             ) }),
     CommunityTabItem(
-        title = "이벤트",
+        title = R.string.title_event,
         screen = { navController, viewModel ->
             EventScreen(
                 navController = navController,
                 viewModel = viewModel
             ) }),
     CommunityTabItem(
-        title = "당첨자 발표",
+        title = R.string.winner_announcement,
         screen = { navController, viewModel ->
             EventEndScreen(
                 navController = navController,

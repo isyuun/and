@@ -26,6 +26,7 @@ import net.pettip.data.bbs.BbsNtc
 import net.pettip.data.bbs.BbsQna
 import net.pettip.data.bbs.BbsRcmdtnReq
 import net.pettip.data.bbs.EndEventListRes
+import net.pettip.data.bbs.EventDclrCreateReq
 import net.pettip.data.bbs.EventListRes
 import net.pettip.data.bbs.NtcListRes
 import net.pettip.data.bbs.QnaDetailRes
@@ -62,7 +63,6 @@ import net.pettip.data.daily.StoryRes
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.data.user.BbsFaq
 import net.pettip.data.user.BbsReq
-import net.pettip.data.user.FAQData
 import net.pettip.data.user.FAQRes
 import net.pettip.singleton.RetrofitClientServer
 import net.pettip.util.Log
@@ -602,6 +602,12 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _selectCmnt.value = newValue
     }
 
+    private val _selectEventCmnt = MutableStateFlow<BbsCmnt?>(null)
+    val selectEventCmnt: StateFlow<BbsCmnt?> = _selectEventCmnt.asStateFlow()
+    fun updateSelectEventCmnt(newValue: BbsCmnt?) {
+        _selectEventCmnt.value = newValue
+    }
+
     private val _selectDclr = MutableStateFlow<CdDetail?>(null)
     val selectDclr: StateFlow<CdDetail?> = _selectDclr.asStateFlow()
     fun updateSelectDclr(newValue: CdDetail?) {
@@ -651,6 +657,42 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         )
 
         val call = apiService.dclrCreate(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            Log.d("LOG","1")
+                            continuation.resume(true)
+                        }
+                    }else{
+                        Log.d("LOG","2")
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    Log.d("LOG",t.message.toString())
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun eventDclrCreate():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = EventDclrCreateReq(
+            pstCmntNo = _selectEventCmnt.value?.pstCmntNo ?: 0,
+            dclrCn = _dclrCn.value,
+            dclrRsnCd = _selectDclr.value?.cdId?: "001",
+            dclrSeCd = if (_selectEventCmnt.value==null) "001" else "002",
+            pstSn = _bbsDetail.value?.data?.pstSn ?: 0
+        )
+
+        val call = apiService.eventDclrCreate(data)
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<commonRes>{
                 override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {

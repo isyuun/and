@@ -234,11 +234,14 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
     LaunchedEffect(key1 = G.pushSeqNo, key2 = init){
         delay(400)
         if (G.pushPage != null && !init && MySharedPreference.getIsLogin()) {
-            Log.d("LOG","${G.pushPage} : ${G.pushSeqNo}")
-            delay(400)
-            navController.navigate(Screen.StoryDetail.route)
-            communityViewModel.updateLastPstSn(G.pushSeqNo?.toInt())
-            G.pushSeqNo?.toInt()?.let { communityViewModel.getStoryDetail(it) }
+            if (G.pushPage == "story"){
+                if (communityViewModel.storyDetail.value == null){
+                    // 이미 스토리 상세화면이 떠있는 경우, 데이터만 덮어쓰기
+                    navController.navigate(Screen.StoryDetail.route)
+                }
+                communityViewModel.updateLastPstSn(G.pushSeqNo?.toInt())
+                G.pushSeqNo?.toInt()?.let { communityViewModel.getStoryDetail(it) }
+            }
             G.pushPage = null
             G.pushSeqNo = null
         }
@@ -257,22 +260,11 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
             route = "intro",
             deepLinks = listOf(
                 navDeepLink {
-                    uriPattern = "http://carepet.hopto.org/{data}"
+                    uriPattern = "http://carepet.hopto.org"
                     action = Intent.ACTION_VIEW
-                }
-            ),
-            arguments = listOf(
-                navArgument("data") {
-                    type = NavType.StringType
-                    defaultValue = ""
                 }
             )
         ) {
-            //val data = it.arguments?.getString("data")
-            //if (!data.isNullOrBlank()) {
-            //    sharedViewModel.updateInviteCode(data)
-            //    Log.d("LOG", "intro: $data")
-            //}
             IntroScreen(navController = navController, viewModel = sharedViewModel)
         }
         composable("login") {

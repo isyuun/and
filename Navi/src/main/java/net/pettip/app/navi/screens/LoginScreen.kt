@@ -29,6 +29,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,13 +37,17 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -72,10 +77,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -83,6 +93,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -170,7 +182,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                     viewModel.updateLoginMethod("GOOGLE")
                     navController.navigate(Screen.EasyRegScreen.route)
                 }else{
-                    Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -228,7 +240,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
     ){ paddingValues ->
 
         LoadingDialog(
-            loadingText = "로그인..",
+            loadingText = stringResource(R.string.login_),
             loadingState = isLoading
         )
 
@@ -239,7 +251,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
             , horizontalAlignment = Alignment.CenterHorizontally) {
 
             Image(painter = painterResource(id = R.drawable.logo_login_pettip), contentDescription = "logo", modifier = Modifier
-                .padding(top = 40.dp, bottom = 40.dp)
+                .padding(top = 60.dp, bottom = 60.dp)
                 .width(100.dp))
 
             Column (modifier = Modifier
@@ -251,187 +263,192 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                 )
                 ,
                 horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "로그인",modifier= Modifier
-                    .padding(top = 40.dp, bottom = 20.dp)
-                    , textAlign = TextAlign.Center,
-                    fontSize = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
 
+                // -------------- 일반 사용자 로그인 --------------
 
-                CustomTextField(
-                    value = id,
-                    onValueChange = {id = it },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next),
-                    modifier = Modifier
-                        .padding(start = 20.dp, end = 20.dp)
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    placeholder = { Text(text = "Email", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                    leadingIcon = { Icon(painter = painterResource(id = R.drawable.icon_email), contentDescription = "")},
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                        focusedContainerColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
-                        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                        cursorColor = design_intro_bg.copy(alpha = 0.5f)
-                    ),
-                    textStyle = TextStyle(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 16.sp, letterSpacing = (-0.4).sp
-                    ),
-                    shape = RoundedCornerShape(4.dp)
-                )
+                //Text(text = "로그인",modifier= Modifier
+                //    .padding(top = 40.dp, bottom = 20.dp)
+                //    , textAlign = TextAlign.Center,
+                //    fontSize = 24.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                //    color = MaterialTheme.colorScheme.onPrimary
+                //)
+                //
+                //
+                //CustomTextField(
+                //    value = id,
+                //    onValueChange = {id = it },
+                //    singleLine = true,
+                //    keyboardOptions = KeyboardOptions(
+                //        keyboardType = KeyboardType.Email,
+                //        imeAction = ImeAction.Next),
+                //    modifier = Modifier
+                //        .padding(start = 20.dp, end = 20.dp)
+                //        .fillMaxWidth()
+                //        .height(48.dp),
+                //    placeholder = { Text(text = "Email", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                //    leadingIcon = { Icon(painter = painterResource(id = R.drawable.icon_email), contentDescription = "")},
+                //    colors = OutlinedTextFieldDefaults.colors(
+                //        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                //        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                //        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                //        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                //        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                //        focusedContainerColor = MaterialTheme.colorScheme.primary,
+                //        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                //        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                //        cursorColor = design_intro_bg.copy(alpha = 0.5f)
+                //    ),
+                //    textStyle = TextStyle(
+                //        color = MaterialTheme.colorScheme.onPrimary,
+                //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                //        fontSize = 16.sp, letterSpacing = (-0.4).sp
+                //    ),
+                //    shape = RoundedCornerShape(4.dp)
+                //)
+                //
+                //CustomTextField(
+                //    value = password,
+                //    onValueChange = {password = it},
+                //    singleLine = true,
+                //    keyboardOptions = KeyboardOptions(
+                //        keyboardType = KeyboardType.Password,
+                //        imeAction = ImeAction.Done),
+                //    keyboardActions = KeyboardActions(onDone = {
+                //        scope.launch {
+                //            isLoading = true
+                //            val result = viewModel.onLoginButtonClick(userId = id, userPw = password, loginMethod = "EMAIL")
+                //            if (result==0){
+                //                isLoading = false
+                //                MySharedPreference.setUserEmail(id)
+                //                sharedViewModel.updateInit(true)
+                //                sharedViewModel.updateDupleLogin(false)
+                //                navController.navigate(Screen.MainScreen.route){
+                //                    popUpTo(0)
+                //                }
+                //            }else if (result == 1){
+                //                isLoading = false
+                //                focusManager.clearFocus()
+                //                snackbarHostState.showSnackbar(
+                //                    message = "아이디 및 패스워드를 확인해주세요.",
+                //                    actionLabel = "확인",
+                //                    duration = SnackbarDuration.Short,
+                //                    withDismissAction = false
+                //                )
+                //            }else{
+                //                isLoading = false
+                //                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                //            }
+                //        }
+                //    }),
+                //    visualTransformation = PasswordVisualTransformation(),
+                //    modifier = Modifier
+                //        .padding(start = 20.dp, end = 20.dp, top = 8.dp)
+                //        .fillMaxWidth()
+                //        .height(48.dp),
+                //    placeholder = { Text(text = "PassWord",fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                //    leadingIcon = { Icon(painter = painterResource(id = R.drawable.icon_password), contentDescription = "")},
+                //    colors = OutlinedTextFieldDefaults.colors(
+                //        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                //        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                //        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                //        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                //        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                //        focusedContainerColor = MaterialTheme.colorScheme.primary,
+                //        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                //        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                //        cursorColor = design_intro_bg.copy(alpha = 0.5f)
+                //    ),
+                //    textStyle = TextStyle(
+                //        color = MaterialTheme.colorScheme.onPrimary,
+                //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                //        fontSize = 16.sp, letterSpacing = (-0.4).sp
+                //    ),
+                //    shape = RoundedCornerShape(4.dp)
+                //)
+                //
+                //Button(
+                //    onClick = {
+                //        scope.launch {
+                //            isLoading = true
+                //            val result = viewModel.onLoginButtonClick(userId = id, userPw = password, loginMethod = "EMAIL")
+                //            if (result==0){
+                //                isLoading = false
+                //                MySharedPreference.setUserEmail(id)
+                //                sharedViewModel.updateInit(true)
+                //                sharedViewModel.updateDupleLogin(false)
+                //                navController.navigate(Screen.MainScreen.route){
+                //                    popUpTo(0)
+                //                }
+                //            }else if (result == 1){
+                //                isLoading = false
+                //                focusManager.clearFocus()
+                //                snackbarHostState.showSnackbar(
+                //                    message = "아이디 및 패스워드를 확인해주세요.",
+                //                    actionLabel = "확인",
+                //                    duration = SnackbarDuration.Short,
+                //                    withDismissAction = false
+                //                )
+                //            }else{
+                //                isLoading = false
+                //                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                //            }
+                //        } },
+                //    modifier = Modifier
+                //        .padding(top = 16.dp)
+                //        .fillMaxWidth()
+                //        .height(48.dp)
+                //        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
+                //    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                //    colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
+                //)
+                //{
+                //    Text(text = "로그인", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                //}
+                //
+                //Row (modifier = Modifier
+                //    .fillMaxWidth()
+                //    .padding(top = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
+                //    //Text(
+                //    //    text = "아이디 찾기",
+                //    //    fontSize = 14.sp,
+                //    //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                //    //    color = MaterialTheme.colorScheme.onPrimary,
+                //    //    modifier = Modifier.clickable { navController.navigate(route = Screen.IdPwSearch.route+"/0") })
+                //
+                //    //Spacer(modifier = Modifier
+                //    //    .padding(horizontal = 9.dp)
+                //    //    .size(2.dp, 8.dp)
+                //    //    .background(color = design_login_text))
+                //
+                //    Text(
+                //        text = "비밀번호 찾기",
+                //        fontSize = 14.sp,
+                //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                //        color = MaterialTheme.colorScheme.onPrimary,
+                //        modifier = Modifier.clickable {  navController.navigate(route = Screen.PwSearchScreen.route) })
+                //
+                //    Spacer(modifier = Modifier
+                //        .padding(horizontal = 9.dp)
+                //        .size(2.dp, 8.dp)
+                //        .background(color = design_login_text))
+                //
+                //    Text(
+                //        text = "회원가입",
+                //        fontSize = 14.sp,
+                //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                //        color = MaterialTheme.colorScheme.onPrimary,
+                //        modifier = Modifier.clickable {
+                //            navController.navigate(Screen.UserCreate.route)
+                //        })
+                //}
 
-                CustomTextField(
-                    value = password,
-                    onValueChange = {password = it},
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = {
-                        scope.launch {
-                            isLoading = true
-                            val result = viewModel.onLoginButtonClick(userId = id, userPw = password, loginMethod = "EMAIL")
-                            if (result==0){
-                                isLoading = false
-                                MySharedPreference.setUserEmail(id)
-                                sharedViewModel.updateInit(true)
-                                sharedViewModel.updateDupleLogin(false)
-                                navController.navigate(Screen.MainScreen.route){
-                                    popUpTo(0)
-                                }
-                            }else if (result == 1){
-                                isLoading = false
-                                focusManager.clearFocus()
-                                snackbarHostState.showSnackbar(
-                                    message = "아이디 및 패스워드를 확인해주세요.",
-                                    actionLabel = "확인",
-                                    duration = SnackbarDuration.Short,
-                                    withDismissAction = false
-                                )
-                            }else{
-                                isLoading = false
-                                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }),
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier
-                        .padding(start = 20.dp, end = 20.dp, top = 8.dp)
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    placeholder = { Text(text = "PassWord",fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
-                    leadingIcon = { Icon(painter = painterResource(id = R.drawable.icon_password), contentDescription = "")},
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                        focusedContainerColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
-                        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                        cursorColor = design_intro_bg.copy(alpha = 0.5f)
-                    ),
-                    textStyle = TextStyle(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        fontSize = 16.sp, letterSpacing = (-0.4).sp
-                    ),
-                    shape = RoundedCornerShape(4.dp)
-                )
-
-                Button(
-                    onClick = {
-                        scope.launch {
-                            isLoading = true
-                            val result = viewModel.onLoginButtonClick(userId = id, userPw = password, loginMethod = "EMAIL")
-                            if (result==0){
-                                isLoading = false
-                                MySharedPreference.setUserEmail(id)
-                                sharedViewModel.updateInit(true)
-                                sharedViewModel.updateDupleLogin(false)
-                                navController.navigate(Screen.MainScreen.route){
-                                    popUpTo(0)
-                                }
-                            }else if (result == 1){
-                                isLoading = false
-                                focusManager.clearFocus()
-                                snackbarHostState.showSnackbar(
-                                    message = "아이디 및 패스워드를 확인해주세요.",
-                                    actionLabel = "확인",
-                                    duration = SnackbarDuration.Short,
-                                    withDismissAction = false
-                                )
-                            }else{
-                                isLoading = false
-                                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
-                            }
-                        } },
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
-                )
-                {
-                    Text(text = "로그인", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-                }
+                // ------------- 일반 사용자 로그인 ---------------------
 
                 Row (modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
-                    //Text(
-                    //    text = "아이디 찾기",
-                    //    fontSize = 14.sp,
-                    //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    //    color = MaterialTheme.colorScheme.onPrimary,
-                    //    modifier = Modifier.clickable { navController.navigate(route = Screen.IdPwSearch.route+"/0") })
-
-                    //Spacer(modifier = Modifier
-                    //    .padding(horizontal = 9.dp)
-                    //    .size(2.dp, 8.dp)
-                    //    .background(color = design_login_text))
-
-                    Text(
-                        text = "비밀번호 찾기",
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.clickable {  navController.navigate(route = Screen.PwSearchScreen.route) })
-
-                    Spacer(modifier = Modifier
-                        .padding(horizontal = 9.dp)
-                        .size(2.dp, 8.dp)
-                        .background(color = design_login_text))
-
-                    Text(
-                        text = "회원가입",
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.clickable {
-                            navController.navigate(Screen.UserCreate.route)
-                        })
-                }
-
-                Row (modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+                    .padding(top = 80.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
                     Divider(modifier=Modifier.size(92.dp,1.dp), color = design_textFieldOutLine)
-                    Text(text = " SNS 계정으로 로그인 ", modifier = Modifier.padding(horizontal = 14.dp),
+                    Text(text = stringResource(R.string.login_with_sns), modifier = Modifier.padding(horizontal = 14.dp),
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         color = MaterialTheme.colorScheme.onPrimary)
                     Divider(modifier=Modifier.size(92.dp,1.dp), color = design_textFieldOutLine)
@@ -441,119 +458,233 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                 val isLoggedIn = viewModel.isLoggedIn.collectAsState()
                 val loginStatusInfo = if(isLoggedIn.value) "로그인 상태" else "로그아웃 상태"
 
-                Button(onClick = {
-                    scope.launch {
-                        val kakaoLoginResult = viewModel.kakaoLogin(context)
-                        if (kakaoLoginResult){
+                Box{
+                    Button(onClick = {
+                        scope.launch {
+                            val kakaoLoginResult = viewModel.kakaoLogin(context)
+                            if (kakaoLoginResult){
 
-                            val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "KAKAO")
-                            if (loginResult == 0){
-                                sharedViewModel.updateInit(true)
-                                sharedViewModel.updateDupleLogin(false)
-                                navController.navigate(Screen.MainScreen.route){
-                                    popUpTo(0)
+                                val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "KAKAO")
+                                if (loginResult == 0){
+                                    sharedViewModel.updateInit(true)
+                                    sharedViewModel.updateDupleLogin(false)
+                                    navController.navigate(Screen.MainScreen.route){
+                                        popUpTo(0)
+                                    }
+                                }else if (loginResult == 1){
+                                    viewModel.updateLoginMethod("KAKAO")
+                                    navController.navigate(Screen.EasyRegScreen.route)
+                                }else{
+                                    // 실패시의 상황을 하나로 상정하면 안됨.
+                                    // 통신실패의 경우에는 토스트를 띄어 다시시도하기 유도
+                                    Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
                                 }
-                            }else if (loginResult == 1){
-                                // 실패시의 상황을 하나로 상정하면 안됨.
-                                // 통신실패의 경우에는 토스트를 띄어 다시시도하기 유도
-                                viewModel.updateLoginMethod("KAKAO")
-                                navController.navigate(Screen.EasyRegScreen.route)
                             }else{
-                                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Kakao 로그인 실패", Toast.LENGTH_SHORT).show()
                             }
-                        }else{
-                            Toast.makeText(context, "Kakao 로그인 실패", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                        modifier = Modifier
+                            .padding(top = 32.dp)
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = design_login_kakaobtn, contentColor = design_login_text)
+                    ) {
+                        Box (modifier = Modifier.fillMaxSize()){
+                            Icon(painter = painterResource(id = R.drawable.icon_kakao), contentDescription = "",
+                                modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
+                            Text(text = stringResource(R.string.login_with_kakao), modifier = Modifier.align(Alignment.Center),
+                                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)))
                         }
                     }
-                },
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = design_login_kakaobtn, contentColor = design_login_text)
-                ) {
-                    Box (modifier = Modifier.fillMaxSize()){
-                        Icon(painter = painterResource(id = R.drawable.icon_kakao), contentDescription = "",
-                            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
-                        Text(text = "카카오톡으로 로그인", modifier = Modifier.align(Alignment.Center),
-                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-                    }
-                }
 
-                Button(onClick = {
-                    scope.launch {
-                        val naverLoginResult = viewModel.naverLogin(context)
-                        if (naverLoginResult){
-
-                            val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "NAVER")
-                            // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
-                            if (loginResult == 0){
-                                sharedViewModel.updateInit(true)
-                                sharedViewModel.updateDupleLogin(false)
-                                navController.navigate(Screen.MainScreen.route){
-                                    popUpTo(0)
-                                }
-                            }else if(loginResult == 1){
-                                viewModel.updateLoginMethod("NAVER")
-                                navController.navigate(Screen.EasyRegScreen.route)
-                            }else{
-                                Toast.makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT).show()
+                    if (MySharedPreference.getLastLoginMethod() == "KAKAO"){
+                        Column(
+                            modifier = Modifier
+                                .width(IntrinsicSize.Max)
+                                .align(Alignment.TopEnd)
+                                .padding(end = 40.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .background(
+                                        color = design_sharp.copy(alpha = 0.8f),
+                                        shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp)
+                                    )
+                                    .wrapContentWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    stringResource(R.string.last_login_method),
+                                    fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                    color = design_white,
+                                    modifier = Modifier.padding(horizontal = 8.dp))
                             }
-                        }else{
-                            Toast.makeText(context, "Naver 로그인 실패", Toast.LENGTH_SHORT).show()
+                            Column(
+                                modifier = Modifier
+                                    .background(
+                                        color = design_sharp.copy(alpha = 1.0f),
+                                        shape = TriangleEdgeShape(30)
+                                    )
+                                    .width(8.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            ) {
+                            }
                         }
                     }
-                },
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = design_login_naverbtn, contentColor = design_white)
-                ) {
-                    Box (modifier = Modifier.fillMaxSize()){
-                        Icon(painter = painterResource(id = R.drawable.icon_naver), contentDescription = "",
-                            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
-                        Text(text = "네이버로 로그인", modifier = Modifier.align(Alignment.Center),
-                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                }
+
+
+                Box {
+                    Button(onClick = {
+                        scope.launch {
+                            val naverLoginResult = viewModel.naverLogin(context)
+                            if (naverLoginResult){
+
+                                val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "NAVER")
+                                // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
+                                if (loginResult == 0){
+                                    sharedViewModel.updateInit(true)
+                                    sharedViewModel.updateDupleLogin(false)
+                                    navController.navigate(Screen.MainScreen.route){
+                                        popUpTo(0)
+                                    }
+                                }else if(loginResult == 1){
+                                    viewModel.updateLoginMethod("NAVER")
+                                    navController.navigate(Screen.EasyRegScreen.route)
+                                }else{
+                                    Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
+                                }
+                            }else{
+                                Toast.makeText(context, "Naver 로그인 실패", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    },
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = design_login_naverbtn, contentColor = design_white)
+                    ) {
+                        Box (modifier = Modifier.fillMaxSize()){
+                            Icon(painter = painterResource(id = R.drawable.icon_naver), contentDescription = "",
+                                modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
+                            Text(text = stringResource(R.string.login_with_naver), modifier = Modifier.align(Alignment.Center),
+                                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                        }
+                    }
+
+                    if (MySharedPreference.getLastLoginMethod() == "NAVER"){
+                        Column(
+                            modifier = Modifier
+                                .width(IntrinsicSize.Max)
+                                .align(Alignment.TopEnd)
+                                .padding(end = 40.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .background(
+                                        color = design_sharp.copy(alpha = 1.0f),
+                                        shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp)
+                                    )
+                                    .wrapContentWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.last_login_method),
+                                    fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                    color = design_white,
+                                    modifier = Modifier.padding(horizontal = 8.dp))
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .background(
+                                        color = design_sharp.copy(alpha = 1.0f),
+                                        shape = TriangleEdgeShape(30)
+                                    )
+                                    .width(8.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            ) {
+                            }
+                        }
                     }
                 }
 
-                Button(onClick = {
-                    scope.launch {
-                        val signInIntent = mGoogleSignInClient.signInIntent
-                        googleAuthLauncher.launch(signInIntent)
+                Box {
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                val signInIntent = mGoogleSignInClient.signInIntent
+                                googleAuthLauncher.launch(signInIntent)
+                            } },
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(top = 16.dp)
+                            .border(
+                                width = 1.dp,
+                                color = design_btn_border,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = design_white, contentColor = design_login_text)
+                    ) {
+                        Box (modifier = Modifier.fillMaxSize()){
+                            Icon(painter = painterResource(id = R.drawable.icon_google), contentDescription = "",
+                                modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
+                            Text(text = stringResource(R.string.login_with_google), modifier = Modifier.align(Alignment.Center),
+                                fontSize = 14.sp,letterSpacing = (-0.7).sp,
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                        }
                     }
-                },
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .padding(top = 8.dp)
-                        .border(
-                            width = 1.dp,
-                            color = design_btn_border,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = design_white, contentColor = design_login_text)
-                ) {
-                    Box (modifier = Modifier.fillMaxSize()){
-                        Icon(painter = painterResource(id = R.drawable.icon_google), contentDescription = "",
-                            modifier = Modifier.align(Alignment.CenterStart), tint = Color.Unspecified)
-                        Text(text = "구글로 로그인", modifier = Modifier.align(Alignment.Center),
-                            fontSize = 14.sp,letterSpacing = (-0.7).sp,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+
+                    if (MySharedPreference.getLastLoginMethod() == "GOOGLE"){
+                        Column(
+                            modifier = Modifier
+                                .width(IntrinsicSize.Max)
+                                .align(Alignment.TopEnd)
+                                .padding(end = 40.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .background(
+                                        color = design_sharp.copy(alpha = 1.0f),
+                                        shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp)
+                                    )
+                                    .wrapContentWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    stringResource(id = R.string.last_login_method),
+                                    fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                    color = design_white,
+                                    modifier = Modifier.padding(horizontal = 8.dp))
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .background(
+                                        color = design_sharp.copy(alpha = 1.0f),
+                                        shape = TriangleEdgeShape(30)
+                                    )
+                                    .width(8.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            ) {
+                            }
+                        }
                     }
                 }
-
-            }
+            }// col
         }
     }
 
@@ -611,7 +742,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            BackTopBar(title = "회원가입", navController = navController)
+            BackTopBar(title = stringResource(R.string.sign_up_), navController = navController)
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
     ) { paddingValues ->
@@ -672,10 +803,11 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                             checkmarkColor = design_white)
                     )
 
-                    Text(text = "전체 약관에 동의합니다.",
+                    Text(
+                        text = stringResource(R.string.agree_all_term),
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                        color = if (allCheck) design_intro_bg else MaterialTheme.colorScheme.onPrimary, modifier=Modifier.offset(x = (-8).dp),
+                        color = if (allCheck) design_intro_bg else MaterialTheme.colorScheme.onPrimary, modifier = Modifier.offset(x = (-8).dp),
                         letterSpacing = (-0.7).sp,
                     )
                 }
@@ -683,19 +815,19 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
                 AgreeComponent(
-                    title = "회원가입약관 동의",
-                    mainText = "마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용",
+                    title = stringResource(R.string.agree_terms_service),
+                    mainText = stringResource(R.string.agree_terms_service_main_text),
                     check = memberCheck,
                     onClick = { newValue -> viewModel.updateMemberCheck(newValue)})
 
                 AgreeComponent(
-                    title = "개인정보처리방침안내 동의",
+                    title = stringResource(R.string.agree_privacy_policy),
                     mainText = "마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용",
                     check = personCheck,
                     onClick = { newValue -> viewModel.updatePersonCheck(newValue)})
 
                 AgreeComponent(
-                    title = "마케팅수신동의",
+                    title = stringResource(R.string.agree_marketing),
                     mainText = "마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용",
                     check = marketingCheck,
                     onClick = { newValue -> viewModel.updateMarketingCheck(newValue)})
@@ -703,7 +835,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
                 Row (Modifier.fillMaxWidth()){
-                    Text(text = "닉네임", fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    Text(text = stringResource(id = R.string.nickname), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         modifier=Modifier.padding(start = 20.dp), color = MaterialTheme.colorScheme.onPrimary)
                     Text(
                         text = "*",
@@ -724,7 +856,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                         .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                         .fillMaxWidth()
                         .height(48.dp),
-                    placeholder = { Text(text = "닉네임을 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
+                    placeholder = { Text(text = stringResource(id = R.string.place_holder_nickname), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
                         focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
@@ -757,16 +889,16 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                                             focusManager.clearFocus()
                                             userCreateViewModel.updateUserNickNamePass(nickName)
                                             snackbarHostState.showSnackbar(
-                                                message = "사용하실 수 있는 닉네임입니다",
-                                                actionLabel = "확인",
+                                                message = context.getString(R.string.available_nickname),
+                                                actionLabel = context.getString(R.string.confirm),
                                                 duration = SnackbarDuration.Short,
                                                 withDismissAction = false
                                             )
                                         }else{
                                             focusManager.clearFocus()
                                             snackbarHostState.showSnackbar(
-                                                message = "이미 사용중인 닉네임입니다",
-                                                actionLabel = "확인",
+                                                message = context.getString(R.string.already_use_nickname),
+                                                actionLabel = context.getString(R.string.confirm),
                                                 duration = SnackbarDuration.Short,
                                                 withDismissAction = false
                                             )
@@ -783,7 +915,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                                 contentPadding = PaddingValues(horizontal = 0.dp)
                             ) {
                                 Text(
-                                    text = "중복확인",
+                                    text = stringResource(id = R.string.duplicate_check),
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                     color = MaterialTheme.colorScheme.onPrimary
@@ -799,15 +931,15 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                             if(allCheck){
                                 if (nickName.isEmpty()) {
                                     snackbarHostState.showSnackbar(
-                                        message = "닉네임을 입력해주세요",
-                                        actionLabel = "확인",
+                                        message = context.getString(R.string.place_holder_nickname),
+                                        actionLabel = context.getString(R.string.confirm),
                                         duration = SnackbarDuration.Short,
                                         withDismissAction = true
                                     )
                                 } else if ( nickName != nickNamePass ) {
                                     snackbarHostState.showSnackbar(
-                                        message = "닉네임 중복확인을 해주세요",
-                                        actionLabel = "확인",
+                                        message = context.getString(R.string.check_duplicate_nickname),
+                                        actionLabel = context.getString(R.string.confirm),
                                         duration = SnackbarDuration.Short,
                                         withDismissAction = true
                                     )
@@ -820,7 +952,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                                     navController.navigate(Screen.PetCreateScreen.route)
                                 }
                             }else{
-                                Toast.makeText(context, "약관에 동의해주세요", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, R.string.please_agree_term, Toast.LENGTH_SHORT).show()
                             }
                         }
 
@@ -834,7 +966,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                     colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
                 )
                 {
-                    Text(text = "다음", color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+                    Text(text = stringResource(R.string.next), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
                 }
 
             } // column
@@ -903,16 +1035,22 @@ fun AgreeComponent(
         AnimatedVisibility(
             visible = expanded,
             enter = expandVertically(),
-            exit = shrinkVertically()
+            exit = shrinkVertically(),
         ) {
-            Text(
-                text = mainText,
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                fontSize = 12.sp,
-                letterSpacing = (-0.6).sp,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.padding(start = 38.dp, end = 16.dp, top = 8.dp)
-            )
+            Column (
+                modifier = Modifier
+                    .heightIn(max = 300.dp)
+                    .verticalScroll(rememberScrollState())
+            ){
+                Text(
+                    text = mainText,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 12.sp,
+                    letterSpacing = (-0.6).sp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(start = 38.dp, end = 16.dp, top = 8.dp)
+                )
+            }
         }
 
 
@@ -944,5 +1082,21 @@ fun checkAndRequestPermissions(
     else {
         launcher.launch(permissions)
         Log.d("test5", "권한을 요청하였습니다.")
+    }
+}
+
+class TriangleEdgeShape(val offset: Int) : Shape {
+
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        val trianglePath = Path().apply {
+            moveTo(x = size.width/2 - offset/2, y = size.height)
+            lineTo(x = size.width/2, y = size.height + offset)
+            lineTo(x = size.width/2 + offset/2, y = size.height)
+        }
+        return Outline.Generic(path = trianglePath)
     }
 }

@@ -352,13 +352,13 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
             Button(
                 onClick = {
                           if (settingViewModel.inquiryKind.value ==null){
-                              Toast.makeText(context, "문의 유형을 선택해주세요", Toast.LENGTH_SHORT).show()
+                              Toast.makeText(context, R.string.select_inquiry_kind, Toast.LENGTH_SHORT).show()
                           }else if(settingViewModel.title.value == ""){
-                              Toast.makeText(context, "제목을 입력해주세요", Toast.LENGTH_SHORT).show()
+                              Toast.makeText(context, R.string.place_holder_title, Toast.LENGTH_SHORT).show()
                           }else if(settingViewModel.inquiryMain.value ==""){
-                              Toast.makeText(context, "내용을 입력해주세요", Toast.LENGTH_SHORT).show()
+                              Toast.makeText(context, R.string.enter_memo, Toast.LENGTH_SHORT).show()
                           }else if (!settingViewModel.isCheck.value){
-                              Toast.makeText(context, "정보 수집에 동의해주세요", Toast.LENGTH_SHORT).show()
+                              Toast.makeText(context, R.string.agree_information_collection, Toast.LENGTH_SHORT).show()
                           }else{
                               scope.launch {
                                   isLoading = true
@@ -368,17 +368,17 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                                           val qnaUpload = settingViewModel.qnaCreate()
                                           if (qnaUpload){
                                               communityViewModel.updateQnaListInit(true)
-                                              loadingText = "등록 성공!"
+                                              loadingText = context.getString(R.string.registration_successful)
                                               delay(1000)
                                               isLoading = false
                                               navController.popBackStack()
                                           }else{
-                                              loadingText = "등록 실패..."
+                                              loadingText = context.getString(R.string.registration_failed)
                                               delay(1000)
                                               isLoading = false
                                           }
                                       }else{
-                                          loadingText = "등록 실패..."
+                                          loadingText = context.getString(R.string.registration_failed)
                                           delay(1000)
                                           isLoading = false
                                       }
@@ -386,12 +386,12 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                                       val qnaUpload = settingViewModel.qnaCreate()
                                       if (qnaUpload){
                                           communityViewModel.updateQnaListInit(true)
-                                          loadingText = "등록 성공!"
+                                          loadingText = context.getString(R.string.registration_successful)
                                           delay(1000)
                                           isLoading = false
                                           navController.popBackStack()
                                       }else{
-                                          loadingText = "등록 실패..."
+                                          loadingText = context.getString(R.string.registration_failed)
                                           delay(1000)
                                           isLoading = false
                                       }

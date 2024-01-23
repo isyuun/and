@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -66,7 +67,7 @@ fun SearchBox(viewModel:WalkViewModel, modifier: Modifier, changeIsSearching:(Bo
         modifier = modifier
             .fillMaxWidth()
             .height(44.dp),
-        placeholder = { Text(text = "검색어를 입력해주세요", fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
+        placeholder = { Text(text = stringResource(R.string.enter_search_term), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp) },
         colors = OutlinedTextFieldDefaults.colors(
             unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
             focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,

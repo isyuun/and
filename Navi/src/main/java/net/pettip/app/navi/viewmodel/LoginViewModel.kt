@@ -118,6 +118,7 @@ class LoginViewModel() : ViewModel() {
 
 
     private fun trmnlMng(){
+        // 등록된 토큰과 현재 디바이스 토큰이 다르면 업데이트
         if ( _appKey.value != _registedAppKey.value || _registedAppKey.value == ""  ){
             val apiService = RetrofitClientServer.instance
 

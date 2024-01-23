@@ -23,3 +23,17 @@
 # settings.gradle.kts : include(":NAV")
 # build.gradle.kts : implementation(project(mapOf("path" to ":NAV")))
 -keep class net.pettip.data.** { *; }
+
+-keep class com.kakao.sdk.**.model.* { <fields>; }
+-keep class * extends com.google.gson.TypeAdapter
+
+# https://github.com/square/okhttp/pull/6792
+-dontwarn org.bouncycastle.jsse.**
+-dontwarn org.conscrypt.*
+-dontwarn org.openjsse.**
+
+# To use naver login with proguard
+-keep public class com.navercorp.nid.oauth.** {*;}
+
+# To use naver login profile with proguard
+-keep public class com.navercorp.nid.profile.data.** {*;}

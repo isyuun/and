@@ -19,7 +19,7 @@ data class DailyCreateReq(
     @SerializedName("schCdList")
     var schCdList: List<String>,
     @SerializedName("schCn")
-    var schCn: String, // String
+    var schCn: String?, // String
     @SerializedName("schTtl")
     var schTtl: String, // String
     @SerializedName("totClr")
