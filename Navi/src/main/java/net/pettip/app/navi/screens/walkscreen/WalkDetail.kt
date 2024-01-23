@@ -101,6 +101,7 @@ import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStream
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
@@ -153,6 +154,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
             navController.popBackStack()
         }
     }
+
 
     LaunchedEffect(key1 = dailyDetail) {
         if (!dailyDetail?.totMvmnPathFileSn.isNullOrEmpty() && !gpxDownload){
@@ -230,23 +232,25 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                     .height(360.dp)
                             ) {
                                 if (dailyDetail != null && gpxDownload) {
-                                    val file: File? = try {
-                                        File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX")
-                                        //File("")  //test
-                                    } catch (e: Exception) {
-                                        e.printStackTrace()
-                                        null
-                                    }
-                                    Log.wtf(__CLASSNAME__, "::GpxMap()${getMethodName()}[${file?.exists()}][${file?.length()}][${file}]")
-                                    val `in`: FileInputStream? = file?.let { f ->
-                                        try {
-                                            if (f.exists() && f.length() > 0) f.inputStream() else null
-                                        } catch (e: Exception) {
-                                            e.printStackTrace()
-                                            null
-                                        }
-                                    }
-                                    `in`?.let { i ->
+                                    //val file: File? = try {
+                                    //    File("${context.filesDir}/${dailyDetail?.schUnqNo}.GPX")
+                                    //    //File("")  //test
+                                    //} catch (e: Exception) {
+                                    //    e.printStackTrace()
+                                    //    null
+                                    //}
+                                    //Log.wtf(__CLASSNAME__, "::GpxMap()${getMethodName()}[${file?.exists()}][${file?.length()}][${file}]")
+                                    //val `in`: FileInputStream? = file?.let { f ->
+                                    //    try {
+                                    //        if (f.exists() && f.length() > 0) f.inputStream() else null
+                                    //    } catch (e: Exception) {
+                                    //        e.printStackTrace()
+                                    //        null
+                                    //    }
+                                    //}
+                                    //val `in`= gpxInputStream
+                                    //Log.v(__CLASSNAME__, "GpxMap()${getMethodName()}[${gpxInputStream?.available()}][${`in`?.available()}]")
+                                    gpxInputStream?.let { i ->
                                         if (i.available() > 0)
                                             GpxMap(i) { _, event ->
                                                 isTouch = when (event.action) {

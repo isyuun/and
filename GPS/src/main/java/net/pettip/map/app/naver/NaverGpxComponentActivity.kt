@@ -43,7 +43,7 @@ import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
-import java.io.FileInputStream
+import java.io.InputStream
 import java.util.Collections
 
 /**
@@ -114,7 +114,7 @@ fun GpxMap(
 @SuppressLint("ClickableViewAccessibility")
 @Composable
 fun GpxMap(
-    `in`: FileInputStream,
+    `in`: InputStream,
     modifier: Modifier = Modifier
         .padding(horizontal = 20.dp)
         .fillMaxWidth()
@@ -124,7 +124,9 @@ fun GpxMap(
     val context = LocalContext.current
     val tracks = Collections.synchronizedList(ArrayList<Track>())
 
+    Log.wtf(__CLASSNAME__, "${getMethodName()}[${`in`.available()}][${tracks.size}]")
     `in`.let { GPXParser(tracks).read(it) }
+    Log.wtf(__CLASSNAME__, "${getMethodName()}[${`in`.available()}][${tracks.size}]")
 
     val isSystemInDarkTheme = isSystemInDarkTheme()
     val mapOptions = remember {
