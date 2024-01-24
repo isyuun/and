@@ -124,9 +124,13 @@ fun GpxMap(
     val context = LocalContext.current
     val tracks = Collections.synchronizedList(ArrayList<Track>())
 
-    Log.wtf(__CLASSNAME__, "${getMethodName()}[${`in`.available()}]")
-    `in`.let { GPXParser(tracks).read(it) }
-    //Log.wtf(__CLASSNAME__, "${getMethodName()}[${tracks.size}]")
+    `in`.let { i ->
+        Log.w(__CLASSNAME__, "GpxMap()${getMethodName()}[${i.equals(`in`)}][${`in`.available()}][${i.available()}]")
+        if (i.available() > 0) {
+            Log.wtf(__CLASSNAME__, "GpxMap()${getMethodName()}[${i.equals(`in`)}][${`in`.available()}][${i.available()}]")
+            GPXParser(tracks).read(i)
+        }
+    }
 
     val isSystemInDarkTheme = isSystemInDarkTheme()
     val mapOptions = remember {

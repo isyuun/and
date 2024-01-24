@@ -98,6 +98,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -407,7 +408,7 @@ fun rememberMapViewWithLifecycle(
         val observer = object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 lifecycleObserver.value.onStart()
-                //if (animate) mapView.isVisible = true
+                if (animate) mapView.isVisible = true
             }
 
             override fun onResume(owner: LifecycleOwner) {
@@ -420,7 +421,7 @@ fun rememberMapViewWithLifecycle(
 
             override fun onStop(owner: LifecycleOwner) {
                 lifecycleObserver.value.onStop()
-                //if (animate) mapView.isVisible = false
+                if (animate) mapView.isVisible = false
             }
 
             override fun onDestroy(owner: LifecycleOwner) {

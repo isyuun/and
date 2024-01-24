@@ -99,9 +99,6 @@ import net.pettip.data.daily.DailyLifePet
 import net.pettip.map.app.naver.GpxMap
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStream
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
@@ -160,15 +157,15 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
 
     LaunchedEffect(key1 = dailyDetail) {
-        if (!dailyDetail?.totMvmnPathFileSn.isNullOrEmpty() && !gpxDownload && !gpxDownloading){
+        if (!dailyDetail?.totMvmnPathFileSn.isNullOrEmpty() && !gpxDownload && !gpxDownloading) {
             dailyDetail?.totMvmnPathFileSn?.let {
                 gpxDownloading = true
                 walkViewModel.viewModelScope.launch {
                     val result = walkViewModel.saveGpxFileToStream(totMvmnPathFileSn = it, context = context, fileName = "${dailyDetail?.schUnqNo}.GPX")
-                    if (result){
+                    if (result) {
                         gpxDownload = true
                         gpxDownloading = false
-                    }else{
+                    } else {
                         gpxDownloading = false
                     }
                 }
@@ -239,17 +236,17 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                     .height(360.dp)
                             ) {
                                 if (dailyDetail != null && gpxDownload) {
-                                    gpxInputStream?.let { i ->
-                                        if (i.available() > 0)
-                                            GpxMap(i) { _, event ->
-                                                isTouch = when (event.action) {
-                                                    MotionEvent.ACTION_DOWN -> true
-                                                    MotionEvent.ACTION_UP -> false
-                                                    else -> true
-                                                }
-                                                //Log.v(__CLASSNAME__, "pointerInteropFilter()${getMethodName()}[isTouch:$isTouch][MotionEvent:$event]")
-                                                false
+                                    val `in` = gpxInputStream
+                                    `in`?.let { i ->
+                                        Log.v(__CLASSNAME__, "GpxMap()${getMethodName()}[${i.equals(`in`)}][${`in`.available()}][${i.available()}]")
+                                        GpxMap(i) { _, event ->
+                                            isTouch = when (event.action) {
+                                                MotionEvent.ACTION_DOWN -> true
+                                                MotionEvent.ACTION_UP -> false
+                                                else -> true
                                             }
+                                            false
+                                        }
                                     }
                                 }
                             }
@@ -508,7 +505,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                         AsyncImage(
                                             model = ImageRequest.Builder(LocalContext.current)
                                                 .data(
-                                                    dailyDetail?.atchPath+
+                                                    dailyDetail?.atchPath +
                                                             item.filePathNm +
                                                             item.atchFileNm
                                                 )
@@ -745,7 +742,7 @@ fun FullScreenImage(
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(
-                   (dailyDetail.atchPath) +
+                    (dailyDetail.atchPath) +
                             (dailyDetail.dailyLifeFileList?.get(page)?.filePathNm ?: "") +
                             (dailyDetail.dailyLifeFileList?.get(page)?.atchFileNm ?: "")
                 )
