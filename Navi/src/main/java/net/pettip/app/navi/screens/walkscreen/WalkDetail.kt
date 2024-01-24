@@ -237,7 +237,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                             ) {
                                 if (dailyDetail != null && gpxDownload) {
                                     val `in` = gpxInputStream
-                                    `in`?.let { i ->
+                                    `in`?.use { i ->
                                         Log.v(__CLASSNAME__, "GpxMap()${getMethodName()}[${i.equals(`in`)}][${`in`.available()}][${i.available()}]")
                                         GpxMap(i) { _, event ->
                                             isTouch = when (event.action) {

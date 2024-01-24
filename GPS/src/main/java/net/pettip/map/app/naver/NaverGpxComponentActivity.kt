@@ -114,17 +114,15 @@ fun GpxMap(
 @SuppressLint("ClickableViewAccessibility")
 @Composable
 fun GpxMap(
-    `in`: InputStream,
+    `in`: InputStream?,
     modifier: Modifier = Modifier
         .padding(horizontal = 20.dp)
         .fillMaxWidth()
         .height(360.dp),
     onTouch: (View, MotionEvent) -> Boolean
 ) {
-    val context = LocalContext.current
     val tracks = Collections.synchronizedList(ArrayList<Track>())
-
-    `in`.let { i ->
+    `in`?.use { i ->
         Log.w(__CLASSNAME__, "GpxMap()${getMethodName()}[${i.equals(`in`)}][${`in`.available()}][${i.available()}]")
         if (i.available() > 0) {
             Log.wtf(__CLASSNAME__, "GpxMap()${getMethodName()}[${i.equals(`in`)}][${`in`.available()}][${i.available()}]")
@@ -132,6 +130,7 @@ fun GpxMap(
         }
     }
 
+    val context = LocalContext.current
     val isSystemInDarkTheme = isSystemInDarkTheme()
     val mapOptions = remember {
         NaverMapOptions()
