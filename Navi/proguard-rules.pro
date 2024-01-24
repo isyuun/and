@@ -24,6 +24,7 @@
 # build.gradle.kts : implementation(project(mapOf("path" to ":NAV")))
 -keep class net.pettip.data.** { *; }
 
+#-keep class com.kakao.sdk.** { *; }
 -keep class com.kakao.sdk.**.model.* { <fields>; }
 -keep class * extends com.google.gson.TypeAdapter
 

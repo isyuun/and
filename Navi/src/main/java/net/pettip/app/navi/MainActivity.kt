@@ -41,6 +41,7 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import com.kakao.sdk.common.util.Utility
 import kotlinx.coroutines.delay
 import net.pettip.BuildConfig
 import net.pettip.app.navi.component.WebViewScreen
@@ -96,6 +97,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         Log.d("LOG","onCreate 진입")
+        //
+        //var keyHash = Utility.getKeyHash(this)
+        //Log.d("HASH",keyHash)
 
         val intentData: Uri? = intent.data
         if (intentData != null) {

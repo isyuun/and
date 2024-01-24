@@ -109,13 +109,6 @@ private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 @Composable
 fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostController) {
 
-    DisposableEffect(Unit) {
-        onDispose {
-            walkViewModel.updateDailyDetail(null)
-            walkViewModel.updateGpxInputStream(null)
-        }
-    }
-
     val isLoading by walkViewModel.isLoading.collectAsState()
     val dailyDetail by walkViewModel.dailyDetail.collectAsState()
     val lastDaily by walkViewModel.lastDaily.collectAsState()
@@ -147,6 +140,13 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
             ) {
                 append("#${it.hashTagNm} ")
             }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            walkViewModel.updateDailyDetail(null)
+            walkViewModel.updateGpxInputStream(null)
         }
     }
 
