@@ -12,4 +12,6 @@ REM [¸±¸®½ººôµå]
 cmd /c .\Navi\.build.release.bat
 REM [µð¹ö±×ºôµå]
 cmd /c .\Navi\.build.debug.bat
+REM [¹øµé.ºôµå]
+cmd /c .\Navi\.build.bundle.bat
 pause
