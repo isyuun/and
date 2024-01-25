@@ -153,7 +153,12 @@ open class gpsapplication3 : gpsapplication2(), SharedPreferences.OnSharedPrefer
     val file: File?
         get() {
             if (tracks?.isEmpty() == true) return null
-            return File("${gpxs(this)}/${GPX_TICK_FORMAT.format(tracks?.first()?.time)}.gpx")
+            try {
+                return File("${gpxs(this)}/${GPX_TICK_FORMAT.format(tracks?.first()?.time)}.gpx")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return null
+            }
         }
 
     val images

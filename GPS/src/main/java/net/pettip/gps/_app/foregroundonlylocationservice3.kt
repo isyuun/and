@@ -123,7 +123,12 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     protected val _file: File?
         get() {
             if (_tracks.isEmpty()) return null
-            return File("${gpxs(this)}/${GPX_TICK_FORMAT.format(_tracks.first().time)}.gpx")
+            try {
+                return File("${gpxs(this)}/${GPX_TICK_FORMAT.format(_tracks.first().time)}.gpx")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return null
+            }
         }
 
     private var _no = ""
