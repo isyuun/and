@@ -144,7 +144,7 @@ fun AddPetScreen(
     val currentMonth = calendar.get(Calendar.MONTH) + 1 // Calendar.MONTH는 0부터 시작하므로 1을 더해줍니다.
     val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
 
-    val year = remember {(1980..2023).map { it.toString() }}
+    val year = remember {(1980..2025).map { it.toString() }}
     val yearPickerState by viewModel.year.collectAsState()
     val month = remember {(1..12).map { it.toString() }}
     val monthPickerState by viewModel.month.collectAsState()
