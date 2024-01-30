@@ -430,7 +430,8 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                                 _userResponse.value = it
                                 continuation.resume(true) // 이곳만 성공(true 반환시 navigate 실행)
                             }else{
-                                _userResponse.value = it
+                                val errorBodyString = response.errorBody()!!.string()
+                                _dm.value = errorBodyParse(errorBodyString)
                                 continuation.resume(false)
                             }
                         }
@@ -606,6 +607,8 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                             }
                         }
                     }else{
+                        val errorBodyString = response.errorBody()!!.string()
+                        _dm.value = errorBodyParse(errorBodyString)
                         continuation.resume(false)
                     }
                 }
@@ -693,7 +696,8 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
 
                                 continuation.resume(true)
                             }else{
-                                _myPetResModel.value = it
+                                val errorBodyString = response.errorBody()!!.string()
+                                _dm.value = errorBodyParse(errorBodyString)
                                 continuation.resume(false)
                             }
                         }

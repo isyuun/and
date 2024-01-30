@@ -924,14 +924,30 @@ fun PetCreateScreen(
                                         }
                                     }else{
                                         isLoading = false
-                                        Toast.makeText(context, viewModel.myPetResModel.value?.detailMessage ?: "", Toast.LENGTH_SHORT).show()
+                                        scope.launch {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "펫등록에 실패했습니다. 로그인 화면에서 로그인을 시도해주세요.",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        }
                                     }
                                 }else{
                                     isLoading = false
                                 }
                             }else{
                                 isLoading = false
-                                Toast.makeText(context, viewModel.userResponse.value.detailMessage, Toast.LENGTH_SHORT).show()
+                                scope.launch {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            dm,
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }
                             }
 
                             isLoading = false

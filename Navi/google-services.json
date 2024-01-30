@@ -7,68 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:985887161836:android:34d90d20e61483a51ad4c9",
-        "android_client_info": {
-          "package_name": "kr.carepet.app.navi"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "985887161836-3fun9eoi5ulfkd38bb14789c8qodn9vo.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "kr.carepet.app.navi",
-            "certificate_hash": "e56d8c2aa237e30f360edde42bc42ea69cd0ca1a"
-          }
-        },
-        {
-          "client_id": "985887161836-4ljh32r3c9jfgrg1rs5orc4o914v1o9d.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "kr.carepet.app.navi",
-            "certificate_hash": "215758442d61433cb222b310ffae36c4e54ead8a"
-          }
-        },
-        {
-          "client_id": "985887161836-f6tsum5fl4i6etgpcnvjp69ajfom2to1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "kr.carepet.app.navi",
-            "certificate_hash": "3ef92a1b0c350042593919fea76afbf76d20e7bc"
-          }
-        },
-        {
-          "client_id": "985887161836-gj9pqql898d85483bc1ik53a5t1kg6du.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBFgIQf_5A0asfU2XFWn8oIKhUkQoH9e_0"
-        },
-        {
-          "current_key": "AIzaSyDlK9JYbcY6HyMUVjfLLuOLq4Hz9p62Efo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "985887161836-gj9pqql898d85483bc1ik53a5t1kg6du.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:985887161836:android:382794103940dedd1ad4c9",
         "android_client_info": {
           "package_name": "net.pettip.app.navi"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "985887161836-2sjd9l554hr11j8sd6m6fe52p2h9vjnb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.pettip.app.navi",
+            "certificate_hash": "0c66583028c52828201cf5f60e1d4017543d8e78"
+          }
+        },
         {
           "client_id": "985887161836-aceml713pkgg5e8h6lv9kl0tl0f4uacr.apps.googleusercontent.com",
           "client_type": 1,
@@ -78,14 +30,19 @@
           }
         },
         {
+          "client_id": "985887161836-q67cid4vc2en2q9r7qevrke4arn08dsc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.pettip.app.navi",
+            "certificate_hash": "3ef92a1b0c350042593919fea76afbf76d20e7bc"
+          }
+        },
+        {
           "client_id": "985887161836-gj9pqql898d85483bc1ik53a5t1kg6du.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
-        {
-          "current_key": "AIzaSyBFgIQf_5A0asfU2XFWn8oIKhUkQoH9e_0"
-        },
         {
           "current_key": "AIzaSyDlK9JYbcY6HyMUVjfLLuOLq4Hz9p62Efo"
         }

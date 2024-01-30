@@ -526,7 +526,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                         if (result) {
                                             if (defaultCheck) {
                                                 snackbarHostState.showSnackbar(
-                                                    message = "푸시 허용",
+                                                    message = "푸시가 ",
                                                     actionLabel = context.getString(R.string.confirm),
                                                     duration = SnackbarDuration.Short
                                                 )

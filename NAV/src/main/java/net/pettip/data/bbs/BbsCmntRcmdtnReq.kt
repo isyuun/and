@@ -5,9 +5,9 @@ import com.google.gson.annotations.SerializedName
 
 data class BbsCmntRcmdtnReq(
     @SerializedName("pstCmntNo")
-    var pstCmntNo: Int, // 16
+    var pstCmntNo: Int?, // 16
     @SerializedName("pstSn")
-    var pstSn: Int, // 001
+    var pstSn: Int?, // 001
     @SerializedName("rcmdtnSeCd")
-    var rcmdtnSeCd: String // 43
+    var rcmdtnSeCd: String? // 43
 )

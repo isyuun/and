@@ -7,7 +7,7 @@ data class EndEventListRes(
     @SerializedName("data")
     var data: EndEventListData,
     @SerializedName("detailMessage")
-    var detailMessage: Any?, // null
+    var detailMessage: String?, // null
     @SerializedName("resultMessage")
     var resultMessage: String, // 당첨자 발표 기본 조회 완료
     @SerializedName("statusCode")

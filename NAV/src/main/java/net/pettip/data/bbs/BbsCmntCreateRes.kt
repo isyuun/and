@@ -15,9 +15,9 @@ data class BbsCmntCreateRes(
     @SerializedName("data")
     var data: List<BbsCmnt>?,
     @SerializedName("detailMessage")
-    var detailMessage: Any?, // null
+    var detailMessage: String?, // null
     @SerializedName("resultMessage")
-    var resultMessage: String, // 일상생활 댓글 등록 완료
+    var resultMessage: String?, // 일상생활 댓글 등록 완료
     @SerializedName("statusCode")
-    var statusCode: Int // 200
+    var statusCode: Int? // 200
 )

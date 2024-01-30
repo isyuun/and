@@ -736,7 +736,7 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
                     viewModel.viewModelScope.launch {
                         navController.navigate(Screen.EventDetail.route)
                         viewModel.updateLastPstSn(eventItemData.pstSn)
-                        viewModel.getEndEventDetail(eventItemData.pstSn)
+                        eventItemData.pstSn?.let { viewModel.getEndEventDetail(it) }
                     }
                 }
             }
@@ -777,7 +777,7 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
 
 
         Text(
-            text =  eventItemData.pstTtl,
+            text =  eventItemData.pstTtl ?: "",
             fontFamily = FontFamily(Font(R.font.pretendard_medium)),
             fontSize = 16.sp,
             letterSpacing = (-0.8).sp,

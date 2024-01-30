@@ -38,3 +38,8 @@
 
 # To use naver login profile with proguard
 -keep public class com.navercorp.nid.profile.data.** {*;}
+
+# google proguard
+-keep public class com.google.firebase.** { *; }
+-keep class com.google.android.gms.internal.** { *; }
+-keepclasseswithmembers class com.google.firebase.FirebaseException
