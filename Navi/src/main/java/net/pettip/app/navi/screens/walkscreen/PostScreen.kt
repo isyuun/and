@@ -487,7 +487,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                 maxLines = 10,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
+                    imeAction = ImeAction.Default
                 ),
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 16.dp)

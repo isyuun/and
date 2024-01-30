@@ -40,6 +40,10 @@ class LoginViewModel() : ViewModel() {
     //private val context = application.applicationContext
 
     // 간편 로그인 Data
+    private val _permissionCheck = MutableStateFlow<Boolean>(false)
+    val permissionCheck: StateFlow<Boolean> = _permissionCheck.asStateFlow()
+    fun updatePermissionCheck(newValue: Boolean) { _permissionCheck.value = newValue }
+
     private val _email = MutableStateFlow<String>("")
     val email: StateFlow<String> = _email.asStateFlow()
     fun updateEmail(newValue: String) { _email.value = newValue }
@@ -99,10 +103,6 @@ class LoginViewModel() : ViewModel() {
     val personCheck: StateFlow<Boolean> = _personCheck.asStateFlow()
     fun updatePersonCheck(newValue: Boolean) { _personCheck.value = newValue }
 
-    private val _marketingCheck = MutableStateFlow<Boolean>(false)
-    val marketingCheck: StateFlow<Boolean> = _marketingCheck.asStateFlow()
-    fun updateMarketingCheck(newValue: Boolean) { _marketingCheck.value = newValue }
-
     private val _appKey = MutableStateFlow<String>("")
     fun updateAppKey() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -114,12 +114,12 @@ class LoginViewModel() : ViewModel() {
         })
     }
 
-    private val _registedAppKey = MutableStateFlow<String>("")
+    private val _registedAppKey = MutableStateFlow<String?>("")
 
 
     private fun trmnlMng(){
         // 등록된 토큰과 현재 디바이스 토큰이 다르면 업데이트
-        if ( _appKey.value != _registedAppKey.value || _registedAppKey.value == ""  ){
+        if ( _appKey.value != _registedAppKey.value || _registedAppKey.value.isNullOrBlank()  ){
             val apiService = RetrofitClientServer.instance
 
             val data = TrmnlMngReq(

@@ -41,7 +41,9 @@ import net.pettip.data.pet.PetListData
 import net.pettip.data.pet.PetListModel
 import net.pettip.data.pet.PetListResModel
 import net.pettip.data.user.NickNameCheckRes
+import net.pettip.data.user.UserDataModel
 import net.pettip.data.user.UserDataResponse
+import net.pettip.singleton.MySharedPreference
 import net.pettip.singleton.RetrofitClientServer
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -132,6 +134,18 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
             _appKey.value = task.result
         })
     }
+
+    private val _marketingCheck = MutableStateFlow<Boolean>(false)
+    val marketingCheck: StateFlow<Boolean> = _marketingCheck.asStateFlow()
+    fun updateMarketingCheck(newValue: Boolean) { _marketingCheck.value = newValue }
+
+    private val _pushCheck = MutableStateFlow<Boolean>(false)
+    val pushCheck: StateFlow<Boolean> = _pushCheck.asStateFlow()
+    fun updatePushCheck(newValue: Boolean) { _pushCheck.value = newValue }
+
+    private val _dawnCheck = MutableStateFlow<Boolean>(false)
+    val dawnCheck: StateFlow<Boolean> = _dawnCheck.asStateFlow()
+    fun updateDawnCheck(newValue: Boolean) { _dawnCheck.value = newValue }
     // --------------   User   -----------------------
 
     // --------------   pet    -----------------------
@@ -384,19 +398,21 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     suspend fun sendUserToServer():Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val appKey = _appKey.value
         val appOs = "001"
         val appTypNm = Build.MODEL.toString()
 
-        val userData = net.pettip.data.user.UserDataModel(
-            appKey = appKey,
+        val userData = UserDataModel(
+            appKey = MySharedPreference.getFcmToken(),
             appOs = appOs,
             appTypNm = appTypNm,
             ncknm = _userNickName.value,
             snsLogin = _snsLogin.value,
             userID = _userID.value,
             userName = _userNickName.value,
-            userPW = _userPW.value
+            userPW = _userPW.value,
+            pushUseYn = if (_pushCheck.value) "Y" else "N",
+            pushAdUseYn = if (_marketingCheck.value) "Y" else "N",
+            pushMdnghtUseYn = if (_dawnCheck.value) "Y" else "N",
         )
 
         val call= apiService.sendUserToServer(userData)

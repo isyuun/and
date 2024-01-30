@@ -6,6 +6,9 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import net.pettip.util.Log
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -97,6 +100,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -146,6 +150,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var requirePermission by remember { mutableStateOf(false) }
+    val permissionCheck by viewModel.permissionCheck.collectAsState()
 
     val snsEmail by viewModel.email.collectAsState()
     val snsUnqId by viewModel.unqId.collectAsState()
@@ -224,7 +229,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
     )
 
     LaunchedEffect(Unit){
-        if (!permissionState.allPermissionsGranted){
+        if (!permissionState.allPermissionsGranted && !viewModel.permissionCheck.value){
             requirePermission = true
         }
     }
@@ -693,7 +698,11 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
         enter = slideInVertically(initialOffsetY = {it/2}) + fadeIn(),
         exit = slideOutVertically(targetOffsetY = {it/2}) + fadeOut()
     ) {
-        PermissionScreen(permissionState = permissionState, onCheck = {newValue -> requirePermission = newValue})
+        PermissionScreen(
+            viewModel = viewModel,
+            permissionState = permissionState,
+            onCheck = {newValue -> requirePermission = newValue}
+        )
     }
 
 }
@@ -717,7 +726,9 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     val allCheck by viewModel.allCheck.collectAsState()
     val memberCheck by viewModel.memberCheck.collectAsState()
     val personCheck by viewModel.personCheck.collectAsState()
-    val marketingCheck by viewModel.marketingCheck.collectAsState()
+    val marketingCheck by userCreateViewModel.marketingCheck.collectAsState()
+    val pushCheck by userCreateViewModel.pushCheck.collectAsState()
+    val dawnCheck by userCreateViewModel.dawnCheck.collectAsState()
     val snsLogin by viewModel.loginMethod.collectAsState()
     val unqId by viewModel.unqId.collectAsState()
     val email by viewModel.email.collectAsState()
@@ -732,7 +743,15 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = memberCheck, key2 = personCheck, key3 = marketingCheck){
-        if (memberCheck && personCheck && marketingCheck){
+        if (memberCheck && personCheck && marketingCheck && pushCheck && dawnCheck){
+            viewModel.updateAllCheck(true)
+        }else{
+            viewModel.updateAllCheck(false)
+        }
+    }
+
+    LaunchedEffect(key1 = pushCheck, key2 = dawnCheck){
+        if (memberCheck && personCheck && marketingCheck && pushCheck && dawnCheck){
             viewModel.updateAllCheck(true)
         }else{
             viewModel.updateAllCheck(false)
@@ -785,7 +804,9 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                             viewModel.updateAllCheck(!allCheck)
                             viewModel.updateMemberCheck(!allCheck)
                             viewModel.updatePersonCheck(!allCheck)
-                            viewModel.updateMarketingCheck(!allCheck)
+                            userCreateViewModel.updateMarketingCheck(!allCheck)
+                            userCreateViewModel.updatePushCheck(!allCheck)
+                            userCreateViewModel.updateDawnCheck(!allCheck)
                         }
                     , verticalAlignment = Alignment.CenterVertically
                 ){
@@ -795,7 +816,9 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                             viewModel.updateAllCheck(it)
                             viewModel.updateMemberCheck(it)
                             viewModel.updatePersonCheck(it)
-                            viewModel.updateMarketingCheck(it)
+                            userCreateViewModel.updateMarketingCheck(it)
+                            userCreateViewModel.updatePushCheck(it)
+                            userCreateViewModel.updateDawnCheck(it)
                                           },
                         colors = CheckboxDefaults.colors(
                             checkedColor = design_select_btn_text,
@@ -816,21 +839,90 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
 
                 AgreeComponent(
                     title = stringResource(R.string.agree_terms_service),
-                    mainText = stringResource(R.string.agree_terms_service_main_text),
+                    page = 1,
                     check = memberCheck,
                     onClick = { newValue -> viewModel.updateMemberCheck(newValue)})
 
                 AgreeComponent(
                     title = stringResource(R.string.agree_privacy_policy),
-                    mainText = "마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용",
+                    page = 2,
                     check = personCheck,
                     onClick = { newValue -> viewModel.updatePersonCheck(newValue)})
 
-                AgreeComponent(
+                AgreeComponentV2(
                     title = stringResource(R.string.agree_marketing),
-                    mainText = "마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용 마케팅수신동의 내용",
                     check = marketingCheck,
-                    onClick = { newValue -> viewModel.updateMarketingCheck(newValue)})
+                    onClick = { newValue -> userCreateViewModel.updateMarketingCheck(newValue)})
+
+                Row (
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Box(modifier = Modifier.weight(1f)){
+                        Row (
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .align(Alignment.CenterStart)
+                                .fillMaxWidth()
+                                .clickable { userCreateViewModel.updatePushCheck(!pushCheck) },
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Icon(
+                                painter =
+                                if(pushCheck){
+                                    painterResource(id = R.drawable.checkbox_blue)
+                                }else{
+                                    painterResource(id = R.drawable.checkbox_gray)
+                                },
+                                contentDescription = "", tint = Color.Unspecified,
+                                modifier = Modifier.padding(start = 20.dp)
+                            )
+
+                            Text(
+                                text = "푸시 알림",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 14.sp,
+                                letterSpacing = (-0.7).sp,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.padding(start = 8.dp, end = 4.dp)
+                            )
+                        }
+                    }
+
+                    Box(modifier = Modifier.weight(1f)){
+                        Row (
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .align(Alignment.CenterStart)
+                                .fillMaxWidth()
+                                .clickable { userCreateViewModel.updateDawnCheck(!dawnCheck) },
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Icon(
+                                painter =
+                                if(dawnCheck){
+                                    painterResource(id = R.drawable.checkbox_blue)
+                                }else{
+                                    painterResource(id = R.drawable.checkbox_gray)
+                                },
+                                contentDescription = "", tint = Color.Unspecified,
+                                modifier = Modifier.padding(start = 20.dp)
+                            )
+
+                            Text(
+                                text = "방해 금지 모드",
+                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                fontSize = 14.sp,
+                                letterSpacing = (-0.7).sp,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.padding(start = 8.dp, end = 4.dp)
+                            )
+                        }
+                    }
+                }
+
 
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
@@ -928,7 +1020,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                 Button(
                     onClick = {
                         scope.launch {
-                            if(allCheck){
+                            if(memberCheck && personCheck){
                                 if (nickName.isEmpty()) {
                                     snackbarHostState.showSnackbar(
                                         message = context.getString(R.string.place_holder_nickname),
@@ -978,7 +1070,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
 @Composable
 fun AgreeComponent(
     title: String,
-    mainText : String,
+    page : Int,
     check : Boolean,
     onClick:(Boolean) -> Unit){
     Column (
@@ -991,6 +1083,7 @@ fun AgreeComponent(
         Box(modifier = Modifier.fillMaxWidth()){
             Row (
                 modifier = Modifier
+                    .padding(vertical = 8.dp)
                     .align(Alignment.CenterStart)
                     .fillMaxWidth()
                     .clickable { onClick(!check) },
@@ -1013,7 +1106,123 @@ fun AgreeComponent(
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
                     color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = 8.dp, end = 4.dp)
+                )
+
+                if ( page != 3){
+                    Text(
+                        text = "*",
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                        color= design_sharp
+                    )
+                }
+            }
+
+            Icon(
+                imageVector =
+                if(expanded){
+                    Icons.Default.KeyboardArrowUp
+                }else{
+                    Icons.Default.KeyboardArrowDown
+                },
+                contentDescription = "",  tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier
+                    .padding(end = 20.dp)
+                    .align(Alignment.CenterEnd)
+                    .clickable { expanded = !expanded }
+            )
+        }
+
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+        ) {
+            Column (
+                modifier = Modifier
+                    .height(500.dp)
+                    .verticalScroll(rememberScrollState())
+            ){
+                val url1 = "http://carepet.hopto.org/terms"
+                val url2 = "http://carepet.hopto.org/privacy_policy"
+                val url3 = "http://carepet.hopto.org/"
+                AndroidView(
+                    factory = { context ->
+                        WebView(context).apply {
+                            layoutParams = ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT
+                            )
+
+                            webViewClient = WebViewClient()
+                            settings.javaScriptEnabled = true
+                            settings.domStorageEnabled = true
+                            settings.loadWithOverviewMode = true
+                            settings.useWideViewPort = true
+                            settings.setSupportZoom(true)
+                        }
+                    },
+                    update = { webView ->
+                        when(page){
+                            1 -> webView.loadUrl(url1)
+                            2 -> webView.loadUrl(url2)
+                            3 -> webView.loadUrl(url3)
+                        }
+                    }
+                )
+
+            }
+        }
+
+
+        Spacer(modifier = Modifier
+            .padding(top = 12.dp, bottom = 8.dp)
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(MaterialTheme.colorScheme.outline))
+    }
+}
+
+@Composable
+fun AgreeComponentV2(
+    title: String,
+    check : Boolean,
+    onClick:(Boolean) -> Unit){
+    Column (
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+    ){
+        var expanded by remember { mutableStateOf(false) }
+
+        Box(modifier = Modifier.fillMaxWidth()){
+            Row (
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .align(Alignment.CenterStart)
+                    .fillMaxWidth()
+                    .clickable { onClick(!check) },
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(
+                    painter =
+                    if(check){
+                        painterResource(id = R.drawable.checkbox_blue)
+                    }else{
+                        painterResource(id = R.drawable.checkbox_gray)
+                    },
+                    contentDescription = "", tint = Color.Unspecified,
+                    modifier = Modifier.padding(start = 20.dp)
+                )
+
+                Text(
+                    text = title,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 14.sp,
+                    letterSpacing = (-0.7).sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(start = 8.dp, end = 4.dp)
                 )
             }
 
@@ -1039,49 +1248,92 @@ fun AgreeComponent(
         ) {
             Column (
                 modifier = Modifier
-                    .heightIn(max = 300.dp)
+                    .height(500.dp)
                     .verticalScroll(rememberScrollState())
             ){
-                Text(
-                    text = mainText,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.6).sp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.padding(start = 38.dp, end = 16.dp, top = 8.dp)
-                )
+                MarketingTerms()
             }
         }
 
 
         Spacer(modifier = Modifier
-            .padding(top = 20.dp, bottom = 8.dp)
+            .padding(top = 12.dp, bottom = 8.dp)
             .fillMaxWidth()
             .height(1.dp)
             .background(MaterialTheme.colorScheme.outline))
     }
 }
 
-fun checkAndRequestPermissions(
-    context: Context,
-    permissions: Array<String>,
-    launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
-) {
+@Composable
+fun MarketingTerms(){
+    Column (
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+    ){
+        Text(
+            text = "마케팅 수신동의",
+            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            fontSize = 16.sp,
+            letterSpacing = (-0.7).sp,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.padding(top = 16.dp)
+        )
 
-    /** 권한이 이미 있는 경우 **/
-    if (permissions.all {
-            ContextCompat.checkSelfPermission(
-                context,
-                it
-            ) == PackageManager.PERMISSION_GRANTED
-        }) {
-        Log.d("test5", "권한이 이미 존재합니다.")
-    }
+        Text(
+            text = "1. 광고성 정보의 이용목적",
+            fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+            fontSize = 14.sp,
+            letterSpacing = (-0.7).sp,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.padding(top = 8.dp)
+        )
 
-    /** 권한이 없는 경우 **/
-    else {
-        launcher.launch(permissions)
-        Log.d("test5", "권한을 요청하였습니다.")
+        Text(
+            text = " 펫팁이 제공하는 이용자 맞춤형 서비스 및 각종 경품 행사, 이벤트 등의 광고성 정보를 문자(SMS 또는 카카오 알림톡), 푸시, 전화 등을 통해 이용자에게 제공합니다." +
+                    " 마케팅 수신 동의는 거부하실 수 있으며 동의 이후에라도 고객의 의사에 따라 동의를 철회할 수 있습니다. 동의를 거부하시더라도 펫팁이 제공하는 서비스의 이용에 제한이 되지 않습니다. 단, 할인, 이벤트 및 이용자 맞춤형 상품 추천 등의 마케팅 정보 안내 서비스가 제한됩니다.",
+            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            fontSize = 14.sp,
+            letterSpacing = (-0.7).sp,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        Text(
+            text = "2. 미동의 시 불이익 사항",
+            fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+            fontSize = 14.sp,
+            letterSpacing = (-0.7).sp,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        Text(
+            text = " 개인정보보호법 제22조 제5항에 의해 선택정보 사항에 대해서는 동의 거부하시더라도 서비스 이용에 제한되지 않습니다. 단, 할인, 이벤트 및 이용자 맞춤형 상품 추천 등의 마케팅 정보 안내 서비스가 제한됩니다.",
+            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            fontSize = 14.sp,
+            letterSpacing = (-0.7).sp,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        Text(
+            text = "3. 서비스 정보 수신 동의 철회",
+            fontFamily = FontFamily(Font(R.font.pretendard_medium)),
+            fontSize = 14.sp,
+            letterSpacing = (-0.7).sp,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        Text(
+            text = " 펫팁에서 제공하는 마케팅 정보를 원하지 않을 경우 ‘내 정보 수정 > 알림 허용’에서 철회를 요청할 수 있습니다. 또한 향후 마케팅 활용에 새롭게 동의하고자 하는 경우에는 ‘내 정보 수정 > 알림 허용’에서 동의하실 수 있습니다.",
+            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            fontSize = 14.sp,
+            letterSpacing = (-0.7).sp,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.padding(top = 8.dp)
+        )
     }
 }
 

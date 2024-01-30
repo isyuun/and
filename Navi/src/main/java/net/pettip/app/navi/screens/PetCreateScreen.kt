@@ -202,6 +202,7 @@ fun PetCreateScreen(
     val userPw by viewModel.userPW.collectAsState()
     val snsLogin by viewModel.snsLogin.collectAsState()
     var isLoading by remember{ mutableStateOf(false) }
+    var skipLoading by remember{ mutableStateOf(false) }
     val dm by viewModel.dm.collectAsState()
 
     Scaffold (
@@ -221,6 +222,11 @@ fun PetCreateScreen(
                 loadingState = isLoading
             )
 
+            LoadingDialog(
+                loadingText = "로딩중...",
+                loadingState = skipLoading
+            )
+
             Row (horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()){
                 Text(text = stringResource(R.string.skip),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -229,6 +235,7 @@ fun PetCreateScreen(
                         .padding(end = 20.dp)
                         .clickable {
                             scope.launch {
+                                skipLoading = true
                                 val userCreateSuccess = viewModel.sendUserToServer()
                                 if (userCreateSuccess) {
                                     val loginSuccess =
@@ -238,13 +245,17 @@ fun PetCreateScreen(
                                             snsLogin
                                         )
                                     if (loginSuccess == 0) {
+                                        skipLoading = false
                                         MySharedPreference.setUserEmail(userId)
                                         sharedViewModel.updateInit(true)
                                         navController.navigate(Screen.MainScreen.route) {
                                             popUpTo(0)
                                         }
+                                    } else{
+                                        skipLoading = false
                                     }
                                 } else {
+                                    skipLoading = false
                                     scope.launch {
                                         Toast
                                             .makeText(

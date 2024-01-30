@@ -74,6 +74,9 @@ import net.pettip.data.user.LoginData
 import net.pettip.data.user.LoginResModel
 import net.pettip.data.user.LogoutRes
 import net.pettip.data.user.NickNameCheckRes
+import net.pettip.data.user.PushYnReq
+import net.pettip.data.user.PushYnRes
+import net.pettip.data.user.PushYnUpdateReq
 import net.pettip.data.user.RelCloseReq
 import net.pettip.data.user.ResetNickNameReq
 import net.pettip.data.user.ResetPwReq
@@ -178,6 +181,12 @@ interface ApiService {
 
     @POST("/api/v1/member/trmnlMng")
     fun trmnlMng(@Body data: TrmnlMngReq): Call<commonRes>
+
+    @POST("/api/v1/member/pushYn/list")
+    fun getPushYn(@Body data: PushYnReq): Call<PushYnRes>
+
+    @POST("/api/v1/member/pushYn/update")
+    fun setPushYn(@Body data: PushYnUpdateReq): Call<commonRes>
     // --------------------- 회원 ----------------------- //
 
     // --------------------- 일상생활 ----------------------- //

@@ -41,6 +41,9 @@ import net.pettip.data.pet.RegPetWgtReq
 import net.pettip.data.pet.SetInviteCodeRes
 import net.pettip.data.user.LogoutRes
 import net.pettip.data.user.NickNameCheckRes
+import net.pettip.data.user.PushYnReq
+import net.pettip.data.user.PushYnRes
+import net.pettip.data.user.PushYnUpdateReq
 import net.pettip.data.user.RelCloseReq
 import net.pettip.data.user.ResetNickNameReq
 import net.pettip.data.user.ResetPwReq
@@ -71,6 +74,18 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
         sharedViewModel.viewModelScope.launch { sharedViewModel.loadCurrentPetInfo() }
     }
     // -------------------My Screen--------------------------
+    private val _pushUseYn = MutableStateFlow(false) // Data 저장
+    val pushUseYn: StateFlow<Boolean> = _pushUseYn.asStateFlow() // state 노출
+    fun updatePushUseYn(newValue: Boolean) { _pushUseYn.value = newValue }
+
+    private val _pushAdUseYn = MutableStateFlow(false) // Data 저장
+    val pushAdUseYn: StateFlow<Boolean> = _pushAdUseYn.asStateFlow() // state 노출
+    fun updatePushAdUseYn(newValue: Boolean) { _pushAdUseYn.value = newValue }
+
+    private val _pushMdnghtUseYn = MutableStateFlow(false) // Data 저장
+    val pushMdnghtUseYn: StateFlow<Boolean> = _pushMdnghtUseYn.asStateFlow() // state 노출
+    fun updatePushMdnghtUseYn(newValue: Boolean) { _pushMdnghtUseYn.value = newValue }
+
     private val _endCheck = MutableStateFlow(false) // Data 저장
     val endCheck: StateFlow<Boolean> = _endCheck.asStateFlow() // state 노출
     fun updateEndCheck(newValue: Boolean) { _endCheck.value = newValue }
@@ -236,6 +251,66 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
             }
             _appKey.value = task.result
         })
+    }
+
+    suspend fun getPushYn():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = PushYnReq(MySharedPreference.getFcmToken())
+
+        val call = apiService.getPushYn(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<PushYnRes>{
+                override fun onResponse(call: Call<PushYnRes>, response: Response<PushYnRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            _pushUseYn.value = it.pushYnData?.pushUseYn == "Y"
+                            _pushAdUseYn.value = it.pushYnData?.pushAdUseYn == "Y"
+                            _pushMdnghtUseYn.value = it.pushYnData?.pushMdnghtUseYn == "Y"
+                            continuation.resume(true)
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<PushYnRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun setPushYn():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = PushYnUpdateReq(
+            appKey = MySharedPreference.getFcmToken(),
+            pushUseYn = if (_pushUseYn.value) "Y" else "N",
+            pushAdUseYn = if (_pushAdUseYn.value) "Y" else "N",
+            pushMdnghtUseYn = if (_pushMdnghtUseYn.value) "Y" else "N"
+        )
+
+        val call = apiService.setPushYn(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    if (response.isSuccessful){
+                        continuation.resume(true)
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+
     }
 
     suspend fun getCmmList(cmmCdData:String):Boolean{
@@ -742,6 +817,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
             call.enqueue(object : Callback<BbsDetailRes>{
                 override fun onResponse(call: Call<BbsDetailRes>, response: Response<BbsDetailRes>) {
                     if (response.isSuccessful){
+                        _photoRes.value = emptyList()
                         continuation.resume(true)
                     }else{
                         continuation.resume(false)

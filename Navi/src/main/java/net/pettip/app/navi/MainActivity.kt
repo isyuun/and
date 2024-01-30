@@ -97,9 +97,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         Log.d("LOG","onCreate 진입")
-        //
-        //var keyHash = Utility.getKeyHash(this)
-        //Log.d("HASH",keyHash)
 
         val intentData: Uri? = intent.data
         if (intentData != null) {
@@ -170,7 +167,7 @@ class MainActivity : ComponentActivity() {
             val seqNo = intent?.getStringExtra("seqNo")
             G.pushPage = page
             G.pushSeqNo = seqNo
-            Log.d("LOG","${page} : ${seqNo}")
+            Log.d("PUSH","${page} : ${seqNo}")
         }
     }
 }
@@ -208,6 +205,7 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
         val token = task.result
         // Log and toast
         Log.d("LOG", token)
+        MySharedPreference.setFcmToken(token)
     })
 
     LaunchedEffect(key1 = G.dupleLogin) {

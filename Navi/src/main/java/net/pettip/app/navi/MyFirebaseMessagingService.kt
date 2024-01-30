@@ -74,6 +74,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val seqNo = remoteMessage.data["seqNo"]
 
         Log.d("LOG","${page} : ${seqNo}")
+        Log.d("SENDNOTI","${remoteMessage.data}")
 
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(FLAG_ACTIVITY_CLEAR_TOP)

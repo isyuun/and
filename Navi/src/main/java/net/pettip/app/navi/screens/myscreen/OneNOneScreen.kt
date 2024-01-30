@@ -113,11 +113,11 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
     DisposableEffect(Unit){
 
         onDispose {
+            settingViewModel.clearSelectedImagesList()
             settingViewModel.updateTitle("")
             settingViewModel.updateInquiryKind(null)
             settingViewModel.updateInquiryMain("")
             settingViewModel.updateIsCheck(false)
-            settingViewModel.clearSelectedImages()
         }
     }
 
@@ -125,6 +125,12 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
         settingViewModel.clearSelectedImagesList()
         settingViewModel.updateSelectedImageList(listOf(dummyUri))
         settingViewModel.getCmmList("PST")
+    }
+
+    LaunchedEffect(key1 = state.listOfSelectedImages) {
+        if (state.listOfSelectedImages.size > 6) {
+            Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
+        }
     }
 
     val galleryLauncher =
@@ -238,7 +244,7 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                 singleLine = false,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next),
+                    imeAction = ImeAction.Default),
                 modifier = Modifier
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                     .fillMaxWidth()

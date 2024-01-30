@@ -19,5 +19,8 @@ data class UserDataModel(
     var snsLogin: String? = "",
     var userID: String,
     var userName: String,
-    var userPW: String
+    var userPW: String,
+    var pushAdUseYn: String,
+    var pushMdnghtUseYn: String,
+    var pushUseYn: String,
 )

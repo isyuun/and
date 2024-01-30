@@ -128,12 +128,32 @@ fun ModifyPetInfoScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val calendar = Calendar.getInstance()
+    val calendar = if (selectPet.petBrthYmd == "미상") {
+        Calendar.getInstance()
+    } else {
+        val year = selectPet.petBrthYmd.substring(0, 4).toIntOrNull() ?: 0
+        val month = selectPet.petBrthYmd.substring(4, 6).toIntOrNull() ?: 1
+        val day = selectPet.petBrthYmd.substring(6, 8).toIntOrNull() ?: 1
+
+        Calendar.getInstance().apply {
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month - 1) // Calendar.MONTH는 0부터 시작하므로 1을 빼줍니다.
+            set(Calendar.DAY_OF_MONTH, day)
+        }
+    }
+
     val currentYear = calendar.get(Calendar.YEAR)
-    val currentMonth = calendar.get(Calendar.MONTH) + 1 // Calendar.MONTH는 0부터 시작하므로 1을 더해줍니다.
+    val currentMonth = calendar.get(Calendar.MONTH) + 1
     val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
 
-    val year = remember {(1980..2023).map { it.toString() }}
+    Log.d("LOG","year:${currentYear},month:${currentMonth},day:${currentDay}")
+
+    //val calendar = Calendar.getInstance()
+    //val currentYear = calendar.get(Calendar.YEAR)
+    //val currentMonth = calendar.get(Calendar.MONTH) + 1
+    //val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val year = remember {(1980..2024).map { it.toString() }}
     val yearPickerState by viewModel.year.collectAsState()
     val month = remember {(1..12).map { it.toString() }}
     val monthPickerState by viewModel.month.collectAsState()

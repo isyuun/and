@@ -17,6 +17,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.isGranted
 import net.pettip.app.navi.R
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
@@ -34,6 +37,8 @@ import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
+import net.pettip.app.navi.viewmodel.LoginViewModel
+import net.pettip.util.Log
 
 /**
  * @Project     : PetTip-Android
@@ -45,7 +50,9 @@ import net.pettip.app.navi.ui.theme.design_white
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun PermissionScreen(permissionState: MultiplePermissionsState, onCheck:(Boolean) -> Unit) {
+fun PermissionScreen(viewModel: LoginViewModel, permissionState: MultiplePermissionsState, onCheck:(Boolean) -> Unit) {
+
+    val permissionCheck by viewModel.permissionCheck.collectAsState()
 
     LaunchedEffect(permissionState.allPermissionsGranted){
         if (permissionState.allPermissionsGranted){
@@ -130,7 +137,14 @@ fun PermissionScreen(permissionState: MultiplePermissionsState, onCheck:(Boolean
         }
 
         Button(
-            onClick = { permissionState.launchMultiplePermissionRequest() },
+            onClick = {
+                if (!permissionCheck){
+                    viewModel.updatePermissionCheck(true)
+                    permissionState.launchMultiplePermissionRequest()
+                }else{
+                    onCheck(false)
+                }
+                      },
             modifier = Modifier
                 .padding(top = 20.dp, bottom = 20.dp)
                 .fillMaxWidth()
@@ -139,7 +153,11 @@ fun PermissionScreen(permissionState: MultiplePermissionsState, onCheck:(Boolean
             colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
         )
         {
-            Text(text = stringResource(id = R.string.confirm), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+            Text(
+                text = if (!permissionCheck) stringResource(id = R.string.confirm) else "뒤로가기",
+                color = design_white, fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular))
+            )
         }
 
     }
