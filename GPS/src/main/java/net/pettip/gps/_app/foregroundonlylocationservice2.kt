@@ -72,7 +72,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
                 //.setStyle(style)      //ㅆㅂ
                 .setContentTitle(title())
                 .setContentText(text)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.currentlocation)
                 .setOngoing(true)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

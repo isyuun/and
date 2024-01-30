@@ -19,6 +19,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -98,7 +99,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -408,7 +408,7 @@ fun rememberMapViewWithLifecycle(
         val observer = object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 lifecycleObserver.value.onStart()
-                if (animate) mapView.isVisible = true
+                if (animate) mapView.animate().alpha(1.0f).setDuration(AnimationConstants.DefaultDurationMillis.toLong()).start()
             }
 
             override fun onResume(owner: LifecycleOwner) {
@@ -421,7 +421,7 @@ fun rememberMapViewWithLifecycle(
 
             override fun onStop(owner: LifecycleOwner) {
                 lifecycleObserver.value.onStop()
-                if (animate) mapView.isVisible = false
+                if (animate) mapView.animate().alpha(0.0f).setDuration(AnimationConstants.DefaultDurationMillis.toLong()).start()
             }
 
             override fun onDestroy(owner: LifecycleOwner) {
