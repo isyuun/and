@@ -17,7 +17,7 @@
 accompanist = "0.30.1"
 androidDesugarJdkLibs = "2.0.4"
 androidGradlePlugin = "8.2.2"
-androidxActivity = "1.8.1"
+androidxActivity = "1.8.2"
 androidxAppCompat = "1.6.1"
 androidxBrowser = "1.7.0"
 androidxComposeBom = "2023.10.01"
@@ -28,10 +28,10 @@ androidxCoreSplashscreen = "1.0.1"
 androidxDataStore = "1.0.0"
 androidxEspresso = "3.5.1"
 androidxHiltNavigationCompose = "1.1.0"
-androidxLifecycle = "2.6.2"
+androidxLifecycle = "2.7.0"
 androidxMacroBenchmark = "1.2.2"
-androidxMetrics = "1.0.0-alpha04"
-androidxNavigation = "2.7.5"
+androidxMetrics = "1.0.0-beta01"
+androidxNavigation = "2.7.6"
 androidxProfileinstaller = "1.3.1"
 androidxStartup = "1.1.1"
 androidxTestCore = "1.5.0"
@@ -42,9 +42,9 @@ androidxTracing = "1.2.0"
 androidxUiAutomator = "2.2.0"
 androidxWindowManager = "1.2.0"
 androidxWork = "2.9.0"
-animation = "1.5.4"
-coil = "2.4.0"
-firebaseBom = "32.6.0"
+animation = "1.6.0"
+coil = "2.5.0"
+firebaseBom = "32.7.1"
 firebaseCrashlyticsPlugin = "2.9.9"
 firebasePerfPlugin = "1.4.2"
 gmsPlugin = "4.4.0"
@@ -60,8 +60,8 @@ kotlinxCoroutines = "1.7.3"
 kotlinxDatetime = "0.4.0"
 kotlinxSerializationJson = "1.6.0"
 ksp = "1.9.10-1.0.13"
-lint = "31.2.0"
-materialIconsCore = "1.5.4"
+lint = "31.2.2"
+materialIconsCore = "1.6.0"
 okhttp = "4.10.0"
 protobuf = "3.23.4"
 protobufPlugin = "0.9.3"
@@ -74,8 +74,8 @@ org-jetbrains-kotlin-android = "1.8.10"
 com-google-gms-google-services = "4.3.15"
 junit = "1.1.5"
 lifecycle-runtime-ktx = "2.6.2"
-material = "1.10.0"
-play-services-location = "21.0.1"
+material = "1.11.0"
+play-services-location = "21.1.0"
 #-----------------------------------
 #[versions]
 #-----------------------------------
@@ -103,7 +103,7 @@ androidxTestExtTruth = "1.5.0"
 #androidxTestRules = "1.5.0"
 #androidxTestRunner = "1.5.2"
 #androidxUiAutomator = "2.2.0"
-media3 = "1.2.0"
+media3 = "1.2.1"
 constraintlayout = "2.1.4"
 
 [libraries]
@@ -114,7 +114,7 @@ play-services-location = { module = "com.google.android.gms:play-services-locati
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
 accompanist-testharness = { group = "com.google.accompanist", name = "accompanist-testharness", version.ref = "accompanist" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
-androidx-work-runtime-ktx = "androidx.work:work-runtime-ktx:2.8.1"
+androidx-work-runtime-ktx = "androidx.work:work-runtime-ktx:2.9.0"
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "androidxMacroBenchmark" }
@@ -130,7 +130,7 @@ androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime
 androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
 androidx-compose-runtime-tracing = { group = "androidx.compose.runtime", name = "runtime-tracing", version.ref = "androidxComposeRuntimeTracing" }
 androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-compose-ui-testManifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version = "1.5.4" }
+androidx-compose-ui-testManifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version = "1.6.0" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-compose-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
@@ -197,7 +197,7 @@ firebase-performance-gradlePlugin = { group = "com.google.firebase", name = "per
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
+lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version = "2.7.0" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -287,7 +287,7 @@ androidx-startup = 'androidx.startup:startup-runtime:1.1.1'
 androidx-window = { module = "androidx.window:window", version.ref = "androidx-window" }
 androidx-window-java = { module = "androidx.window:window-java", version.ref = "androidx-window" }
 androidx-window-rxjava2 = { module = "androidx.window:window-rxjava2", version.ref = "androidx-window" }
-androidx-media = "androidx.media:media:1.6.0"
+androidx-media = "androidx.media:media:1.7.0"
 androidx-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
 androidx-draganddrop = "androidx.draganddrop:draganddrop:1.0.0"
@@ -298,7 +298,7 @@ androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "medi
 
 glide = "com.github.bumptech.glide:glide:4.16.0"
 
-mdc = "com.google.android.material:material:1.10.0"
+mdc = "com.google.android.material:material:1.11.0"
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version = "1.2.1" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version = "2.7.5" }

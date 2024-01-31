@@ -47,7 +47,7 @@ dependencies {
     implementation(project(mapOf("path" to ":GPS")))
     implementation(project(mapOf("path" to ":NAV")))
 
-    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-location:21.1.0")
     implementation("com.naver.maps:map-sdk:3.17.0")
 
     implementation(libs.androidx.core.ktx)

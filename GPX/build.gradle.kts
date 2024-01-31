@@ -53,9 +53,9 @@ android {
 dependencies {
     // JodaTime for Android
     // https://github.com/dlew/joda-time-android
-    implementation("net.danlew:android.joda:2.12.5")        //https://github.com/ticofab/android-gpx-parser
+    implementation("net.danlew:android.joda:2.12.6")        //https://github.com/ticofab/android-gpx-parser
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")    //https://github.com/RideBeeline/android-rx-gpx-writer
-    implementation("org.osmdroid:osmdroid-android:6.1.17")  //https://github.com/osmdroid/osmdroid
+    implementation("org.osmdroid:osmdroid-android:6.1.18")  //https://github.com/osmdroid/osmdroid
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
