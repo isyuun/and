@@ -833,6 +833,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         G.mapPetInfo = pets
     }
     val pets = G.mapPetInfo
+    application.remove()
     if (pets.size == 1) application.add(pets[0])
 
     val location = application.lastLocation ?: source.lastLocation
