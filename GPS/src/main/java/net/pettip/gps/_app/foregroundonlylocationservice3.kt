@@ -12,6 +12,7 @@ package net.pettip.gps._app
 
 /**import net.pettip.util.__CLASSNAME__*/
 import android.content.Intent
+import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
 import net.pettip.app.gpxs
 import net.pettip.gps.R
@@ -48,7 +49,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         val min = GPS_UPDATE_MIN_METERS
         val max = GPS_UPDATE_MAX_METERS
         val exit = size > 0 && (dis < min || dis > max)
-        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[exit:$exit][$size][min:${min}m][max:${max}m][dis:${dis}m][spd1:${trk1?.speed}[spd2:${trk2?.speed}]\n$loc1\n$loc2")
+        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][exit:$exit][$size][min:${min}m][max:${max}m][dis:${dis}m][spd1:${trk1?.speed}[spd2:${trk2?.speed}]\n$loc1\n$loc2")
         return exit
     }
 
@@ -61,6 +62,23 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
             lastLocation?.let { _tracks.add(Track(it)) }
         }
         this.write()
+    }
+
+    override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[gps:${gps()}][locationAvailability:$locationAvailability]")
+        super.onLocationAvailability(locationAvailability)
+    }
+
+    private fun gps(): Boolean {
+        //val ret = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        //    val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        //    lm.isLocationEnabled
+        //} else {
+        //    val mode = Settings.Secure.getInt(contentResolver, Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF)
+        //    mode != Settings.Secure.LOCATION_MODE_OFF
+        //}
+        //return ret
+        return false
     }
 
     override fun onUnbind(intent: Intent): Boolean {

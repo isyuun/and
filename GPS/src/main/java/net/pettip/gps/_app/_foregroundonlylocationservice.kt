@@ -17,7 +17,7 @@ import net.pettip.app.Service
 const val GPS_RELOAD_MINUTES = 10L
 const val GPS_UPDATE_MIllIS = 1L
 const val GPS_UPDATE_MIN_METERS = 5.0f
-const val GPS_UPDATE_MAX_METERS = 20.0f
+const val GPS_UPDATE_MAX_METERS = 10.0f
 const val GPS_LATITUDE_ZERO = 37.546855      //37.5
 const val GPS_LONGITUDE_ZERO = 127.065330    //127.0
 const val GPS_CAMERA_ZOOM_ZERO = 17.0

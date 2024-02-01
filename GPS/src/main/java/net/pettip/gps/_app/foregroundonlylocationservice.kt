@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -46,7 +47,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
 
     private val localBinder = LocalBinder()
 
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private lateinit var locationRequest: LocationRequest
 
@@ -65,26 +66,24 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
     override fun onCreate() {
         Log.v(__CLASSNAME__, "${getMethodName()}...")
         notificationCompatBuilder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, GPS_UPDATE_MIllIS).apply {
-            setMinUpdateDistanceMeters(GPS_UPDATE_MAX_METERS)
-            //setIntervalMillis(100)
-            //setMinUpdateIntervalMillis(50)
-            //setGranularity(Granularity.GRANULARITY_FINE)
-            //setWaitForAccurateLocation(true)
+            setMinUpdateDistanceMeters(GPS_UPDATE_MIN_METERS)
+            setWaitForAccurateLocation(true)
         }.build()
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
                 this@foregroundonlylocationservice.onLocationResult(locationResult)
             }
+
+            override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+                super.onLocationAvailability(locationAvailability)
+                this@foregroundonlylocationservice.onLocationAvailability(locationAvailability)
+            }
+
         }
         //Log.wtf(__CLASSNAME__, "${getMethodName()}$fusedLocationProviderClient")
-    }
-
-    override fun sendBroadcast(intent: Intent) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[$intent]")
-        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
     }
 
     protected open fun onLocationResult(locationResult: LocationResult) {
@@ -93,6 +92,14 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
         intent.putExtra(EXTRA_LOCATION, lastLocation)
         sendBroadcast(intent)
+    }
+
+    protected open fun onLocationAvailability(locationAvailability: LocationAvailability) {
+    }
+
+    override fun sendBroadcast(intent: Intent) {
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[$intent]")
+        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -154,7 +161,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
             e.printStackTrace()
         }
         try {
-            fusedLocationProviderClient.requestLocationUpdates(
+            fusedLocationClient.requestLocationUpdates(
                 locationRequest, locationCallback, Looper.getMainLooper()
             )
         } catch (unlikely: SecurityException) {
@@ -167,7 +174,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         Log.i(__CLASSNAME__, "${getMethodName()}${lastLocation.toText()}, $lastLocation")
         try {
             // TODO: Step 1.6, Unsubscribe to location changes.
-            val removeTask = fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+            val removeTask = fusedLocationClient.removeLocationUpdates(locationCallback)
             removeTask.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Log.d(__CLASSNAME__, "Location Callback removed.")
