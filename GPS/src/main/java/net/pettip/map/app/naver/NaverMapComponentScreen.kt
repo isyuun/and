@@ -127,10 +127,10 @@ import net.pettip.app.toPx
 import net.pettip.app.withClick
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.gps.R
+import net.pettip.gps._app.GPS_CAMERA_ZOOM_ZERO
+import net.pettip.gps._app.GPS_LATITUDE_ZERO
+import net.pettip.gps._app.GPS_LONGITUDE_ZERO
 import net.pettip.gps.app.GPSApplication
-import net.pettip.gpx.GPX_CAMERA_ZOOM_ZERO
-import net.pettip.gpx.GPX_LATITUDE_ZERO
-import net.pettip.gpx.GPX_LONGITUDE_ZERO
 import net.pettip.gpx.TRACK_ZERO_URI
 import net.pettip.gpx.Track
 import net.pettip.gpx._distance
@@ -371,7 +371,7 @@ fun naverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Tr
         naverMap.moveCamera(update)
         if (tracks._distance() < 200.0f) {
             val center = bounds.center
-            val position = CameraPosition(center, GPX_CAMERA_ZOOM_ZERO)
+            val position = CameraPosition(center, GPS_CAMERA_ZOOM_ZERO)
             val update2 = CameraUpdate.toCameraPosition(position)
             naverMap.moveCamera(update2)
         }
@@ -839,8 +839,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     if (pets.size == 1) application.add(pets[0])
 
     val location = application.lastLocation ?: source.lastLocation
-    var position by rememberSaveable { mutableStateOf(if (location != null) LatLng(location.latitude, location.longitude) else LatLng(GPX_LATITUDE_ZERO, GPX_LONGITUDE_ZERO)) }
-    var camera by rememberSaveable { mutableStateOf(CameraPosition(position, GPX_CAMERA_ZOOM_ZERO)) }
+    var position by rememberSaveable { mutableStateOf(if (location != null) LatLng(location.latitude, location.longitude) else LatLng(GPS_LATITUDE_ZERO, GPS_LONGITUDE_ZERO)) }
+    var camera by rememberSaveable { mutableStateOf(CameraPosition(position, GPS_CAMERA_ZOOM_ZERO)) }
 
     Log.i(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${source.lastLocation}]$pets${application.pets}")
 

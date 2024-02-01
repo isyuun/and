@@ -12,17 +12,16 @@ package net.pettip.gps._app
 
 /**import net.pettip.util.__CLASSNAME__*/
 import android.content.Intent
-import android.location.Location
 import com.google.android.gms.location.LocationResult
 import net.pettip.app.gpxs
 import net.pettip.gps.R
 import net.pettip.gpx.GPXWriter
 import net.pettip.gpx.GPX_DATE_FORMAT
 import net.pettip.gpx.GPX_TICK_FORMAT
-import net.pettip.gpx.GPX_UPDATE_METERS
 import net.pettip.gpx.Track
 import net.pettip.gpx._distance
 import net.pettip.gpx._duration
+import net.pettip.gpx.distance
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
@@ -39,30 +38,17 @@ import java.util.Collections
 open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    /** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-tracks-in-metre">Calculate distance between two tracks in metre</a> */
-    private fun distance(trk1: Track?, trk2: Track?): Float {
-        if (trk1 == null || trk2 == null) return 0.0f
-        val lat1: Double = trk1.latitude
-        val lon1: Double = trk1.longitude
-        val lat2: Double = trk2.latitude
-        val lon2: Double = trk2.longitude
-        val distances = FloatArray(2)
-        Location.distanceBetween(
-            lat1, lon1,
-            lat2, lon2,
-            distances
-        )
-        return distances[0]
-    }
-
     protected fun exit(locationResult: LocationResult): Boolean {
-        val trk1 = lastLocation?.let { Track(it) }
-        val trk2 = locationResult.lastLocation?.let { Track(it) }
-        val dist = distance(trk1, trk2)
         val size = _tracks.size
-        val max = GPX_UPDATE_METERS
-        val exit = (size > 0 && dist < max)
-        Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[exit:$exit][$size][${max}m][${dist}m][${trk1?.toText()}, ${trk2?.toText()}], $trk1, $trk2")
+        val loc1 = lastLocation
+        val loc2 = locationResult.lastLocation
+        val trk1 = loc1?.let { Track(it) }
+        val trk2 = loc2?.let { Track(it) }
+        val dis = distance(trk1, trk2)
+        val min = GPS_UPDATE_MIN_METERS
+        val max = GPS_UPDATE_MAX_METERS
+        val exit = size > 0 && (dis < min || dis > max)
+        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[exit:$exit][$size][min:${min}m][max:${max}m][dis:${dis}m][spd1:${trk1?.speed}[spd2:${trk2?.speed}]\n$loc1\n$loc2")
         return exit
     }
 

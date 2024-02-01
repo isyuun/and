@@ -23,6 +23,22 @@ import android.net.Uri
 const val TRACK_ZERO_NUM = "P00000000000000"
 val TRACK_ZERO_URI = Uri.parse("")!!
 
+/** <a hreef="https://stackoverflow.com/questions/43080343/calculate-distance-between-two-tracks-in-metre">Calculate distance between two tracks in metre</a> */
+fun distance(trk1: Track?, trk2: Track?): Float {
+    if (trk1 == null || trk2 == null) return 0.0f
+    val lat1: Double = trk1.latitude
+    val lon1: Double = trk1.longitude
+    val lat2: Double = trk2.latitude
+    val lon2: Double = trk2.longitude
+    val distances = FloatArray(2)
+    Location.distanceBetween(
+        lat1, lon1,
+        lat2, lon2,
+        distances
+    )
+    return distances[0]
+}
+
 fun MutableList<Track>._duration(): Long {
     if (this.isEmpty()) {
         return 0L

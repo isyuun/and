@@ -27,8 +27,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import net.pettip.gpx.GPX_UPDATE_METERS
-import net.pettip.gpx.GPX_UPDATE_MIllIS
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
@@ -68,8 +66,8 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         Log.v(__CLASSNAME__, "${getMethodName()}...")
         notificationCompatBuilder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, GPX_UPDATE_MIllIS).apply {
-            setMinUpdateDistanceMeters(GPX_UPDATE_METERS)
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, GPS_UPDATE_MIllIS).apply {
+            setMinUpdateDistanceMeters(GPS_UPDATE_MAX_METERS)
             //setIntervalMillis(100)
             //setMinUpdateIntervalMillis(50)
             //setGranularity(Granularity.GRANULARITY_FINE)
@@ -90,7 +88,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
     }
 
     protected open fun onLocationResult(locationResult: LocationResult) {
-        Log.v(__CLASSNAME__, "${getMethodName()}...")
+        Log.v(__CLASSNAME__, "${getMethodName()}[$locationResult]")
         lastLocation = locationResult.lastLocation
         val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
         intent.putExtra(EXTRA_LOCATION, lastLocation)

@@ -14,7 +14,6 @@ package net.pettip.gps._app
 import android.content.SharedPreferences
 import net.pettip.app.gpxs
 import net.pettip.gpx.GPXParser
-import net.pettip.gpx.GPX_RELOAD_MINUTES
 import net.pettip.gpx.TRACK_ZERO_URI
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
@@ -70,8 +69,8 @@ open class foregroundonlylocationservice6 : foregroundonlylocationservice5(), Sh
 
     internal fun recent(): File? {
         val file = sharedPreferences.getString(KEY_FOREGROUND_GPXFILE, "")?.let { File(it) }
-        Log.v(__CLASSNAME__, "${getMethodName()}[${file?.exists()}][${file?.minutes()}:$GPX_RELOAD_MINUTES][${file}]")
-        return (if (file != null && file.exists() && file.minutes() < GPX_RELOAD_MINUTES) file else null)
+        Log.v(__CLASSNAME__, "${getMethodName()}[${file?.exists()}][${file?.minutes()}:$GPS_RELOAD_MINUTES][${file}]")
+        return (if (file != null && file.exists() && file.minutes() < GPS_RELOAD_MINUTES) file else null)
     }
 
     override fun write() {

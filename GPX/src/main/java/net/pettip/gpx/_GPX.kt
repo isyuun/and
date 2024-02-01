@@ -32,13 +32,6 @@ val GPX_TICK_FORMAT = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
 val GPX_DECIMAL_FORMAT_3 = DecimalFormat("0.000")
 val GPX_DECIMAL_FORMAT_7 = DecimalFormat("0.0000000")
 
-const val GPX_RELOAD_MINUTES = 10L
-const val GPX_UPDATE_MIllIS = 1L
-const val GPX_UPDATE_METERS = 10.0f
-const val GPX_LATITUDE_ZERO = 37.546855      //37.5
-const val GPX_LONGITUDE_ZERO = 127.065330    //127.0
-const val GPX_CAMERA_ZOOM_ZERO = 17.0
-
 const val TAG_GPX = "gpx"
 const val TAG_VERSION = "version"
 const val TAG_CREATOR = "creator"
