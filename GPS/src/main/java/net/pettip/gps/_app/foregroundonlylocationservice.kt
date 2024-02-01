@@ -162,7 +162,9 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         }
         try {
             fusedLocationClient.requestLocationUpdates(
-                locationRequest, locationCallback, Looper.getMainLooper()
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
             )
         } catch (unlikely: SecurityException) {
             //SharedPreferenceUtil.saveLocationTrackingPref(this, false)
