@@ -833,7 +833,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         G.mapPetInfo = pets
     }
     val pets = G.mapPetInfo
-    application.remove()
+    val dels = ArrayList<CurrentPetData>()
+    application.pets.forEach { pet -> if (!pets.contains(pet)) dels.add(pet) }
+    application.remove(dels)
     if (pets.size == 1) application.add(pets[0])
 
     val location = application.lastLocation ?: source.lastLocation
