@@ -660,105 +660,88 @@ private fun WalkInfoNavi(
             }
         }
         Box(
-            modifier = Modifier
-                .onGloballyPositioned { onGloballyPositioned(it) }
+            modifier = Modifier.onGloballyPositioned { onGloballyPositioned(it) }
         ) {
+            val spc = 6.0.dp
+            val sat = application.sat
+            val gps = application.gps
+            val mod = Modifier
+                .padding(start = 4.0.dp)
+                .basicMarquee(iterations = Int.MAX_VALUE)
+            val head = if (DEBUG) "${stringResource(id = R.string.app_name)}($sat): " else ""
             if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                R.string.walk_title_tip
-                AnimatedVisibility(
-                    visible = !start,
-                    enter = expandVertically(),
-                    exit = shrinkVertically(),
+                Row(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.background,
+                            shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
+                        )
+                        .border(
+                            width = 0.1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
+                        )
+                        .padding(horizontal = 24.0.dp)
+                        .padding(vertical = 16.0.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        space = 0.0.dp,
+                        alignment = Alignment.CenterHorizontally
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.background,
-                                shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
-                            )
-                            .border(
-                                width = 0.1.dp,
-                                color = MaterialTheme.colorScheme.outline,
-                                shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
-                            )
-                            .padding(horizontal = 24.0.dp)
-                            .padding(vertical = 26.0.dp)
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(
-                            space = 8.0.dp,
-                            alignment = Alignment.CenterVertically,
-                        ),
-                        horizontalAlignment = Alignment.Start,
+                    CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
+                    R.string.walk_title_tip
+                    AnimatedVisibility(
+                        visible = !start,
+                        enter = expandVertically(),
+                        exit = shrinkVertically(),
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically,
+                                .padding(horizontal = 12.0.dp)
+                                .padding(vertical = 8.0.dp),
+                            verticalArrangement = Arrangement.spacedBy(spc),
+                            horizontalAlignment = Alignment.Start,
                         ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.icon_bulb),
-                                contentDescription = "",
-                                tint = Color.Unspecified,
-                            )
+                            val body = stringResource(id = R.string.walk_title_tip)
                             Text(
-                                modifier = Modifier
-                                    .padding(start = 4.0.dp)
-                                    .basicMarquee(),
-                                text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_tip),
+                                modifier = mod,
+                                text = head + body,
                                 fontSize = 16.sp,
                                 letterSpacing = (-0.6).sp,
                                 maxLines = 1,
                                 //style = TextStyle(background = Color.Yellow),     //test
                             )
+                            Text(
+                                modifier = Modifier
+                                    .padding(start = 4.0.dp)
+                                    .basicMarquee(),
+                                text = stringResource(id = R.string.walk_title_tips),
+                                fontSize = 14.sp,
+                                letterSpacing = (-0.7).sp,
+                                maxLines = 1,
+                                //style = TextStyle(background = Color.Yellow),     //test
+                            )
                         }
-                        Text(
-                            modifier = Modifier
-                                .padding(start = 24.0.dp)
-                                .basicMarquee(),
-                            text = stringResource(id = R.string.walk_title_tips),
-                            fontSize = 14.sp,
-                            letterSpacing = (-0.7).sp,
-                            maxLines = 1,
-                            //style = TextStyle(background = Color.Yellow),     //test
-                        )
                     }
-                }
-                R.string.walk_title_walking
-                AnimatedVisibility(
-                    visible = start,
-                    enter = expandVertically(),
-                    exit = shrinkVertically(),
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.background,
-                                shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
-                            )
-                            .border(
-                                width = 0.1.dp,
-                                color = MaterialTheme.colorScheme.outline,
-                                shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
-                            )
-                            .padding(horizontal = 24.0.dp)
-                            .padding(vertical = 16.0.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            space = 0.0.dp,
-                            alignment = Alignment.CenterHorizontally
-                        ),
-                        verticalAlignment = Alignment.CenterVertically,
+                    R.string.walk_title_walking
+                    AnimatedVisibility(
+                        visible = start,
+                        enter = expandVertically(),
+                        exit = shrinkVertically(),
                     ) {
-                        CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
                         Column(
                             modifier = Modifier
                                 .padding(horizontal = 12.0.dp)
                                 .padding(vertical = 8.0.dp),
+                            verticalArrangement = Arrangement.spacedBy(spc),
                             horizontalAlignment = Alignment.Start,
                         ) {
+                            val body = if (gps == true) stringResource(id = R.string.walk_title_walking) else stringResource(id = R.string.walk_text_no_tracking)
                             Text(
-                                text = (if (DEBUG) "${stringResource(id = R.string.app_name)}:" else "") + stringResource(id = R.string.walk_title_walking),
+                                modifier = mod,
+                                text = head + body,
                                 fontSize = 16.sp,
                                 letterSpacing = (-0.6).sp,
                                 fontWeight = FontWeight.Normal,
@@ -792,18 +775,6 @@ private fun WalkInfoNavi(
                                 )
                             }
                         }
-                        //Text(
-                        //    text = "반려동물 변경",
-                        //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        //    fontSize = 14.sp,
-                        //    letterSpacing = (-0.6).sp,
-                        //    textDecoration = TextDecoration.Underline,
-                        //    color = design_skip,
-                        //    modifier = Modifier.clickable {
-                        //        viewModel.updateSheetChange("change")
-                        //        scope.launch { bottomSheetState.show() }
-                        //    }
-                        //)
                     }
                 }
             }

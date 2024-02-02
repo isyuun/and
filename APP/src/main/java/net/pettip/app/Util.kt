@@ -240,7 +240,7 @@ fun Version(context: Context, height: Dp) {
     val df = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
     val bt = df.format(Date(stringResource(id = R.string.build_time).toLong()))
     val pi = context.packageManager.getPackageInfo(context.packageName, 0)
-    val vs = "[${pi.versionName}(${if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode else pi.versionCode})][RELEASE:$RELEASE][DEBUG:$DEBUG][$bt]"
+    val vs = "[${pi.versionName}(${if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode else pi.versionCode})][REL:$RELEASE][DEB:$DEBUG][$bt]"
     var version by remember { mutableStateOf(false) }
     var timer by remember { mutableStateOf(false) }
     LaunchedEffect(timer) {

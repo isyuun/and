@@ -268,4 +268,10 @@ open class gpsapplication3 : gpsapplication2(), SharedPreferences.OnSharedPrefer
     fun orient(context: Context, uri: Uri) = this.service?.orient(context, uri)
 
     var preview: Bitmap? = null
+
+    val gps
+        get() = this.service?.gps()
+
+    val sat
+        get() = this.service?.sat()
 }

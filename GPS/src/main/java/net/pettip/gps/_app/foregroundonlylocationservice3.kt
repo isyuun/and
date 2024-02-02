@@ -45,8 +45,11 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         val dis = distance(trk1, trk2)
         val min = GPS_UPDATE_MIN_METERS
         val max = GPS_UPDATE_MAX_METERS
-        val exit = size > 0 && (dis < min || dis > max)
-        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][exit:$exit][$size][min:${min}m][max:${max}m][dis:${dis}m][spd1:${trk1?.speed}[spd2:${trk2?.speed}]\nloc1:$loc1\nloc2:$loc2")
+        val moc = moc(loc2)
+        val gps = gps()
+        val ret = gps || moc
+        val exit = (size > 0 && (!ret || dis < min || dis > max))
+        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:$gps][moc:$moc][ret:$ret][exit:$exit][$size][min:${min}m][max:${max}m][dis:${dis}m][spd1:${trk1?.speed}][spd2:${trk2?.speed}]\n[loc1:$loc1]\n[loc2:$loc2]")
         return exit
     }
 

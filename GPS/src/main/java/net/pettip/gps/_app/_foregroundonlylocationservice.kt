@@ -14,7 +14,9 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.GnssStatus
+import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.ActivityCompat
@@ -133,7 +135,7 @@ open class _foregroundonlylocationservice : Service() {
                 for (i in 0 until numSatsTotal) {
                     if (status.usedInFix(i)) numSatsCount++
                 }
-                Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][sat:$numSatsCount/$numSatsTotal][sta:$status]")
+                //Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][sat:${sat()}][sta:$status]")
             }
         }
         locationManager.registerGnssStatusCallback(gnssStatusCallback, Handler(Looper.getMainLooper()))
@@ -143,8 +145,22 @@ open class _foregroundonlylocationservice : Service() {
         locationManager.unregisterGnssStatusCallback(gnssStatusCallback)
     }
 
-    protected fun gps(): Boolean {
-        return (numSatsCount > 0)
+    internal fun sat(): String {
+        return "$numSatsCount/$numSatsTotal"
+    }
+
+    internal fun gps(): Boolean {
+        val ret = (numSatsCount > 0)
+        Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[ret:${ret}][sat:${sat()}]")
+        return ret
+    }
+
+    internal fun moc(loc: Location?): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            loc?.isMock == true
+        } else {
+            loc?.isFromMockProvider == true
+        }
     }
 
     protected open fun init() {}
