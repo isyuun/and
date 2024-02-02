@@ -16,8 +16,6 @@ import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
 import net.pettip.gps.R
 import net.pettip.gpx.GPXWriter
-import net.pettip.gpx.GPX_DATE_FORMAT
-import net.pettip.gpx.GPX_TICK_FORMAT
 import net.pettip.gpx.Track
 import net.pettip.gpx._distance
 import net.pettip.gpx._duration
@@ -48,13 +46,13 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         val min = GPS_UPDATE_MIN_METERS
         val max = GPS_UPDATE_MAX_METERS
         val exit = size > 0 && (dis < min || dis > max)
-        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][exit:$exit][$size][min:${min}m][max:${max}m][dis:${dis}m][spd1:${trk1?.speed}[spd2:${trk2?.speed}]\n$loc1\n$loc2")
+        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][exit:$exit][$size][min:${min}m][max:${max}m][dis:${dis}m][spd1:${trk1?.speed}[spd2:${trk2?.speed}]\nloc1:$loc1\nloc2:$loc2")
         return exit
     }
 
     override fun onLocationResult(locationResult: LocationResult) {
         val exit = exit(locationResult)
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[exit:$exit]$lastLocation$locationResult")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[gps:${gps()}][exit:$exit][$lastLocation][${locationResult.lastLocation}]")
         lastLocation = locationResult.lastLocation
         if (!exit) {
             super.onLocationResult(locationResult)
@@ -64,11 +62,11 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     }
 
     override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[gps:${gps()}][locationAvailability:$locationAvailability]")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[gps:${gps()}][$locationAvailability][$lastLocation]")
         super.onLocationAvailability(locationAvailability)
     }
 
-    override fun onUnbind(intent: Intent): Boolean {
+    override fun onUnbind(intent: Intent?): Boolean {
         Log.i(__CLASSNAME__, "${getMethodName()}$intent")
         post { this.write() }
         return super.onUnbind(intent)
@@ -98,7 +96,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         if (_tracks.isEmpty()) return
         val file = this._file
         file?.parentFile?.mkdirs()
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[${GPX_DATE_FORMAT.format(_tracks.first().time)}]$file")
+        Log.wtf(__CLASSNAME__, "${getMethodName()}[${date(_tracks.first().time)}]$file")
         file?.let { GPXWriter().write(_tracks, it) }
     }
 
@@ -109,11 +107,11 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     protected val _file: File?
         get() {
             if (_tracks.isEmpty()) return null
-            try {
-                return File("${gpxs(this)}/${GPX_TICK_FORMAT.format(_tracks.first().time)}.gpx")
+            return try {
+                File("${gpxs(this)}/${name(_tracks.first().time)}.gpx")
             } catch (e: Exception) {
                 e.printStackTrace()
-                return null
+                null
             }
         }
 

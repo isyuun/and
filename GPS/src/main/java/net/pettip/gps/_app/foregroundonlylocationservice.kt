@@ -19,7 +19,6 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationAvailability
@@ -55,16 +54,10 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
 
     internal var lastLocation: Location? = null
 
-    /**
-     * Define a LiveData to observe in activity
-     * https://stackoverflow.com/questions/74264850/localbroadcastmanager-is-now-deprecated-how-to-send-data-from-service-to-activi
-     */
-    private val tokenLiveData = MutableLiveData<String>()
-
     protected lateinit var notificationCompatBuilder: NotificationCompat.Builder
 
-    override fun onCreate() {
-        Log.v(__CLASSNAME__, "${getMethodName()}...")
+    override fun init() {
+        super.init()
         notificationCompatBuilder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, GPS_UPDATE_MIllIS).apply {
@@ -83,7 +76,17 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
             }
 
         }
-        //Log.wtf(__CLASSNAME__, "${getMethodName()}$fusedLocationProviderClient")
+    }
+
+    override fun onCreate() {
+        Log.v(__CLASSNAME__, "${getMethodName()}$lastLocation")
+        super.onCreate()
+        init()
+    }
+
+    override fun onDestroy() {
+        Log.v(__CLASSNAME__, "${getMethodName()}$lastLocation")
+        super.onDestroy()
     }
 
     protected open fun onLocationResult(locationResult: LocationResult) {
@@ -127,14 +130,11 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         super.onRebind(intent)
     }
 
-    override fun onUnbind(intent: Intent): Boolean {
+    override fun onUnbind(intent: Intent?): Boolean {
         Log.v(__CLASSNAME__, "${getMethodName()}...")
-        // Ensures onRebind() is called if MainActivity (client) rebinds.
-        return true
-    }
-
-    override fun onDestroy() {
-        Log.v(__CLASSNAME__, "${getMethodName()}...")
+        //// Ensures onRebind() is called if MainActivity (client) rebinds.
+        //return true
+        return super.onUnbind(intent)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

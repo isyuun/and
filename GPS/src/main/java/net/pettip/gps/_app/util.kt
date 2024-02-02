@@ -12,6 +12,8 @@ package net.pettip.gps._app
 import android.content.Context
 import android.location.Location
 import net.pettip.RELEASE
+import net.pettip.gpx.GPX_DATE_FORMAT
+import net.pettip.gpx.GPX_TICK_FORMAT
 import java.io.File
 import java.time.Instant
 import java.time.LocalDateTime
@@ -32,6 +34,14 @@ fun pics(context: Context): String {
 fun gpxs(context: Context): String {
     val ret = "${root(context)}/.GPX"
     return ret
+}
+
+fun name(time: Long): String {
+    return GPX_TICK_FORMAT.format(time)
+}
+
+fun date(time: Long): String {
+    return GPX_DATE_FORMAT.format(time)
 }
 
 /**

@@ -162,7 +162,7 @@ open class foregroundonlylocationservice2 : foregroundonlylocationservice() {
         return super.onBind(intent)
     }
 
-    override fun onUnbind(intent: Intent): Boolean {
+    override fun onUnbind(intent: Intent?): Boolean {
         Log.i(__CLASSNAME__, "${getMethodName()}$launchActivityIntent")
         return super.onUnbind(intent)
     }

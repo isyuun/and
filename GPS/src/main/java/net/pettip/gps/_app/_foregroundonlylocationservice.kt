@@ -12,12 +12,10 @@ package net.pettip.gps._app
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.GnssStatus
 import android.location.LocationManager
 import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.ActivityCompat
 import androidx.core.content.edit
@@ -113,29 +111,29 @@ open class _foregroundonlylocationservice : Service() {
         }
         gnssStatusCallback = object : GnssStatus.Callback() {
             override fun onStarted() {
-                super.onStarted()
                 Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+                super.onStarted()
             }
 
             override fun onStopped() {
-                super.onStopped()
                 Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+                super.onStopped()
             }
 
             override fun onFirstFix(ttffMillis: Int) {
-                super.onFirstFix(ttffMillis)
                 Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+                super.onFirstFix(ttffMillis)
             }
 
             override fun onSatelliteStatusChanged(status: GnssStatus) {
-                super.onSatelliteStatusChanged(status)
                 //Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this][$status]")
+                super.onSatelliteStatusChanged(status)
                 numSatsTotal = status.satelliteCount
                 numSatsCount = 0
                 for (i in 0 until numSatsTotal) {
                     if (status.usedInFix(i)) numSatsCount++
                 }
-                Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][use:$numSatsCount][tot:$numSatsTotal]")
+                Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][sat:$numSatsCount/$numSatsTotal][status:$status]")
             }
         }
         locationManager.registerGnssStatusCallback(gnssStatusCallback, Handler(Looper.getMainLooper()))
@@ -149,6 +147,10 @@ open class _foregroundonlylocationservice : Service() {
         return (numSatsCount > 0)
     }
 
+    protected open fun init() {}
+
+    protected open fun unit() {}
+
     override fun onCreate() {
         Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
         super.onCreate()
@@ -159,15 +161,5 @@ open class _foregroundonlylocationservice : Service() {
         Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
         super.onDestroy()
         unregisterGnssStatusCallback()
-    }
-
-    override fun onBind(intent: Intent): IBinder {
-        Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
-        return super.onBind(intent)
-    }
-
-    override fun onRebind(intent: Intent?) {
-        Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
-        super.onRebind(intent)
     }
 }
