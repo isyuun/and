@@ -14,7 +14,6 @@ package net.pettip.gps._app
 import android.content.Intent
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
-import net.pettip.app.gpxs
 import net.pettip.gps.R
 import net.pettip.gpx.GPXWriter
 import net.pettip.gpx.GPX_DATE_FORMAT
@@ -69,33 +68,16 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         super.onLocationAvailability(locationAvailability)
     }
 
-    private fun gps(): Boolean {
-        //val ret = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        //    val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        //    lm.isLocationEnabled
-        //} else {
-        //    val mode = Settings.Secure.getInt(contentResolver, Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF)
-        //    mode != Settings.Secure.LOCATION_MODE_OFF
-        //}
-        //return ret
-        return false
-    }
-
     override fun onUnbind(intent: Intent): Boolean {
         Log.i(__CLASSNAME__, "${getMethodName()}$intent")
         post { this.write() }
         return super.onUnbind(intent)
     }
 
-    override fun onRebind(intent: Intent) {
+    override fun onRebind(intent: Intent?) {
         Log.i(__CLASSNAME__, "${getMethodName()}$intent")
         super.onRebind(intent)
         post { this.write() }
-    }
-
-    override fun onCreate() {
-        Log.d(__CLASSNAME__, "${getMethodName()}$_tracks")
-        super.onCreate()
     }
 
     override fun start() {

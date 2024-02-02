@@ -9,12 +9,30 @@
  */
 package net.pettip.gps._app
 
+import android.content.Context
 import android.location.Location
+import net.pettip.RELEASE
 import java.io.File
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+
+
+fun root(context: Context): String {
+    val ret = if (RELEASE) context.filesDir.path else context.getExternalFilesDirs("")[0].path
+    return ret
+}
+
+fun pics(context: Context): String {
+    val ret = "${root(context)}/.PIC"
+    return ret
+}
+
+fun gpxs(context: Context): String {
+    val ret = "${root(context)}/.GPX"
+    return ret
+}
 
 /**
  * Returns the `location` object as a human readable string.

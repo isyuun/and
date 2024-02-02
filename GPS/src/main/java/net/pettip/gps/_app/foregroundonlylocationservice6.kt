@@ -12,7 +12,6 @@
 package net.pettip.gps._app
 
 import android.content.SharedPreferences
-import net.pettip.app.gpxs
 import net.pettip.gpx.GPXParser
 import net.pettip.gpx.TRACK_ZERO_URI
 import net.pettip.util.Log

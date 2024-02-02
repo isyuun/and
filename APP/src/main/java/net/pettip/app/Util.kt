@@ -112,6 +112,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.ResourcesCompat
 import kotlinx.coroutines.delay
+import net.pettip.DEBUG
 import net.pettip.R
 import net.pettip.RELEASE
 import java.text.SimpleDateFormat
@@ -127,21 +128,6 @@ import java.util.Locale
  */
 
 //private val __CLASSNAME__ = Exception().stackTrace[0].fileName
-
-fun root(context: Context): String {
-    val ret = if (RELEASE) context.filesDir.path else context.getExternalFilesDirs("")[0].path
-    return ret
-}
-
-fun pics(context: Context): String {
-    val ret = "${root(context)}/.PIC"
-    return ret
-}
-
-fun gpxs(context: Context): String {
-    val ret = "${root(context)}/.GPX"
-    return ret
-}
 
 private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
     val bitmap = Bitmap.createBitmap(
@@ -254,7 +240,7 @@ fun Version(context: Context, height: Dp) {
     val df = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
     val bt = df.format(Date(stringResource(id = R.string.build_time).toLong()))
     val pi = context.packageManager.getPackageInfo(context.packageName, 0)
-    val vs = "[${pi.versionName}(${if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode else pi.versionCode})][${if (RELEASE) "REL" else "DEB"}][$bt]"
+    val vs = "[${pi.versionName}(${if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode else pi.versionCode})][RELEASE:$RELEASE][DEBUG:$DEBUG][$bt]"
     var version by remember { mutableStateOf(false) }
     var timer by remember { mutableStateOf(false) }
     LaunchedEffect(timer) {

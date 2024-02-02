@@ -19,7 +19,6 @@ import android.net.Uri
 import android.os.IBinder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import net.pettip.app.gpxs
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.gpx.GPX_TICK_FORMAT
 import net.pettip.gpx.TRACK_ZERO_NUM

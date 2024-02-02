@@ -120,7 +120,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         return localBinder
     }
 
-    override fun onRebind(intent: Intent) {
+    override fun onRebind(intent: Intent?) {
         Log.v(__CLASSNAME__, "${getMethodName()}...")
         changing = false
         Log.w(__CLASSNAME__, "${getMethodName()}...")

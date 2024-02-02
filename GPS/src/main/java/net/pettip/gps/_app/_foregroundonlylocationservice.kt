@@ -10,9 +10,20 @@
 
 package net.pettip.gps._app
 
+import android.Manifest
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.GnssStatus
+import android.location.LocationManager
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import androidx.core.app.ActivityCompat
 import androidx.core.content.edit
 import net.pettip.app.Service
+import net.pettip.util.Log
+import net.pettip.util.getMethodName
 
 const val GPS_RELOAD_MINUTES = 10L
 const val GPS_UPDATE_MIllIS = 1L
@@ -79,4 +90,84 @@ private object SharedPreferenceUtil {
  * @author      : isyuun@care-biz.co.kr
  * @description :
  */
-open class _foregroundonlylocationservice : Service()
+open class _foregroundonlylocationservice : Service() {
+    private val __CLASSNAME__ = Exception().stackTrace[0].fileName
+
+    private lateinit var locationManager: LocationManager
+    private lateinit var gnssStatusCallback: GnssStatus.Callback
+    private lateinit var gnssStatus: GnssStatus
+    private var numSatsTotal: Int = -1
+    private var numSatsCount: Int = -1
+
+    protected fun registerGnssStatusCallback() {
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager // Location Manager
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        gnssStatusCallback = object : GnssStatus.Callback() {
+            override fun onStarted() {
+                super.onStarted()
+                Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+            }
+
+            override fun onStopped() {
+                super.onStopped()
+                Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+            }
+
+            override fun onFirstFix(ttffMillis: Int) {
+                super.onFirstFix(ttffMillis)
+                Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+            }
+
+            override fun onSatelliteStatusChanged(status: GnssStatus) {
+                super.onSatelliteStatusChanged(status)
+                //Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this][$status]")
+                numSatsTotal = status.satelliteCount
+                numSatsCount = 0
+                for (i in 0 until numSatsTotal) {
+                    if (status.usedInFix(i)) numSatsCount++
+                }
+                Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][use:$numSatsCount][tot:$numSatsTotal]")
+            }
+        }
+        locationManager.registerGnssStatusCallback(gnssStatusCallback, Handler(Looper.getMainLooper()))
+    }
+
+    protected fun unregisterGnssStatusCallback() {
+        locationManager.unregisterGnssStatusCallback(gnssStatusCallback)
+    }
+
+    protected fun gps(): Boolean {
+        return (numSatsCount > 0)
+    }
+
+    override fun onCreate() {
+        Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+        super.onCreate()
+        registerGnssStatusCallback()
+    }
+
+    override fun onDestroy() {
+        Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+        super.onDestroy()
+        unregisterGnssStatusCallback()
+    }
+
+    override fun onBind(intent: Intent): IBinder {
+        Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+        return super.onBind(intent)
+    }
+
+    override fun onRebind(intent: Intent?) {
+        Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+        super.onRebind(intent)
+    }
+}
