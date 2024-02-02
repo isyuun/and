@@ -133,7 +133,7 @@ open class _foregroundonlylocationservice : Service() {
                 for (i in 0 until numSatsTotal) {
                     if (status.usedInFix(i)) numSatsCount++
                 }
-                Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][sat:$numSatsCount/$numSatsTotal][status:$status]")
+                Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][sat:$numSatsCount/$numSatsTotal][sta:$status]")
             }
         }
         locationManager.registerGnssStatusCallback(gnssStatusCallback, Handler(Looper.getMainLooper()))
