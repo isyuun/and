@@ -12,7 +12,6 @@ package net.pettip.gps._app
 
 /**import net.pettip.util.__CLASSNAME__*/
 import android.content.Intent
-import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
 import net.pettip.gps.R
 import net.pettip.gpx.GPXWriter
@@ -62,11 +61,6 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
             lastLocation?.let { _tracks.add(Track(it)) }
         }
         this.write()
-    }
-
-    override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-        Log.wtf(__CLASSNAME__, "${getMethodName()}[gps:${gps()}][$locationAvailability][$lastLocation]")
-        super.onLocationAvailability(locationAvailability)
     }
 
     override fun onUnbind(intent: Intent?): Boolean {

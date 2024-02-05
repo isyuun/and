@@ -669,7 +669,7 @@ private fun WalkInfoNavi(
             val mod = Modifier
                 .padding(start = 4.0.dp)
                 .basicMarquee(iterations = Int.MAX_VALUE)
-            val head = if (DEBUG) "${stringResource(id = R.string.app_name)}($satalite): " else ""
+            val head = if (DEBUG) "${stringResource(id = R.string.app_name)}: " else ""
             if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 Row(
                     modifier = Modifier
@@ -705,7 +705,7 @@ private fun WalkInfoNavi(
                             verticalArrangement = Arrangement.spacedBy(spc),
                             horizontalAlignment = Alignment.Start,
                         ) {
-                            val body = stringResource(id = R.string.walk_title_tip)
+                            val body = if (gps == true) stringResource(id = R.string.walk_title_tip) else "${stringResource(id = R.string.walk_text_no_tracking)}($satalite)"
                             Text(
                                 modifier = mod,
                                 text = head + body,
@@ -739,7 +739,7 @@ private fun WalkInfoNavi(
                             verticalArrangement = Arrangement.spacedBy(spc),
                             horizontalAlignment = Alignment.Start,
                         ) {
-                            val body = if (gps == true) stringResource(id = R.string.walk_title_walking) else stringResource(id = R.string.walk_text_no_tracking)
+                            val body = if (gps == true) stringResource(id = R.string.walk_title_walking) else "${stringResource(id = R.string.walk_text_no_tracking)}($satalite)"
                             Text(
                                 modifier = mod,
                                 text = head + body,

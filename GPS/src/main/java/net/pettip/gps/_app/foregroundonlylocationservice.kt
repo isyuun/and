@@ -97,8 +97,7 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         sendBroadcast(intent)
     }
 
-    protected open fun onLocationAvailability(locationAvailability: LocationAvailability) {
-    }
+    protected open fun onLocationAvailability(locationAvailability: LocationAvailability) {}
 
     override fun sendBroadcast(intent: Intent) {
         Log.wtf(__CLASSNAME__, "${getMethodName()}[$intent]")
