@@ -649,6 +649,7 @@ private fun WalkInfoNavi(
         if (application.pets.isNotEmpty()) pet = application.pets[0]
         var duration by remember { mutableStateOf("00:00:00") }
         var distance by remember { mutableStateOf("0.00 km") }
+        var satalite by remember { mutableStateOf("0/0") }
         /** 1초마다 업데이트*/
         LaunchedEffect(start) {
             Log.wtf(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}$start")
@@ -657,18 +658,18 @@ private fun WalkInfoNavi(
                 delay(1000) // 1초마다 업데이트
                 duration = if (application.pause) "${application.duration}" else "${application.__duration}"
                 distance = "${application.distance}"
+                satalite = "${application.sat}"
             }
         }
         Box(
             modifier = Modifier.onGloballyPositioned { onGloballyPositioned(it) }
         ) {
             val spc = 6.0.dp
-            val sat = application.sat
             val gps = application.gps
             val mod = Modifier
                 .padding(start = 4.0.dp)
                 .basicMarquee(iterations = Int.MAX_VALUE)
-            val head = if (DEBUG) "${stringResource(id = R.string.app_name)}($sat): " else ""
+            val head = if (DEBUG) "${stringResource(id = R.string.app_name)}($satalite): " else ""
             if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 Row(
                     modifier = Modifier
