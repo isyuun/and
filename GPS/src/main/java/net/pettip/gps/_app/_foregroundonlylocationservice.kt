@@ -150,9 +150,7 @@ open class _foregroundonlylocationservice : Service() {
     }
 
     internal fun gps(): Boolean {
-        val ret = (numSatsCount > 0)
-        Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[ret:${ret}][sat:${sat()}]")
-        return ret
+        return (numSatsCount > 0)
     }
 
     internal fun moc(loc: Location?): Boolean {
