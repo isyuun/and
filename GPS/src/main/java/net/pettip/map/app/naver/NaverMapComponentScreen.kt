@@ -663,7 +663,7 @@ private fun WalkInfoNavi(
             Log.wtf(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}$start")
             while (true) {
                 //Log.w(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}$start")
-                delay(1000) // 1초마다 업데이트
+                delay(500) // 0.5초마다 업데이트
                 dur = if (application.pause) "${application.duration}" else "${application.__duration}"
                 dis = "${application.distance}"
                 gps = application.gps == true
