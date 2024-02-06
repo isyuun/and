@@ -150,7 +150,7 @@ open class _foregroundonlylocationservice : Service() {
     }
 
     internal fun gps(): Boolean {
-        return (numSatsCount > 0)
+        return (numSatsCount > 15)
     }
 
     internal fun moc(loc: Location?): Boolean {
