@@ -648,23 +648,27 @@ private fun WalkInfoNavi(
             )
         }
         if (application.pets.isNotEmpty()) pet = application.pets[0]
-        var duration by remember { mutableStateOf("00:00:00") }
-        var distance by remember { mutableStateOf("0.00 km") }
-        var satalite by remember { mutableStateOf("0/0") }
-        satalite = "${application.sat}"
+        var dur by remember { mutableStateOf("00:00:00") }
+        var dis by remember { mutableStateOf("0.00 km") }
+        var sat by remember { mutableStateOf("0/0") }
         var gps by remember { mutableStateOf(false) }
-        val head = if (DEBUG) "${stringResource(id = R.string.app_name)}($satalite): " else ""
+        var spd by remember { mutableStateOf("0.0.m/s") }
+        val head = if (DEBUG) "${stringResource(id = R.string.app_name)}[$gps][$sat][$spd.m/s]: " else ""
         var text by remember { mutableStateOf(context.getString(R.string.walk_title_tip)) }
+        sat = "${application.sat}"
+        gps = application.gps == true
+        spd = "${application.spd}"
         /** 1초마다 업데이트*/
         LaunchedEffect(start) {
             Log.wtf(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}$start")
             while (true) {
                 //Log.w(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}$start")
                 delay(1000) // 1초마다 업데이트
-                duration = if (application.pause) "${application.duration}" else "${application.__duration}"
-                distance = "${application.distance}"
-                satalite = "${application.sat}"
+                dur = if (application.pause) "${application.duration}" else "${application.__duration}"
+                dis = "${application.distance}"
                 gps = application.gps == true
+                sat = "${application.sat}"
+                spd = "${application.spd}"
                 val body = if (start) {
                     if (gps == true) context.getString(R.string.walk_title_walking) else "${context.getString(R.string.walk_text_no_tracking)}"
                 } else {
@@ -764,7 +768,7 @@ private fun WalkInfoNavi(
                                 Text(
                                     modifier = Modifier
                                         .weight(1.0f),
-                                    text = duration,
+                                    text = dur,
                                     fontSize = 22.sp,
                                     letterSpacing = (-0.0).sp,
                                     fontWeight = FontWeight.Bold,
@@ -775,7 +779,7 @@ private fun WalkInfoNavi(
                                 Text(
                                     modifier = Modifier
                                         .weight(1.0f),
-                                    text = distance,
+                                    text = dis,
                                     fontSize = 22.sp,
                                     letterSpacing = (-0.0).sp,
                                     fontWeight = FontWeight.Bold,

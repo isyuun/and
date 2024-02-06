@@ -35,7 +35,7 @@ import java.util.Collections
 open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
-    internal fun spd() = lastLocation?.speed
+    internal fun spd() = lastLocation?.speed ?: 0.0
 
     protected fun exit(locationResult: LocationResult): Boolean {
         val size = _tracks.size
