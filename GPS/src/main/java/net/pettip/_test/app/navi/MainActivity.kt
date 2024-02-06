@@ -344,6 +344,8 @@ open class MainActivity : ComponentActivity() {
                 }
             }   //Box2
         }   //Surface
+        var open by remember { mutableStateOf(false) }
+        val color = if (open) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -359,7 +361,8 @@ open class MainActivity : ComponentActivity() {
                 net.pettip.R.string.start
                 FloatingActionButton(
                     onClick = withClick {
-                        containerColor = Color.Red
+                        containerColor = color
+                        open = true
                         application.openMap()
                     },
                     shape = CircleShape,
@@ -383,7 +386,8 @@ open class MainActivity : ComponentActivity() {
                 net.pettip.R.string.stop
                 FloatingActionButton(
                     onClick = withClick {
-                        containerColor = Color.Red
+                        containerColor = color
+                        open = false
                         application.recent()?.let { application.openGpx(it) }
                     },
                     shape = CircleShape,

@@ -274,4 +274,7 @@ open class gpsapplication3 : gpsapplication2(), SharedPreferences.OnSharedPrefer
 
     val sat
         get() = this.service?.sat()
+
+    val spd
+        get() = this.service?.spd()
 }

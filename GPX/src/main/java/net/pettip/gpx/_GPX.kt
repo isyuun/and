@@ -26,8 +26,7 @@ const val GPX_CREATOR = "PetTip"
 const val GPX_NAMESPACE = "http://www.topografix.com/GPX/1/1"
 const val GPX_XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
 
-//val GPX_SIMPLE_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-val GPX_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz", Locale.getDefault())
+val GPX_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault())
 val GPX_TICK_FORMAT = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
 val GPX_DECIMAL_FORMAT_3 = DecimalFormat("0.000")
 val GPX_DECIMAL_FORMAT_7 = DecimalFormat("0.0000000")
