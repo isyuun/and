@@ -652,12 +652,8 @@ private fun WalkInfoNavi(
         var dis by remember { mutableStateOf("0.00 km") }
         var sat by remember { mutableStateOf("0/0") }
         var gps by remember { mutableStateOf(false) }
-        var spd by remember { mutableStateOf("0.0.m/s") }
-        val head = if (DEBUG) "${stringResource(id = R.string.app_name)}[$gps][$sat][$spd.m/s]: " else ""
+        var spd by remember { mutableStateOf("0.0") }
         var text by remember { mutableStateOf(context.getString(R.string.walk_title_tip)) }
-        sat = "${application.sat}"
-        gps = application.gps == true
-        spd = "${application.spd}"
         /** 1초마다 업데이트*/
         LaunchedEffect(start) {
             Log.wtf(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}$start")
@@ -674,6 +670,7 @@ private fun WalkInfoNavi(
                 } else {
                     if (gps == true) context.getString(R.string.walk_title_tip) else "${context.getString(R.string.walk_text_no_tracking)}"
                 }
+                val head = if (DEBUG) "${context.getString(R.string.app_name)}[$gps][$sat][$spd.m/s]: " else ""
                 text = "$head$body"
                 Log.w(__CLASSNAME__, ":;WalkInfoNavi()${getMethodName()}[$start][$gps][$text]")
             }

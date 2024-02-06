@@ -50,7 +50,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         val gps = gps()
         val ret = gps || moc
         val exit = (size > 0 && (!ret || dis < min || dis > max))
-        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:$gps][moc:$moc][exit:$exit][$size][min:${min}m][max:${max}m][dis:${dis}m]\n[loc1:$loc1][spd1:${loc1?.speed}]\n[loc2:$loc2][spd2:${loc2?.speed}]")
+        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:$gps][moc:$moc][exit:$exit][$size][min:${min}m][max:${max}m][dis:${dis}m]\n[loc1:$loc1][spd:${loc1?.speed}]\n[loc2:$loc2][spd:${loc2?.speed}]")
         return exit
     }
 
