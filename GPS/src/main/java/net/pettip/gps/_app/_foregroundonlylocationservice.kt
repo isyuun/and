@@ -25,10 +25,11 @@ import net.pettip.app.Service
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
+const val GPS_MAX_SATELLITES = 20
 const val GPS_RELOAD_MINUTES = 10L
 const val GPS_UPDATE_MIllIS = 1L
 const val GPS_UPDATE_MIN_METERS = 5.0f
-const val GPS_UPDATE_MAX_METERS = 10.0f
+const val GPS_UPDATE_MAX_METERS = 15.0f
 const val GPS_LATITUDE_ZERO = 37.546855      //37.5
 const val GPS_LONGITUDE_ZERO = 127.065330    //127.0
 const val GPS_CAMERA_ZOOM_ZERO = 17.0
@@ -113,29 +114,29 @@ open class _foregroundonlylocationservice : Service() {
         }
         gnssStatusCallback = object : GnssStatus.Callback() {
             override fun onStarted() {
-                Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+                Log.i(__CLASSNAME__, "${getMethodName()}[$this]")
                 super.onStarted()
             }
 
             override fun onStopped() {
-                Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+                Log.i(__CLASSNAME__, "${getMethodName()}[$this]")
                 super.onStopped()
             }
 
             override fun onFirstFix(ttffMillis: Int) {
-                Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+                Log.i(__CLASSNAME__, "${getMethodName()}[$this]")
                 super.onFirstFix(ttffMillis)
             }
 
             override fun onSatelliteStatusChanged(status: GnssStatus) {
-                //Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this][$status]")
+                //Log.i(__CLASSNAME__, "${getMethodName()}[$this][$status]")
                 super.onSatelliteStatusChanged(status)
                 numSatsTotal = status.satelliteCount
                 numSatsCount = 0
                 for (i in 0 until numSatsTotal) {
                     if (status.usedInFix(i)) numSatsCount++
                 }
-                //Log.v(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:${gps()}][sat:${sat()}][sta:$status]")
+                Log.v(__CLASSNAME__, "${getMethodName()}[gps:${gps()}][sat:${sat()}][sta:$status]")
             }
         }
         locationManager.registerGnssStatusCallback(gnssStatusCallback, Handler(Looper.getMainLooper()))
@@ -150,7 +151,7 @@ open class _foregroundonlylocationservice : Service() {
     }
 
     internal fun gps(): Boolean {
-        return (numSatsCount > 0)
+        return (numSatsCount > GPS_MAX_SATELLITES)
     }
 
     internal fun moc(loc: Location?): Boolean {
@@ -166,13 +167,13 @@ open class _foregroundonlylocationservice : Service() {
     protected open fun unit() {}
 
     override fun onCreate() {
-        Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+        Log.i(__CLASSNAME__, "${getMethodName()}[$this]")
         super.onCreate()
         registerGnssStatusCallback()
     }
 
     override fun onDestroy() {
-        Log.i(__CLASSNAME__, "::onLocationResult${getMethodName()}[$this]")
+        Log.i(__CLASSNAME__, "${getMethodName()}[$this]")
         super.onDestroy()
         unregisterGnssStatusCallback()
     }

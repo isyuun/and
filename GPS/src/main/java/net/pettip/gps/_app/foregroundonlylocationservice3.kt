@@ -37,6 +37,10 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
 
     internal fun spd() = lastLocation?.speed ?: 0.0
 
+    private var exit = false
+    private var _exit: Track? = null
+    private val _exits = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
+
     protected fun exit(locationResult: LocationResult): Boolean {
         val size = _tracks.size
         val loc1 = lastLocation
@@ -48,10 +52,10 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         val max = GPS_UPDATE_MAX_METERS
         val moc = moc(loc2)
         val gps = gps()
-        val ret = gps || moc
-        val exit = (size > 0 && (!ret || dis < min || dis > max))
-        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:$gps][moc:$moc][exit:$exit][$size][min:${min}m][max:${max}m][dis:${dis}m][spd1:${trk1?.speed}][spd2:${trk2?.speed}]\n[loc1:$loc1]\n[loc2:$loc2]")
-        return exit
+        val chk = gps || moc
+        val ret = (size > 0 && (!chk || dis < min || dis > max))
+        Log.w(__CLASSNAME__, "::onLocationResult${getMethodName()}[gps:$gps][moc:$moc][exit:$ret][$size][min:${min}m][max:${max}m][dis:${dis}m]\n[loc1:$loc1][spd:${loc1?.speed}]\n[loc2:$loc2][spd:${loc2?.speed}]")
+        return ret
     }
 
     override fun onLocationResult(locationResult: LocationResult) {

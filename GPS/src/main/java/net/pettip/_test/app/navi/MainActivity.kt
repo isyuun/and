@@ -362,7 +362,7 @@ open class MainActivity : ComponentActivity() {
                 FloatingActionButton(
                     onClick = withClick {
                         containerColor = color
-                        open = true
+                        open = !open
                         application.openMap()
                     },
                     shape = CircleShape,
@@ -387,7 +387,7 @@ open class MainActivity : ComponentActivity() {
                 FloatingActionButton(
                     onClick = withClick {
                         containerColor = color
-                        open = false
+                        open = !open
                         application.recent()?.let { application.openGpx(it) }
                     },
                     shape = CircleShape,
