@@ -62,6 +62,7 @@ import net.pettip.app.navi.screens.commuscreen.EventEndDetail
 import net.pettip.app.navi.screens.commuscreen.StoryDetail
 import net.pettip.app.navi.screens.mainscreen.MainScreen
 import net.pettip.app.navi.screens.mainscreen.SettingScreen
+import net.pettip.app.navi.screens.mainscreen.WalkScreenV2
 import net.pettip.app.navi.screens.myscreen.AddPetScreen
 import net.pettip.app.navi.screens.myscreen.InquiryDetail
 import net.pettip.app.navi.screens.myscreen.InviteScreen
@@ -100,6 +101,8 @@ class MainActivity : ComponentActivity() {
 
         val intentData: Uri? = intent.data
         if (intentData != null) {
+            // 초대코드 Uri scheme 으로 들어온 경우
+            // 코드 발라내서 초대코드 등록 페이지로 이동
             val pathSegments: List<String>? = intentData.pathSegments
             val lastPathSegment: String? = pathSegments?.lastOrNull()
 
@@ -114,6 +117,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }else{
+            // 댓글 또는 게시글이 등록된 inetnt
+            // page 참조해서 해당하는 페이지로 이동 ( 현재 story 만 있음 )
             val page = intent?.getStringExtra("page")
             val seqNo = intent?.getStringExtra("seqNo")
             G.pushPage = page
@@ -460,6 +465,9 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
         composable("webViewScreen/{page}", arguments = listOf(navArgument("page") { type = NavType.IntType })){backStackEntry ->
             WebViewScreen(backStackEntry.arguments?.getInt("page")?:1)
         }
+        composable("walkScreenV2"){
+            WalkScreenV2(viewModel = walkViewModel, navController = navController, sharedViewModel = sharedViewModel)
+        }
     }
 
     if (G.dupleLogin) {
@@ -514,6 +522,7 @@ sealed class Screen(val route: String) {
     object WalkScreen : Screen("walkScreen")
     object PwSearchScreen : Screen("pwSearchScreen")
     object WebViewScreen : Screen("webViewScreen")
+    object WalkScreenV2 : Screen("walkScreenV2")
 
 }
 

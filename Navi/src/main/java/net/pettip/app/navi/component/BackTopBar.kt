@@ -16,6 +16,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,13 +31,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
+import net.pettip.app.navi.Screen
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_white
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackTopBar(title: String, navController: NavHostController, backVisible:Boolean=true){
+
+    var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -54,7 +62,11 @@ fun BackTopBar(title: String, navController: NavHostController, backVisible:Bool
                             .size(30.dp)
                             .clip(shape = CircleShape)
                             .clickable {
-                                navController.popBackStack()
+                                val currentTime = System.currentTimeMillis()
+                                if (currentTime - lastClickTime >= 500) {
+                                    lastClickTime = currentTime
+                                    navController.popBackStack()
+                                }
                             }
                             .align(Alignment.CenterStart),
                         contentAlignment = Alignment.Center

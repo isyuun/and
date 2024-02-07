@@ -69,6 +69,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -81,6 +82,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -121,11 +123,13 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
+import net.pettip.app.navi.component.CustomAlert
 import net.pettip.app.navi.component.DclrDialog
 import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.component.LoadingAnimation3
 import net.pettip.app.navi.component.LoadingDialog
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.mainscreen.calculateCurrentOffsetForPage
 import net.pettip.app.navi.screens.mainscreen.metersToKilometers
 import net.pettip.app.navi.screens.myscreen.CustomDialogDelete
@@ -142,7 +146,6 @@ import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.daily.Cmnt
 import net.pettip.data.daily.DailyDetailData
 import net.pettip.singleton.G
-import net.pettip.util.Log
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.absoluteValue
@@ -158,6 +161,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     val replyCmnt by viewModel.replyCmnt.collectAsState()
     val lastSchUnqNo by viewModel.lastPstSn.collectAsState()
 
+    val snackState = remember { SnackbarHostState() }
     val story = storyDetail?.data
     val isWalk = story?.dailyLifeSchSeList?.any{ it.cdId == "001" }
 
@@ -245,18 +249,20 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
         }
     }
 
-    Scaffold (
-        topBar = {BackTopBar(title = stringResource(R.string.title_story), navController = navController)}
-    ){ paddingValues ->
+    if (dclrDialogOpen){
+        DclrDialog(
+            viewModel = viewModel,
+            expanded = expanded,
+            expandChange = {newValue -> expanded = newValue},
+            onDismiss ={newValue -> dclrDialogOpen = newValue},
+            snackState = snackState
+        )
+    }
 
-        if (dclrDialogOpen){
-            DclrDialog(
-                viewModel = viewModel,
-                expanded = expanded,
-                expandChange = {newValue -> expanded = newValue},
-                onDismiss ={newValue -> dclrDialogOpen = newValue}
-            )
-        }
+    Scaffold (
+        topBar = {BackTopBar(title = stringResource(R.string.title_story), navController = navController)},
+        snackbarHost = { Toasty(snackState = snackState) }
+    ){ paddingValues ->
 
         Crossfade(
             targetState = !storyLoading && storyDetail==null,
@@ -275,7 +281,14 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                     ){
                         Spacer(modifier = Modifier.padding(top = 20.dp))
 
-                        StoryDetailTopContent(story,viewModel,navController, modifyChange = {newValue -> isModify = newValue}, dclrDialogOpen = {newValue -> dclrDialogOpen = newValue})
+                        StoryDetailTopContent(
+                            story = story,
+                            viewModel = viewModel,
+                            navcontroller = navController,
+                            modifyChange = {newValue -> isModify = newValue},
+                            dclrDialogOpen = {newValue -> dclrDialogOpen = newValue},
+                            snackState = snackState
+                        )
 
                         Spacer(
                             modifier = Modifier
@@ -653,9 +666,10 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
 fun StoryDetailTopContent(
     story: DailyDetailData?,
     viewModel: CommunityViewModel,
-    navcontroller:NavHostController,
-    modifyChange:(Boolean) ->Unit,
-    dclrDialogOpen:(Boolean) ->Unit
+    navcontroller: NavHostController,
+    modifyChange: (Boolean) -> Unit,
+    dclrDialogOpen: (Boolean) -> Unit,
+    snackState: SnackbarHostState
 ) {
 
     var deleteDialog by remember { mutableStateOf(false) }
@@ -663,6 +677,7 @@ fun StoryDetailTopContent(
     var loading by remember { mutableStateOf(false) }
     var rlsUpdateLoading by remember{ mutableStateOf(false) }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var animatedValue by remember { mutableFloatStateOf(0f) }
     var booleanValue by remember{ mutableStateOf(false) }
@@ -677,13 +692,13 @@ fun StoryDetailTopContent(
         label = "").value
 
     if (deleteDialog){
-        CustomDialogDelete(
+        CustomAlert(
             onDismiss = { newValue -> deleteDialog = newValue },
             confirm = stringResource(id = R.string.delete),
             dismiss = stringResource(id = R.string.cancel_kor),
             title = stringResource(R.string.story_delete),
-            text = stringResource(id = R.string.delete_confirm),
-            valueChange = { newValue -> storyDelete = newValue}
+            text = "글을 삭제하시겠어요?",
+            confirmJob = { storyDelete = true }
         )
     }
 
@@ -703,10 +718,8 @@ fun StoryDetailTopContent(
     LaunchedEffect(key1 = storyDelete){
         if (storyDelete){
             loading = true
-            Log.d("LOG","delete 진입")
             val result = viewModel.updateDaily(delYn = "Y")
             if (!result){
-                Log.d("LOG","결과 진입")
                 loading = false
                 Toast.makeText(context,  R.string.retry, Toast.LENGTH_SHORT).show()
             }else{
@@ -721,8 +734,6 @@ fun StoryDetailTopContent(
                     loading = false
                     navcontroller.popBackStack()
                 }
-
-
             }
         }
         storyDelete = false
@@ -831,14 +842,10 @@ fun StoryDetailTopContent(
                                             val result = viewModel.updateDailyRls("Y")
                                             if (result) {
                                                 rlsUpdateLoading = false
-                                                Toast
-                                                    .makeText(context, R.string.make_public, Toast.LENGTH_SHORT)
-                                                    .show()
+                                                scope.launch { snackState.showSnackbar("공개처리 되었습니다") }
                                             } else {
                                                 rlsUpdateLoading = false
-                                                Toast
-                                                    .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
-                                                    .show()
+                                                scope.launch { snackState.showSnackbar("다시 시도해주세요") }
                                             }
                                         }
                                     }
@@ -882,14 +889,10 @@ fun StoryDetailTopContent(
                                         val result = viewModel.updateDailyRls("N")
                                         if (result) {
                                             rlsUpdateLoading = false
-                                            Toast
-                                                .makeText(context, R.string.make_private, Toast.LENGTH_SHORT)
-                                                .show()
+                                            scope.launch { snackState.showSnackbar("비공개처리 되었습니다") }
                                         } else {
                                             rlsUpdateLoading = false
-                                            Toast
-                                                .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
-                                                .show()
+                                            scope.launch { snackState.showSnackbar("다시 시도해주세요") }
                                         }
                                     }
                                 }
@@ -1237,13 +1240,13 @@ fun CommentListItem(
     }
 
     if (deleteDialog){
-        CustomDialogDelete(
+        CustomAlert(
             onDismiss = { newValue -> deleteDialog = newValue },
             confirm = stringResource(id = R.string.delete),
             dismiss = stringResource(id = R.string.cancel_kor),
             title = stringResource(id = R.string.comment_delete),
             text = stringResource(id = R.string.delete_confirm),
-            valueChange = { newValue -> commentDelete = newValue}
+            confirmJob = { commentDelete = true }
         )
     }
 

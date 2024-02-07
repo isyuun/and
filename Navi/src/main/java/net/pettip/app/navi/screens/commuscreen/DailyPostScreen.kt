@@ -91,9 +91,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -104,8 +101,11 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
+import net.pettip.app.navi.component.CustomAlert
+import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.mainscreen.getFormattedDate
 import net.pettip.app.navi.screens.mainscreen.shadow
 import net.pettip.app.navi.screens.walkscreen.HashTagTransformation
@@ -115,7 +115,6 @@ import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_shadow
@@ -126,6 +125,7 @@ import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.cmm.CdDetail
 import net.pettip.data.pet.CurrentPetData
+import net.pettip.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -143,7 +143,10 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
     }else{
         emptyList<CdDetail>().toMutableList()
     }
-    
+
+    var alertShow by remember{ mutableStateOf(false) }
+    var alertMsg by remember{ mutableStateOf("") }
+
     val state = viewModel.state
     val dummyUri = Uri.parse("")
     var expanded by remember { mutableStateOf(false) }
@@ -184,7 +187,8 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
 
     LaunchedEffect(key1 = state.listOfSelectedImages) {
         if (state.listOfSelectedImages.size > 6) {
-            Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
+            alertMsg = "사진은 5장까지만 등록이 가능해요\n확인해주세요"
+            alertShow = true
         }
     }
 
@@ -200,7 +204,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
         }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackState, Modifier) }
+        snackbarHost = { Toasty(snackState = snackState) }
     ) { paddingValues ->
 
         LoadingDialog(
@@ -208,14 +212,23 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             loadingState = isLoading
         )
 
+        if (alertShow){
+            CustomAlertOneBtn(
+                onDismiss = {alertShow = false},
+                confirm = "확인",
+                title = alertMsg
+            )
+        }
+
         if (showDiagLog) {
-            CustomDialogInPost(
+            CustomAlert(
                 onDismiss = { showDiagLog = false},
-                navController = navController,
-                title =  stringResource(id = R.string.daily_dialog_title),
-                text = stringResource(id = R.string.daily_dialog_text),
-                dismiss = stringResource(id = R.string.daily_dialog_dismiss), confirm = stringResource(id = R.string.daily_dialog_confirm)
-                )
+                confirm = "더 작성",
+                dismiss = stringResource(id = R.string.daily_dialog_dismiss),
+                title =  "작성을 그만하시겠어요?",
+                text = "그만두시면, 작성된 내용은 저장되지 않아요.",
+                dismissJob = { navController.popBackStack() }
+            )
         }
 
 
@@ -598,6 +611,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
             Button(
+                enabled = selectedPet.isNotEmpty() && selectedCategory.isNotEmpty(),
                 onClick = {
                     if (selectedPet.size == 0){
                         Toast.makeText(context, R.string.toast_msg_select_pet, Toast.LENGTH_SHORT).show()
@@ -665,7 +679,10 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                     .height(48.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = design_button_bg,
+                    disabledContainerColor = design_skip
+                )
             )
             {
                 Text(

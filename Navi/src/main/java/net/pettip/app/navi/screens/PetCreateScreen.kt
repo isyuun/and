@@ -59,15 +59,21 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -117,9 +123,12 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
+import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingDialog
+import net.pettip.app.navi.screens.mainscreen.MySelectableDates2
+import net.pettip.app.navi.screens.myscreen.MySelectableDates
 import net.pettip.app.navi.screens.myscreen.integrityCheck
 import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
@@ -141,6 +150,8 @@ import net.pettip.data.SggList
 import net.pettip.data.UmdList
 import net.pettip.data.pet.PetListData
 import net.pettip.singleton.MySharedPreference
+import java.sql.Date
+import java.text.SimpleDateFormat
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -164,26 +175,16 @@ fun PetCreateScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val calendar = Calendar.getInstance()
-    val currentYear = calendar.get(Calendar.YEAR)
-    val currentMonth = calendar.get(Calendar.MONTH) + 1 // Calendar.MONTH는 0부터 시작하므로 1을 더해줍니다.
-    val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
-
-    val year = remember {(1980..2025).map { it.toString() }}
-    val yearPickerState by viewModel.year.collectAsState()
-    val month = remember {(1..12).map { it.toString() }}
-    val monthPickerState by viewModel.month.collectAsState()
-    val day = remember {(1..31).map { it.toString() }}
-    val dayPickerState by viewModel.day.collectAsState()
-
-    var yearIndex by rememberSaveable { mutableIntStateOf(year.indexOf(currentYear.toString())) }
-    var monthIndex by rememberSaveable { mutableIntStateOf(month.indexOf(currentMonth.toString())) }
-    var dayIndex by rememberSaveable { mutableIntStateOf(day.indexOf(currentDay.toString())) }
-
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
-    var expanded by remember { mutableStateOf (false) }
     val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
+
+    // 달력
+    val datePickerState = rememberDatePickerState(selectableDates = MySelectableDates())
+    var openDialog by remember{ mutableStateOf(false) }
+    // 달력
+
+    val alertMsg by viewModel.integrityCheckMsg.collectAsState()
+    var alertShow by remember{ mutableStateOf(false) }
 
     val petDorC by viewModel.petDorC.collectAsState()
     val petKind by viewModel.petKind.collectAsState()
@@ -211,6 +212,15 @@ fun PetCreateScreen(
             BackTopBar(title = stringResource(R.string.enter_pet_info), navController = navController)
         }
     ){ paddingValues ->
+
+        if (alertShow){
+            CustomAlertOneBtn(
+                onDismiss = {alertShow = false},
+                confirm = "확인",
+                title = alertMsg
+            )
+        }
+
         Column (modifier= Modifier
             .fillMaxSize()
             .padding(paddingValues)
@@ -226,6 +236,64 @@ fun PetCreateScreen(
                 loadingText = "로딩중...",
                 loadingState = skipLoading
             )
+
+            if (openDialog) {
+                val confirmEnabled = remember{derivedStateOf { datePickerState.selectedDateMillis != null }}
+                DatePickerDialog(
+                    onDismissRequest = {
+                        focusManager.clearFocus()
+                        openDialog = false
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                val sdfDate = SimpleDateFormat("yyyyMMdd")
+                                val date =  sdfDate.format(Date(datePickerState.selectedDateMillis?:0))
+
+                                viewModel.updatePetBirth(date)
+                                focusManager.moveFocus(FocusDirection.Next)
+                                openDialog = false
+                            },
+                            enabled = confirmEnabled.value
+                        ) {
+                            Text(text = stringResource(R.string.ok), color = design_intro_bg)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                focusManager.clearFocus()
+                                openDialog = false
+                            }
+                        ) {
+                            Text(text = stringResource(R.string.cancel), color = design_intro_bg)
+                        }
+                    },
+                    colors = DatePickerDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.primary
+
+                    )
+                ) {
+                    DatePicker(
+                        state = datePickerState,
+                        colors = DatePickerDefaults.colors(
+                            selectedDayContainerColor = design_intro_bg,
+                            selectedDayContentColor = design_white,
+                            todayDateBorderColor = design_intro_bg,
+                            todayContentColor = design_intro_bg,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                            headlineContentColor = MaterialTheme.colorScheme.onPrimary,
+                            weekdayContentColor = MaterialTheme.colorScheme.onPrimary,
+                            subheadContentColor = MaterialTheme.colorScheme.onPrimary,
+                            navigationContentColor = MaterialTheme.colorScheme.onPrimary,
+                            yearContentColor = MaterialTheme.colorScheme.onPrimary,
+                            dayContentColor = MaterialTheme.colorScheme.onPrimary,
+                            currentYearContentColor = MaterialTheme.colorScheme.onPrimary,
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                }
+            }
 
             Row (horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()){
                 Text(text = stringResource(R.string.skip),
@@ -251,7 +319,7 @@ fun PetCreateScreen(
                                         navController.navigate(Screen.MainScreen.route) {
                                             popUpTo(0)
                                         }
-                                    } else{
+                                    } else {
                                         skipLoading = false
                                     }
                                 } else {
@@ -457,7 +525,7 @@ fun PetCreateScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next),
+                    imeAction = ImeAction.None),
                 modifier = Modifier
                     .padding(start = 20.dp, top = 8.dp, end = 20.dp)
                     .fillMaxWidth()
@@ -487,31 +555,32 @@ fun PetCreateScreen(
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
-            Row (modifier= Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically){
+            Row (
+                modifier= Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ){
                 CustomTextField(
                     enabled = !petBirthUK,
                     readOnly = true,
-                    value = if(!yearPickerState.selectedItem.equals("")){
-                        "${yearPickerState.selectedItem}-${monthPickerState.selectedItem}-${dayPickerState.selectedItem}"
-                    }else{
-                         petBirth
-                         },
+                    value = if (petBirth.matches(Regex("\\d{8}"))) {
+                        "${petBirth.substring(0, 4)}-${petBirth.substring(4, 6)}-${petBirth.substring(6, 8)}"
+                    } else {
+                        petBirth
+                    },
                     onValueChange = {},
                     singleLine = true,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next),
+                        imeAction = ImeAction.Next
+                    ),
                     modifier = Modifier
                         .focusRequester(focusRequester)
                         .weight(1f)
                         .height(48.dp)
                         .onFocusChanged { focusState ->
-                            if (focusState.isFocused) {
-                                keyboardController?.hide()
-                            }
-                            expanded = focusState.isFocused
+                            openDialog = focusState.isFocused
                         },
                     placeholder = { Text(text = stringResource(id = R.string.place_holder_birthday), fontFamily = FontFamily(Font(R.font.pretendard_regular)), fontSize = 14.sp)},
                     colors = OutlinedTextFieldDefaults.colors(
@@ -556,78 +625,77 @@ fun PetCreateScreen(
 
             }
 
-            AnimatedVisibility(
-                visible = expanded
-            ) {
-                Column (
-                    modifier= Modifier
-                        .padding(start = 20.dp, end = 20.dp)
-                ){
-                    Spacer(modifier = Modifier.padding(top=24.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Picker(
-                            state = yearPickerState,
-                            items = year,
-                            visibleItemsCount = 3,
-                            startIndex = yearIndex,
-                            modifier = Modifier.weight(0.3f),
-                            textModifier = Modifier.padding(8.dp),
-                            textStyle = TextStyle(
-                                fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary),
-                            dividerColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Picker(
-                            state = monthPickerState,
-                            items = month,
-                            visibleItemsCount = 3,
-                            startIndex = monthIndex,
-                            modifier = Modifier.weight(0.2f),
-                            textModifier = Modifier.padding(8.dp),
-                            textStyle = TextStyle(
-                                fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary),
-                            dividerColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Picker(
-                            state = dayPickerState,
-                            items = day,
-                            visibleItemsCount = 3,
-                            startIndex = dayIndex,
-                            modifier = Modifier.weight(0.3f),
-                            textModifier = Modifier.padding(8.dp),
-                            textStyle = TextStyle(
-                                fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary),
-                            dividerColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Button(
-                            onClick = {
-                                yearIndex = year.indexOf(yearPickerState.selectedItem)
-                                monthIndex = month.indexOf(monthPickerState.selectedItem)
-                                dayIndex = day.indexOf(dayPickerState.selectedItem)
-
-                                val formYear = String.format("%04d", yearPickerState.selectedItem.toInt())
-                                val formMonth = String.format("%02d", monthPickerState.selectedItem.toInt())
-                                val formDay = String.format("%02d", dayPickerState.selectedItem.toInt())
-                                val formattedDate = "$formYear$formMonth$formDay"
-
-                                viewModel.updatePetBirth(formattedDate)
-                                focusManager.moveFocus(FocusDirection.Next)
-                            },
-                            modifier = Modifier
-                                .padding(start = 8.dp)
-                                .weight(0.2f)
-                                .height(100.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
-                        )
-                        {
-                            Text(text = stringResource(id = R.string.complete_col), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
-                        }
-                    }
-                    Spacer(modifier = Modifier.padding(top=24.dp))
-                }
-            }
-
+            //AnimatedVisibility(
+            //    visible = expanded
+            //) {
+            //    Column (
+            //        modifier= Modifier
+            //            .padding(start = 20.dp, end = 20.dp)
+            //    ){
+            //        Spacer(modifier = Modifier.padding(top=24.dp))
+            //        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            //            Picker(
+            //                state = yearPickerState,
+            //                items = year,
+            //                visibleItemsCount = 3,
+            //                startIndex = yearIndex,
+            //                modifier = Modifier.weight(0.3f),
+            //                textModifier = Modifier.padding(8.dp),
+            //                textStyle = TextStyle(
+            //                    fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary),
+            //                dividerColor = MaterialTheme.colorScheme.onPrimary
+            //            )
+            //            Picker(
+            //                state = monthPickerState,
+            //                items = month,
+            //                visibleItemsCount = 3,
+            //                startIndex = monthIndex,
+            //                modifier = Modifier.weight(0.2f),
+            //                textModifier = Modifier.padding(8.dp),
+            //                textStyle = TextStyle(
+            //                    fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary),
+            //                dividerColor = MaterialTheme.colorScheme.onPrimary
+            //            )
+            //            Picker(
+            //                state = dayPickerState,
+            //                items = day,
+            //                visibleItemsCount = 3,
+            //                startIndex = dayIndex,
+            //                modifier = Modifier.weight(0.3f),
+            //                textModifier = Modifier.padding(8.dp),
+            //                textStyle = TextStyle(
+            //                    fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)), color = MaterialTheme.colorScheme.onPrimary),
+            //                dividerColor = MaterialTheme.colorScheme.onPrimary
+            //            )
+            //            Button(
+            //                onClick = {
+            //                    yearIndex = year.indexOf(yearPickerState.selectedItem)
+            //                    monthIndex = month.indexOf(monthPickerState.selectedItem)
+            //                    dayIndex = day.indexOf(dayPickerState.selectedItem)
+            //
+            //                    val formYear = String.format("%04d", yearPickerState.selectedItem.toInt())
+            //                    val formMonth = String.format("%02d", monthPickerState.selectedItem.toInt())
+            //                    val formDay = String.format("%02d", dayPickerState.selectedItem.toInt())
+            //                    val formattedDate = "$formYear$formMonth$formDay"
+            //
+            //                    viewModel.updatePetBirth(formattedDate)
+            //                    focusManager.moveFocus(FocusDirection.Next)
+            //                },
+            //                modifier = Modifier
+            //                    .padding(start = 8.dp)
+            //                    .weight(0.2f)
+            //                    .height(100.dp),
+            //                shape = RoundedCornerShape(12.dp),
+            //                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            //                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
+            //            )
+            //            {
+            //                Text(text = stringResource(id = R.string.complete_col), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
+            //            }
+            //        }
+            //        Spacer(modifier = Modifier.padding(top=24.dp))
+            //    }
+            //}
 
             Text(text = stringResource(id = R.string.weight), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
@@ -951,6 +1019,8 @@ fun PetCreateScreen(
                             }
 
                             isLoading = false
+                        }else{
+                            alertShow = true
                         }
                     }
                 },
@@ -1117,13 +1187,16 @@ fun PetKindContent(
             }
 
             Button(
+                enabled = selectPet != null,
                 onClick = {
-                    if (selectPet == null){
-                        Toast.makeText(context, R.string.select_pet_kind, Toast.LENGTH_SHORT).show()
-                    }else{
-                        viewModel.updatePetKind(selectPet!!)
-                        navController.popBackStack()
-                    }
+                    //if (selectPet == null){
+                    //    Toast.makeText(context, R.string.select_pet_kind, Toast.LENGTH_SHORT).show()
+                    //}else{
+                    //    viewModel.updatePetKind(selectPet!!)
+                    //    navController.popBackStack()
+                    //}
+                    viewModel.updatePetKind(selectPet!!)
+                    navController.popBackStack()
                 },
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 40.dp)
@@ -1132,7 +1205,11 @@ fun PetKindContent(
                     .height(48.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
+                colors = ButtonDefaults
+                    .buttonColors(
+                        containerColor = design_button_bg,
+                        disabledContainerColor = design_skip
+                    )
             )
             {
                 Text(text = stringResource(R.string.selection_complete), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
@@ -1186,6 +1263,7 @@ fun LocationPickContent(
     val scdList = viewModel.scdList
     val sggList by viewModel.sggList.collectAsState()
     val umdList by viewModel.umdList.collectAsState()
+    val loading by viewModel.addressLoading.collectAsState()
 
     var expanded1 by remember { mutableStateOf (false) }
     var expanded2 by remember { mutableStateOf (false) }
@@ -1428,6 +1506,7 @@ fun LocationPickContent(
             }
 
             Button(
+                enabled = selectSCD != null && selectSGG != null && (umdList.isEmpty() || selectUMD != null) && !loading,
                 onClick = {
                     if (selectSCD == null){
                         Toast.makeText(context, R.string.select_cd, Toast.LENGTH_SHORT).show()
@@ -1454,7 +1533,10 @@ fun LocationPickContent(
                     .padding(horizontal = 20.dp),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = design_button_bg,
+                    disabledContainerColor = design_skip
+                )
             )
             {
                 Text(text = stringResource(id = R.string.selection_complete), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))

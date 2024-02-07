@@ -114,8 +114,10 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
+import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
@@ -145,6 +147,9 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    var alertMsg by remember{ mutableStateOf("") }
+    var alertShow by remember{ mutableStateOf(false) }
 
     var id by remember { mutableStateOf(MySharedPreference.getUserEmail()) }
     var password by remember { mutableStateOf("") }
@@ -187,7 +192,8 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                     viewModel.updateLoginMethod("GOOGLE")
                     navController.navigate(Screen.EasyRegScreen.route)
                 }else{
-                    Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
+                    alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+                    alertShow = true
                 }
             }
 
@@ -243,6 +249,14 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
     Scaffold (
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ){ paddingValues ->
+
+        if (alertShow){
+            CustomAlertOneBtn(
+                onDismiss = {alertShow = false},
+                confirm = "확인",
+                title = alertMsg
+            )
+        }
 
         LoadingDialog(
             loadingText = stringResource(R.string.login_),
@@ -482,10 +496,12 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                 }else{
                                     // 실패시의 상황을 하나로 상정하면 안됨.
                                     // 통신실패의 경우에는 토스트를 띄어 다시시도하기 유도
-                                    Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
+                                    alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+                                    alertShow = true
                                 }
                             }else{
-                                Toast.makeText(context, "Kakao 로그인 실패", Toast.LENGTH_SHORT).show()
+                                alertMsg = "Kakao 로그인에 실패했습니다.\n다시 시도해주세요"
+                                alertShow = true
                             }
                         }
                     },
@@ -562,10 +578,12 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                     viewModel.updateLoginMethod("NAVER")
                                     navController.navigate(Screen.EasyRegScreen.route)
                                 }else{
-                                    Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
+                                    alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+                                    alertShow = true
                                 }
                             }else{
-                                Toast.makeText(context, "Naver 로그인 실패", Toast.LENGTH_SHORT).show()
+                                alertMsg = "Naver 로그인에 실패했습니다.\n다시 시도해주세요"
+                                alertShow = true
                             }
                         }
                     },
@@ -733,6 +751,10 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     val unqId by viewModel.unqId.collectAsState()
     val email by viewModel.email.collectAsState()
     val context = LocalContext.current
+    val snsNickName by viewModel.nickName.collectAsState()
+
+    var alertMsg by remember{ mutableStateOf("") }
+    var alertShow by remember{ mutableStateOf(false) }
 
     //val nickName by viewModel.nickName.collectAsState()
     val nickName by userCreateViewModel.userNickName.collectAsState()
@@ -741,6 +763,12 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     val focusManager = LocalFocusManager.current
     val snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit){
+        if (snsNickName != null){
+            userCreateViewModel.updateUserNickName(snsNickName?:"")
+        }
+    }
 
     LaunchedEffect(key1 = memberCheck, key2 = personCheck, key3 = marketingCheck){
         if (memberCheck && personCheck && marketingCheck && pushCheck && dawnCheck){
@@ -763,8 +791,16 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
         topBar = {
             BackTopBar(title = stringResource(R.string.sign_up_), navController = navController)
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
+        snackbarHost = { Toasty(snackState = snackbarHostState) }
     ) { paddingValues ->
+
+        if (alertShow){
+            CustomAlertOneBtn(
+                onDismiss = {alertShow = false},
+                confirm = "확인",
+                title = alertMsg
+            )
+        }
 
         Box (modifier = Modifier
             .padding(paddingValues)
@@ -980,20 +1016,12 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                                         if (result){
                                             focusManager.clearFocus()
                                             userCreateViewModel.updateUserNickNamePass(nickName)
-                                            snackbarHostState.showSnackbar(
-                                                message = context.getString(R.string.available_nickname),
-                                                actionLabel = context.getString(R.string.confirm),
-                                                duration = SnackbarDuration.Short,
-                                                withDismissAction = false
-                                            )
+                                            alertMsg = "사용하실 수 있는 닉네임입니다"
+                                            alertShow = true
                                         }else{
                                             focusManager.clearFocus()
-                                            snackbarHostState.showSnackbar(
-                                                message = context.getString(R.string.already_use_nickname),
-                                                actionLabel = context.getString(R.string.confirm),
-                                                duration = SnackbarDuration.Short,
-                                                withDismissAction = false
-                                            )
+                                            alertMsg = "닉네임이 중복되지 않게\n다시 입력해주세요"
+                                            alertShow = true
                                         }
                                     }
                                 },
@@ -1022,19 +1050,11 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                         scope.launch {
                             if(memberCheck && personCheck){
                                 if (nickName.isEmpty()) {
-                                    snackbarHostState.showSnackbar(
-                                        message = context.getString(R.string.place_holder_nickname),
-                                        actionLabel = context.getString(R.string.confirm),
-                                        duration = SnackbarDuration.Short,
-                                        withDismissAction = true
-                                    )
+                                    alertMsg = "닉네임을 입력해주세요"
+                                    alertShow = true
                                 } else if ( nickName != nickNamePass ) {
-                                    snackbarHostState.showSnackbar(
-                                        message = context.getString(R.string.check_duplicate_nickname),
-                                        actionLabel = context.getString(R.string.confirm),
-                                        duration = SnackbarDuration.Short,
-                                        withDismissAction = true
-                                    )
+                                    alertMsg = "닉네임 중복확인을 해주세요"
+                                    alertShow = true
                                 }else{
                                     userCreateViewModel.updateUserNickName(nickName)
                                     userCreateViewModel.updateUserID(email)
@@ -1044,7 +1064,8 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                                     navController.navigate(Screen.PetCreateScreen.route)
                                 }
                             }else{
-                                Toast.makeText(context, R.string.please_agree_term, Toast.LENGTH_SHORT).show()
+                                alertMsg = "필수약관에 동의해주세요"
+                                alertShow = true
                             }
                         }
 

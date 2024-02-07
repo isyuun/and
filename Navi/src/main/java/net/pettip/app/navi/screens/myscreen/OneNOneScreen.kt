@@ -73,6 +73,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
+import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.screens.walkscreen.PhotoItem
@@ -103,6 +104,8 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
     val title by settingViewModel.title.collectAsState()
     val inquiryMain by settingViewModel.inquiryMain.collectAsState()
     val isCheck by settingViewModel.isCheck.collectAsState()
+    var alertMsg by remember{ mutableStateOf("") }
+    var alertShow by remember{ mutableStateOf(false) }
 
     val scope= rememberCoroutineScope()
     val context = LocalContext.current
@@ -129,7 +132,8 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
 
     LaunchedEffect(key1 = state.listOfSelectedImages) {
         if (state.listOfSelectedImages.size > 6) {
-            Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
+            alertMsg = "사진은 5장까지만 등록이 가능해요\n확인해주세요"
+            alertShow = true
         }
     }
 
@@ -152,6 +156,14 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
             loadingText = loadingText,
             loadingState = isLoading
         )
+
+        if (alertShow){
+            CustomAlertOneBtn(
+                onDismiss = {alertShow = false},
+                confirm = "확인",
+                title = alertMsg
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -356,15 +368,11 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
             }
 
             Button(
+                enabled = inquiryKind != null && title.isNotBlank() && inquiryMain.isNotBlank() ,
                 onClick = {
-                          if (settingViewModel.inquiryKind.value ==null){
-                              Toast.makeText(context, R.string.select_inquiry_kind, Toast.LENGTH_SHORT).show()
-                          }else if(settingViewModel.title.value == ""){
-                              Toast.makeText(context, R.string.place_holder_title, Toast.LENGTH_SHORT).show()
-                          }else if(settingViewModel.inquiryMain.value ==""){
-                              Toast.makeText(context, R.string.enter_memo, Toast.LENGTH_SHORT).show()
-                          }else if (!settingViewModel.isCheck.value){
-                              Toast.makeText(context, R.string.agree_information_collection, Toast.LENGTH_SHORT).show()
+                          if (!settingViewModel.isCheck.value){
+                              alertMsg = "개인정보 수집 이용에 동의해주세요"
+                              alertShow = true
                           }else{
                               scope.launch {
                                   isLoading = true
@@ -412,7 +420,10 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                     .height(48.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = design_button_bg,
+                    disabledContainerColor = design_skip
+                )
             )
             {
                 Text(text = stringResource(R.string.inquiry_complete), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))

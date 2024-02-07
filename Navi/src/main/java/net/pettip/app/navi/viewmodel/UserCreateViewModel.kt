@@ -67,6 +67,10 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     private val _dm = MutableStateFlow<String>("")
     val dm = _dm.asStateFlow()
 
+    private val _integrityCheckMsg = MutableStateFlow<String>("")
+    val integrityCheckMsg = _integrityCheckMsg.asStateFlow()
+    fun updateIntegrityCheckMsg(newValue: String) { _integrityCheckMsg.value = newValue }
+
     private val _sggList = MutableStateFlow<List<SggList>>(emptyList()) // 시군구
     val sggList: StateFlow<List<SggList>> = _sggList.asStateFlow()
     fun updateSggList(newValue: List<SggList>) { _sggList.value = newValue }
@@ -452,10 +456,16 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
 
     val petCreateSuccess = MutableStateFlow<Boolean>(false)
 
+    private val _addressLoading = MutableStateFlow<Boolean>(false)
+    val addressLoading: StateFlow<Boolean> = _addressLoading.asStateFlow()
+
+
     fun sggListLoad(sidoCd:String){
         val apiService = RetrofitClientServer.instance
 
         val call = apiService.getSggList(sidoCd)
+
+        _addressLoading.value = true
 
         viewModelScope.launch {
             call.enqueue(object: Callback<SggListRes>{
@@ -464,6 +474,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                         val body = response.body()
                         body?.let {
                             _sggList.value = it.data
+                            _addressLoading.value = false
                         }
                     }
                 }
@@ -482,6 +493,8 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
 
         val call = apiService.getUmdList(data)
 
+        _addressLoading.value = true
+
         viewModelScope.launch {
             call.enqueue(object: Callback<UmdListRes>{
                 override fun onResponse(call: Call<UmdListRes>, response: Response<UmdListRes>) {
@@ -489,6 +502,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                         val body = response.body()
                         body?.let {
                             _umdList.value = it.data
+                            _addressLoading.value = false
                         }
                     }
                 }

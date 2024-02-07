@@ -35,7 +35,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Snackbar
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,6 +54,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -96,7 +100,9 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.CircleImageTopBar
+import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.LoadingDialog
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.ui.theme.design_999999
 import net.pettip.app.navi.ui.theme.design_DDDDDD
 import net.pettip.app.navi.ui.theme.design_EFECFE
@@ -128,6 +134,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
         androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val application = GPSApplication.instance
+    val scope = rememberCoroutineScope()
 
     val context = LocalContext.current
     val density = LocalDensity.current.density
@@ -172,7 +179,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
     }
 
     Scaffold (
-        snackbarHost = {SnackbarHost(hostState = snackState, Modifier)}
+        snackbarHost = { Toasty(snackState = snackState) }
     ){ paddingValues ->
 
         LoadingDialog(
@@ -285,7 +292,8 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         onClick = {
                             if (petInfo[0].ownrPetUnqNo!=""){
                                 openBottomSheet = true
-                            } },
+                            }
+                                  },
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.tertiaryContainer
@@ -710,6 +718,9 @@ fun MyBottomSheet(
 
     val scope = rememberCoroutineScope()
 
+    var alertMsg by remember{ mutableStateOf("") }
+    var alertShow by remember{ mutableStateOf(false) }
+
     val sdfDate = SimpleDateFormat("yyyy.MM.dd")
     val formattedDate = sdfDate.format(Date(dateState.selectedDateMillis?:Date().time))
 
@@ -717,6 +728,15 @@ fun MyBottomSheet(
     
     LaunchedEffect(Unit){
         selectedPet.clear()
+        settingViewModel.updateSelectedTime("")
+    }
+
+    if (alertShow){
+        CustomAlertOneBtn(
+            onDismiss = {alertShow = false},
+            confirm = "확인",
+            title = alertMsg
+        )
     }
 
     Column (
@@ -796,10 +816,12 @@ fun MyBottomSheet(
                     )
 
                     Text(
-                        text = "${formattedDate}  " +
-                               if (selectedTime != ""){
-                                   "${if(timeState.hour<10) "0"+timeState.hour else timeState.hour}:${if(timeState.minute<10) "0"+timeState.minute else timeState.minute}"
-                               }else{""},
+                        text =
+                        if (selectedTime == ""){
+                            "날짜를 선택해주세요"
+                        }else{
+                            "$formattedDate ${if(timeState.hour<10) "0"+timeState.hour else timeState.hour}:${if(timeState.minute<10) "0"+timeState.minute else timeState.minute}"
+                        },
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         fontSize = 14.sp, letterSpacing = (-0.7).sp,
                         color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(start = 12.dp)
@@ -847,10 +869,12 @@ fun MyBottomSheet(
                             }
                         }
                     }else{
-                        Toast.makeText(context, context.getString(R.string.select_end_date), Toast.LENGTH_SHORT).show()
+                        alertShow =true
+                        alertMsg = "날짜를 선택해주세요"
                     }
                 }else{
-                    Toast.makeText(context, context.getString(R.string.select_pet_toast), Toast.LENGTH_SHORT).show()
+                    alertShow =true
+                    alertMsg = "펫을 선택해주세요"
                 }
                       },
             modifier = Modifier

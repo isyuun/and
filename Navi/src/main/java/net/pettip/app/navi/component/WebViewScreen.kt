@@ -19,8 +19,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun WebViewScreen(page:Int){
-    val url1 = "http://carepet.hopto.org/terms"
-    val url2 = "http://carepet.hopto.org/privacy_policy"
+    val baseURL = "http://dev.pettip.net/"
+    val url1 = "${baseURL}terms"
+    val url2 = "${baseURL}privacy_policy"
     val url3 = "http://carepet.hopto.org/"
     AndroidView(
         factory = { context ->

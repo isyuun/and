@@ -220,6 +220,7 @@ fun MainScreen(
                                         if (currentPet[0].ownrPetUnqNo==""){
                                             showDialog = true
                                         }else{
+                                            Log.d("LOG", "currentPet:$currentPet")
                                             G.mapPetInfo = currentPet
                                             GPSApplication.instance.openMap()
                                         }
@@ -416,7 +417,8 @@ fun MainScreen(
                         BackTopBar(title = stringResource(R.string.title_mypage), navController = navController, false)
                 }
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.primary
     ) { innerPadding ->
         Box(
             modifier = Modifier.fillMaxSize()
@@ -425,7 +427,9 @@ fun MainScreen(
             NavHost(
                 navController = bottomNavController,
                 startDestination = BottomNav.HomeScreen.route,
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.padding(innerPadding).background(color = MaterialTheme.colorScheme.primary),
+                enterTransition = { fadeIn(tween(700)) },
+                exitTransition = { fadeOut(tween(700)) }
             ) {
                 composable(BottomNav.HomeScreen.route) {
                     HomeScreen(
@@ -531,7 +535,7 @@ fun BottomNavigationComponent(
     val selectedIndex = items.indexOfFirst { screen -> currentDestination?.hierarchy?.any { it.route == screen.route } == true }
 
     BottomNavigation(
-        backgroundColor = MaterialTheme.colorScheme.tertiary,
+        backgroundColor = MaterialTheme.colorScheme.primary,
         elevation = 8.dp,
         modifier = Modifier.height(60.dp)
     ) {
@@ -614,9 +618,4 @@ fun BackOnPressed() {
         }
         backPressedTime = System.currentTimeMillis()
     }
-}
-
-fun clearPushDataFromIntent() {
-    val intent = Intent()
-    intent.data = null
 }

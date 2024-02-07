@@ -82,8 +82,12 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
+import net.pettip.app.navi.component.CustomAlert
+import net.pettip.app.navi.component.CustomAlertOneBtn
+import net.pettip.app.navi.component.CustomDialog
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.ErrorScreen
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.isAlphaNumeric
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
@@ -116,6 +120,9 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
     var pushYnError by remember { mutableStateOf(false) }
     var refresh by remember { mutableStateOf(true) }
+
+    var alertMsg by remember{ mutableStateOf("") }
+    var alertShow by remember{ mutableStateOf(false) }
 
     val defaultCheck by settingViewModel.pushUseYn.collectAsState()
     val marketingCheck by settingViewModel.pushAdUseYn.collectAsState()
@@ -171,17 +178,33 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
     Scaffold(
         topBar = { BackTopBar(title = stringResource(R.string.userinfo_modify), navController = navController) },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { Toasty(snackState = snackbarHostState) }
     ) { paddingValues ->
 
+        if (alertShow){
+            CustomAlertOneBtn(
+                onDismiss = { alertShow = false },
+                confirm = "확인",
+                title = alertMsg
+            )
+        }
+
         if (showDialog) {
-            CustomDialogDelete(
+            //CustomDialogDelete(
+            //    onDismiss = { newValue -> showDialog = newValue },
+            //    confirm = stringResource(R.string.withdraw),
+            //    dismiss = stringResource(R.string.cancel_kor),
+            //    title = stringResource(R.string.member_withdraw),
+            //    text = stringResource(R.string.member_withdraw_confirm),
+            //    valueChange = { newValue -> withDraw = newValue }
+            //)
+            CustomAlert(
                 onDismiss = { newValue -> showDialog = newValue },
                 confirm = stringResource(R.string.withdraw),
                 dismiss = stringResource(R.string.cancel_kor),
-                title = stringResource(R.string.member_withdraw),
-                text = stringResource(R.string.member_withdraw_confirm),
-                valueChange = { newValue -> withDraw = newValue }
+                title = "회원을 탈퇴하시겠어요?",
+                text = "탈퇴하시면, 현재 게시글 및 저장된 데이터가 모두 즉시 삭제되어, 복구가 불가능해요",
+                confirmJob = { withDraw = true }
             )
         }
 
@@ -238,7 +261,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 innerPadding = PaddingValues(start = 16.dp),
                 trailingIcon = {
                     AnimatedVisibility(
-                        visible = nickName.isNotEmpty(),
+                        visible = nickName.isNotEmpty() && nickName != G.userNickName,
                         enter = scaleIn(),
                         exit = scaleOut()
                     ) {
@@ -249,20 +272,12 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                     if (result) {
                                         settingViewModel.updateUserNickNamePass(nickName)
                                         focusManager.clearFocus()
-                                        snackbarHostState.showSnackbar(
-                                            message = context.getString(R.string.available_nickname),
-                                            actionLabel = context.getString(R.string.confirm),
-                                            duration = SnackbarDuration.Short,
-                                            withDismissAction = true
-                                        )
+                                        alertMsg = "사용하실 수 있는 닉네임입니다"
+                                        alertShow = true
                                     } else {
                                         focusManager.clearFocus()
-                                        snackbarHostState.showSnackbar(
-                                            message = context.getString(R.string.already_use_nickname),
-                                            actionLabel = context.getString(R.string.confirm),
-                                            duration = SnackbarDuration.Short,
-                                            withDismissAction = true
-                                        )
+                                        alertMsg = "닉네임이 중복되지 않게\n다시 입력해 주세요"
+                                        alertShow = true
                                     }
                                 }
                             },
@@ -315,7 +330,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(300.dp),
+                            .height(320.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -407,13 +422,11 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                             if (marketingCheck) {
                                                 snackbarHostState.showSnackbar(
                                                     message = "마케팅 및 이벤트 알림 동의",
-                                                    actionLabel = context.getString(R.string.confirm),
                                                     duration = SnackbarDuration.Short
                                                 )
                                             } else {
                                                 snackbarHostState.showSnackbar(
                                                     message = "마케팅 및 이벤트 알림 거절",
-                                                    actionLabel = context.getString(R.string.confirm),
                                                     duration = SnackbarDuration.Short
                                                 )
                                             }
@@ -421,7 +434,6 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                             settingViewModel.updatePushAdUseYn(!newValue)
                                             snackbarHostState.showSnackbar(
                                                 message = "변경에 실패했습니다. 다시 시도해주세요",
-                                                actionLabel = context.getString(R.string.confirm),
                                                 duration = SnackbarDuration.Short
                                             )
                                         }
@@ -526,14 +538,12 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                         if (result) {
                                             if (defaultCheck) {
                                                 snackbarHostState.showSnackbar(
-                                                    message = "푸시가 ",
-                                                    actionLabel = context.getString(R.string.confirm),
+                                                    message = "푸시가 활성화 되었습니다",
                                                     duration = SnackbarDuration.Short
                                                 )
                                             } else {
                                                 snackbarHostState.showSnackbar(
-                                                    message = "푸시 거절",
-                                                    actionLabel = context.getString(R.string.confirm),
+                                                    message = "푸시가 비활성화 되었습니다",
                                                     duration = SnackbarDuration.Short
                                                 )
                                             }
@@ -541,7 +551,6 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                             settingViewModel.updatePushUseYn(!newValue)
                                             snackbarHostState.showSnackbar(
                                                 message = "변경에 실패했습니다. 다시 시도해주세요",
-                                                actionLabel = context.getString(R.string.confirm),
                                                 duration = SnackbarDuration.Short
                                             )
                                         }
@@ -614,14 +623,12 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                         if (result) {
                                             if (dawnCheck) {
                                                 snackbarHostState.showSnackbar(
-                                                    message = "야간 무음 모드 허용",
-                                                    actionLabel = context.getString(R.string.confirm),
+                                                    message = "야간 무음 모드가 활성화 되었습니다",
                                                     duration = SnackbarDuration.Short
                                                 )
                                             } else {
                                                 snackbarHostState.showSnackbar(
-                                                    message = "야간 무음 모드 거절",
-                                                    actionLabel = context.getString(R.string.confirm),
+                                                    message = "야간 무음 모드가 비활성화 되었습니다",
                                                     duration = SnackbarDuration.Short
                                                 )
                                             }
@@ -629,7 +636,6 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                             settingViewModel.updatePushMdnghtUseYn(!newValue)
                                             snackbarHostState.showSnackbar(
                                                 message = "변경에 실패했습니다. 다시 시도해주세요",
-                                                actionLabel = context.getString(R.string.confirm),
                                                 duration = SnackbarDuration.Short
                                             )
                                         }
@@ -805,12 +811,11 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
             //)
 
             Button(
+                enabled = nickName == passedNick,
                 onClick = {
                     scope.launch {
                         focusManager.clearFocus()
-                        if (G.userNickName == nickName) {
-                            Log.d("userInfo", "변경안함")
-                        } else if (nickName != passedNick) {
+                        if (nickName != passedNick) {
                             snackbarHostState.showSnackbar(
                                 message = context.getString(R.string.check_duplicate_nickname),
                                 actionLabel = context.getString(R.string.confirm),
@@ -833,38 +838,38 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                             }
                         }
 
-                        if (userPw == "") {
-                            Log.d("userInfo", "변경x")
-                        } else if (userPw != userPwCheck) {
-                            snackbarHostState.showSnackbar(
-                                message = "비밀번호가 일치하지 않습니다",
-                                actionLabel = "확인",
-                                duration = SnackbarDuration.Short
-                            )
-                        } else if (userPw == userPwCheck) {
-                            if (!isAlphaNumeric(userPw)) {
-                                snackbarHostState.showSnackbar(
-                                    message = "올바른 비밀번호 형식이 아닙니다",
-                                    actionLabel = "확인",
-                                    duration = SnackbarDuration.Short
-                                )
-                            } else {
-                                val result = settingViewModel.resetPw()
-                                if (result) {
-                                    snackbarHostState.showSnackbar(
-                                        message = "비밀번호가 변경되었습니다",
-                                        actionLabel = "확인",
-                                        duration = SnackbarDuration.Short
-                                    )
-                                } else {
-                                    snackbarHostState.showSnackbar(
-                                        message = "비밀번호변경에 실패했습니다",
-                                        actionLabel = "확인",
-                                        duration = SnackbarDuration.Short
-                                    )
-                                }
-                            }
-                        }
+                        //if (userPw == "") {
+                        //    Log.d("userInfo", "변경x")
+                        //} else if (userPw != userPwCheck) {
+                        //    snackbarHostState.showSnackbar(
+                        //        message = "비밀번호가 일치하지 않습니다",
+                        //        actionLabel = "확인",
+                        //        duration = SnackbarDuration.Short
+                        //    )
+                        //} else if (userPw == userPwCheck) {
+                        //    if (!isAlphaNumeric(userPw)) {
+                        //        snackbarHostState.showSnackbar(
+                        //            message = "올바른 비밀번호 형식이 아닙니다",
+                        //            actionLabel = "확인",
+                        //            duration = SnackbarDuration.Short
+                        //        )
+                        //    } else {
+                        //        val result = settingViewModel.resetPw()
+                        //        if (result) {
+                        //            snackbarHostState.showSnackbar(
+                        //                message = "비밀번호가 변경되었습니다",
+                        //                actionLabel = "확인",
+                        //                duration = SnackbarDuration.Short
+                        //            )
+                        //        } else {
+                        //            snackbarHostState.showSnackbar(
+                        //                message = "비밀번호변경에 실패했습니다",
+                        //                actionLabel = "확인",
+                        //                duration = SnackbarDuration.Short
+                        //            )
+                        //        }
+                        //    }
+                        //}
                     }
                 },
                 modifier = Modifier
@@ -873,7 +878,10 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     .height(48.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = design_button_bg,
+                    disabledContainerColor = design_skip
+                )
             )
             {
                 Text(

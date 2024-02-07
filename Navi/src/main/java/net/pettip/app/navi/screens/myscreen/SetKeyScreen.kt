@@ -27,6 +27,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -44,6 +45,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -60,13 +62,14 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
+import net.pettip.app.navi.component.CustomAlertOneBtn
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.ui.theme.design_CBE8F3
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.singleton.MySharedPreference
-import net.pettip.util.Log
 
 @Composable
 fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingViewModel, sharedViewModel: SharedViewModel){
@@ -76,7 +79,11 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
     val dm by settingViewModel.detailMessage.collectAsState()
     val otp by settingViewModel.otpValue.collectAsState()
 
+    var alertMsg by remember{ mutableStateOf("") }
+    var alertShow by remember{ mutableStateOf(false) }
     var sendCode by remember{ mutableStateOf(false) }
+
+    val snackState = remember{SnackbarHostState()}
 
     DisposableEffect(Unit){
         onDispose {
@@ -86,7 +93,8 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
 
     LaunchedEffect(key1 = dm){
         if (!dm.isNullOrEmpty()){
-            Toast.makeText(context, dm, Toast.LENGTH_SHORT).show()
+            alertMsg = dm?:""
+            alertShow = true
             settingViewModel.updateDetailMessage()
         }
     }
@@ -108,8 +116,17 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = stringResource(R.string.invite_code_register), navController = navController) }
+        topBar = { BackTopBar(title = stringResource(R.string.invite_code_register), navController = navController) },
+        snackbarHost = { Toasty(snackState = snackState) }
     ) { paddingValues ->
+        if (alertShow){
+            CustomAlertOneBtn(
+                onDismiss = {alertShow = false},
+                confirm = "확인",
+                title = alertMsg
+            )
+        }
+
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -158,7 +175,8 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
                 SetKeyTemp(
                     settingViewModel = settingViewModel,
                     sharedViewModel = sharedViewModel,
-                    onSendCode = {newValue -> sendCode = newValue}
+                    onSendCode = {newValue -> sendCode = newValue},
+                    snackState = snackState
                 )
 
                 Spacer(modifier = Modifier.padding(top = 40.dp))
@@ -202,14 +220,16 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
 
 @OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
 @Composable
-fun SetKeyTemp(settingViewModel: SettingViewModel, sharedViewModel: SharedViewModel, onSendCode:(Boolean)->Unit){
+fun SetKeyTemp(settingViewModel: SettingViewModel, sharedViewModel: SharedViewModel, onSendCode: (Boolean) -> Unit, snackState: SnackbarHostState){
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
     val inviCode by sharedViewModel.inviteCode.collectAsState()
     val otpValue by settingViewModel.otpValue.collectAsState()
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
+    val focusManager = LocalFocusManager.current
     val inputService = LocalTextInputService.current
 
     LaunchedEffect(Unit){
@@ -272,9 +292,10 @@ fun SetKeyTemp(settingViewModel: SettingViewModel, sharedViewModel: SharedViewMo
                                         if (clipboardText.length == 6) {
                                             settingViewModel.updateOtpValue(clipboardText)
                                         } else {
-                                            Toast
-                                                .makeText(context, R.string.no_copied_invitation_code, Toast.LENGTH_SHORT)
-                                                .show()
+                                            focusManager.clearFocus()
+                                            scope.launch {
+                                                snackState.showSnackbar("복사된 초대 코드가 없습니다")
+                                            }
                                         }
                                     }
                                 },

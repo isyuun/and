@@ -50,6 +50,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -90,6 +91,7 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
 import net.pettip.app.navi.component.ErrorScreen
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_bg
 import net.pettip.app.navi.ui.theme.design_white
@@ -122,6 +124,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
     var refresh by remember { mutableStateOf(false) }
     var curruntImage by remember { mutableIntStateOf(0) }
 
+    val snackState = remember { SnackbarHostState() }
     val pagerState = rememberPagerState(pageCount = { dailyDetail?.dailyLifeFileList?.size ?: 0 })
 
     val annotatedString = buildAnnotatedString {
@@ -186,7 +189,8 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
 
 
     Scaffold(
-        topBar = { BackTopBar(title = dailyDetail?.schTtl ?: "", navController = navController) }
+        topBar = { BackTopBar(title = dailyDetail?.schTtl ?: "", navController = navController) },
+        snackbarHost = { Toasty(snackState = snackState) }
     ) { paddingValue ->
 
         Crossfade(

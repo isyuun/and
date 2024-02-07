@@ -3,10 +3,8 @@ package net.pettip.app.navi.component
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
@@ -17,13 +15,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,6 +31,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -59,19 +56,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
-import net.pettip.app.navi.ui.theme.design_DDDDDD
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_sharp
-import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.data.cmm.CdDetail
-import net.pettip.util.Log
 
 /**
  * @Project     : PetTip-Android
@@ -85,10 +76,11 @@ import net.pettip.util.Log
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DclrDialog(
-    viewModel : CommunityViewModel,
-    expanded : Boolean,
+    viewModel: CommunityViewModel,
+    expanded: Boolean,
     expandChange: (Boolean) -> Unit,
     onDismiss: (Boolean) -> Unit,
+    snackState: SnackbarHostState,
 ){
     val dclrCn by viewModel.dclrCn.collectAsState()
     val dclrList by viewModel.dclrList.collectAsState()
@@ -257,9 +249,7 @@ fun DclrDialog(
                                 enabled = !isLoading
                             ) {
                                 if (selectDclr == null) {
-                                    Toast
-                                        .makeText(context, R.string.select_dclr_reason, Toast.LENGTH_SHORT)
-                                        .show()
+                                    scope.launch { snackState.showSnackbar("test") }
                                 } else if (dclrCn.isNullOrBlank()) {
                                     Toast
                                         .makeText(context, R.string.place_holder_dclrcn, Toast.LENGTH_SHORT)

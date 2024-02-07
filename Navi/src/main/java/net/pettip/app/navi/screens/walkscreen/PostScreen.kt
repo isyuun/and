@@ -151,6 +151,8 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
     val images = application.images
     val pets = application.pets.toList()
 
+    Log.d("LOG",pets.toString())
+
     val walkTitle by viewModel.walkTitle.collectAsState()
     val walkMemo by viewModel.walkMemo.collectAsState()
     val postStory by viewModel.postStory.collectAsState()

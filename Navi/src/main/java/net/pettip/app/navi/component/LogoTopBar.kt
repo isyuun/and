@@ -67,6 +67,7 @@ fun LogoTopBar(
 ) {
 
     val currentPetData by sharedViewModel.currentPetInfo.collectAsState()
+    val toCal by walkViewModel.toMonthCalendar.collectAsState()
 
     TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -101,7 +102,9 @@ fun LogoTopBar(
                         modifier = Modifier
                             .size(30.dp)
                             .clip(shape = CircleShape)
-                            .clickable {
+                            .clickable(
+                                enabled = toCal
+                            ) {
                                 walkViewModel.updateToMonthCalendar(false)
                             }
                             .align(Alignment.CenterStart),

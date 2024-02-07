@@ -52,9 +52,9 @@ class LoginViewModel() : ViewModel() {
     val unqId: StateFlow<String> = _unqId.asStateFlow()
     fun updateUnqId(newValue: String) { _unqId.value = newValue }
 
-    private val _nickName = MutableStateFlow<String>("")
-    val nickName: StateFlow<String> = _nickName.asStateFlow()
-    fun updateNickName(newValue: String) { _nickName.value = newValue }
+    private val _nickName = MutableStateFlow<String?>(null)
+    val nickName: StateFlow<String?> = _nickName.asStateFlow()
+    fun updateNickName(newValue: String?) { _nickName.value = newValue }
 
     private val _loginMethod = MutableStateFlow<String>("")
     val loginMethod: StateFlow<String> = _loginMethod.asStateFlow()
@@ -251,7 +251,7 @@ class LoginViewModel() : ViewModel() {
                         if(user!=null){
                             _email.value = user.kakaoAccount?.email ?: ""
                             _unqId.value = user.id.toString()
-                            _nickName.value = user.kakaoAccount?.profile?.nickname ?: ""
+                            _nickName.value = user.kakaoAccount?.profile?.nickname
 
                             continuation.resume(true)
                         }

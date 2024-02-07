@@ -34,6 +34,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -62,6 +63,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
+import net.pettip.app.navi.component.CustomAlert
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.commuscreen.HtmlText
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_f1f1f1
@@ -82,6 +85,8 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
     var deleteDialog by remember{ mutableStateOf(false) }
     var qnaDelete by remember{ mutableStateOf(false) }
     val context = LocalContext.current
+
+    val snackState = remember{SnackbarHostState()}
 
     val uriList: List<Uri>? = qnaDetail?.data?.get(0)?.files?.map {
         Uri.parse("${qnaDetail?.data?.get(0)?.atchPath}${it.filePathNm}${it.atchFileNm}")
@@ -108,23 +113,25 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                 viewModel.updateQnaListInit(true)
                 navController.popBackStack()
             }else{
-                Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
+                snackState.showSnackbar("다시 시도 해주세요")
+                qnaDelete = false
             }
         }
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = stringResource(R.string.inquiry), navController = navController) }
+        topBar = { BackTopBar(title = stringResource(R.string.inquiry), navController = navController) },
+        snackbarHost = { Toasty(snackState = snackState) }
     ) { paddingValues ->
 
         if (deleteDialog){
-            CustomDialogDelete(
+            CustomAlert(
                 onDismiss = { newValue -> deleteDialog = newValue },
                 confirm = stringResource(id = R.string.delete),
                 dismiss = stringResource(id = R.string.cancel_kor),
                 title = stringResource(R.string.inquiry_delete),
                 text = stringResource(id = R.string.delete_confirm),
-                valueChange = { newValue -> qnaDelete = newValue}
+                confirmJob = { qnaDelete = true }
             )
         }
 

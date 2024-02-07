@@ -7,7 +7,6 @@ package net.pettip.app.navi.screens.mainscreen
 import android.Manifest
 import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
@@ -16,15 +15,12 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,6 +51,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
@@ -81,7 +78,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
@@ -118,8 +114,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
+import net.pettip.app.navi.component.CustomAlert
 import net.pettip.app.navi.component.CustomBottomSheet
-import net.pettip.app.navi.component.CustomDialog
 import net.pettip.app.navi.component.CustomIndicator
 import net.pettip.app.navi.component.LoadingAnimation1
 import net.pettip.app.navi.ui.theme.design_grad_end
@@ -134,11 +130,13 @@ import net.pettip.app.navi.ui.theme.design_shadow
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_weather_1
+import net.pettip.app.navi.ui.theme.design_weather_2
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.HomeViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.daily.RTStoryData
+import net.pettip.data.pet.CurrentPetData
 import net.pettip.data.pet.PetDetailData
 import net.pettip.map.app.naver.ShowDialogRestart
 import net.pettip.singleton.G
@@ -177,7 +175,7 @@ fun HomeScreen(
 
     val selectedPet by sharedViewModel.selectPet.collectAsState()
 
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
         onRefresh = {
@@ -197,6 +195,7 @@ fun HomeScreen(
         0.dp
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = pagerState.currentPage, key2 = currentPetInfo){
         delay(100)
@@ -232,18 +231,14 @@ fun HomeScreen(
         backChange(false)
     }
 
-    AnimatedVisibility(
-        visible = showDialog,
-        enter = scaleIn(tween(durationMillis = 1000)),
-        exit = scaleOut(tween(durationMillis = 1000))
-    ) {
-        CustomDialog(
+    if(showDialog){
+        CustomAlert(
             onDismiss = { newValue -> showDialogChange(newValue) },
-            navController = navController,
             confirm = stringResource(R.string.dialog_regist),
             dismiss = stringResource(R.string.dialog_later),
             title = stringResource(R.string.dialog_any_pet),
-            text = stringResource(R.string.dialog_sub_regist)
+            text = stringResource(R.string.dialog_sub_regist),
+            confirmJob = {navController.navigate(Screen.AddPetScreen.route)}
         )
     }
 
@@ -340,8 +335,6 @@ fun HomeScreen(
         }
         CustomIndicator(state = pullRefreshState, refreshing = refreshing)
     }
-
-
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -589,7 +582,7 @@ fun ProfileContent(
                                     beyondBoundsPageCount = 1,
                                     flingBehavior = PagerDefaults.flingBehavior(
                                         state = pagerState,
-                                        snapVelocityThreshold = 1.dp,
+                                        snapVelocityThreshold = 20.dp,
                                         pagerSnapDistance = PagerSnapDistance.atMost(10)
                                     )
                                 ) { page ->
@@ -613,7 +606,7 @@ fun ProfileContent(
                                         contentAlignment = Alignment.Center
                                     ) {
 
-                                        CircleImageHome(size = 180, imageUri = currentPetInfo[page].petRprsImgAddr, page, pagerState)
+                                        CircleImageHome(size = 180, currentPet = currentPetInfo, page = page, pagerState = pagerState)
                                     }
                                 }
                             }
@@ -1276,15 +1269,15 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
             }
             .clip(RoundedCornerShape(12.dp))
             .background(
-                color = if(petList == selectPet) {
-                   design_select_btn_bg
+                color = if (petList == selectPet) {
+                    design_select_btn_bg
                 } else {
                     MaterialTheme.colorScheme.primary
                 },
                 shape = RoundedCornerShape(12.dp)
             )
             .border(
-                border = if(petList == selectPet) {
+                border = if (petList == selectPet) {
                     BorderStroke(1.dp, color = design_select_btn_text)
                 } else {
                     BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer)
@@ -1612,7 +1605,8 @@ fun BottomInfo(navController: NavHostController){
                 letterSpacing = (-0.6).sp,
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.clickable {
-                    navController.navigate("webViewScreen/3")
+                    //navController.navigate("webViewScreen/3")
+                    navController.navigate(Screen.WalkScreenV2.route)
                 }
             )
         }
@@ -1666,14 +1660,15 @@ fun CircleImage(size: Int, imageUri: String?){
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CircleImageHome(size: Int, imageUri: String?, page: Int, pagerState: PagerState){
+fun CircleImageHome(size: Int, currentPet: List<CurrentPetData>?, page: Int, pagerState: PagerState){
 
     val scope = rememberCoroutineScope()
+    var select by remember{ mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .size(size.dp)
-            .border(shape = CircleShape, border = BorderStroke(5.dp, color = MaterialTheme.colorScheme.tertiary))
+            .border(shape = CircleShape, border = BorderStroke(5.dp, color = if (!select)MaterialTheme.colorScheme.tertiary else design_weather_2))
             .shadow(
                 color = MaterialTheme.colorScheme.onSurface,
                 offsetY = 10.dp,
@@ -1684,17 +1679,19 @@ fun CircleImageHome(size: Int, imageUri: String?, page: Int, pagerState: PagerSt
             )
             .clip(CircleShape)
             .clickable {
-                scope.launch {
-                    pagerState.animateScrollToPage(
-                        page = page,
-                        animationSpec = tween(durationMillis = 600)
-                    )
-                }
+                // TODO: 홈 화면에서 산책할 펫 선택시 변경할 부분
+                //scope.launch {
+                //    pagerState.animateScrollToPage(
+                //        page = page,
+                //        animationSpec = tween(durationMillis = 600)
+                //    )
+                //}
+                select = !select
             }
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUri)
+                .data(currentPet?.get(page)?.petRprsImgAddr)
                 .crossfade(true)
                 .build(),
             contentDescription = "",

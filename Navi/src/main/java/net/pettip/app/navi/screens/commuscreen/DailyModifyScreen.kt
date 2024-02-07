@@ -93,6 +93,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
+import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.screens.mainscreen.getFormattedDate
@@ -150,6 +151,8 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
     val scrollState = rememberScrollState()
 
     var showDiagLog by remember { mutableStateOf(false) }
+    var alertShow by remember{ mutableStateOf(false) }
+    var alertMsg by remember{ mutableStateOf("") }
 
     val snackState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -204,7 +207,8 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
 
     LaunchedEffect(key1 = state.listOfSelectedImages) {
         if (state.listOfSelectedImages.size > 6) {
-            Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
+            alertMsg = "사진은 5장까지만 등록이 가능해요\n확인해주세요"
+            alertShow = true
         }
     }
 
@@ -227,6 +231,14 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             loadingText = stringResource(R.string.daily_uploading),
             loadingState = isLoading
         )
+
+        if (alertShow){
+            CustomAlertOneBtn(
+                onDismiss = {alertShow = false},
+                confirm = "확인",
+                title = alertMsg
+            )
+        }
 
         if (showDiagLog) {
             CustomDialogInPost(

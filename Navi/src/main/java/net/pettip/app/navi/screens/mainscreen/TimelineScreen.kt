@@ -4,6 +4,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.EaseInOutBack
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -244,6 +247,12 @@ fun TimelineScreen(
         previousSelectedPet = selectedPet
     }
 
+    BackHandler(
+        enabled = isSearching
+    ) {
+        dismiss(false)
+    }
+
     Scaffold { paddingValues ->
         if (isLoading){
             Box(modifier = Modifier
@@ -398,8 +407,8 @@ fun TimelineScreen(
 
                 AnimatedVisibility(
                     visible = isSearching,
-                    enter = expandVertically(tween(easing = LinearEasing)) + fadeIn(),
-                    exit = shrinkVertically(tween(easing = LinearEasing)) + fadeOut()
+                    enter = expandVertically(tween(easing = EaseInOutCubic)) + fadeIn(),
+                    exit = shrinkVertically(tween(easing = EaseInOutCubic)) + fadeOut()
                 ) {
                     // 나타나는 Composable
                     Column(
@@ -523,9 +532,9 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .fillMaxWidth()
-            .clickable (
+            .clickable(
                 enabled = timeData.bldYn != "Y"
-            ){
+            ) {
                 val currentTime = System.currentTimeMillis()
                 if (currentTime - lastClickTime >= 300) {
                     lastClickTime = currentTime

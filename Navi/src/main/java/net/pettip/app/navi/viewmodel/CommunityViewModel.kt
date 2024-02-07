@@ -210,15 +210,15 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     // ------------------------------------------------------------------
     private val _selectPetMulti = MutableStateFlow<MutableList<CurrentPetData>>(mutableListOf())
     val selectPetMulti: StateFlow<MutableList<CurrentPetData>> = _selectPetMulti.asStateFlow()
-    fun addSelectPetMulti(newValue: CurrentPetData) { _selectPetMulti.value.add(newValue) }
-    fun subSelectPetMulti(newValue: CurrentPetData) { _selectPetMulti.value.remove(newValue) }
-    fun clearSelectPetMulti() { _selectPetMulti.value.clear() }
+    fun addSelectPetMulti(newValue: CurrentPetData) { _selectPetMulti.value = (_selectPetMulti.value + newValue).toMutableList() } // add로 넣으면 변화가 감지되지않음
+    fun subSelectPetMulti(newValue: CurrentPetData) { _selectPetMulti.value = _selectPetMulti.value.filter { it != newValue }.toMutableList() }
+    fun clearSelectPetMulti() { _selectPetMulti.value = mutableListOf() }
 
     private val _selectCategory = MutableStateFlow<MutableList<CdDetail>>(mutableListOf())
     val selectCategory: StateFlow<MutableList<CdDetail>> = _selectCategory.asStateFlow()
-    fun addSelectCategory(newValue: CdDetail) { _selectCategory.value.add(newValue) }
-    fun subSelectCategory(newValue: CdDetail) { _selectCategory.value.remove(newValue) }
-    fun clearSelectCategory() { _selectCategory.value.clear() }
+    fun addSelectCategory(newValue: CdDetail) { _selectCategory.value = (_selectCategory.value + newValue).toMutableList() }
+    fun subSelectCategory(newValue: CdDetail) { _selectCategory.value = _selectCategory.value.filter { it != newValue }.toMutableList() }
+    fun clearSelectCategory() { _selectCategory.value = mutableListOf() }
 
     private val _walkMemo = MutableStateFlow<String>("")
     val walkMemo: StateFlow<String> = _walkMemo.asStateFlow()
@@ -506,6 +506,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
             }
         } ?: emptyList()) as MutableList<DailyLifeFile>?
     }
+
 
     // 새로 등록된 사진 리스트
     private val _newFileList = MutableStateFlow<List<DailyLifeFile>?>(null)

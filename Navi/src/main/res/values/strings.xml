@@ -180,7 +180,7 @@
     <string name="this_code">"이 코드는 "</string>
     <string name="valid_oneday">1일 동안 유효</string>
     <string name="is_doing">"합니다 "</string>
-    <string name="transfer_code">코드 전송</string>
+    <string name="transfer_code">등록하기</string>
     <string name="edit_inquiry">1:1 문의 수정</string>
     <string name="inquiry_type">문의유형</string>
     <string name="inquiry_type_select">문의유형을 선택해주세요</string>

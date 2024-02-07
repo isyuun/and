@@ -109,6 +109,9 @@ fun ModifyInquiryScreen(
     var isLoading by remember { mutableStateOf(false) }
     var loadingText by remember { mutableStateOf("문의 업로드중..") }
 
+    var alertMsg by remember{ mutableStateOf("") }
+    var alertShow by remember{ mutableStateOf(false) }
+
     val inquiryKindList by settingViewModel.inquiryKindList.collectAsState()
     val inquiryKind by settingViewModel.inquiryKind.collectAsState()
     val title by settingViewModel.title.collectAsState()
@@ -412,27 +415,47 @@ fun ModifyInquiryScreen(
             }
 
             Button(
+                enabled = inquiryKind != null && title.isNotBlank() && inquiryMain.isNotBlank(),
                 onClick = {
                     val localUriList = state.listOfSelectedImages.filter { uri ->
                         uri.scheme != "http" && uri.scheme != "https"
                     }
 
-                    if (settingViewModel.inquiryKind.value ==null){
-                        Toast.makeText(context, R.string.select_inquiry_kind, Toast.LENGTH_SHORT).show()
-                    }else if(settingViewModel.title.value == ""){
-                        Toast.makeText(context, R.string.place_holder_title, Toast.LENGTH_SHORT).show()
-                    }else if(settingViewModel.inquiryMain.value ==""){
-                        Toast.makeText(context, R.string.enter_memo, Toast.LENGTH_SHORT).show()
-                    }else{
-                        scope.launch {
-                            isLoading = true
-                            if(localUriList.size<=1){
-                                val result = settingViewModel.updateQna(modifiedQna!!,viewModel)
+                    //if (settingViewModel.inquiryKind.value ==null){
+                    //    Toast.makeText(context, R.string.select_inquiry_kind, Toast.LENGTH_SHORT).show()
+                    //}else if(settingViewModel.title.value == ""){
+                    //    Toast.makeText(context, R.string.place_holder_title, Toast.LENGTH_SHORT).show()
+                    //}else if(settingViewModel.inquiryMain.value ==""){
+                    //    Toast.makeText(context, R.string.enter_memo, Toast.LENGTH_SHORT).show()
+                    //}else{
+                    //
+                    //}
+
+                    scope.launch {
+                        isLoading = true
+                        if(localUriList.size<=1){
+                            val result = settingViewModel.updateQna(modifiedQna!!,viewModel)
+                            if (result){
+                                isLoading = false
+                                onDismiss(false)
+                            }else{
+                                isLoading=false
+                                snackState.showSnackbar(
+                                    message = context.getString(R.string.inquiry_modify_fail_retry),
+                                    actionLabel = context.getString(R.string.confirm),
+                                    duration = SnackbarDuration.Short,
+                                    withDismissAction = false
+                                )
+                            }
+                        }else{
+                            val photoUpload = settingViewModel.fileUploadModify(context)
+                            if(photoUpload){
+                                val result = settingViewModel.updateQna(modifiedQna!!, viewModel)
                                 if (result){
                                     isLoading = false
                                     onDismiss(false)
                                 }else{
-                                    isLoading=false
+                                    isLoading = false
                                     snackState.showSnackbar(
                                         message = context.getString(R.string.inquiry_modify_fail_retry),
                                         actionLabel = context.getString(R.string.confirm),
@@ -440,32 +463,14 @@ fun ModifyInquiryScreen(
                                         withDismissAction = false
                                     )
                                 }
-
                             }else{
-                                val photoUpload = settingViewModel.fileUploadModify(context)
-                                if(photoUpload){
-                                    val result = settingViewModel.updateQna(modifiedQna!!, viewModel)
-                                    if (result){
-                                        isLoading = false
-                                        onDismiss(false)
-                                    }else{
-                                        isLoading = false
-                                        snackState.showSnackbar(
-                                            message = context.getString(R.string.inquiry_modify_fail_retry),
-                                            actionLabel = context.getString(R.string.confirm),
-                                            duration = SnackbarDuration.Short,
-                                            withDismissAction = false
-                                        )
-                                    }
-                                }else{
-                                    isLoading = false
-                                    snackState.showSnackbar(
-                                        message = context.getString(R.string.upload_photo_fail_retry),
-                                        actionLabel = context.getString(R.string.confirm),
-                                        duration = SnackbarDuration.Short,
-                                        withDismissAction = false
-                                    )
-                                }
+                                isLoading = false
+                                snackState.showSnackbar(
+                                    message = context.getString(R.string.upload_photo_fail_retry),
+                                    actionLabel = context.getString(R.string.confirm),
+                                    duration = SnackbarDuration.Short,
+                                    withDismissAction = false
+                                )
                             }
                         }
                     }
@@ -476,9 +481,11 @@ fun ModifyInquiryScreen(
                     .height(48.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
-            )
-            {
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = design_button_bg,
+                    disabledContainerColor = design_skip
+                )
+            ) {
                 Text(text = stringResource(R.string.edit_inquiry_), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
             }
         }
