@@ -135,9 +135,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                     MySharedPreference.setIsLogin(false)
 
                     snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.withdraw_success),
-                        actionLabel = context.getString(R.string.confirm),
-                        duration = SnackbarDuration.Short
+                        message = context.getString(R.string.withdraw_success)
                     )
 
                     navController.navigate(Screen.Login.route) {
@@ -147,9 +145,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
                 } else {
                     snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.withdraw_fail),
-                        actionLabel = context.getString(R.string.confirm),
-                        duration = SnackbarDuration.Short
+                        message = context.getString(R.string.withdraw_fail)
                     )
                 }
                 withDraw = false
@@ -798,23 +794,17 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                         focusManager.clearFocus()
                         if (nickName != passedNick) {
                             snackbarHostState.showSnackbar(
-                                message = context.getString(R.string.check_duplicate_nickname),
-                                actionLabel = context.getString(R.string.confirm),
-                                duration = SnackbarDuration.Short
+                                message = context.getString(R.string.check_duplicate_nickname)
                             )
                         } else {
                             val result = settingViewModel.resetNickName()
                             if (result) {
                                 snackbarHostState.showSnackbar(
-                                    message = context.getString(R.string.change_nickname),
-                                    actionLabel = context.getString(R.string.confirm),
-                                    duration = SnackbarDuration.Short
+                                    message = context.getString(R.string.change_nickname)
                                 )
                             } else {
                                 snackbarHostState.showSnackbar(
-                                    message = context.getString(R.string.change_nickname_fail),
-                                    actionLabel = context.getString(R.string.confirm),
-                                    duration = SnackbarDuration.Short
+                                    message = context.getString(R.string.change_nickname_fail)
                                 )
                             }
                         }
