@@ -41,7 +41,9 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import com.kakao.sdk.common.util.Utility
 import kotlinx.coroutines.delay
+import net.pettip.BuildConfig
 import net.pettip.app.navi.component.WebViewScreen
 import net.pettip.app.navi.screens.EasyRegScreen
 import net.pettip.app.navi.screens.IdFindScreen
@@ -84,8 +86,10 @@ import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.UserCreateViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.SCDLocalData
+import net.pettip.map.app.naver.ShowDialogRestart
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
+import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 
 class MainActivity : ComponentActivity() {
@@ -264,7 +268,7 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
             route = "intro",
             deepLinks = listOf(
                 navDeepLink {
-                    uriPattern = "http://carepet.hopto.org"
+                    uriPattern = "http://pettip.net"
                     action = Intent.ACTION_VIEW
                 }
             )

@@ -62,7 +62,7 @@ data class BbsData(
     @SerializedName("relPstSn")
     var relPstSn: Int?, // 0
     @SerializedName("rprsImgUrl")
-    var rprsImgUrl: String?, // http://carepet.hopto.org/img/bbs/event/atch/20231122/f14992aba44f46938d4b231be0b75bc0.JPG
+    var rprsImgUrl: String?,
     @SerializedName("upPstNo")
     var upPstNo: Int?, // 0
     @SerializedName("userId")
@@ -100,7 +100,7 @@ data class BbsCmnt(
     @SerializedName("nrcmdtnCnt")
     var nrcmdtnCnt: Int?, // 0
     @SerializedName("petImgUrl")
-    var petImgUrl: String?, // http://carepet.hopto.org/img/mypet/20231122/a92cc210042e49d3bd827655814b5060.JPG
+    var petImgUrl: String?,
     @SerializedName("petNm")
     var petNm: String?, // 수정
     @SerializedName("prvtYn")

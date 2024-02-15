@@ -31,5 +31,5 @@ data class BbsAncmntWinner(
     @SerializedName("pstgEndDt")
     var pstgEndDt: String, // 2023-11-30
     @SerializedName("rprsImgUrl")
-    var rprsImgUrl: String? // http://carepet.hopto.org/img/bbs/event/atch/20231109/0c3092f96cf748bcb621e1d0296489c3.JPG
+    var rprsImgUrl: String?
 )

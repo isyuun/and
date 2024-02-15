@@ -59,7 +59,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="carepet.hopto.org"
+                    android:host="pettip.net"
                     android:scheme="http" />
             </intent-filter>
             <intent-filter>
@@ -67,7 +67,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="carepet.hopto.org"
+                    android:host="pettip.net"
                     android:scheme="https" />
             </intent-filter>
             <intent-filter>
@@ -75,7 +75,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="carepet.hopto.org"
+                    android:host="pettip.net"
                     android:scheme="pettip" />
             </intent-filter>
 

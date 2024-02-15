@@ -50,7 +50,7 @@ data class Story(
     @SerializedName("schUnqNo")
     var schUnqNo: Int, // 7
     @SerializedName("storyFile")
-    var storyFile: String?, // http://carepet.hopto.org/img/dailyLife/20230920/ca3eb4c310094ceb98266afdc570b171.JPG
+    var storyFile: String?, //
     @SerializedName("bldYn")
     var bldYn: String, // Y
 )

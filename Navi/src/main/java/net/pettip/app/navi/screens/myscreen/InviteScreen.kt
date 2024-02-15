@@ -182,7 +182,7 @@ fun InviteScreen(navController: NavHostController, settingViewModel: SettingView
                     colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
                 )
                 {
-                    Text(text = stringResource(R.string.transfer_code),
+                    Text(text = "공유하기",
                         color = design_white, fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp
@@ -204,7 +204,7 @@ private fun share(context: Context, inviteCode:String, selectPet:List<PetDetailD
         val inviteString =
             "${G.userNickName}님이 Pet Tip으로 초대했어요!" +
                     "\n${formattedString} 관리에 동참하시겠어요?"+
-                    "\n초대코드등록란에 [${inviteCode}]를 입력해주세요. \n carepet.hopto.org/kakao/${inviteCode} "
+                    "\n초대코드등록란에 [${inviteCode}]를 입력해주세요. \n pettip.net/kakao/${inviteCode} "
         putExtra(Intent.EXTRA_TEXT, inviteString)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         type = "text/plain"

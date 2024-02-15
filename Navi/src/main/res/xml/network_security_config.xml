@@ -6,6 +6,6 @@
         </trust-anchors>
     </base-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">carepet.hopto.org</domain>
+        <domain includeSubdomains="true">pettip.net</domain>
     </domain-config>
 </network-security-config>

@@ -26,5 +26,5 @@ data class RTStoryData(
     @SerializedName("schUnqNo")
     var schUnqNo: Int, // 173
     @SerializedName("storyFile")
-    var storyFile: String? // http://carepet.hopto.org/img/dailyLife/20231107/1eedc670dbaa46b2909c78dd6f680974.JPG
+    var storyFile: String? //
 )

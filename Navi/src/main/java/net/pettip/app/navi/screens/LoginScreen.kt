@@ -120,6 +120,7 @@ import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.LoginViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.UserCreateViewModel
+import net.pettip.singleton.BASE_URL
 import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 
@@ -1152,9 +1153,8 @@ fun AgreeComponent(
                     .height(500.dp)
                     .verticalScroll(rememberScrollState())
             ){
-                val url1 = "http://carepet.hopto.org/terms"
-                val url2 = "http://carepet.hopto.org/privacy_policy"
-                val url3 = "http://carepet.hopto.org/"
+                val url1 = "${BASE_URL}/terms"
+                val url2 = "${BASE_URL}/privacy_policy"
                 AndroidView(
                     factory = { context ->
                         WebView(context).apply {
@@ -1175,7 +1175,6 @@ fun AgreeComponent(
                         when(page){
                             1 -> webView.loadUrl(url1)
                             2 -> webView.loadUrl(url2)
-                            3 -> webView.loadUrl(url3)
                         }
                     }
                 )

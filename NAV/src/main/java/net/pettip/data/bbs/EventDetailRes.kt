@@ -16,7 +16,7 @@ data class EventDetailRes(
 
 data class EventDetailData(
     @SerializedName("pstCn")
-    var pstCn: String, // ![](http://carepet.hopto.org/img/bbs/img/20231019/642c9f02735e464d9e1f8a195dedf461.JPG)
+    var pstCn: String, //
     @SerializedName("pstSn")
     var pstSn: Int, // 89
     @SerializedName("pstTtl")
@@ -24,7 +24,7 @@ data class EventDetailData(
     @SerializedName("rcmdtnSeCd")
     var rcmdtnSeCd: String?,
     @SerializedName("rprsImgUrl")
-    var rprsImgUrl: String?, // http://carepet.hopto.org/img/bbs/img/20231019/642c9f02735e464d9e1f8a195dedf461.JPG
+    var rprsImgUrl: String?,
     @SerializedName("bbsCmnts")
     var bbsCmnts: List<BbsCmnt>?
 )

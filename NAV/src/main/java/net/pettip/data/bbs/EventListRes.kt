@@ -31,5 +31,5 @@ data class BbsEvnt(
     @SerializedName("pstgEndDt")
     var pstgEndDt: String?, // 2023-10-31 17:01:00
     @SerializedName("rprsImgUrl")
-    var rprsImgUrl: String? // http://carepet.hopto.org/img/bbs/img/20231019/642c9f02735e464d9e1f8a195dedf461.JPG
+    var rprsImgUrl: String? //
 )

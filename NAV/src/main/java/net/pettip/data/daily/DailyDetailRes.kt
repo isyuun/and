@@ -16,7 +16,7 @@ data class DailyDetailRes(
 
 data class DailyDetailData(
     @SerializedName("atchPath")
-    var atchPath: String, // http://carepet.hopto.org/img
+    var atchPath: String, //
     @SerializedName("cmntCnt")
     var cmntCnt: Int, // 0
     @SerializedName("cmntList")

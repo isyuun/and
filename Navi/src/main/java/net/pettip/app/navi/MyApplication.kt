@@ -1,7 +1,8 @@
 package net.pettip.app.navi
 
-import com.kakao.sdk.common.KakaoSdk
 import net.pettip.util.Log
+import com.kakao.sdk.common.KakaoSdk
+import com.kakao.sdk.common.util.Utility
 
 class MyApplication : net.pettip.map.app.MapApplication() {
     override fun onCreate() {
