@@ -1153,8 +1153,8 @@ fun AgreeComponent(
                     .height(500.dp)
                     .verticalScroll(rememberScrollState())
             ){
-                val url1 = "${BASE_URL}/terms"
-                val url2 = "${BASE_URL}/privacy_policy"
+                val url1 = "${BASE_URL}terms"
+                val url2 = "${BASE_URL}privacy_policy"
                 AndroidView(
                     factory = { context ->
                         WebView(context).apply {
