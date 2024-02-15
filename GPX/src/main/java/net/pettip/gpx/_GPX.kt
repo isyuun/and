@@ -28,6 +28,7 @@ const val GPX_XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"
 
 val GPX_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault())
 val GPX_TICK_FORMAT = SimpleDateFormat("yyyyMMdd.HHmmss", Locale.getDefault())
+val GPX_DECIMAL_FORMAT_1 = DecimalFormat("0.0")
 val GPX_DECIMAL_FORMAT_3 = DecimalFormat("0.000")
 val GPX_DECIMAL_FORMAT_7 = DecimalFormat("0.0000000")
 
@@ -72,6 +73,7 @@ const val TAG_DOMAIN = "domain"
 // extensions-related tags
 const val TAG_EXTENSIONS = "extensions"
 const val TAG_SPEED = "speed"
+const val TAG_BEARING = "bearing"
 
 val namespace: String? = null
 

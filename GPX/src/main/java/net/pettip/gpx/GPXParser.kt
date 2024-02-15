@@ -123,6 +123,7 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
         val event = Track.EVENT.valueOf(parser.getAttributeValue(namespace, "event").uppercase())
         var time = 0L
         var speed = 0.0f
+        var bearing = 0.0f
         var ele = 0.0
         var uri = ""
         while (loopMustContinue(parser.next())) {
@@ -134,6 +135,7 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
                 TAG_TIME -> time = parseDateTime(text)
                 TAG_SPEED -> speed = if (text.isNotEmpty()) text.toFloat() else 0.0f
                 TAG_ELEVATION -> ele = if (text.isNotEmpty()) text.toDouble() else 0.0
+                TAG_BEARING -> bearing = if (text.isNotEmpty()) text.toFloat() else 0.0f
                 TAG_URI -> uri = text
             }
         }
@@ -143,6 +145,7 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
         loc.time = time
         loc.speed = speed
         loc.altitude = ele
+        loc.bearing = bearing
         val track = Track(loc = loc, no = no, event = event, uri = Uri.parse(uri))
         //println("read() [${GPX_DATE_FORMAT.format(time)}][$track]")
         tracks.add(track)

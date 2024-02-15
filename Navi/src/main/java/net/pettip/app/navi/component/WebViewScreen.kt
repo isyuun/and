@@ -6,6 +6,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
+import net.pettip.singleton.BASE_URL
 
 /**
  * @Project     : PetTip-Android
@@ -17,11 +18,9 @@ import androidx.compose.ui.viewinterop.AndroidView
  */
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebViewScreen(page:Int){
-    val baseURL = "http://dev.pettip.net/"
-    val url1 = "${baseURL}terms"
-    val url2 = "${baseURL}privacy_policy"
-    val url3 = "http://carepet.hopto.org/"
+fun WebViewScreen(page:Int) {
+    val url1 = "${BASE_URL}terms"
+    val url2 = "${BASE_URL}privacy_policy"
     AndroidView(
         factory = { context ->
             WebView(context).apply {
@@ -42,7 +41,6 @@ fun WebViewScreen(page:Int){
             when(page){
                 1 -> webView.loadUrl(url1)
                 2 -> webView.loadUrl(url2)
-                3 -> webView.loadUrl(url3)
             }
         }
     )

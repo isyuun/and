@@ -99,4 +99,7 @@ data class Track(
 
     val altitude: Double
         get() = loc.altitude
+
+    val bearing: Float
+        get() = loc.bearing
 }

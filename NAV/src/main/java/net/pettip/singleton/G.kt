@@ -4,6 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import net.pettip.data.pet.CurrentPetData
+//const val BASE_URL = "http://carepet.hopto.org/'
+//const val BASE_URL = "http://dev.pettip.net:8020/"
+const val BASE_URL = "https://pettip.net/"
 
 object G {
     var userName: String = ""
