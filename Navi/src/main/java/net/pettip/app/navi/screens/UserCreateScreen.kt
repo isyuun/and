@@ -8,7 +8,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -39,9 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -60,14 +56,9 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomTextField
-import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_sharp
-import net.pettip.app.navi.ui.theme.design_textFieldOutLine
-import net.pettip.app.navi.ui.theme.design_weather_4
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.UserCreateViewModel
 

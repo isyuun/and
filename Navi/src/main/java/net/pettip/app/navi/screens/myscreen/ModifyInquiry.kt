@@ -2,7 +2,6 @@ package net.pettip.app.navi.screens.myscreen
 
 import android.net.Uri
 import android.os.Build
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -64,7 +63,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -85,12 +83,8 @@ import net.pettip.app.navi.screens.commuscreen.PhotoItemInModify
 import net.pettip.app.navi.screens.walkscreen.PlusBox
 import net.pettip.app.navi.ui.theme.design_999EA9
 import net.pettip.app.navi.ui.theme.design_button_bg
-import net.pettip.app.navi.ui.theme.design_f1f1f1
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_select_btn_text
-import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel

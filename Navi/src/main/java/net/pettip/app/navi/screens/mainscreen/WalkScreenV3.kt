@@ -46,25 +46,11 @@ import androidx.wear.compose.material.Scaffold
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.screens.myscreen.MySelectableDates
-import net.pettip.app.navi.ui.theme.design_002D83
 import net.pettip.app.navi.ui.theme.design_4783F5
-import net.pettip.app.navi.ui.theme.design_666666
-import net.pettip.app.navi.ui.theme.design_777777
-import net.pettip.app.navi.ui.theme.design_999EA9
-import net.pettip.app.navi.ui.theme.design_ACC1E9
-import net.pettip.app.navi.ui.theme.design_B4CDFF
-import net.pettip.app.navi.ui.theme.design_DEDEDE
-import net.pettip.app.navi.ui.theme.design_FFF2EB
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_shadow
-import net.pettip.app.navi.ui.theme.design_sharp
-import net.pettip.app.navi.ui.theme.design_skip
-import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
-import net.pettip.data.pet.CurrentPetData
 import net.pettip.util.Log
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -73,7 +59,6 @@ import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlin.math.roundToInt
 
 /**
  * @Project     : PetTip-Android

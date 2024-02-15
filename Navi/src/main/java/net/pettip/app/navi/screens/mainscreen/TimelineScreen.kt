@@ -4,10 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.EaseInOutBack
 import androidx.compose.animation.core.EaseInOutCubic
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -46,10 +43,8 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -65,21 +60,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -100,28 +90,22 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.CircleImageTopBar
 import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
-import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_shadow
-import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
-import net.pettip.app.navi.viewmodel.getLastSegmentAfterSlash
 import net.pettip.data.daily.LifeTimeLineItem
 import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.G
-import net.pettip.util.Log
-import org.apache.commons.lang3.mutable.Mutable
 
 /**
  * @Project     : PetTip-Android

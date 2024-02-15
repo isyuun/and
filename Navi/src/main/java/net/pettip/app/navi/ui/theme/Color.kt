@@ -1,5 +1,4 @@
 package net.pettip.app.navi.ui.theme
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.Color
 
 //---------------------------------------------------------------------------//

@@ -44,7 +44,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
@@ -90,7 +89,6 @@ import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.DailyLifeWalk
 import net.pettip.data.daily.Day
 import net.pettip.singleton.G
-import net.pettip.util.Log
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields

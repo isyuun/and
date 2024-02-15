@@ -132,7 +132,6 @@ import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.mainscreen.calculateCurrentOffsetForPage
 import net.pettip.app.navi.screens.mainscreen.metersToKilometers
-import net.pettip.app.navi.screens.myscreen.CustomDialogDelete
 import net.pettip.app.navi.screens.walkscreen.FullScreenImage
 import net.pettip.app.navi.ui.theme.design_DDDDDD
 import net.pettip.app.navi.ui.theme.design_intro_bg

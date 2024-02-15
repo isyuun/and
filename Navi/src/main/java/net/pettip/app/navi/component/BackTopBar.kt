@@ -23,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -31,11 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
-import net.pettip.app.navi.Screen
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_white
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

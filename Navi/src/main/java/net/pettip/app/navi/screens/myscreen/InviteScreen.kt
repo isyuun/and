@@ -46,11 +46,8 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.ui.theme.design_FCE9B3
 import net.pettip.app.navi.ui.theme.design_button_bg
-import net.pettip.app.navi.ui.theme.design_login_bg
-import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_sharp
-import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.data.pet.PetDetailData

@@ -1,7 +1,6 @@
 package net.pettip.app.navi.screens.myscreen
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -29,7 +28,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -67,10 +65,6 @@ import net.pettip.app.navi.component.CustomAlert
 import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.commuscreen.HtmlText
 import net.pettip.app.navi.ui.theme.design_button_bg
-import net.pettip.app.navi.ui.theme.design_f1f1f1
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_skip
-import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SettingViewModel

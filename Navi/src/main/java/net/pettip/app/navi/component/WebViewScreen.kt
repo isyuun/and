@@ -2,7 +2,6 @@ package net.pettip.app.navi.component
 
 import android.annotation.SuppressLint
 import android.view.ViewGroup
-import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable

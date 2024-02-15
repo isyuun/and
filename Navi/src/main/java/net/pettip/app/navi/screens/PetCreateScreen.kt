@@ -4,12 +4,9 @@
 
 package net.pettip.app.navi.screens
 
-import net.pettip.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -76,11 +73,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -103,7 +98,6 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -126,24 +120,16 @@ import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
-import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.component.Toasty
-import net.pettip.app.navi.screens.mainscreen.MySelectableDates2
 import net.pettip.app.navi.screens.myscreen.MySelectableDates
 import net.pettip.app.navi.screens.myscreen.integrityCheck
 import net.pettip.app.navi.ui.theme.design_999EA9
-import net.pettip.app.navi.ui.theme.design_DEDEDE
-import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_camera_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_text
-import net.pettip.app.navi.ui.theme.design_shadow
-import net.pettip.app.navi.ui.theme.design_sharp
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
@@ -157,7 +143,6 @@ import net.pettip.data.pet.PetListData
 import net.pettip.singleton.MySharedPreference
 import java.sql.Date
 import java.text.SimpleDateFormat
-import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1139,7 +1124,7 @@ fun PetKindContent(
                     shape = RoundedCornerShape(12.dp),
                     innerPadding = PaddingValues(start=16.dp),
                     trailingIcon = {
-                        Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary)
+                        Icon(painter = painterResource(id = R.drawable.icon_search), contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary)
                     }
                 )
 

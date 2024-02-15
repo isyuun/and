@@ -56,7 +56,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -119,14 +118,12 @@ import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_shadow
-import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.cmm.CdDetail
 import net.pettip.data.pet.CurrentPetData
-import net.pettip.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

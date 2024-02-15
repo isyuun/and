@@ -17,7 +17,6 @@ import net.pettip.data.daily.WeekData
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.RetrofitClientServer
-import net.pettip.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

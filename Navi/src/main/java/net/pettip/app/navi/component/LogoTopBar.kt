@@ -4,7 +4,6 @@
 
 package net.pettip.app.navi.component
 
-import net.pettip.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -48,8 +47,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import net.pettip.app.navi.R
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.pet.CurrentPetData

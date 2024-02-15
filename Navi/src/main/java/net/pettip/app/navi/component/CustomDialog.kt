@@ -17,7 +17,6 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_white
 
 @Composable

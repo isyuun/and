@@ -1,7 +1,6 @@
 package net.pettip.app.navi.viewmodel
 
 import android.os.Bundle
-import net.pettip.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +19,7 @@ import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import net.pettip.singleton.RetrofitClientServer
+import net.pettip.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

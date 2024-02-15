@@ -25,11 +25,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.NavHostController
 import net.pettip.app.navi.R
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_white
-import net.pettip.util.Log
 
 /**
  * @Project     : PetTip-Android

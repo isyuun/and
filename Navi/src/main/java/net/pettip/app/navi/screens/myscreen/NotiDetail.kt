@@ -27,10 +27,6 @@ import androidx.navigation.NavHostController
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.screens.commuscreen.HtmlText
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_skip
-import net.pettip.app.navi.ui.theme.design_textFieldOutLine
-import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

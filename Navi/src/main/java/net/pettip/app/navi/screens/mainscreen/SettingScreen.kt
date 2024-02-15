@@ -1,7 +1,6 @@
 package net.pettip.app.navi.screens.mainscreen
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
@@ -54,7 +53,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -65,7 +63,6 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
@@ -73,13 +70,10 @@ import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomIndicator
 import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingAnimation1
-import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
-import net.pettip.app.navi.ui.theme.design_f1f1f1
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_bg
 import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
@@ -87,7 +81,6 @@ import net.pettip.data.bbs.BbsNtc
 import net.pettip.data.bbs.BbsQna
 import net.pettip.data.user.BbsFaq
 import net.pettip.singleton.G
-import net.pettip.util.Log
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable

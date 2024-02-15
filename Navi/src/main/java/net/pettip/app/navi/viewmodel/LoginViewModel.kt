@@ -2,7 +2,6 @@ package net.pettip.app.navi.viewmodel
 
 import android.content.Context
 import android.os.Build
-import net.pettip.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.tasks.OnCompleteListener
@@ -26,6 +25,7 @@ import net.pettip.data.user.TrmnlMngReq
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import net.pettip.singleton.RetrofitClientServer
+import net.pettip.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
