@@ -78,6 +78,7 @@ import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.screens.walkscreen.PhotoItem
 import net.pettip.app.navi.screens.walkscreen.PlusBox
+import net.pettip.app.navi.ui.theme.design_999EA9
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_f1f1f1
 import net.pettip.app.navi.ui.theme.design_intro_bg
@@ -417,12 +418,12 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                 modifier = Modifier
                     .padding(top = 20.dp, bottom = 20.dp)
                     .fillMaxWidth()
-                    .height(48.dp)
+                    .height(56.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = design_button_bg,
-                    disabledContainerColor = design_skip
+                    disabledContainerColor = design_999EA9
                 )
             )
             {

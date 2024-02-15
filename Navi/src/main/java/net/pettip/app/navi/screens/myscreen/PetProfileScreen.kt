@@ -50,6 +50,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -113,22 +114,17 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomTextField
-import net.pettip.app.navi.component.ErrorScreen
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.component.rememberMarker
 import net.pettip.app.navi.screens.mainscreen.CircleImage
 import net.pettip.app.navi.screens.mainscreen.formatWghtVl
 import net.pettip.app.navi.ui.theme.design_999999
 import net.pettip.app.navi.ui.theme.design_DDDDDD
-import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_icon_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_bg
-import net.pettip.app.navi.ui.theme.design_login_text
-import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_sharp
-import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SettingViewModel
@@ -184,6 +180,8 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
     val markerVisibilityChangeListener = MyMarkerVisibilityChangeListener()
     val xValue by markerVisibilityChangeListener.xValue.collectAsState()
+
+    var snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
     
     val lineChart = lineChart(
         remember(defaultLines) {
@@ -271,7 +269,8 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
     }
 
     Scaffold (
-        topBar = { BackTopBar(title = "${selectedPet.petNm} ${stringResource(id = R.string.profile)}", navController = navController) }
+        topBar = { BackTopBar(title = "${selectedPet.petNm} ${stringResource(id = R.string.profile)}", navController = navController) },
+        snackbarHost = { Toasty(snackState = snackbarHostState )}
     ) { paddingValues ->
 
         if (weightRgstDialog){
@@ -281,7 +280,8 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 confirm = stringResource(id = R.string.register),
                 dismiss = stringResource(id = R.string.cancel_kor),
                 ownrPetUnqNo = selectedPet.ownrPetUnqNo,
-                refresh = {newValue -> updatePetWgt = newValue}
+                refresh = {newValue -> updatePetWgt = newValue},
+                snackbarHostState = snackbarHostState
             )
         }
 
@@ -290,7 +290,8 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 onDismiss = {newValue -> weightCNDDialog = newValue},
                 viewModel = settingViewModel,
                 index = xValue,
-                refresh = {newValue -> updatePetWgt = newValue}
+                refresh = {newValue -> updatePetWgt = newValue},
+                snackbarHostState = snackbarHostState
             )
         }
 
@@ -885,7 +886,8 @@ fun WeightCNDDialog(
     onDismiss: (Boolean) -> Unit,
     viewModel: SettingViewModel,
     index: Int,
-    refresh:(Boolean) -> Unit
+    refresh: (Boolean) -> Unit,
+    snackbarHostState: SnackbarHostState
 ){
 
     val petWeightList by viewModel.petWeightList.collectAsState()
@@ -1021,7 +1023,7 @@ fun WeightCNDDialog(
                             .clickable {
                                 if (petWeightList?.size == 1) {
                                     Toast
-                                        .makeText(context, R.string.unable_delete, Toast.LENGTH_SHORT)
+                                        .makeText(context, "삭제 할 수 없습니다", Toast.LENGTH_SHORT)
                                         .show()
                                 } else {
                                     scope.launch {
@@ -1031,9 +1033,9 @@ fun WeightCNDDialog(
                                         if (result) {
                                             onDismiss(false)
                                             refresh(true)
-                                            Toast
-                                                .makeText(context, R.string.delete_success, Toast.LENGTH_SHORT)
-                                                .show()
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar("삭제되었습니다")
+                                            }
                                         } else {
                                             Toast
                                                 .makeText(context, dm, Toast.LENGTH_SHORT)
@@ -1068,9 +1070,9 @@ fun WeightCNDDialog(
                                         if (result) {
                                             onDismiss(false)
                                             refresh(true)
-                                            Toast
-                                                .makeText(context, R.string.modify_success, Toast.LENGTH_SHORT)
-                                                .show()
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar("수정되었습니다")
+                                            }
                                         } else {
                                             Toast
                                                 .makeText(context, dm, Toast.LENGTH_SHORT)
@@ -1079,7 +1081,7 @@ fun WeightCNDDialog(
                                     }
                                 } else {
                                     Toast
-                                        .makeText(context, R.string.invalid_pet_weight, Toast.LENGTH_SHORT)
+                                        .makeText(context, "올바른 몸무게를 입력해주세요", Toast.LENGTH_SHORT)
                                         .show()
                                 }
 
@@ -1108,7 +1110,8 @@ fun WeightDialog(
     confirm: String,
     dismiss: String,
     ownrPetUnqNo: String,
-    refresh:(Boolean) -> Unit
+    refresh:(Boolean) -> Unit,
+    snackbarHostState: SnackbarHostState
 ){
 
     val petWeight by viewModel.petWeight.collectAsState()
@@ -1363,9 +1366,9 @@ fun WeightDialog(
                                             if (result) {
                                                 onDismiss(false)
                                                 refresh(true)
-                                                Toast
-                                                    .makeText(context, R.string.registration_success, Toast.LENGTH_SHORT)
-                                                    .show()
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar("등록되었습니다")
+                                                }
                                             } else {
                                                 Toast
                                                     .makeText(context, regDM, Toast.LENGTH_SHORT)

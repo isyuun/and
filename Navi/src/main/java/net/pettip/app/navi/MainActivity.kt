@@ -63,6 +63,7 @@ import net.pettip.app.navi.screens.commuscreen.StoryDetail
 import net.pettip.app.navi.screens.mainscreen.MainScreen
 import net.pettip.app.navi.screens.mainscreen.SettingScreen
 import net.pettip.app.navi.screens.mainscreen.WalkScreenV2
+import net.pettip.app.navi.screens.mainscreen.WalkScreenV3
 import net.pettip.app.navi.screens.myscreen.AddPetScreen
 import net.pettip.app.navi.screens.myscreen.InquiryDetail
 import net.pettip.app.navi.screens.myscreen.InviteScreen
@@ -468,6 +469,10 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
         composable("walkScreenV2"){
             WalkScreenV2(viewModel = walkViewModel, navController = navController, sharedViewModel = sharedViewModel)
         }
+
+        composable("walkScreenV3"){
+            WalkScreenV3(viewModel = walkViewModel, navController = navController, sharedViewModel = sharedViewModel)
+        }
     }
 
     if (G.dupleLogin) {
@@ -523,6 +528,7 @@ sealed class Screen(val route: String) {
     object PwSearchScreen : Screen("pwSearchScreen")
     object WebViewScreen : Screen("webViewScreen")
     object WalkScreenV2 : Screen("walkScreenV2")
+    object WalkScreenV3 : Screen("walkScreenV3")
 
 }
 

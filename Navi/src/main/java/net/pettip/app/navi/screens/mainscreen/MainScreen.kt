@@ -38,6 +38,7 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -129,6 +130,7 @@ fun MainScreen(
     val currentPet by sharedViewModel.currentPetInfo.collectAsState()
     val currentTab by sharedViewModel.currentTab.collectAsState()
 
+
     // logoTopbar back on/off
     var backBtnOnLT by remember { mutableStateOf(false) }
 
@@ -195,6 +197,7 @@ fun MainScreen(
     }
 
     BackOnPressed()
+
     Scaffold(
         floatingActionButton = {
 
@@ -602,7 +605,8 @@ fun BottomNavigationComponent(
 }
 
 @Composable
-fun BackOnPressed() {
+fun BackOnPressed(
+) {
     val context = LocalContext.current
     var backPressedState by remember { mutableStateOf(true) }
     var backPressedTime = 0L

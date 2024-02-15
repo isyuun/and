@@ -676,7 +676,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp)
+                    .height(56.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
@@ -714,7 +714,7 @@ fun BwlMvmNmtmContent(walkViewModel: WalkViewModel, pet: List<Pet>, selectPet: L
 
         LazyColumn(
             state = rememberLazyListState(),
-            modifier = Modifier.heightIn(max = 300.dp),
+            modifier = Modifier.heightIn(max = 2000.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items = pet) { petInfo ->

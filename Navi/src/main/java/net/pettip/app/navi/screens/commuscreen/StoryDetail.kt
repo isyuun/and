@@ -261,7 +261,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
 
     Scaffold (
         topBar = {BackTopBar(title = stringResource(R.string.title_story), navController = navController)},
-        snackbarHost = { Toasty(snackState = snackState) }
+        snackbarHost = { Toasty(snackState = snackState, bottomPadding = 20.dp) }
     ){ paddingValues ->
 
         Crossfade(
@@ -1801,13 +1801,13 @@ fun CommentListItem2(
     }
 
     if (deleteDialog){
-        CustomDialogDelete(
+        CustomAlert(
             onDismiss = { newValue -> deleteDialog = newValue },
             confirm = stringResource(id = R.string.delete),
             dismiss = stringResource(id = R.string.cancel_kor),
             title = stringResource(id = R.string.comment_delete),
             text = stringResource(id = R.string.delete_confirm),
-            valueChange = { newValue -> commentDelete = newValue}
+            confirmJob = { commentDelete = true }
         )
     }
 

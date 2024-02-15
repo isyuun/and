@@ -920,7 +920,7 @@ fun AddPetScreen(
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 40.dp)
                     .fillMaxWidth()
-                    .height(48.dp)
+                    .height(56.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)

@@ -148,7 +148,7 @@ fun PermissionScreen(viewModel: LoginViewModel, permissionState: MultiplePermiss
             modifier = Modifier
                 .padding(top = 20.dp, bottom = 20.dp)
                 .fillMaxWidth()
-                .height(48.dp), shape = RoundedCornerShape(12.dp),
+                .height(56.dp), shape = RoundedCornerShape(12.dp),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
             colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
         )

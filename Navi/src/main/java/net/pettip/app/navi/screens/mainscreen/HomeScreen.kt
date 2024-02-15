@@ -150,6 +150,7 @@ import java.time.format.TextStyle
 import java.util.Date
 import java.util.Locale
 import kotlin.math.absoluteValue
+import kotlin.reflect.KClass
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -1201,7 +1202,7 @@ fun BottomSheetContent(
                     color = MaterialTheme.colorScheme.onTertiaryContainer
                 )
             }
-            
+
             Spacer(modifier = Modifier.padding(start = 8.dp))
 
             Button(
@@ -1591,24 +1592,24 @@ fun BottomInfo(navController: NavHostController){
                 }
             )
 
-            Spacer(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .size(2.dp, 8.dp)
-                    .background(color = design_skip)
-            )
-
-            Text(
-                text = stringResource(R.string.introduc_corp),
-                fontSize = 12.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                letterSpacing = (-0.6).sp,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.clickable {
-                    //navController.navigate("webViewScreen/3")
-                    navController.navigate(Screen.WalkScreenV2.route)
-                }
-            )
+            //Spacer(
+            //    modifier = Modifier
+            //        .padding(horizontal = 8.dp)
+            //        .size(2.dp, 8.dp)
+            //        .background(color = design_skip)
+            //)
+            //
+            //Text(
+            //    text = stringResource(R.string.introduc_corp),
+            //    fontSize = 12.sp,
+            //    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+            //    letterSpacing = (-0.6).sp,
+            //    color = MaterialTheme.colorScheme.secondary,
+            //    modifier = Modifier.clickable {
+            //        //navController.navigate("webViewScreen/3")
+            //        navController.navigate(Screen.WalkScreenV3.route)
+            //    }
+            //)
         }
         
         Spacer(modifier = Modifier.padding(bottom = 16.dp))
@@ -1680,13 +1681,13 @@ fun CircleImageHome(size: Int, currentPet: List<CurrentPetData>?, page: Int, pag
             .clip(CircleShape)
             .clickable {
                 // TODO: 홈 화면에서 산책할 펫 선택시 변경할 부분
-                //scope.launch {
-                //    pagerState.animateScrollToPage(
-                //        page = page,
-                //        animationSpec = tween(durationMillis = 600)
-                //    )
-                //}
-                select = !select
+                scope.launch {
+                    pagerState.animateScrollToPage(
+                        page = page,
+                        animationSpec = tween(durationMillis = 600)
+                    )
+                }
+                //select = !select
             }
     ) {
         AsyncImage(
@@ -1754,6 +1755,46 @@ fun Modifier.shadow(
             val leftPixel = (0f - spreadPixel) + offsetX.toPx()
             val topPixel = (0f - spreadPixel) + offsetY.toPx()
             val rightPixel = (this.size.width + spreadPixel)
+            val bottomPixel = (this.size.height + spreadPixel)
+
+            if (blurRadius != 0.dp) {
+                frameworkPaint.maskFilter =
+                    (BlurMaskFilter(blurRadius.toPx(), BlurMaskFilter.Blur.NORMAL))
+            }
+
+            frameworkPaint.color = color.toArgb()
+            it.drawRoundRect(
+                left = leftPixel,
+                top = topPixel,
+                right = rightPixel,
+                bottom = bottomPixel,
+                radiusX = borderRadius.toPx(),
+                radiusY = borderRadius.toPx(),
+                paint
+            )
+        }
+    }
+)
+
+fun Modifier.shadowWithBottom(
+    modifier: Modifier = Modifier
+) = this.then(
+    modifier.drawBehind {
+        this.drawIntoCanvas {
+
+            val spread = 6.dp
+            val offsetX = 0.dp
+            val offsetY = 5.dp
+            val blurRadius = 5.dp
+            val color = design_shadow
+            val borderRadius = 12.dp
+
+            val paint = Paint()
+            val frameworkPaint = paint.asFrameworkPaint()
+            val spreadPixel = spread.toPx()
+            val leftPixel = offsetX.toPx() + 1.dp.toPx()
+            val topPixel = offsetY.toPx()
+            val rightPixel = (this.size.width - 1.dp.toPx())
             val bottomPixel = (this.size.height + spreadPixel)
 
             if (blurRadius != 0.dp) {

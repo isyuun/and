@@ -29,9 +29,8 @@ import java.util.concurrent.TimeUnit
 object RetrofitClientServer {
     // 서버쪽 retrofit 싱글톤 객체
 
-    //private const val BASE_URL = "http://carepet.hopto.org:8020/"
-    //private const val BASE_URL = "http://pettip.duckdns.org:8020/"
     private const val BASE_URL = "http://dev.pettip.net:8020/"
+    //private const val BASE_URL = "https://wwww.pettip.net/"
     private val tokenInterceptor = TokenInterceptor()
     private val retryInterceptor = RetryInterceptor(3)
 

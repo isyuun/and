@@ -249,7 +249,9 @@ fun DclrDialog(
                                 enabled = !isLoading
                             ) {
                                 if (selectDclr == null) {
-                                    scope.launch { snackState.showSnackbar("test") }
+                                    Toast
+                                        .makeText(context, "신고사유를 선택해주세요", Toast.LENGTH_SHORT)
+                                        .show()
                                 } else if (dclrCn.isNullOrBlank()) {
                                     Toast
                                         .makeText(context, R.string.place_holder_dclrcn, Toast.LENGTH_SHORT)

@@ -66,6 +66,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -127,9 +128,12 @@ import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.LoadingDialog
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.mainscreen.MySelectableDates2
 import net.pettip.app.navi.screens.myscreen.MySelectableDates
 import net.pettip.app.navi.screens.myscreen.integrityCheck
+import net.pettip.app.navi.ui.theme.design_999EA9
+import net.pettip.app.navi.ui.theme.design_DEDEDE
 import net.pettip.app.navi.ui.theme.design_btn_border
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_camera_bg
@@ -139,6 +143,7 @@ import net.pettip.app.navi.ui.theme.design_placeHolder
 import net.pettip.app.navi.ui.theme.design_select_btn_bg
 import net.pettip.app.navi.ui.theme.design_select_btn_text
 import net.pettip.app.navi.ui.theme.design_shadow
+import net.pettip.app.navi.ui.theme.design_sharp
 import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
@@ -205,12 +210,14 @@ fun PetCreateScreen(
     var isLoading by remember{ mutableStateOf(false) }
     var skipLoading by remember{ mutableStateOf(false) }
     val dm by viewModel.dm.collectAsState()
+    val snackState = remember{SnackbarHostState()}
 
     Scaffold (
         modifier = modifier.fillMaxSize(),
         topBar = {
             BackTopBar(title = stringResource(R.string.enter_pet_info), navController = navController)
-        }
+        },
+        snackbarHost = { Toasty(snackState = snackState)}
     ){ paddingValues ->
 
         if (alertShow){
@@ -325,13 +332,7 @@ fun PetCreateScreen(
                                 } else {
                                     skipLoading = false
                                     scope.launch {
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                dm,
-                                                Toast.LENGTH_SHORT
-                                            )
-                                            .show()
+                                        snackState.showSnackbar(dm)
                                     }
                                 }
                             }
@@ -993,13 +994,7 @@ fun PetCreateScreen(
                                     }else{
                                         isLoading = false
                                         scope.launch {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    "펫등록에 실패했습니다. 로그인 화면에서 로그인을 시도해주세요.",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
+                                            snackState.showSnackbar("펫등록에 실패했습니다. 로그인 화면에서 로그인을 시도해주세요.")
                                         }
                                     }
                                 }else{
@@ -1008,13 +1003,7 @@ fun PetCreateScreen(
                             }else{
                                 isLoading = false
                                 scope.launch {
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            dm,
-                                            Toast.LENGTH_SHORT
-                                        )
-                                        .show()
+                                    snackState.showSnackbar(dm)
                                 }
                             }
 
@@ -1027,7 +1016,7 @@ fun PetCreateScreen(
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 40.dp)
                     .fillMaxWidth()
-                    .height(48.dp)
+                    .height(56.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
@@ -1202,7 +1191,7 @@ fun PetKindContent(
                     .padding(top = 16.dp, bottom = 40.dp)
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .height(48.dp)
+                    .height(56.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults
@@ -1509,11 +1498,11 @@ fun LocationPickContent(
                 enabled = selectSCD != null && selectSGG != null && (umdList.isEmpty() || selectUMD != null) && !loading,
                 onClick = {
                     if (selectSCD == null){
-                        Toast.makeText(context, R.string.select_cd, Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(context, R.string.select_cd, Toast.LENGTH_SHORT).show()
                     }else if (selectSGG == null){
-                        Toast.makeText(context, R.string.select_sgg, Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(context, R.string.select_sgg, Toast.LENGTH_SHORT).show()
                     }else if (umdList.isNotEmpty() && selectUMD == null){
-                        Toast.makeText(context, R.string.select_umd, Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(context, R.string.select_umd, Toast.LENGTH_SHORT).show()
                     }else{
 
                         viewModel.updateSelectedItem1(selectSCD!!)
@@ -1529,13 +1518,13 @@ fun LocationPickContent(
                     .padding(top = 16.dp, bottom = 40.dp)
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .height(48.dp)
+                    .height(56.dp)
                     .padding(horizontal = 20.dp),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = design_button_bg,
-                    disabledContainerColor = design_skip
+                    disabledContainerColor = design_999EA9
                 )
             )
             {

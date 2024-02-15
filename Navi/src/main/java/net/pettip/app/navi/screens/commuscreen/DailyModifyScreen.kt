@@ -96,6 +96,7 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.mainscreen.getFormattedDate
 import net.pettip.app.navi.screens.mainscreen.shadow
 import net.pettip.app.navi.screens.walkscreen.HashTagTransformation
@@ -224,7 +225,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
         }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackState, Modifier) }
+        snackbarHost = { Toasty(snackState = snackState) }
     ) { paddingValues ->
 
         LoadingDialog(
@@ -659,11 +660,11 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                     }
 
                     if (((uploadedPet.count { it.rowState == null })?.plus(newPetList.size))==0){
-                        Toast.makeText(context, R.string.toast_msg_select_pet, Toast.LENGTH_SHORT).show()
+                        scope.launch { snackState.showSnackbar("반려동물을 선택해주세요") }
                     }else if(uploadSchSeList.count { it.rowState==null }.plus(uploadSchSeList.count{it.rowState == "C"})==0){
-                        Toast.makeText(context, R.string.toast_msg_select_daily, Toast.LENGTH_SHORT).show()
+                        scope.launch { snackState.showSnackbar("일상구분을 선택해주세요") }
                     }else if(((uploadedFile?.count { it.rowState == null } ?: 0) + (localUriList.size-1)) >5){
-                        Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
+                        scope.launch { snackState.showSnackbar("최대 5장까지 업로드 가능합니다") }
                     }else{
                         scope.launch {
                             isLoading = true

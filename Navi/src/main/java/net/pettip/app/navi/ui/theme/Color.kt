@@ -48,6 +48,19 @@ val design_CBE8F3 = Color(0xFFCBE8F3)
 val design_main_pattern = Color(0xFFf3f3f3)
 // 디자인 다크 색상
 val design_dark = Color(0xFF2D3034)
+val design_002D83 = Color(0xFF002D83)
+val design_B4CDFF = Color(0xFFB4CDFF)
+val design_666666 = Color(0xFF666666)
+val design_777777 = Color(0xFF777777)
+val design_444444 = Color(0xFF444444)
+val design_05358F = Color(0xFF05358F)
+val design_ACC1E9 = Color(0xFFACC1E9)
+val design_FFF2EB = Color(0xFFFFF2EB)
+val design_4783F5 = Color(0x404783F5)
+
+//추가 색상
+val design_999EA9 = Color(0xFF999EA9)
+val design_DEDEDE = Color(0xFFDEDEDE)
 
 
 //---------------------------------------------------------------------------//

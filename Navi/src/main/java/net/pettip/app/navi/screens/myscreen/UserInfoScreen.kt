@@ -89,6 +89,7 @@ import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.isAlphaNumeric
+import net.pettip.app.navi.ui.theme.design_999EA9
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
@@ -178,7 +179,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
     Scaffold(
         topBar = { BackTopBar(title = stringResource(R.string.userinfo_modify), navController = navController) },
-        snackbarHost = { Toasty(snackState = snackbarHostState) }
+        snackbarHost = { Toasty(snackState = snackbarHostState, bottomPadding = 20.dp) }
     ) { paddingValues ->
 
         if (alertShow){
@@ -880,7 +881,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = design_button_bg,
-                    disabledContainerColor = design_skip
+                    disabledContainerColor = design_999EA9
                 )
             )
             {

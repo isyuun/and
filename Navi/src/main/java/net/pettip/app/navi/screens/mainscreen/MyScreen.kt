@@ -465,7 +465,8 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         openDatePicker = {newValue -> openDialog = newValue},
                         openBottomSheet = { newValue -> openBottomSheet = newValue },
                         dateState = datePickerState,
-                        timeState = timePickerState
+                        timeState = timePickerState,
+                        snackState = snackState
                     )
                     Spacer(modifier = Modifier
                         .height(navigationBarHeight)
@@ -705,7 +706,8 @@ fun MyBottomSheet(
     openBottomSheet: (Boolean) -> Unit,
     openDatePicker: (Boolean) -> Unit,
     dateState: DatePickerState,
-    timeState: TimePickerState
+    timeState: TimePickerState,
+    snackState : SnackbarHostState
 ){
 
     val petList by sharedViewModel.petInfo.collectAsState()
@@ -861,7 +863,8 @@ fun MyBottomSheet(
                         val currentDate = sdfCurrentDate.format(Date().time)
 
                         if(currentDate > selectedDate+selectedTime){
-                            Toast.makeText(context, context.getString(R.string.already_end_date), Toast.LENGTH_SHORT).show()
+                            alertMsg = "이미 만료된 시간입니다"
+                            alertShow =true
                         }else{
                             if (settingViewModel.updateSelectedPetSave(selectedPet)) {
                                 openBottomSheet(false)
@@ -869,17 +872,17 @@ fun MyBottomSheet(
                             }
                         }
                     }else{
-                        alertShow =true
                         alertMsg = "날짜를 선택해주세요"
+                        alertShow =true
                     }
                 }else{
-                    alertShow =true
                     alertMsg = "펫을 선택해주세요"
+                    alertShow =true
                 }
                       },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
+                .height(56.dp)
                 .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
             colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)

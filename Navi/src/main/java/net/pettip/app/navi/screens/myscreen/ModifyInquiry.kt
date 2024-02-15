@@ -83,6 +83,7 @@ import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.screens.commuscreen.PhotoItemInModify
 import net.pettip.app.navi.screens.walkscreen.PlusBox
+import net.pettip.app.navi.ui.theme.design_999EA9
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_f1f1f1
 import net.pettip.app.navi.ui.theme.design_intro_bg
@@ -483,7 +484,7 @@ fun ModifyInquiryScreen(
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = design_button_bg,
-                    disabledContainerColor = design_skip
+                    disabledContainerColor = design_999EA9
                 )
             ) {
                 Text(text = stringResource(R.string.edit_inquiry_), color = design_white, fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))

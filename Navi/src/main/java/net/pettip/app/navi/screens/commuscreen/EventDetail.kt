@@ -307,277 +307,277 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                 .padding(horizontal = 20.dp)
                                 .fillMaxWidth())
 
-                            Row (
-                                modifier = Modifier
-                                    .padding(top = 40.dp)
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.onPrimaryContainer)
-                                    .height(36.dp)
-                                    .clickable { cmntExpanded = !cmntExpanded }
-                                ,
-                                verticalAlignment = Alignment.CenterVertically
-                            ){
-
-                                Icon(
-                                    painter = painterResource(id = R.drawable.icon_comment_line),
-                                    contentDescription = "", tint = Color.Unspecified,
-                                    modifier = Modifier.padding(start = 20.dp))
-
-                                Text(
-                                    text = "${stringResource(id = R.string.comment)} ${cmntList?.size ?: 0}",
-                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                    fontSize = 12.sp,
-                                    letterSpacing = (-0.6).sp,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.padding(start = 4.dp)
-                                )
-                            }
-
-                            AnimatedVisibility(
-                                visible = cmntExpanded && upCmntNo0.isNotEmpty(),
-                                enter = expandVertically(tween(durationMillis = 700)).plus(fadeIn(tween(durationMillis = 500, delayMillis = 200))),
-                                exit = shrinkVertically(tween(durationMillis = 700)).plus(fadeOut())
-                            ) {
-                                LazyColumn(
-                                    state = lazyListState,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .heightIn(max = 1000.dp),
-                                    contentPadding = PaddingValues(top = 18.dp, bottom = 20.dp)
-                                ){
-                                    itemsIndexed(upCmntNo0){ index, item ->
-                                        EventCommentListItem(
-                                            comment = item,
-                                            viewModel = viewModel,
-                                            onReply = onReply,
-                                            onReplyChange = {newValue -> onReply = newValue},
-                                            dclrDialogOpen = {newValue -> dclrDialogOpen = newValue }
-                                        )
-
-                                        if(index != (upCmntNo0?.size?.minus(1) ?: 0)){
-                                            Spacer(modifier = Modifier
-                                                .padding(vertical = 16.dp, horizontal = 20.dp)
-                                                .fillMaxWidth()
-                                                .height(1.dp)
-                                                .background(color = MaterialTheme.colorScheme.outline))
-                                        }
-                                    }
-                                }
-                            }
-
-                            AnimatedVisibility(
-                                visible =  onReply,
-                                enter = expandVertically(expandFrom = Alignment.Top),
-                                exit = shrinkVertically(shrinkTowards = Alignment.Top)
-                            ) {
-                                Row (
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(color = design_intro_bg),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ){
-                                    Row (
-                                        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
-                                        verticalAlignment = Alignment.Bottom
-                                    ){
-                                        Text(
-                                            text = "${replyCmnt?.petNm}${stringResource(id = R.string.to_comment_writing)}",
-                                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
-                                            color = design_white,
-                                            lineHeight = 14.sp,
-                                            modifier = Modifier.padding(start = 20.dp, end = 8.dp)
-                                        )
-
-                                        LoadingAnimation3(circleSize = 4.dp, circleColor = design_white, animationDelay = 600)
-                                    }
-
-                                    Icon(
-                                        imageVector = Icons.Default.Clear,
-                                        contentDescription = "", tint = design_white,
-                                        modifier = Modifier
-                                            .padding(end = 20.dp)
-                                            .clickable { onReply = false })
-                                }
-
-                                Spacer(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(1.dp)
-                                    .background(MaterialTheme.colorScheme.onPrimary))
-                            }
-
-                            Spacer(modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(MaterialTheme.colorScheme.onPrimary))
-
-                            Row (
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ){
-                                TextField(
-                                    value = if (onReply) replyText else comment,
-                                    onValueChange = {
-                                        if (onReply){
-                                            replyText = it
-                                        }else{
-                                            viewModel.updateBbsComment(it)
-                                        }
-                                    },
-                                    textStyle = TextStyle(
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                        fontSize = 14.sp,
-                                        letterSpacing = (-0.7).sp
-                                    ),
-                                    placeholder = {
-                                        Text(text = stringResource(R.string.ph_comment), style = TextStyle(
-                                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                            fontSize = 14.sp,
-                                            letterSpacing = (-0.7).sp
-                                        )) },
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Text,
-                                        imeAction = ImeAction.Done),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .focusRequester(focusRequester)
-                                    ,
-                                    colors = TextFieldDefaults.colors(
-                                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                                        focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
-                                        unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                                        focusedContainerColor = MaterialTheme.colorScheme.primary,
-                                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
-                                        focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                                        cursorColor = design_intro_bg.copy(alpha = 0.5f),
-                                        selectionColors = TextSelectionColors(
-                                            handleColor = design_intro_bg.copy(alpha = 0.5f),
-                                            backgroundColor = design_intro_bg.copy(alpha = 0.5f)
-                                        ),
-                                        focusedIndicatorColor = MaterialTheme.colorScheme.onPrimary,
-                                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSecondaryContainer
-                                    )
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .padding(end = 8.dp)
-                                        .size(width = 56.dp, height = 40.dp)
-                                        .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(12.dp))
-                                        .clip(shape = RoundedCornerShape(12.dp))
-                                        .clickable(
-                                            enabled = if (onReply) replyText != "" && !isLoading else comment != "" && !isLoading,
-                                            onClick = {
-                                                viewModel.viewModelScope.launch {
-                                                    isLoading = true
-
-                                                    if (onReply) {
-                                                        val result = viewModel.bbsCmntCreate(replyText)
-                                                        if (result) {
-                                                            replyText = ""
-                                                            onReply = false
-                                                            isLoading = false
-                                                        } else {
-                                                            isLoading = false
-                                                            Toast
-                                                                .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
-                                                                .show()
-                                                        }
-                                                    } else {
-                                                        val result = viewModel.bbsCmntCreate()
-                                                        if (result) {
-                                                            viewModel.updateBbsComment("")
-                                                            isLoading = false
-                                                        } else {
-                                                            isLoading = false
-                                                            Toast
-                                                                .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
-                                                                .show()
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ){
-                                    if (isLoading){
-                                        LoadingAnimation3(
-                                            circleColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                            circleSize = 4.dp
-                                        )
-                                    }else{
-                                        Text(text = stringResource(R.string.comment_apply), style = TextStyle(
-                                            color = MaterialTheme.colorScheme.onTertiaryContainer,
-                                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                            fontSize = 14.sp,
-                                            letterSpacing = (-0.7).sp),
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .padding(end = 4.dp)
-                                        .size(40.dp)
-                                        .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
-                                        .clip(shape = RoundedCornerShape(12.dp))
-                                        .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
-                                        .clickable(
-                                            enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
-                                        ) {
-                                            scope.launch {
-                                                rcmdtnLoading = true
-                                                val result = viewModel.bbsRcmdtn(pstSn = detailData?.data?.pstSn ?: 0, rcmdtnSeCd = "001")
-                                                if (result) {
-                                                    rcmdtnLoading = false
-                                                } else {
-                                                    rcmdtnLoading = false
-                                                    Toast
-                                                        .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
-                                                        .show()
-                                                }
-                                            }
-                                        }
-                                    ,
-                                    contentAlignment = Alignment.Center
-                                ){
-                                    Icon(painter = painterResource(id = if (detailData?.data?.rcmdtnSeCd == "001" ) R.drawable.icon_like else R.drawable.icon_like_default),
-                                        contentDescription = "", tint = Color.Unspecified)
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .padding(end = 8.dp)
-                                        .size(40.dp)
-                                        .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
-                                        .clip(shape = RoundedCornerShape(12.dp))
-                                        .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
-                                        .clickable(
-                                            enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
-                                        ) {
-                                            scope.launch {
-                                                rcmdtnLoading = true
-                                                val result = viewModel.bbsRcmdtn(pstSn = detailData?.data?.pstSn ?: 0, rcmdtnSeCd = "002")
-                                                if (result) {
-                                                    rcmdtnLoading = false
-                                                } else {
-                                                    rcmdtnLoading = false
-                                                    Toast
-                                                        .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
-                                                        .show()
-                                                }
-                                            }
-                                        }
-                                    ,
-                                    contentAlignment = Alignment.Center
-                                ){
-                                    Icon(painter = painterResource(id = if (detailData?.data?.rcmdtnSeCd == "002" ) R.drawable.icon_dislike else R.drawable.icon_dislike_default),
-                                        contentDescription = "", tint = Color.Unspecified)
-                                }
-                            }
+                            //Row (
+                            //    modifier = Modifier
+                            //        .padding(top = 40.dp)
+                            //        .fillMaxWidth()
+                            //        .background(MaterialTheme.colorScheme.onPrimaryContainer)
+                            //        .height(36.dp)
+                            //        .clickable { cmntExpanded = !cmntExpanded }
+                            //    ,
+                            //    verticalAlignment = Alignment.CenterVertically
+                            //){
+                            //
+                            //    Icon(
+                            //        painter = painterResource(id = R.drawable.icon_comment_line),
+                            //        contentDescription = "", tint = Color.Unspecified,
+                            //        modifier = Modifier.padding(start = 20.dp))
+                            //
+                            //    Text(
+                            //        text = "${stringResource(id = R.string.comment)} ${cmntList?.size ?: 0}",
+                            //        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            //        fontSize = 12.sp,
+                            //        letterSpacing = (-0.6).sp,
+                            //        color = MaterialTheme.colorScheme.secondary,
+                            //        modifier = Modifier.padding(start = 4.dp)
+                            //    )
+                            //}
+                            //
+                            //AnimatedVisibility(
+                            //    visible = cmntExpanded && upCmntNo0.isNotEmpty(),
+                            //    enter = expandVertically(tween(durationMillis = 700)).plus(fadeIn(tween(durationMillis = 500, delayMillis = 200))),
+                            //    exit = shrinkVertically(tween(durationMillis = 700)).plus(fadeOut())
+                            //) {
+                            //    LazyColumn(
+                            //        state = lazyListState,
+                            //        modifier = Modifier
+                            //            .fillMaxWidth()
+                            //            .heightIn(max = 1000.dp),
+                            //        contentPadding = PaddingValues(top = 18.dp, bottom = 20.dp)
+                            //    ){
+                            //        itemsIndexed(upCmntNo0){ index, item ->
+                            //            EventCommentListItem(
+                            //                comment = item,
+                            //                viewModel = viewModel,
+                            //                onReply = onReply,
+                            //                onReplyChange = {newValue -> onReply = newValue},
+                            //                dclrDialogOpen = {newValue -> dclrDialogOpen = newValue }
+                            //            )
+                            //
+                            //            if(index != (upCmntNo0?.size?.minus(1) ?: 0)){
+                            //                Spacer(modifier = Modifier
+                            //                    .padding(vertical = 16.dp, horizontal = 20.dp)
+                            //                    .fillMaxWidth()
+                            //                    .height(1.dp)
+                            //                    .background(color = MaterialTheme.colorScheme.outline))
+                            //            }
+                            //        }
+                            //    }
+                            //}
+                            //
+                            //AnimatedVisibility(
+                            //    visible =  onReply,
+                            //    enter = expandVertically(expandFrom = Alignment.Top),
+                            //    exit = shrinkVertically(shrinkTowards = Alignment.Top)
+                            //) {
+                            //    Row (
+                            //        modifier = Modifier
+                            //            .fillMaxWidth()
+                            //            .background(color = design_intro_bg),
+                            //        verticalAlignment = Alignment.CenterVertically,
+                            //        horizontalArrangement = Arrangement.SpaceBetween
+                            //    ){
+                            //        Row (
+                            //            modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
+                            //            verticalAlignment = Alignment.Bottom
+                            //        ){
+                            //            Text(
+                            //                text = "${replyCmnt?.petNm}${stringResource(id = R.string.to_comment_writing)}",
+                            //                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            //                fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            //                color = design_white,
+                            //                lineHeight = 14.sp,
+                            //                modifier = Modifier.padding(start = 20.dp, end = 8.dp)
+                            //            )
+                            //
+                            //            LoadingAnimation3(circleSize = 4.dp, circleColor = design_white, animationDelay = 600)
+                            //        }
+                            //
+                            //        Icon(
+                            //            imageVector = Icons.Default.Clear,
+                            //            contentDescription = "", tint = design_white,
+                            //            modifier = Modifier
+                            //                .padding(end = 20.dp)
+                            //                .clickable { onReply = false })
+                            //    }
+                            //
+                            //    Spacer(modifier = Modifier
+                            //        .fillMaxWidth()
+                            //        .height(1.dp)
+                            //        .background(MaterialTheme.colorScheme.onPrimary))
+                            //}
+                            //
+                            //Spacer(modifier = Modifier
+                            //    .fillMaxWidth()
+                            //    .height(1.dp)
+                            //    .background(MaterialTheme.colorScheme.onPrimary))
+                            //
+                            //Row (
+                            //    modifier = Modifier.fillMaxWidth(),
+                            //    verticalAlignment = Alignment.CenterVertically
+                            //){
+                            //    TextField(
+                            //        value = if (onReply) replyText else comment,
+                            //        onValueChange = {
+                            //            if (onReply){
+                            //                replyText = it
+                            //            }else{
+                            //                viewModel.updateBbsComment(it)
+                            //            }
+                            //        },
+                            //        textStyle = TextStyle(
+                            //            color = MaterialTheme.colorScheme.onPrimary,
+                            //            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            //            fontSize = 14.sp,
+                            //            letterSpacing = (-0.7).sp
+                            //        ),
+                            //        placeholder = {
+                            //            Text(text = stringResource(R.string.ph_comment), style = TextStyle(
+                            //                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            //                fontSize = 14.sp,
+                            //                letterSpacing = (-0.7).sp
+                            //            )) },
+                            //        keyboardOptions = KeyboardOptions(
+                            //            keyboardType = KeyboardType.Text,
+                            //            imeAction = ImeAction.Done),
+                            //        modifier = Modifier
+                            //            .weight(1f)
+                            //            .focusRequester(focusRequester)
+                            //        ,
+                            //        colors = TextFieldDefaults.colors(
+                            //            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                            //            focusedPlaceholderColor = MaterialTheme.colorScheme.primaryContainer,
+                            //            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                            //            focusedContainerColor = MaterialTheme.colorScheme.primary,
+                            //            unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+                            //            focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                            //            cursorColor = design_intro_bg.copy(alpha = 0.5f),
+                            //            selectionColors = TextSelectionColors(
+                            //                handleColor = design_intro_bg.copy(alpha = 0.5f),
+                            //                backgroundColor = design_intro_bg.copy(alpha = 0.5f)
+                            //            ),
+                            //            focusedIndicatorColor = MaterialTheme.colorScheme.onPrimary,
+                            //            unfocusedIndicatorColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            //        )
+                            //    )
+                            //
+                            //    Box(
+                            //        modifier = Modifier
+                            //            .padding(end = 8.dp)
+                            //            .size(width = 56.dp, height = 40.dp)
+                            //            .background(color = MaterialTheme.colorScheme.tertiaryContainer, shape = RoundedCornerShape(12.dp))
+                            //            .clip(shape = RoundedCornerShape(12.dp))
+                            //            .clickable(
+                            //                enabled = if (onReply) replyText != "" && !isLoading else comment != "" && !isLoading,
+                            //                onClick = {
+                            //                    viewModel.viewModelScope.launch {
+                            //                        isLoading = true
+                            //
+                            //                        if (onReply) {
+                            //                            val result = viewModel.bbsCmntCreate(replyText)
+                            //                            if (result) {
+                            //                                replyText = ""
+                            //                                onReply = false
+                            //                                isLoading = false
+                            //                            } else {
+                            //                                isLoading = false
+                            //                                Toast
+                            //                                    .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
+                            //                                    .show()
+                            //                            }
+                            //                        } else {
+                            //                            val result = viewModel.bbsCmntCreate()
+                            //                            if (result) {
+                            //                                viewModel.updateBbsComment("")
+                            //                                isLoading = false
+                            //                            } else {
+                            //                                isLoading = false
+                            //                                Toast
+                            //                                    .makeText(context, "댓글 등록에 실패했습니다", Toast.LENGTH_SHORT)
+                            //                                    .show()
+                            //                            }
+                            //                        }
+                            //                    }
+                            //                }
+                            //            ),
+                            //        contentAlignment = Alignment.Center
+                            //    ){
+                            //        if (isLoading){
+                            //            LoadingAnimation3(
+                            //                circleColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            //                circleSize = 4.dp
+                            //            )
+                            //        }else{
+                            //            Text(text = stringResource(R.string.comment_apply), style = TextStyle(
+                            //                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            //                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            //                fontSize = 14.sp,
+                            //                letterSpacing = (-0.7).sp),
+                            //                textAlign = TextAlign.Center
+                            //            )
+                            //        }
+                            //    }
+                            //
+                            //    Box(
+                            //        modifier = Modifier
+                            //            .padding(end = 4.dp)
+                            //            .size(40.dp)
+                            //            .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
+                            //            .clip(shape = RoundedCornerShape(12.dp))
+                            //            .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                            //            .clickable(
+                            //                enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
+                            //            ) {
+                            //                scope.launch {
+                            //                    rcmdtnLoading = true
+                            //                    val result = viewModel.bbsRcmdtn(pstSn = detailData?.data?.pstSn ?: 0, rcmdtnSeCd = "001")
+                            //                    if (result) {
+                            //                        rcmdtnLoading = false
+                            //                    } else {
+                            //                        rcmdtnLoading = false
+                            //                        Toast
+                            //                            .makeText(context, "다시 시도해주세요", Toast.LENGTH_SHORT)
+                            //                            .show()
+                            //                    }
+                            //                }
+                            //            }
+                            //        ,
+                            //        contentAlignment = Alignment.Center
+                            //    ){
+                            //        Icon(painter = painterResource(id = if (detailData?.data?.rcmdtnSeCd == "001" ) R.drawable.icon_like else R.drawable.icon_like_default),
+                            //            contentDescription = "", tint = Color.Unspecified)
+                            //    }
+                            //
+                            //    Box(
+                            //        modifier = Modifier
+                            //            .padding(end = 8.dp)
+                            //            .size(40.dp)
+                            //            .background(color = Color.Transparent, shape = RoundedCornerShape(12.dp))
+                            //            .clip(shape = RoundedCornerShape(12.dp))
+                            //            .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                            //            .clickable(
+                            //                enabled = detailData?.data?.rcmdtnSeCd == null && !rcmdtnLoading
+                            //            ) {
+                            //                scope.launch {
+                            //                    rcmdtnLoading = true
+                            //                    val result = viewModel.bbsRcmdtn(pstSn = detailData?.data?.pstSn ?: 0, rcmdtnSeCd = "002")
+                            //                    if (result) {
+                            //                        rcmdtnLoading = false
+                            //                    } else {
+                            //                        rcmdtnLoading = false
+                            //                        Toast
+                            //                            .makeText(context, R.string.retry, Toast.LENGTH_SHORT)
+                            //                            .show()
+                            //                    }
+                            //                }
+                            //            }
+                            //        ,
+                            //        contentAlignment = Alignment.Center
+                            //    ){
+                            //        Icon(painter = painterResource(id = if (detailData?.data?.rcmdtnSeCd == "002" ) R.drawable.icon_dislike else R.drawable.icon_dislike_default),
+                            //            contentDescription = "", tint = Color.Unspecified)
+                            //    }
+                            //}
                         }//col
                     }
 

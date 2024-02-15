@@ -110,6 +110,7 @@ import net.pettip.app.navi.screens.mainscreen.getFormattedDate
 import net.pettip.app.navi.screens.mainscreen.shadow
 import net.pettip.app.navi.screens.walkscreen.HashTagTransformation
 import net.pettip.app.navi.screens.walkscreen.HashTagTransformationForDark
+import net.pettip.app.navi.ui.theme.design_999EA9
 import net.pettip.app.navi.ui.theme.design_alpha50_black
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
@@ -681,7 +682,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = design_button_bg,
-                    disabledContainerColor = design_skip
+                    disabledContainerColor = design_999EA9
                 )
             )
             {
