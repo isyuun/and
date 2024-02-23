@@ -465,6 +465,8 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                 val isLoggedIn = viewModel.isLoggedIn.collectAsState()
                 val loginStatusInfo = if(isLoggedIn.value) "로그인 상태" else "로그아웃 상태"
 
+                Spacer(modifier = Modifier.padding(top = 16.dp))
+                
                 Box{
                     Button(onClick = {
                         scope.launch {
@@ -494,7 +496,7 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         }
                     },
                         modifier = Modifier
-                            .padding(top = 32.dp)
+                            .padding(top = 16.dp)
                             .fillMaxWidth()
                             .height(48.dp)
                             .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
@@ -873,10 +875,16 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                     check = personCheck,
                     onClick = { newValue -> viewModel.updatePersonCheck(newValue)})
 
-                AgreeComponentV2(
+                AgreeComponent(
                     title = stringResource(R.string.agree_marketing),
+                    page = 3,
                     check = marketingCheck,
                     onClick = { newValue -> userCreateViewModel.updateMarketingCheck(newValue)})
+
+                //AgreeComponentV2(
+                //    title = stringResource(R.string.agree_marketing),
+                //    check = marketingCheck,
+                //    onClick = { newValue -> userCreateViewModel.updateMarketingCheck(newValue)})
 
                 Row (
                     modifier = Modifier
@@ -1155,6 +1163,7 @@ fun AgreeComponent(
             ){
                 val url1 = "${BASE_URL}terms"
                 val url2 = "${BASE_URL}privacy_policy"
+                val url3 = "${BASE_URL}marketing"
                 AndroidView(
                     factory = { context ->
                         WebView(context).apply {
@@ -1175,6 +1184,7 @@ fun AgreeComponent(
                         when(page){
                             1 -> webView.loadUrl(url1)
                             2 -> webView.loadUrl(url2)
+                            3 -> webView.loadUrl(url3)
                         }
                     }
                 )

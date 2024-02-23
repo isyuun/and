@@ -3,6 +3,7 @@ package net.pettip.singleton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import net.pettip.BuildConfig
 import net.pettip.data.pet.CurrentPetData
 
 //const val BASE_URL = "http://carepet.hopto.org/'

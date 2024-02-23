@@ -242,7 +242,7 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
     LaunchedEffect(key1 = G.pushSeqNo, key2 = init){
         delay(400)
         if (G.pushPage != null && !init && MySharedPreference.getIsLogin()) {
-            if (G.pushPage == "story"){
+            if (G.pushPage == "story" || G.pushPage == "walk"){
                 if (communityViewModel.storyDetail.value == null){
                     // 이미 스토리 상세화면이 떠있는 경우, 데이터만 덮어쓰기
                     navController.navigate(Screen.StoryDetail.route)

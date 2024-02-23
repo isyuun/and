@@ -348,7 +348,8 @@ fun TimelineScreen(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(
                                     color = Color.Black
-                                )
+                                ),
+                                enabled = !(petList.isNotEmpty() && petList[0].ownrPetUnqNo == "")
                             ) {
                                 modeChange(true)
                                 viewModel.updateToMonthCalendar(true)

@@ -496,15 +496,16 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     fun updateUploadedFileList(newValue: List<DailyLifeFile>?){
         _uploadedFileList.value = newValue
     }
-    fun subUploadedFileList(newValue:Uri){
+
+    fun subUploadedFileList(newValue: Uri) {
         val fileName = getLastSegmentAfterSlash(newValue.toString())
-        _uploadedFileList.value = (_uploadedFileList.value?.map { file ->
+        _uploadedFileList.value = _uploadedFileList.value?.map { file ->
             if (file.atchFileNm == fileName) {
                 file.copy(rowState = "D")
             } else {
                 file
             }
-        } ?: emptyList()) as MutableList<DailyLifeFile>?
+        }?.toMutableList() ?: mutableListOf()
     }
 
 

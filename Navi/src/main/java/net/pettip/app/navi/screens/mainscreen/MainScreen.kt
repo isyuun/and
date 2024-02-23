@@ -392,7 +392,9 @@ fun MainScreen(
                                                     modifier = Modifier
                                                         .align(Alignment.CenterEnd)
                                                         .padding(end = 20.dp)
-                                                        .clickable {
+                                                        .clickable (
+                                                            enabled = !(currentPet.isNotEmpty() && currentPet[0].ownrPetUnqNo =="")
+                                                        ){
                                                             if (isSearching) {
                                                                 walkViewModel.viewModelScope.launch {
                                                                     walkViewModel.dailyLifeTimeLineListClear()

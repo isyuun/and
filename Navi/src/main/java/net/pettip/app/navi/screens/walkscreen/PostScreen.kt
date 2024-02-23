@@ -109,6 +109,7 @@ import net.pettip.app.navi.R
 import net.pettip.app.navi.component.CircleImageTopBar
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
+import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.commuscreen.CustomDialogInPost
 import net.pettip.app.navi.screens.mainscreen.getFormattedDate
 import net.pettip.app.navi.ui.theme.design_alpha50_black
@@ -201,7 +202,8 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
 
     LaunchedEffect(key1 = state.listOfSelectedImages) {
         if (state.listOfSelectedImages.size > 6) {
-            Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, R.string.photo_upload_toast_msg, Toast.LENGTH_SHORT).show()
+            snackState.showSnackbar("사진은 최대 5장까지 가능합니다")
         }
     }
 
@@ -255,7 +257,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
         }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackState, Modifier) }
+        snackbarHost = { Toasty(snackState = snackState, bottomPadding = 20.dp) }
     ) { paddingValues ->
 
         LoadingDialog(

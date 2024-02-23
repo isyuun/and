@@ -664,87 +664,148 @@ fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
             val originalBitmap = BitmapFactory.decodeStream(inputStream)
 
             // 원본 이미지 파일 크기가 2MB 이하면 원본 이미지 반환
-            if (originalBitmap.byteCount <= 2 * 1024 * 1024) {
+            //if (originalBitmap.byteCount <= 2 * 1024 * 1024) {
+            //
+            //    val fileName = "image${index}"
+            //    val file = File(context.filesDir, fileName)
+            //    val files = try {
+            //        val outputStream = FileOutputStream(file)
+            //        inputStream?.copyTo(outputStream)
+            //
+            //        outputStream.close()
+            //        inputStream?.close()
+            //
+            //        Log.d("LOG","2MB 이하 파일")
+            //        file // 변환된 File 객체를 StateFlow에 업데이트
+            //    } catch (e: IOException) {
+            //        e.printStackTrace()
+            //        null// 변환 실패 시 null로 업데이트
+            //    }
+            //    return files
+            //
+            //}else{
+            //    val inputStreamForRote = contentResolver.openInputStream(fileUri)
+            //    val exifInterface = inputStreamForRote?.let { ExifInterface(it) } // Exif 정보를 읽어오기 위해
+            //
+            //    // 이미지 회전 각도 가져오기 (Exif 정보 사용)
+            //    var orientation =
+            //        exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            //
+            //    when (orientation) {
+            //        ExifInterface.ORIENTATION_NORMAL -> orientation = 0
+            //        ExifInterface.ORIENTATION_ROTATE_90 -> orientation = 90
+            //        ExifInterface.ORIENTATION_ROTATE_180 -> orientation = 180
+            //        ExifInterface.ORIENTATION_ROTATE_270 -> orientation = 270
+            //    }
+            //    Log.d("LOG",orientation.toString())
+            //
+            //    // 이미지를 회전시키기
+            //    val matrix = Matrix()
+            //    matrix.setRotate(orientation?.toFloat() ?: 0f)
+            //    val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
+            //
+            //
+            //    val quality = 100 // 원하는 품질로 조절
+            //    val maxWidth = 1920 // 최대 가로 크기 (원하는 크기로 조절)
+            //    val maxHeight = 1080 // 최대 세로 크기 (원하는 크기로 조절)
+            //    val newWidth: Int
+            //    val newHeight: Int
+            //    Log.d("WH",originalBitmap.width.toString() +" : "+ originalBitmap.height.toString())
+            //    if (originalBitmap.width > originalBitmap.height) {
+            //        newWidth = min(originalBitmap.width, maxWidth)
+            //        newHeight = (newWidth.toFloat() / originalBitmap.width * originalBitmap.height).toInt()
+            //    } else {
+            //        newHeight = min(originalBitmap.height, maxHeight)
+            //        newWidth = (newHeight.toFloat() / originalBitmap.height * originalBitmap.width).toInt()
+            //    }
+            //
+            //    // 크기 조절된 이미지를 생성
+            //    val resizedBitmap =
+            //        if (orientation == 0){
+            //            Bitmap.createScaledBitmap(rotatedBitmap, newWidth, newHeight,  true)
+            //        }else {
+            //            Bitmap.createScaledBitmap(rotatedBitmap, newHeight, newWidth,  true)
+            //        }
+            //
+            //
+            //
+            //    // 이미지 파일 저장
+            //    val cacheDir = context.cacheDir
+            //    val fileName = "image${index}"
+            //    val resizedFile = File(cacheDir, fileName)
+            //    if (resizedFile.exists()) {
+            //        resizedFile.delete() // 이미 존재하는 파일 삭제
+            //    }
+            //    val outputStream = FileOutputStream(resizedFile)
+            //
+            //    // 이미지를 JPEG 형식으로 저장 (품질 설정 적용)
+            //    resizedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+            //    outputStream.close()
+            //
+            //    inputStream?.run { close() }
+            //    return resizedFile
+            //}
 
-                val fileName = "image${index}"
-                val file = File(context.filesDir, fileName)
-                val files = try {
-                    val outputStream = FileOutputStream(file)
-                    inputStream?.copyTo(outputStream)
+            val inputStreamForRote = contentResolver.openInputStream(fileUri)
+            val exifInterface = inputStreamForRote?.let { ExifInterface(it) } // Exif 정보를 읽어오기 위해
 
-                    outputStream.close()
-                    inputStream?.close()
+            // 이미지 회전 각도 가져오기 (Exif 정보 사용)
+            var orientation =
+                exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
 
-                    Log.d("LOG","2MB 이하 파일")
-                    file // 변환된 File 객체를 StateFlow에 업데이트
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                    null// 변환 실패 시 null로 업데이트
-                }
-                return files
-
-            }else{
-                val inputStreamForRote = contentResolver.openInputStream(fileUri)
-                val exifInterface = inputStreamForRote?.let { ExifInterface(it) } // Exif 정보를 읽어오기 위해
-
-                // 이미지 회전 각도 가져오기 (Exif 정보 사용)
-                var orientation =
-                    exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-
-                when (orientation) {
-                    ExifInterface.ORIENTATION_NORMAL -> orientation = 0
-                    ExifInterface.ORIENTATION_ROTATE_90 -> orientation = 90
-                    ExifInterface.ORIENTATION_ROTATE_180 -> orientation = 180
-                    ExifInterface.ORIENTATION_ROTATE_270 -> orientation = 270
-                }
-                Log.d("LOG",orientation.toString())
-
-                // 이미지를 회전시키기
-                val matrix = Matrix()
-                matrix.setRotate(orientation?.toFloat() ?: 0f)
-                val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
-
-
-                val quality = 100 // 원하는 품질로 조절
-                val maxWidth = 1920 // 최대 가로 크기 (원하는 크기로 조절)
-                val maxHeight = 1080 // 최대 세로 크기 (원하는 크기로 조절)
-                val newWidth: Int
-                val newHeight: Int
-                Log.d("WH",originalBitmap.width.toString() +" : "+ originalBitmap.height.toString())
-                if (originalBitmap.width > originalBitmap.height) {
-                    newWidth = min(originalBitmap.width, maxWidth)
-                    newHeight = (newWidth.toFloat() / originalBitmap.width * originalBitmap.height).toInt()
-                } else {
-                    newHeight = min(originalBitmap.height, maxHeight)
-                    newWidth = (newHeight.toFloat() / originalBitmap.height * originalBitmap.width).toInt()
-                }
-
-                // 크기 조절된 이미지를 생성
-                val resizedBitmap =
-                    if (orientation == 0){
-                        Bitmap.createScaledBitmap(rotatedBitmap, newWidth, newHeight,  true)
-                    }else {
-                        Bitmap.createScaledBitmap(rotatedBitmap, newHeight, newWidth,  true)
-                    }
-
-
-
-                // 이미지 파일 저장
-                val cacheDir = context.cacheDir
-                val fileName = "image${index}"
-                val resizedFile = File(cacheDir, fileName)
-                if (resizedFile.exists()) {
-                    resizedFile.delete() // 이미 존재하는 파일 삭제
-                }
-                val outputStream = FileOutputStream(resizedFile)
-
-                // 이미지를 JPEG 형식으로 저장 (품질 설정 적용)
-                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-                outputStream.close()
-
-                inputStream?.run { close() }
-                return resizedFile
+            when (orientation) {
+                ExifInterface.ORIENTATION_NORMAL -> orientation = 0
+                ExifInterface.ORIENTATION_ROTATE_90 -> orientation = 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> orientation = 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> orientation = 270
             }
+            Log.d("LOG",orientation.toString())
+
+            // 이미지를 회전시키기
+            val matrix = Matrix()
+            matrix.setRotate(orientation?.toFloat() ?: 0f)
+            val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
+
+
+            val quality = 100 // 원하는 품질로 조절
+            val maxWidth = 1920 // 최대 가로 크기 (원하는 크기로 조절)
+            val maxHeight = 1080 // 최대 세로 크기 (원하는 크기로 조절)
+            val newWidth: Int
+            val newHeight: Int
+            Log.d("WH",originalBitmap.width.toString() +" : "+ originalBitmap.height.toString())
+            if (originalBitmap.width > originalBitmap.height) {
+                newWidth = min(originalBitmap.width, maxWidth)
+                newHeight = (newWidth.toFloat() / originalBitmap.width * originalBitmap.height).toInt()
+            } else {
+                newHeight = min(originalBitmap.height, maxHeight)
+                newWidth = (newHeight.toFloat() / originalBitmap.height * originalBitmap.width).toInt()
+            }
+
+            // 크기 조절된 이미지를 생성
+            val resizedBitmap =
+                if (orientation == 0){
+                    Bitmap.createScaledBitmap(rotatedBitmap, newWidth, newHeight,  true)
+                }else {
+                    Bitmap.createScaledBitmap(rotatedBitmap, newHeight, newWidth,  true)
+                }
+
+
+
+            // 이미지 파일 저장
+            val cacheDir = context.cacheDir
+            val fileName = "image${index}"
+            val resizedFile = File(cacheDir, fileName)
+            if (resizedFile.exists()) {
+                resizedFile.delete() // 이미 존재하는 파일 삭제
+            }
+            val outputStream = FileOutputStream(resizedFile)
+
+            // 이미지를 JPEG 형식으로 저장 (품질 설정 적용)
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+            outputStream.close()
+
+            inputStream?.run { close() }
+            return resizedFile
         }
     } catch (e: IOException) {
         e.printStackTrace()

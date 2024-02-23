@@ -1014,7 +1014,7 @@ fun WeightCNDDialog(
                     modifier = Modifier
                         .padding(top = 20.dp)
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                        .clip(RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 20.dp, bottomEnd = 20.dp))
                 ){
                     Box(
                         modifier = Modifier
@@ -1172,7 +1172,7 @@ fun WeightDialog(
                         modifier = Modifier
                             .padding(top = 8.dp)
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                            .clip(RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 20.dp, bottomEnd = 20.dp))
                     ){
                         Box(
                             modifier = Modifier
@@ -1329,7 +1329,7 @@ fun WeightDialog(
                         modifier = Modifier
                             .padding(top = 20.dp)
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                            .clip(RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 20.dp, bottomEnd = 20.dp))
                     ){
                         Box(
                             modifier = Modifier

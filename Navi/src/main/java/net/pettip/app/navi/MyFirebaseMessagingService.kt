@@ -83,7 +83,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
 
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent, FLAG_UPDATE_CURRENT
+            this, 0, intent, FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
         )
 
 

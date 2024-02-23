@@ -112,6 +112,7 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
             .background(gradient))
 
         Column (modifier= Modifier
+            .padding(horizontal = 8.dp)
             .width(160.dp)
             .wrapContentHeight()
             .align(Alignment.BottomCenter)
