@@ -15,7 +15,7 @@ plugins {
 
 android {
     namespace = "net.pettip.gpx"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 26
