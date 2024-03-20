@@ -4,6 +4,9 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.Html
+import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -20,6 +23,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -286,6 +290,7 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                 text = detailData?.data?.pstTtl ?: "",
                                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                                 fontSize = 24.sp,
+                                lineHeight = 32.sp,
                                 letterSpacing = (-1.2).sp,
                                 color = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)
@@ -299,9 +304,12 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
                                     .background(MaterialTheme.colorScheme.outline)
                             )
 
-                            HtmlText(htmlString = detailData?.data?.pstCn?:"", modifier = Modifier
-                                .padding(horizontal = 20.dp)
-                                .fillMaxWidth())
+                            HtmlText(
+                                htmlString = detailData?.data?.pstCn?:"",
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp)
+                                    .fillMaxWidth()
+                            )
 
                             //Row (
                             //    modifier = Modifier
@@ -588,20 +596,84 @@ fun HtmlText(htmlString: String, modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
     val textColor = MaterialTheme.colorScheme.onPrimary
+    val textColor2 = if (isSystemInDarkTheme()) "FFFFFF" else  "222222"
 
-    AndroidView(
-        modifier = modifier,
-        factory = { context -> TextView(context) },
-        update = { textView ->
-            val typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
-            textView.text = HtmlCompat.fromHtml(
-                htmlString, HtmlCompat.FROM_HTML_MODE_COMPACT,
-                CoilImageGetter(textView),null
-            )
-            textView.setTextColor(textColor.toArgb())
-            textView.typeface = typeface
+    val exam = "<p>텍스트</p>\n" +
+            "<img src=\"https://kr1-api-object-storage.nhncloudservice.com/v1/AUTH_9c6eacbf7cf24d05ae625145cdc3b0f9/bbs_ntc/20240318/93d67ae96e774cdeaf9aea37fbe301e2.jpg\" contenteditable=\"false\" width=\"100%\">\n" +
+            "<p>이미지 설명</p>\n" +
+            "<p>추가 텍스트</p>"+
+            "<p><strong>ㅁㄴㅇ</strong></p><h1>ㅂㅈㄷ</h1><p><em>ㅋㅌㅊㅍ</em></p><p><del>퓨ㅜ</del></p><p>ㅁㄴㅇ</p><div contenteditable=\"false\"><hr></div><div contenteditable=\"false\"><hr></div><div contenteditable=\"false\"><hr></div><p><br></p>"
+
+    val color = MaterialTheme.colorScheme.primary.toArgb()
+    //val styledHtmlString = htmlString.replaceLast("<p>", "<p style=\"color: $textColor2\">")
+    val styledHtmlString = exam.replaceAllParagraphAndHeadingTags(textColor2)
+
+
+
+    Column {
+        // 기존
+        AndroidView(
+            modifier = modifier,
+            factory = { context -> TextView(context) },
+            update = { textView ->
+                val typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
+                textView.text = HtmlCompat.fromHtml(
+                    htmlString, HtmlCompat.FROM_HTML_MODE_COMPACT,
+                    CoilImageGetter(textView),null
+                )
+                textView.setTextColor(textColor.toArgb())
+                textView.typeface = typeface
+            }
+        )
+
+        // 신규 - setBackgroundColor, styledHtmlString 설정(white,dark 테마)
+        //AndroidView(
+        //    factory = { context ->
+        //        WebView(context).apply {
+        //            setBackgroundColor(color)
+        //            settings.javaScriptEnabled = false
+        //            settings.loadWithOverviewMode = true
+        //            webViewClient = WebViewClient()
+        //        }
+        //    },
+        //    update = { webView ->
+        //        webView.loadDataWithBaseURL(null, styledHtmlString , "text/html", "UTF-8", null)
+        //    },
+        //    modifier = modifier
+        //)
+        //
+        // 신규 - WebView 그대로 보여주기
+        //AndroidView(
+        //    factory = { context ->
+        //        WebView(context).apply {
+        //            settings.javaScriptEnabled = false
+        //            settings.loadWithOverviewMode = true
+        //            webViewClient = WebViewClient()
+        //        }
+        //    },
+        //    update = { webView ->
+        //        webView.loadDataWithBaseURL(null, htmlString , "text/html", "UTF-8", null)
+        //    },
+        //    modifier = Modifier.fillMaxSize()
+        //)
+    }
+}
+fun String.replaceLast(oldValue: String, newValue: String): String {
+    val lastIndex = this.lastIndexOf(oldValue)
+    if (lastIndex == -1) {
+        return this
+    }
+    return this.substring(0, lastIndex) + newValue + this.substring(lastIndex + oldValue.length)
+}
+fun String.replaceAllParagraphAndHeadingTags(textColor: String): String {
+    val regex = Regex("<p>|<h1>")
+    return regex.replace(this) {
+        when (it.value) {
+            "<p>" -> "<p style=\"color: $textColor\">"
+            "<h1>" -> "<h1 style=\"color: $textColor\">"
+            else -> it.value
         }
-    )
+    }
 }
 
 open class CoilImageGetter(

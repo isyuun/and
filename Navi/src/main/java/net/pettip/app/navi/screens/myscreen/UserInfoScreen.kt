@@ -394,6 +394,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                 onCheckedChange = { newValue ->
                                     settingViewModel.updatePushAdUseYn(newValue)
                                     settingViewModel.viewModelScope.launch {
+                                        snackbarHostState.currentSnackbarData?.dismiss()
                                         val result = settingViewModel.setPushYn()
                                         if (result) {
                                             if (marketingCheck) {
@@ -511,6 +512,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                 onCheckedChange = { newValue ->
                                     settingViewModel.updatePushUseYn(newValue)
                                     settingViewModel.viewModelScope.launch {
+                                        snackbarHostState.currentSnackbarData?.dismiss()
                                         val result = settingViewModel.setPushYn()
                                         if (result) {
                                             if (defaultCheck) {
@@ -596,6 +598,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                 onCheckedChange = { newValue ->
                                     settingViewModel.updatePushMdnghtUseYn(newValue)
                                     settingViewModel.viewModelScope.launch {
+                                        snackbarHostState.currentSnackbarData?.dismiss()
                                         val result = settingViewModel.setPushYn()
                                         if (result) {
                                             if (dawnCheck) {

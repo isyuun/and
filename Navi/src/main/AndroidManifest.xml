@@ -44,7 +44,7 @@
             android:name="net.pettip.app.navi.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.CarePetDemo"
+            android:theme="@style/Theme.Pettip.Splash"
             android:screenOrientation="portrait"
             android:launchMode="singleTop"
             >
@@ -75,9 +75,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="pettip.net"
+
                     android:scheme="pettip" />
             </intent-filter>
+
 
 
             <intent-filter>

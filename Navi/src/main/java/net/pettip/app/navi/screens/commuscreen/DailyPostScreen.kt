@@ -149,7 +149,6 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
     val dummyUri = Uri.parse("")
     var expanded by remember { mutableStateOf(false) }
     val items = petList.map { "${it.petNm}와 즐거운 산책~!" }
-    val focusManager = LocalFocusManager.current
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
     val scrollState = rememberScrollState()
 

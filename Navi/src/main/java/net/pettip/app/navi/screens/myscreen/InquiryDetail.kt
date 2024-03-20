@@ -3,12 +3,18 @@ package net.pettip.app.navi.screens.myscreen
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,14 +45,18 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -59,16 +69,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomAlert
 import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.commuscreen.HtmlText
+import net.pettip.app.navi.screens.walkscreen.FullScreenImage
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.data.bbs.QnaDetailData
+import net.pettip.data.daily.DailyDetailData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,6 +91,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
     var isModify by remember{ mutableStateOf(false) }
     var deleteDialog by remember{ mutableStateOf(false) }
     var qnaDelete by remember{ mutableStateOf(false) }
+    var showImage by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     val snackState = remember{SnackbarHostState()}
@@ -85,10 +99,13 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
     val uriList: List<Uri>? = qnaDetail?.data?.get(0)?.files?.map {
         Uri.parse("${qnaDetail?.data?.get(0)?.atchPath}${it.filePathNm}${it.atchFileNm}")
     }
+    var selectImage by remember{ mutableStateOf<Uri?>(null) }
 
     BackHandler {
         if (isModify){
             isModify = false
+        }else if (showImage){
+            showImage = false
         }else{
             navController.popBackStack()
         }
@@ -248,7 +265,12 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                 ){
                     items(uriList){item ->
                         Box(
-                            modifier = Modifier.size(100.dp)
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clickable {
+                                    selectImage = item
+                                    showImage = true
+                                }
                         ){
                             AsyncImage(
                                 model = ImageRequest.Builder(LocalContext.current)
@@ -281,6 +303,19 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
             }
         }
     }
+
+    AnimatedVisibility(
+        visible = showImage,
+        enter = scaleIn(transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.5f)).plus(fadeIn()),
+        exit = scaleOut(transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.5f)).plus(fadeOut())
+    ) {
+        selectImage?.let {
+            FullScreenImageInquiry(
+                uri = it,
+                onDismiss = { newValue -> showImage = newValue })
+        }
+    }
+
 
     AnimatedVisibility(
         visible = isModify,
@@ -373,4 +408,90 @@ fun InquiryDetailAnswer(answer: QnaDetailData?) {
 
         HtmlText(htmlString = answer?.pstCn?:"", modifier = Modifier.padding(top = 20.dp, start = 40.dp, end = 40.dp))
     }// col
+}
+
+@Composable
+fun FullScreenImageInquiry(
+    uri:Uri,
+    onDismiss: (Boolean) -> Unit
+) {
+    var systemBarColor by remember { mutableStateOf(Color.Black) }
+    val color = MaterialTheme.colorScheme.primary
+
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(color = systemBarColor)
+
+    var rotate by remember { mutableStateOf(false) }
+    var scale by remember { mutableFloatStateOf(1f) }
+    val rotation: Float by animateFloatAsState(if (rotate) 90f else 0f, label = "")
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
+        scale *= zoomChange
+        //rotation += rotationChange
+        offset = if (scale <= 1f) {
+            Offset.Zero
+        } else {
+            offset + offsetChange
+        }
+    }
+
+    BackHandler {
+        systemBarColor = color
+        onDismiss(false)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = {
+                    systemBarColor = color
+                    onDismiss(false)
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(uri)
+                .crossfade(true)
+                .build(),
+            contentDescription = "",
+            modifier = Modifier
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    rotationZ = rotation,
+                    translationX = if (rotate) -offset.y * scale else offset.x * scale,
+                    translationY = if (rotate) offset.x * scale else offset.y * scale
+                )
+                // add transformable to listen to multitouch transformation events
+                // after offset
+                .transformable(state = state)
+                .fillMaxSize(),
+            contentScale = ContentScale.Fit
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(bottom = 20.dp)
+                .clickable {
+                    rotate = !rotate
+                    offset = Offset.Zero
+                }
+                .align(Alignment.BottomCenter),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "사진 회전",
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                fontSize = 12.sp, color = design_white.copy(alpha = 0.5f),
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+        }
+
+    }
 }

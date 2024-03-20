@@ -55,6 +55,7 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
                 text = notiDetail?.data?.pstTtl?:"",
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 24.sp,
+                lineHeight = 32.sp,
                 letterSpacing = (-1.2).sp,
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)
@@ -76,7 +77,12 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
                 .background(color = MaterialTheme.colorScheme.outline)
             )
 
-            HtmlText(htmlString = notiDetail?.data?.pstCn?:"", modifier = Modifier.padding(horizontal = 20.dp))
+            HtmlText(
+                htmlString = notiDetail?.data?.pstCn?:"",
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .fillMaxWidth()
+            )
         }
     }
 

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.pettip.data.cmm.commonRes
+import net.pettip.data.user.CheckEmailRes
 import net.pettip.data.user.LoginResModel
 import net.pettip.data.user.TrmnlMngReq
 import net.pettip.singleton.G
@@ -103,6 +104,12 @@ class LoginViewModel() : ViewModel() {
     val personCheck: StateFlow<Boolean> = _personCheck.asStateFlow()
     fun updatePersonCheck(newValue: Boolean) { _personCheck.value = newValue }
 
+    private val _signYn = MutableStateFlow<String>("")
+    val signYn: StateFlow<String> = _signYn.asStateFlow()
+
+    private val _snsNm = MutableStateFlow<String>("")
+    val snsNm: StateFlow<String> = _snsNm.asStateFlow()
+
     private val _appKey = MutableStateFlow<String>("")
     fun updateAppKey() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -182,9 +189,9 @@ class LoginViewModel() : ViewModel() {
                                     MySharedPreference.setLastLoginMethod(loginMethod)
                                     MySharedPreference.setIsLogin(true)
 
-                                    continuation.resume(0)
+                                    continuation.resume(
+                                        0)
                                 } else {
-
                                     continuation.resume(1)
                                 }
                             }
@@ -305,5 +312,37 @@ class LoginViewModel() : ViewModel() {
             }
 
             NaverIdLoginSDK.authenticate(context,oAuthLoginCallback)
+    }
+
+    suspend fun checkEmail():String{
+        val apiService = RetrofitClientServer.instance
+
+        val call = apiService.checkEmail(_email.value)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<CheckEmailRes>{
+                override fun onResponse(call: Call<CheckEmailRes>, response: Response<CheckEmailRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (it.statusCode == 200){
+                                _signYn.value = it.data?.signYn ?: ""
+                                _snsNm.value = it.data?.snsNm ?: ""
+
+                                if (it.data?.signYn == "Y"){
+                                    continuation.resume("Y")
+                                }else{
+                                    continuation.resume("N")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<CheckEmailRes>, t: Throwable) {
+                    continuation.resume("error")
+                }
+
+            })
+        }
     }
 }

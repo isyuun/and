@@ -27,6 +27,7 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
@@ -187,17 +188,15 @@ fun NotiScreen(navController: NavHostController, viewModel: CommunityViewModel){
         }
     }
 
-    LaunchedEffect(key1 = init) {
-        if (init) {
-            isLoading = true
+    LaunchedEffect(Unit) {
+        isLoading = true
 
-            viewModel.updateNtcListClear()
-            viewModel.updateNtcListPage(1)
-            val result = viewModel.getNtcList(1)
-            isLoading = false
-            isError = !result
-            viewModel.updateNtcListInit(false)
-        }
+        viewModel.updateNtcListClear()
+        viewModel.updateNtcListPage(1)
+        val result = viewModel.getNtcList(1)
+        isLoading = false
+        isError = !result
+        //viewModel.updateNtcListInit(false)
     }
 
 
@@ -250,7 +249,7 @@ fun NotiScreen(navController: NavHostController, viewModel: CommunityViewModel){
                 }
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+                PullRefreshIndicator(refreshing = refreshing, state = pullRefreshState)
             }
         }
     }
@@ -270,16 +269,25 @@ fun FAQScreen(navController: NavHostController, viewModel: CommunityViewModel){
     var refreshing by remember{ mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
 
-    LaunchedEffect(key1 = init){
-        if (init){
-            isLoading = true
+    //LaunchedEffect(key1 = init){
+    //    if (init){
+    //        isLoading = true
+    //
+    //        viewModel.updateFaqListClear()
+    //        val result = viewModel.getFaqList(1)
+    //        isLoading = false
+    //        isError = !result
+    //        viewModel.updateFaqListInit(false)
+    //    }
+    //}
 
-            viewModel.updateFaqListClear()
-            val result = viewModel.getFaqList(1)
-            isLoading = false
-            isError = !result
-            viewModel.updateFaqListInit(false)
-        }
+    LaunchedEffect(Unit){
+        isLoading = true
+
+        viewModel.updateFaqListClear()
+        val result = viewModel.getFaqList(1)
+        isLoading = false
+        isError = !result
     }
 
     LaunchedEffect(key1 = refreshing){
@@ -362,16 +370,26 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
             refreshing = true
         })
 
-    LaunchedEffect(key1 = init){
-        if (init){
-            isLoading = true
+    //LaunchedEffect(key1 = init){
+    //    if (init){
+    //        isLoading = true
+    //
+    //        viewModel.updateQnaListClear()
+    //        val result = viewModel.getQnaList(1)
+    //        isLoading = false
+    //        isError = !result
+    //        viewModel.updateQnaListInit(false)
+    //    }
+    //}
 
-            viewModel.updateQnaListClear()
-            val result = viewModel.getQnaList(1)
-            isLoading = false
-            isError = !result
-            viewModel.updateQnaListInit(false)
-        }
+    LaunchedEffect(Unit){
+        isLoading = true
+
+        viewModel.updateQnaListClear()
+        val result = viewModel.getQnaList(1)
+        isLoading = false
+        isError = !result
+        //viewModel.updateQnaListInit(false)
     }
 
     LaunchedEffect(key1 = refreshing){
@@ -489,7 +507,7 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
                     }
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                        CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+                        PullRefreshIndicator(refreshing = refreshing, state = pullRefreshState)
                     }
                 }
             }

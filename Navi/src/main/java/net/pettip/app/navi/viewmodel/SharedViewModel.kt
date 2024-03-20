@@ -147,7 +147,7 @@ class SharedViewModel:ViewModel(){
         }
     }
 
-    fun changeBirth(birth:String):String{
+    fun changeBirth(birth: String): String {
         val birthday = parseBirthday(birth)
         val currentDate = LocalDate.now() // 현재 날짜
 
@@ -155,18 +155,43 @@ class SharedViewModel:ViewModel(){
 
         val years = period.years // 연 차이
         val months = period.months // 월 차이
+        val days = period.days // 일 차이
 
-        val returnBirth = if (years > 0) {
-            if (months > 0) {
-                "$years 년 $months 개월"
-            } else {
-                "$years 년"
-            }
+        val yearStr = if (years > 0) {
+            "${years}년"
         } else {
-            "$months 개월"
+            ""
         }
 
-        return returnBirth
+        val monthStr = if (months > 0) {
+            "${months}개월"
+        } else {
+            ""
+        }
+
+        val dayStr = if (days > 0) {
+            "${days}일"
+        } else {
+            ""
+        }
+
+        // 연도와 월이 모두 있는 경우
+        if (years > 0 && months > 0) {
+            return "$yearStr $monthStr $dayStr"
+        }
+
+        // 연도만 있는 경우
+        if (years > 0 && months == 0) {
+            return "$yearStr $dayStr"
+        }
+
+        // 월만 있는 경우
+        if (years == 0 && months > 0) {
+            return "$monthStr $dayStr"
+        }
+
+        // 그 외의 경우 (연도와 월이 모두 없는 경우)
+        return dayStr
     }
 
 

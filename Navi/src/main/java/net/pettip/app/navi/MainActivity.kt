@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -31,6 +33,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.core.splashscreen.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.splashscreen.SplashScreenViewProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -96,7 +101,10 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        splashScreen.setKeepOnScreenCondition{false}
 
         Log.d("LOG","onCreate 진입")
 
@@ -268,7 +276,8 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
             route = "intro",
             deepLinks = listOf(
                 navDeepLink {
-                    uriPattern = "http://pettip.net"
+                    uriPattern = "https://pettip.net"
+                    //uriPattern = "http://carepet.hopto.org"
                     action = Intent.ACTION_VIEW
                 }
             )

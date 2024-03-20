@@ -64,6 +64,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -148,7 +149,10 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
     val snsEmail by viewModel.email.collectAsState()
     val snsUnqId by viewModel.unqId.collectAsState()
 
+    val snsNm by viewModel.snsNm.collectAsState()
+
     var snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
+    var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
     val focusManager = LocalFocusManager.current
 
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -177,8 +181,20 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                         popUpTo(0)
                     }
                 }else if (loginResult == 1){
-                    viewModel.updateLoginMethod("GOOGLE")
-                    navController.navigate(Screen.EasyRegScreen.route)
+                    when(viewModel.checkEmail()){
+                        "Y" -> {
+                            alertMsg = "이미 ${snsNm}로 등록된 사용자입니다"
+                            alertShow = true
+                        }
+                        "N" -> {
+                            viewModel.updateLoginMethod("GOOGLE")
+                            navController.navigate(Screen.EasyRegScreen.route)
+                        }
+                        else -> {
+                            alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+                            alertShow = true
+                        }
+                    }
                 }else{
                     alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
                     alertShow = true
@@ -186,7 +202,9 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
             }
 
         } catch (e: ApiException){
-            Log.e("Google account","signInResult:failed Code = " + e.statusCode)
+            alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+            alertShow = true
+            //Log.e("Google account","signInResult:failed Code = " + e.statusCode)
         }
     }
 
@@ -469,29 +487,45 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                 
                 Box{
                     Button(onClick = {
-                        scope.launch {
-                            val kakaoLoginResult = viewModel.kakaoLogin(context)
-                            if (kakaoLoginResult){
+                        val currentTime = System.currentTimeMillis()
+                        if (currentTime - lastClickTime >= 1500) {
+                            lastClickTime = currentTime
+                            scope.launch {
+                                val kakaoLoginResult = viewModel.kakaoLogin(context)
+                                if (kakaoLoginResult){
 
-                                val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "KAKAO")
-                                if (loginResult == 0){
-                                    sharedViewModel.updateInit(true)
-                                    sharedViewModel.updateDupleLogin(false)
-                                    navController.navigate(Screen.MainScreen.route){
-                                        popUpTo(0)
+                                    val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "KAKAO")
+                                    if (loginResult == 0){
+                                        sharedViewModel.updateInit(true)
+                                        sharedViewModel.updateDupleLogin(false)
+                                        navController.navigate(Screen.MainScreen.route){
+                                            popUpTo(0)
+                                        }
+                                    }else if (loginResult == 1){
+                                        when(viewModel.checkEmail()){
+                                            "Y" -> {
+                                                alertMsg = "이미 ${snsNm}로 등록된 사용자입니다"
+                                                alertShow = true
+                                            }
+                                            "N" -> {
+                                                viewModel.updateLoginMethod("KAKAO")
+                                                navController.navigate(Screen.EasyRegScreen.route)
+                                            }
+                                            else -> {
+                                                alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+                                                alertShow = true
+                                            }
+                                        }
+                                    }else{
+                                        // 실패시의 상황을 하나로 상정하면 안됨.
+                                        // 통신실패의 경우에는 토스트를 띄어 다시시도하기 유도
+                                        alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+                                        alertShow = true
                                     }
-                                }else if (loginResult == 1){
-                                    viewModel.updateLoginMethod("KAKAO")
-                                    navController.navigate(Screen.EasyRegScreen.route)
                                 }else{
-                                    // 실패시의 상황을 하나로 상정하면 안됨.
-                                    // 통신실패의 경우에는 토스트를 띄어 다시시도하기 유도
-                                    alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+                                    alertMsg = "Kakao 로그인에 실패했습니다.\n다시 시도해주세요"
                                     alertShow = true
                                 }
-                            }else{
-                                alertMsg = "Kakao 로그인에 실패했습니다.\n다시 시도해주세요"
-                                alertShow = true
                             }
                         }
                     },
@@ -552,28 +586,44 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
 
                 Box {
                     Button(onClick = {
-                        scope.launch {
-                            val naverLoginResult = viewModel.naverLogin(context)
-                            if (naverLoginResult){
+                        val currentTime = System.currentTimeMillis()
+                        if (currentTime - lastClickTime >= 1500) {
+                            lastClickTime = currentTime
+                            scope.launch {
+                                val naverLoginResult = viewModel.naverLogin(context)
+                                if (naverLoginResult){
 
-                                val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "NAVER")
-                                // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
-                                if (loginResult == 0){
-                                    sharedViewModel.updateInit(true)
-                                    sharedViewModel.updateDupleLogin(false)
-                                    navController.navigate(Screen.MainScreen.route){
-                                        popUpTo(0)
+                                    val loginResult = viewModel.onLoginButtonClick(snsEmail, snsUnqId, "NAVER")
+                                    // 가져온 정보로 로그인 시도, 성공시 메인// 실패시 가입
+                                    if (loginResult == 0){
+                                        sharedViewModel.updateInit(true)
+                                        sharedViewModel.updateDupleLogin(false)
+                                        navController.navigate(Screen.MainScreen.route){
+                                            popUpTo(0)
+                                        }
+                                    }else if(loginResult == 1){
+                                        when(viewModel.checkEmail()){
+                                            "Y" -> {
+                                                alertMsg = "이미 ${snsNm}로 등록된 사용자입니다"
+                                                alertShow = true
+                                            }
+                                            "N" -> {
+                                                viewModel.updateLoginMethod("NAVER")
+                                                navController.navigate(Screen.EasyRegScreen.route)
+                                            }
+                                            else -> {
+                                                alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+                                                alertShow = true
+                                            }
+                                        }
+                                    }else{
+                                        alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+                                        alertShow = true
                                     }
-                                }else if(loginResult == 1){
-                                    viewModel.updateLoginMethod("NAVER")
-                                    navController.navigate(Screen.EasyRegScreen.route)
                                 }else{
-                                    alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
+                                    alertMsg = "Naver 로그인에 실패했습니다.\n다시 시도해주세요"
                                     alertShow = true
                                 }
-                            }else{
-                                alertMsg = "Naver 로그인에 실패했습니다.\n다시 시도해주세요"
-                                alertShow = true
                             }
                         }
                     },
@@ -635,8 +685,13 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                     Button(
                         onClick = {
                             scope.launch {
-                                val signInIntent = mGoogleSignInClient.signInIntent
-                                googleAuthLauncher.launch(signInIntent)
+                                val currentTime = System.currentTimeMillis()
+                                if (currentTime - lastClickTime >= 1500) {
+                                    lastClickTime = currentTime
+
+                                    val signInIntent = mGoogleSignInClient.signInIntent
+                                    googleAuthLauncher.launch(signInIntent)
+                                }
                             } },
                         modifier = Modifier
                             .padding(horizontal = 20.dp)

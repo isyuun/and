@@ -69,6 +69,7 @@ import net.pettip.data.pet.PetWgtRes
 import net.pettip.data.pet.RegPetWgtReq
 import net.pettip.data.pet.SetInviteCodeRes
 import net.pettip.data.user.BbsReq
+import net.pettip.data.user.CheckEmailRes
 import net.pettip.data.user.FAQRes
 import net.pettip.data.user.LoginData
 import net.pettip.data.user.LoginResModel
@@ -187,6 +188,9 @@ interface ApiService {
 
     @POST("/api/v1/member/pushYn/update")
     fun setPushYn(@Body data: PushYnUpdateReq): Call<commonRes>
+
+    @POST("/api/v1/member/chk-email")
+    fun checkEmail(@Body data: String): Call<CheckEmailRes>
     // --------------------- 회원 ----------------------- //
 
     // --------------------- 일상생활 ----------------------- //
@@ -199,9 +203,6 @@ interface ApiService {
 
     @POST("api/v1/daily-life/update")
     fun updateDaily(@Body data: DailyUpdateReq): Call<DailyDetailRes>
-
-    @POST("api/v1/daily-life/rls/update")
-    fun rlsDaily(@Body data: RlsDailyReq): Call<DailyDetailRes>
 
     @POST("api/v1/daily-life/list")
     fun getWalkList(@Body data: WalkListReq): Call<WalkListRes>
@@ -326,9 +327,6 @@ interface ApiService {
 
     // --------------------- 공통 코드 ----------------------- //
     @POST("api/v1/cmm/code-list")
-    fun commonCodeList(@Body data: CommonCodeModel): Call<CommonCodeResModel>
-
-    @POST("api/v1/cmm/code-list")
     fun getCmmList(@Body data: CommonCodeModel): Call<CmmRes>
 
     @POST("api/v1/cmm/pet-list")
@@ -339,20 +337,19 @@ interface ApiService {
 
     @POST("api/v1/cmm/umd-list")
     fun getUmdList(@Body data: UmdListReq): Call<UmdListRes>
-
-    @POST("api/v1/weather")
-    fun getWeather(@Body data: WeatherReq): Call<WeatherRes>
     // --------------------- 공통 코드 ----------------------- //
 
-    // --------------------- 공통 코드 ----------------------- //
+    // --------------------- 스토리 ----------------------- //
     @POST("api/v1/story/real-time-list")
     fun getRealTimeList(): Call<RTStoryListRes>
 
     @POST("/api/v1/story/list")
     fun getStoryList(@Body data: StoryReq): Call<StoryRes>
 
-    // --------------------- 공통 코드 ----------------------- //
+    // --------------------- 스토리 ----------------------- //
 
-    @GET
-    fun downloadGpxFile(@Url fileUrl: String): Call<ResponseBody>
+    // --------------------- 날씨 정보 ----------------------- //
+    @POST("api/v1/weather")
+    fun getWeather(@Body data: WeatherReq): Call<WeatherRes>
+    // --------------------- 날씨 정보 ----------------------- //
 }

@@ -19,8 +19,8 @@ android {
         applicationId = "net.pettip.app.navi"
         minSdk = 26
         targetSdk = 34
-        versionCode = 9
-        versionName = "0.9"
+        versionCode = 10
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -102,6 +102,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0") // Pager Indicators
     implementation("com.patrykandpatrick.vico:compose-m3:1.12.0")
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
+    implementation("androidx.core:core-splashscreen:1.0.0-beta02")
 
     //카카오 SDK
     implementation("com.kakao.sdk:v2-all:2.15.0")

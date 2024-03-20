@@ -21,6 +21,7 @@ import net.pettip.singleton.BASE_URL
 fun WebViewScreen(page:Int) {
     val url1 = "${BASE_URL}terms"
     val url2 = "${BASE_URL}privacy_policy"
+    val url3 = "${BASE_URL}loc-based-terms"
     AndroidView(
         factory = { context ->
             WebView(context).apply {
@@ -41,6 +42,7 @@ fun WebViewScreen(page:Int) {
             when(page){
                 1 -> webView.loadUrl(url1)
                 2 -> webView.loadUrl(url2)
+                3 -> webView.loadUrl(url3)
             }
         }
     )

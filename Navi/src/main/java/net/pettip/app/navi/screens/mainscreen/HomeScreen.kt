@@ -6,7 +6,10 @@ package net.pettip.app.navi.screens.mainscreen
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.BlurMaskFilter
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
@@ -52,6 +55,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
@@ -111,6 +115,7 @@ import coil.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
@@ -334,7 +339,7 @@ fun HomeScreen(
                 }
             }
         }
-        CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+        PullRefreshIndicator(refreshing = refreshing, state = pullRefreshState)
     }
 }
 
@@ -446,7 +451,18 @@ fun ProfileContent(
                                 viewModel.updateWeatherRefresh(true)
                                 Log.d("LOG", "1")
                             } else {
-                                locationPermissionState.launchPermissionRequest()
+                                //locationPermissionState.launchPermissionRequest()
+                                if (locationPermissionState.status.shouldShowRationale) {
+                                    // 사용자에게 왜 권한이 필요한지 설명하는 다이얼로그를 표시할 수 있음
+                                    locationPermissionState.launchPermissionRequest()
+                                } else {
+                                    // 사용자가 다시 보지 않기를 선택한 경우
+                                    // 앱 설정으로 이동하여 사용자가 권한을 수동으로 활성화하도록 안내
+                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                    val uri = Uri.fromParts("package", context.packageName, null)
+                                    intent.data = uri
+                                    context.startActivity(intent)
+                                }
                             }
                         }
                     )
@@ -1589,6 +1605,24 @@ fun BottomInfo(navController: NavHostController){
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.clickable {
                     navController.navigate("webViewScreen/2")
+                }
+            )
+
+            Spacer(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .size(2.dp, 8.dp)
+                    .background(color = design_skip)
+            )
+
+            Text(
+                text = "위치기반서비스 이용약관",
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                letterSpacing = (-0.6).sp,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.clickable {
+                    navController.navigate("webViewScreen/3")
                 }
             )
 

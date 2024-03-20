@@ -872,6 +872,14 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         }
     }
 
+    LaunchedEffect(key1 = loading){
+        if (loading){
+            delay(10000)
+            application.stop()
+            loading = false
+        }
+    }
+
     val buttonText = if (start) stringResource(id = R.string.walk_button_end) else stringResource(R.string.walk_button_start)
     val buttonColors = if (start) ButtonDefaults.buttonColors(MaterialTheme.colorScheme.inversePrimary) else ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
 

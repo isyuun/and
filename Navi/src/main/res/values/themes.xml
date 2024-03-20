@@ -4,4 +4,17 @@
     <style name="Theme.CarePetDemo" parent="Theme.MaterialComponents.DayNight" >
         <item name="android:statusBarColor">@color/white</item>
     </style>
+
+    <style name="Theme.Pettip.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dummy_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.Pettip</item>
+
+    </style>
+
+    <style name="Theme.Pettip" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
 </resources>

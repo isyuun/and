@@ -29,6 +29,7 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DropdownMenuItem
@@ -411,7 +412,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                 }
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                    CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+                    PullRefreshIndicator(refreshing = refreshing, state = pullRefreshState)
                 }
             }
         }// col
@@ -520,7 +521,7 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
         }
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-            CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+            PullRefreshIndicator(refreshing = refreshing, state = pullRefreshState)
         }
     }
 }
@@ -628,7 +629,7 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
         }
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-            CustomIndicator(state = pullRefreshState, refreshing = refreshing)
+            PullRefreshIndicator(refreshing = refreshing, state = pullRefreshState)
         }
     }
 }
@@ -825,7 +826,7 @@ val CommunityTabItems = listOf(
 )
 
 fun compareTimes(inputDate: String?): Boolean {
-    if (inputDate == "" || inputDate == null) {
+    if (inputDate.isNullOrBlank()){
         return false
     } else {
         // 현재 날짜 가져오기
