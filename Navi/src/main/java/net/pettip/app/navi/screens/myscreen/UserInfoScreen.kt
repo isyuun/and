@@ -39,6 +39,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -108,6 +109,12 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
     val defaultCheck by settingViewModel.pushUseYn.collectAsState()
     val marketingCheck by settingViewModel.pushAdUseYn.collectAsState()
     val dawnCheck by settingViewModel.pushMdnghtUseYn.collectAsState()
+
+    DisposableEffect(Unit){
+        onDispose {
+            settingViewModel.updateUserNickNamePass("")
+        }
+    }
 
     LaunchedEffect(key1 = refresh) {
         if (refresh) {
@@ -399,12 +406,12 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                                         if (result) {
                                             if (marketingCheck) {
                                                 snackbarHostState.showSnackbar(
-                                                    message = "마케팅 및 이벤트 알림 동의",
+                                                    message = "마케팅 및 이벤트 알림이 활성화 되었습니다",
                                                     duration = SnackbarDuration.Short
                                                 )
                                             } else {
                                                 snackbarHostState.showSnackbar(
-                                                    message = "마케팅 및 이벤트 알림 거절",
+                                                    message = "마케팅 및 이벤트 알림이 비활성화 되었습니다",
                                                     duration = SnackbarDuration.Short
                                                 )
                                             }
@@ -791,7 +798,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
             //)
 
             Button(
-                enabled = nickName == passedNick,
+                enabled = (nickName == passedNick && nickName.isNotBlank()),
                 onClick = {
                     scope.launch {
                         focusManager.clearFocus()

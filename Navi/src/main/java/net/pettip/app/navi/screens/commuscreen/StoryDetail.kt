@@ -841,10 +841,16 @@ fun StoryDetailTopContent(
                                             val result = viewModel.updateDailyRls("Y")
                                             if (result) {
                                                 rlsUpdateLoading = false
-                                                scope.launch { snackState.showSnackbar("공개처리 되었습니다") }
+                                                scope.launch {
+                                                    snackState.currentSnackbarData?.dismiss()
+                                                    snackState.showSnackbar("공개처리 되었습니다")
+                                                }
                                             } else {
                                                 rlsUpdateLoading = false
-                                                scope.launch { snackState.showSnackbar("다시 시도해주세요") }
+                                                scope.launch {
+                                                    snackState.currentSnackbarData?.dismiss()
+                                                    snackState.showSnackbar("다시 시도해주세요")
+                                                }
                                             }
                                         }
                                     }
@@ -888,10 +894,15 @@ fun StoryDetailTopContent(
                                         val result = viewModel.updateDailyRls("N")
                                         if (result) {
                                             rlsUpdateLoading = false
-                                            scope.launch { snackState.showSnackbar("비공개처리 되었습니다") }
+                                            scope.launch {
+                                                snackState.currentSnackbarData?.dismiss()
+                                                snackState.showSnackbar("비공개처리 되었습니다") }
                                         } else {
                                             rlsUpdateLoading = false
-                                            scope.launch { snackState.showSnackbar("다시 시도해주세요") }
+                                            scope.launch {
+                                                snackState.currentSnackbarData?.dismiss()
+                                                snackState.showSnackbar("다시 시도해주세요")
+                                            }
                                         }
                                     }
                                 }

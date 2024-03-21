@@ -5,9 +5,9 @@ import javax.inject.Inject
 
 @Immutable
 data class SCD(
-    val cdld: String,
-    val upCdId: String,
-    val cdNm: String
+    val cdld: String?,
+    val upCdId: String?,
+    val cdNm: String?
 )
 
 class SCDLocalData @Inject constructor() {

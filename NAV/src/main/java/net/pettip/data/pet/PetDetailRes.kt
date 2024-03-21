@@ -54,15 +54,15 @@ data class PetDetailData(
     @SerializedName("sexTypNm")
     var sexTypNm: String?, // 남아
     @SerializedName("stdgCtpvCd")
-    var stdgCtpvCd: String, // 11
+    var stdgCtpvCd: String?, // 11
     @SerializedName("stdgCtpvNm")
-    var stdgCtpvNm: String, // 서울특별시
+    var stdgCtpvNm: String?, // 서울특별시
     @SerializedName("stdgSggCd")
-    var stdgSggCd: String, // 350
+    var stdgSggCd: String?, // 350
     @SerializedName("stdgSggNm")
-    var stdgSggNm: String, // 노원구
+    var stdgSggNm: String?, // 노원구
     @SerializedName("stdgUmdCd")
-    var stdgUmdCd: String, // 103
+    var stdgUmdCd: String?, // 103
     @SerializedName("stdgUmdNm")
     var stdgUmdNm: String?, // 공릉동
     @SerializedName("wghtVl")

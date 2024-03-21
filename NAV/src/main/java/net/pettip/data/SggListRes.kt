@@ -16,7 +16,7 @@ data class SggListRes(
 
 data class SggList(
     @SerializedName("sggCd")
-    var sggCd: String, // 110
+    var sggCd: String?, // 110
     @SerializedName("sggNm")
-    var sggNm: String // 종로구
+    var sggNm: String? // 종로구
 )

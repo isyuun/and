@@ -16,14 +16,14 @@ data class UmdListRes(
 
 data class UmdList(
     @SerializedName("umdCd")
-    var umdCd: String, // 101
+    var umdCd: String?, // 101
     @SerializedName("umdNm")
-    var umdNm: String // 상왕십리동
+    var umdNm: String? // 상왕십리동
 )
 
 data class UmdListReq(
     @SerializedName("sggCd")
-    var sggCd: String,
+    var sggCd: String?,
     @SerializedName("sidoCd")
-    var sidoCd: String
+    var sidoCd: String?
 )

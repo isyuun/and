@@ -306,7 +306,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "${selectedPet.stdgCtpvNm} ${selectedPet.stdgSggNm} ${selectedPet.stdgUmdNm ?: ""}",
+                    text = "${selectedPet.stdgCtpvNm?:""} ${selectedPet.stdgSggNm?:""} ${selectedPet.stdgUmdNm ?:""}",
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     letterSpacing = (-0.7).sp,

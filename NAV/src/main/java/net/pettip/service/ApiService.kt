@@ -296,17 +296,17 @@ interface ApiService {
         @Part("petRelCd") petRelCd: RequestBody,
         @Part("petNm") petNm: RequestBody,
         @Part("petRegNo") petRegNo: RequestBody,
-        @Part("stdgSggCd") stdgSggCd: RequestBody,
+        @Part("stdgSggCd") stdgSggCd: RequestBody?,
         @Part("petInfoUnqNo") petInfoUnqNo: RequestBody,
         @Part("petBrthYmd") petBrthYmd: RequestBody,
         @Part("delYn") delYn: RequestBody,
-        @Part("stdgUmdCd") stdgUmdCd: RequestBody,
+        @Part("stdgUmdCd") stdgUmdCd: RequestBody?,
         @Part file: MultipartBody.Part,
         @Part("petRprsYn") petRprsYn: RequestBody,
         @Part("ntrTypCd") ntrTypCd: RequestBody,
         @Part("sexTypCd") sexTypCd: RequestBody,
         @Part("petMngrYn") petMngrYn: RequestBody,
-        @Part("stdgCtpvCd") stdgCtpvCd: RequestBody,
+        @Part("stdgCtpvCd") stdgCtpvCd: RequestBody?,
     ): Call<MyPetResModel>
 
     @POST("/api/v1/mypet/rel-close")

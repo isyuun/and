@@ -582,7 +582,7 @@ fun ModifyPetInfoScreen(
             ) {
                 Row(modifier= Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
                     Text(
-                        text = if(scd.cdld == "") stringResource(id = R.string.address_selection) else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
+                        text = if(scd.cdld.isNullOrBlank()) stringResource(id = R.string.address_selection) else "${scd.cdNm?:""} ${sgg.sggNm?:""} ${umd.umdNm?:""}",
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular))
                     )

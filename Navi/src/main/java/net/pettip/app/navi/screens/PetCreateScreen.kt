@@ -1542,7 +1542,7 @@ fun addressItem1(viewModel: UserCreateViewModel, address: SCD, onClick: (Boolean
                 umdClear()
 
                 viewModel.updateUmdList(emptyList())
-                viewModel.sggListLoad(address.cdld)
+                address.cdld?.let { viewModel.sggListLoad(it) }
 
                 onClick(false)
             },
@@ -1550,7 +1550,7 @@ fun addressItem1(viewModel: UserCreateViewModel, address: SCD, onClick: (Boolean
     ){
 
         Text(
-            text = address.cdNm,
+            text = address.cdNm ?: "",
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onPrimary,
@@ -1577,14 +1577,14 @@ fun addressItem2(viewModel: UserCreateViewModel, address: SggList, sidoCd: Strin
             .clickable {
                 onSelect(address)
                 umdClear()
-                viewModel.umdListLoad(address.sggCd, sidoCd)
+                address.sggCd?.let { viewModel.umdListLoad(it, sidoCd) }
                 onClick(false)
             },
         verticalArrangement = Arrangement.Center
     ){
 
         Text(
-            text = address.sggNm,
+            text = address.sggNm?:"",
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onPrimary,
@@ -1616,7 +1616,7 @@ fun addressItem3(viewModel: UserCreateViewModel, address: UmdList, onClick: (Boo
     ){
 
         Text(
-            text = address.umdNm,
+            text = address.umdNm?:"",
             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onPrimary,

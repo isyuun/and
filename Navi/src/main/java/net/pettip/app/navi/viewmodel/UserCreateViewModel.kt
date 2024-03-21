@@ -557,7 +557,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
             val petNm = petName.value.toRequestBody("text/plain".toMediaType()) //펫 이름
             val petRegNo = "Y".toRequestBody("text/plain".toMediaType()) //펫 등록번호
             val petInfoUnqNo = petKind.value.petInfoUnqNo.toString().toRequestBody("text/plain".toMediaType()) //펫 종 고유번호
-            val stdgSggCd = selectedItem2.value.sggCd.toRequestBody("text/plain".toMediaType()) //시군구 코드
+            val stdgSggCd = selectedItem2.value.sggCd?.toRequestBody("text/plain".toMediaType()) //시군구 코드
             val petBrthYmd = if (_petBirthUnknown.value){
                 "미상".toRequestBody("text/plain".toMediaType()) // 생일
             }else{
@@ -565,7 +565,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
             }
             val stdgUmdCd =
                 if(selectedItem3.value.umdCd!=""){
-                    selectedItem3.value.umdCd.toRequestBody("text/plain".toMediaType())
+                    selectedItem3.value.umdCd?.toRequestBody("text/plain".toMediaType())
                 }else{
                     "1".toRequestBody("text/plain".toMediaType())
                 } // 읍면동 코드
@@ -585,9 +585,9 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
             }
             val petMngrYn = "Y".toRequestBody("text/plain".toMediaType()) // 펫 관리자여부
             val wghtVl = petWght.value.toFloat() // 몸무게
-            val stdgCtpvCd = selectedItem1.value.cdld.toRequestBody("text/plain".toMediaType()) //시도 코드
+            val stdgCtpvCd = selectedItem1.value.cdld?.toRequestBody("text/plain".toMediaType()) //시도 코드
 
-            val response = apiService.createPet(petRelCd, petNm, petRegNo, stdgSggCd, petInfoUnqNo,petBrthYmd, delYn, stdgUmdCd, filePart, petRprsYn, ntrTypCd, sexTypCd, petMngrYn, stdgCtpvCd, wghtVl)
+            val response = apiService.createPet(petRelCd, petNm, petRegNo, stdgSggCd!!, petInfoUnqNo,petBrthYmd, delYn, stdgUmdCd!!, filePart, petRprsYn, ntrTypCd, sexTypCd, petMngrYn, stdgCtpvCd!!, wghtVl)
             response.enqueue(object : Callback<MyPetResModel>{
                 override fun onResponse(call: Call<MyPetResModel>, response: Response<MyPetResModel>) {
                     if(response.isSuccessful){
@@ -646,7 +646,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
         val petNm = petName.value.toRequestBody("text/plain".toMediaType()) //펫 이름
         val petRegNo = "Y".toRequestBody("text/plain".toMediaType()) //펫 등록번호
         val petInfoUnqNo = petKind.value.petInfoUnqNo.toString().toRequestBody("text/plain".toMediaType()) //펫 종 고유번호
-        val stdgSggCd = selectedItem2.value.sggCd.toRequestBody("text/plain".toMediaType()) //시군구 코드
+        val stdgSggCd = selectedItem2.value.sggCd?.toRequestBody("text/plain".toMediaType()) //시군구 코드
         val petBrthYmd = if (_petBirthUnknown.value){
             "미상".toRequestBody("text/plain".toMediaType()) // 생일
         }else{
@@ -654,7 +654,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
         }
         val stdgUmdCd =
             if(selectedItem3.value.umdCd!=""){
-                selectedItem3.value.umdCd.toRequestBody("text/plain".toMediaType())
+                selectedItem3.value.umdCd?.toRequestBody("text/plain".toMediaType())
             }else{
                 "1".toRequestBody("text/plain".toMediaType())
             } // 읍면동 코드
@@ -674,7 +674,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
         }
         val petMngrYn = "Y".toRequestBody("text/plain".toMediaType()) // 펫 관리자여부
         //val wghtVl = petWght.value.toFloat() // 몸무게
-        val stdgCtpvCd = selectedItem1.value.cdld.toRequestBody("text/plain".toMediaType()) //시도 코드
+        val stdgCtpvCd = selectedItem1.value.cdld?.toRequestBody("text/plain".toMediaType()) //시도 코드
 
         Log.d("IMAGE",filePart.toString())
         val call = apiService.modifyPet(ownrPetUnqNo, petRelCd, petNm, petRegNo, stdgSggCd, petInfoUnqNo,petBrthYmd, delYn, stdgUmdCd, filePart, petRprsYn, ntrTypCd, sexTypCd, petMngrYn, stdgCtpvCd)
