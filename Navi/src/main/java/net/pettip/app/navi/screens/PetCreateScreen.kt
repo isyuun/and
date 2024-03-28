@@ -469,7 +469,7 @@ fun PetCreateScreen(
             }
 
             // 주소 선택
-            Text(text = stringResource(id = R.string.address), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.activity_region), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 

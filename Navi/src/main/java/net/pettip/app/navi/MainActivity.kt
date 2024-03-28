@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -98,6 +99,11 @@ import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 
 class MainActivity : ComponentActivity() {
+
+    private var retryCount = 0
+    private val MAX_RETRY_COUNT = 3
+    private val RETRY_INTERVAL_MILLIS = 10 * 1000L
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,7 +112,7 @@ class MainActivity : ComponentActivity() {
 
         splashScreen.setKeepOnScreenCondition{false}
 
-        Log.d("LOG","onCreate 진입")
+        getTokenWithRetry()
 
         val intentData: Uri? = intent.data
         if (intentData != null) {
@@ -184,6 +190,27 @@ class MainActivity : ComponentActivity() {
             Log.d("PUSH","${page} : ${seqNo}")
         }
     }
+
+    private fun getTokenWithRetry() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                MySharedPreference.setFcmToken(token)
+            } else {
+                // 작업이 실패한 경우 재시도
+                retryCount++
+                if (retryCount < MAX_RETRY_COUNT) {
+                    // 일정 시간이 지난 후에 재시도
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        getTokenWithRetry()
+                    }, RETRY_INTERVAL_MILLIS)
+                } else {
+                    Log.e("LOG", "Failed to get FCM token after $MAX_RETRY_COUNT retries")
+                    Toast.makeText(this, "일시적인 오류가 발생하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -211,16 +238,16 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
     var count by remember { mutableIntStateOf(3) }
     val init by sharedViewModel.init.collectAsState()
 
-    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-        if (!task.isSuccessful) {
-            return@OnCompleteListener
-        }
-        // Get new FCM registration token
-        val token = task.result
-        // Log and toast
-        Log.d("LOG", token)
-        MySharedPreference.setFcmToken(token)
-    })
+    //FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+    //    if (!task.isSuccessful) {
+    //        return@OnCompleteListener
+    //    }
+    //    // Get new FCM registration token
+    //    val token = task.result
+    //    // Log and toast
+    //    Log.d("LOG", token)
+    //    MySharedPreference.setFcmToken(token)
+    //})
 
     LaunchedEffect(key1 = G.dupleLogin) {
         if (G.dupleLogin) {

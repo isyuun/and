@@ -1096,6 +1096,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                     }
                 )
 
+                // TODO: 로그인 프로세스 바꿀때 이 영역부터 바꾸기
                 Button(
                     onClick = {
                         scope.launch {

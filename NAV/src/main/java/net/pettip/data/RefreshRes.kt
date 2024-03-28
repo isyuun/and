@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class RefreshRes(
     @SerializedName("data")
-    var data: TokenData,
+    var data: TokenData?,
     @SerializedName("detailMessage")
     var detailMessage: String, // null
     @SerializedName("resultMessage")
@@ -16,21 +16,21 @@ data class RefreshRes(
 
 data class TokenData(
     @SerializedName("accessToken")
-    var accessToken: String,
+    var accessToken: String?,
     @SerializedName("failReason")
-    var failReason: String, // null
+    var failReason: String?, // null
     @SerializedName("message")
-    var message: String, // null
+    var message: String?, // null
     @SerializedName("refreshToken")
-    var refreshToken: String,
+    var refreshToken: String?,
     @SerializedName("status")
     var status: Boolean, // true
     @SerializedName("userId")
-    var userId: String, //
+    var userId: String?, //
     @SerializedName("nckNm")
-    var nckNm: String, //
+    var nckNm: String?, //
     @SerializedName("email")
-    var email: String, //
+    var email: String?, //
 )
 
 data class RefreshToken(

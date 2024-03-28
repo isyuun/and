@@ -48,7 +48,7 @@ class OAuthAuthenticator(private val apiService: ApiService) : Authenticator {
 
     private fun getRefreshToken(): RefreshToken {
         // Retrieve the refresh token from local storage.
-        return RefreshToken(G.refreshToken)
+        return RefreshToken(G.refreshToken?:"")
     }
 
     private fun updateAccessToken(newAccessToken: String) {

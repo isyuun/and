@@ -470,7 +470,7 @@ fun AddPetScreen(
 
 
             // 주소 선택
-            Text(text = stringResource(R.string.address), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.activity_region), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 

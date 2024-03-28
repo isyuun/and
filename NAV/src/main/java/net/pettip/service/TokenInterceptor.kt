@@ -14,8 +14,10 @@ class TokenInterceptor() : Interceptor {
         // 원래의 요청을 가져옵니다.
         val originalRequest = chain.request()
 
-        val token = G.accessToken
-        val refreshToken = G.refreshToken
+        //val token = G.accessToken
+        //val refreshToken = G.refreshToken
+        val token : String? = G.accessToken
+        val refreshToken : String? = G.refreshToken
 
         val requestBuilder = originalRequest.newBuilder()
         if (!token.isNullOrBlank()) {
@@ -24,7 +26,7 @@ class TokenInterceptor() : Interceptor {
         }else{
             requestBuilder.header("Authorization", MySharedPreference.getAccessToken())
         }
-        if (refreshToken.isNullOrBlank()) {
+        if (!refreshToken.isNullOrBlank()) {
             // RefreshToken이 있는 경우 Refresh 헤더를 추가
             requestBuilder.header("Refresh", refreshToken)
         }else{
@@ -46,15 +48,15 @@ class TokenInterceptor() : Interceptor {
             val gson = Gson()
             val tokenResponse = gson.fromJson(responseBodyString.string(), RefreshRes::class.java)
 
-            G.accessToken = tokenResponse.data.accessToken
-            G.refreshToken = tokenResponse.data.refreshToken
-            MySharedPreference.setAccessToken(tokenResponse.data.accessToken)
-            MySharedPreference.setRefreshToken(tokenResponse.data.refreshToken)
+            G.accessToken = tokenResponse.data?.accessToken
+            G.refreshToken = tokenResponse.data?.refreshToken
+            MySharedPreference.setAccessToken(tokenResponse.data?.accessToken ?:"")
+            MySharedPreference.setRefreshToken(tokenResponse.data?.refreshToken ?:"")
 
-            if (G.accessToken != null) {
+            if (!G.accessToken.isNullOrBlank()) {
                 val retryRequestBuilder = originalRequest.newBuilder()
-                retryRequestBuilder.header("Authorization", G.accessToken)
-                retryRequestBuilder.header("Refresh", G.refreshToken)
+                retryRequestBuilder.header("Authorization", G.accessToken!!)
+                retryRequestBuilder.header("Refresh", G.refreshToken!!)
 
                 val retryRequestWithToken = retryRequestBuilder.build()
                 return chain.proceed(retryRequestWithToken)

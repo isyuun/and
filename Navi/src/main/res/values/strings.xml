@@ -156,6 +156,7 @@
     <string name="cat">고양이</string>
     <string name="size_breed_selection">사이즈/품종 선택</string>
     <string name="address">주소</string>
+    <string name="activity_region">활동 지역</string>
     <string name="address_selection">주소 선택</string>
     <string name="name">이름</string>
     <string name="place_holder_pet_name">이름을 입력해주세요</string>

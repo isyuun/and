@@ -131,8 +131,8 @@ open class _foregroundonlylocationservice : Service() {
             override fun onSatelliteStatusChanged(status: GnssStatus) {
                 //Log.i(__CLASSNAME__, "${getMethodName()}[$this][$status]")
                 super.onSatelliteStatusChanged(status)
-                numSatsTotal = status.satelliteCount
-                numSatsCount = 0
+                numSatsTotal = status.satelliteCount // 현재 사용 가능한 위성수
+                numSatsCount = 0 // usedIn
                 for (i in 0 until numSatsTotal) {
                     if (status.usedInFix(i)) numSatsCount++
                 }

@@ -29,7 +29,7 @@ object RetrofitClientServer {
     // 서버쪽 retrofit 싱글톤 객체
 
     private val tokenInterceptor = TokenInterceptor()
-    private val retryInterceptor = RetryInterceptor(3)
+    //private val retryInterceptor = RetryInterceptor(3)
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY // 로깅 레벨 설정

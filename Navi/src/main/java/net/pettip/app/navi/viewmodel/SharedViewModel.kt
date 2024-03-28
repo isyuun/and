@@ -279,17 +279,17 @@ class SharedViewModel:ViewModel(){
                         val body = response.body()
                         body?.let {
                             if (it.statusCode==200){
-                                G.accessToken = it.data.accessToken
-                                G.refreshToken = it.data.refreshToken
-                                G.userId = it.data.userId
-                                G.userNickName = it.data.nckNm
-                                G.userEmail = it.data.email
+                                G.accessToken = it.data?.accessToken
+                                G.refreshToken = it.data?.refreshToken
+                                G.userId = it.data?.userId ?: ""
+                                G.userNickName = it.data?.nckNm ?:""
+                                G.userEmail = it.data?.email ?: ""
 
-                                _nickName.value = it.data.nckNm
+                                _nickName.value = it.data?.nckNm ?: ""
 
-                                MySharedPreference.setAccessToken(it.data.accessToken)
-                                MySharedPreference.setRefreshToken(it.data.refreshToken)
-                                MySharedPreference.setUserId(it.data.userId)
+                                MySharedPreference.setAccessToken(it.data?.accessToken?:"")
+                                MySharedPreference.setRefreshToken(it.data?.refreshToken ?:"")
+                                MySharedPreference.setUserId(it.data?.userId ?:"")
 
                                 continuation.resume(true)
                             }else{

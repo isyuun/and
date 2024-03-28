@@ -1,6 +1,7 @@
 package net.pettip.app.navi.component
 
 import android.annotation.SuppressLint
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -36,6 +37,9 @@ fun WebViewScreen(page:Int) {
                 settings.loadWithOverviewMode = true
                 settings.useWideViewPort = true
                 settings.setSupportZoom(true)
+
+                // WebView hardware 가속 비활성화
+                //setLayerType(View.LAYER_TYPE_SOFTWARE,null)
             }
         },
         update = { webView ->
