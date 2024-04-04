@@ -116,6 +116,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import androidx.wear.compose.material.HorizontalPageIndicator
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
@@ -896,7 +897,8 @@ fun StoryDetailTopContent(
                                             rlsUpdateLoading = false
                                             scope.launch {
                                                 snackState.currentSnackbarData?.dismiss()
-                                                snackState.showSnackbar("비공개처리 되었습니다") }
+                                                snackState.showSnackbar("비공개처리 되었습니다")
+                                            }
                                         } else {
                                             rlsUpdateLoading = false
                                             scope.launch {

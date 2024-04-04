@@ -18,14 +18,26 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateRotation
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -34,6 +46,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -42,8 +55,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,10 +71,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -69,29 +87,41 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import androidx.wear.compose.material.HorizontalPageIndicator
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.naver.maps.map.CameraUpdate.scrollBy
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CircleImageTopBar
 import net.pettip.app.navi.component.ErrorScreen
 import net.pettip.app.navi.component.Toasty
+import net.pettip.app.navi.ui.theme.design_DDDDDD
 import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_bg
 import net.pettip.app.navi.ui.theme.design_white
@@ -101,6 +131,13 @@ import net.pettip.data.daily.DailyLifePet
 import net.pettip.map.app.naver.GpxMap
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.absoluteValue
+import kotlin.math.cos
+import kotlin.math.roundToInt
+import kotlin.math.sin
+import kotlin.math.withSign
 
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
@@ -674,30 +711,7 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet) {
     }
 }
 
-@Composable
-fun LoadingComposable() {
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-    val alpha by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 1000
-                0.7f at 500
-            },
-            repeatMode = RepeatMode.Reverse
-        ), label = ""
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(400.dp)
-            .background(design_login_bg.copy(alpha))
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun FullScreenImage(
     dailyDetail: DailyDetailData,
@@ -710,19 +724,9 @@ fun FullScreenImage(
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(color = systemBarColor)
 
-    var rotate by remember { mutableStateOf(false) }
-    var scale by remember { mutableFloatStateOf(1f) }
-    val rotation: Float by animateFloatAsState(if (rotate) 90f else 0f, label = "")
-    var offset by remember { mutableStateOf(Offset.Zero) }
-    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
-        scale *= zoomChange
-        //rotation += rotationChange
-        offset = if (scale <= 1f) {
-            Offset.Zero
-        } else {
-            offset + offsetChange
-        }
-    }
+    val pagerState = rememberPagerState(pageCount = { dailyDetail.dailyLifeFileList?.size ?:0 },initialPage = page)
+    val scrollEnabled = remember { mutableStateOf(true) }
+    var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     BackHandler {
         systemBarColor = color
@@ -733,58 +737,168 @@ fun FullScreenImage(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = {
-                    systemBarColor = color
-                    onDismiss(false)
-                }
-            ),
+            //.clickable(
+            //    interactionSource = remember { MutableInteractionSource() },
+            //    indication = null,
+            //    onClick = {
+            //        systemBarColor = color
+            //        onDismiss(false)
+            //    }
+            //)
+        ,
         contentAlignment = Alignment.Center
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(
-                    (dailyDetail.atchPath) +
-                            (dailyDetail.dailyLifeFileList?.get(page)?.filePathNm ?: "") +
-                            (dailyDetail.dailyLifeFileList?.get(page)?.atchFileNm ?: "")
-                )
-                .crossfade(true)
-                .build(),
-            contentDescription = "",
+        HorizontalPager(
+            state = pagerState,
             modifier = Modifier
-                .graphicsLayer(
-                    scaleX = scale,
-                    scaleY = scale,
-                    rotationZ = rotation,
-                    translationX = if (rotate) -offset.y * scale else offset.x * scale,
-                    translationY = if (rotate) offset.x * scale else offset.y * scale
-                )
-                // add transformable to listen to multitouch transformation events
-                // after offset
-                .transformable(state = state)
                 .fillMaxSize(),
-            contentScale = ContentScale.Fit
-        )
+            beyondBoundsPageCount = 0,
+            userScrollEnabled = scrollEnabled.value
+        ) {
+            ZoomablePagerImage(
+                imageUri = (dailyDetail.atchPath) +
+                        (dailyDetail.dailyLifeFileList?.get(it)?.filePathNm ?: "") +
+                        (dailyDetail.dailyLifeFileList?.get(it)?.atchFileNm ?: ""),
+                scrollEnabled = scrollEnabled
+            )
+        }
 
         Box(
             modifier = Modifier
                 .padding(bottom = 20.dp)
-                .clickable {
-                    rotate = !rotate
-                    offset = Offset.Zero
-                }
                 .align(Alignment.BottomCenter),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "사진 회전",
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                fontSize = 12.sp, color = design_white.copy(alpha = 0.5f),
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
+            Row(
+                Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                repeat(dailyDetail.dailyLifeFileList?.size ?: 0 ) { iteration ->
+                    val color = if (pagerState.currentPage == iteration) design_intro_bg else design_DDDDDD
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                            .size(10.dp)
+                    )
+                }
+            }
         }
 
+        Box(
+            modifier = Modifier
+                .padding(top = 12.dp, start = 8.dp)
+                .size(30.dp)
+                .clip(shape = CircleShape)
+                .align(Alignment.TopStart)
+                .clickable {
+                    val currentTime = System.currentTimeMillis()
+                    if (currentTime - lastClickTime >= 500) {
+                        systemBarColor = color
+                        onDismiss(false)
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_back),
+                contentDescription = "",
+                tint = design_white
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ZoomablePagerImage(
+    modifier: Modifier = Modifier,
+    imageUri: String,
+    scrollEnabled: MutableState<Boolean>,
+    minScale: Float = 1f,
+    maxScale: Float = 5f,
+    isRotation: Boolean = false,
+) {
+    var targetScale by remember { mutableStateOf(1f) }
+    val scale = animateFloatAsState(targetValue = maxOf(minScale, minOf(maxScale, targetScale)))
+    var rotationState by remember { mutableStateOf(1f) }
+    var offsetX by remember { mutableStateOf(1f) }
+    var offsetY by remember { mutableStateOf(1f) }
+    val configuration = LocalConfiguration.current
+    val screenWidthPx = with(LocalDensity.current) { configuration.screenWidthDp.dp.toPx() }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(RectangleShape)
+            .background(Color.Transparent)
+            .combinedClickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = { },
+                onDoubleClick = {
+                    if (targetScale >= 2f) {
+                        targetScale = 1f
+                        offsetX = 1f
+                        offsetY = 1f
+                        scrollEnabled.value = true
+                    } else targetScale = 3f
+                },
+            )
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    awaitFirstDown()
+                    do {
+                        val event = awaitPointerEvent()
+                        val zoom = event.calculateZoom()
+                        targetScale *= zoom
+                        val offset = event.calculatePan()
+                        if (targetScale <= 1) {
+                            offsetX = 1f
+                            offsetY = 1f
+                            targetScale = 1f
+                            scrollEnabled.value = true
+                        } else {
+                            offsetX += offset.x
+                            offsetY += offset.y
+                            if (zoom > 1) {
+                                scrollEnabled.value = false
+                                rotationState += event.calculateRotation()
+                            }
+                            val imageWidth = screenWidthPx * scale.value
+                            val borderReached = imageWidth - screenWidthPx - 2 * abs(offsetX)
+                            scrollEnabled.value = borderReached <= 0
+                            if (borderReached < 0) {
+                                offsetX = ((imageWidth - screenWidthPx) / 2f).withSign(offsetX)
+                                if (offset.x != 0f) offsetY -= offset.y
+                            }
+                        }
+                    } while (event.changes.any { it.pressed })
+                }
+            }
+
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUri)
+                .crossfade(true)
+                .build(),
+            contentDescription = "",
+            contentScale = ContentScale.Fit,
+            modifier = modifier
+                .fillMaxSize()
+                .align(Alignment.Center)
+                .fillMaxSize()
+                .graphicsLayer {
+                    this.scaleX = scale.value
+                    this.scaleY = scale.value
+                    if (isRotation) {
+                        rotationZ = rotationState
+                    }
+                    this.translationX = offsetX
+                    this.translationY = offsetY
+                }
+        )
     }
 }

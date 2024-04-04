@@ -28,4 +28,6 @@ object G {
     // 푸쉬로 받은 데이터
     var pushPage by mutableStateOf<String?>(null)
     var pushSeqNo by mutableStateOf<String?>(null)
+
+    var isGpsUnavailable by mutableStateOf<Boolean>(false)
 }

@@ -11,9 +11,15 @@
 package net.pettip.map.app.naver
 
 import android.app.Activity
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -68,6 +74,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -99,6 +106,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.NotificationCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -120,6 +128,7 @@ import com.naver.maps.map.widget.LocationButtonView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.DEBUG
+import net.pettip._test.app.navi.MainActivity
 import net.pettip.app.Version
 import net.pettip.app.getDeviceDensityString
 import net.pettip.app.getRounded
@@ -130,14 +139,17 @@ import net.pettip.gps.R
 import net.pettip.gps._app.GPS_CAMERA_ZOOM_ZERO
 import net.pettip.gps._app.GPS_LATITUDE_ZERO
 import net.pettip.gps._app.GPS_LONGITUDE_ZERO
+import net.pettip.gps._app.NotificationActivity
 import net.pettip.gps.app.GPSApplication
 import net.pettip.gpx.TRACK_ZERO_URI
 import net.pettip.gpx.Track
 import net.pettip.gpx._distance
 import net.pettip.map.app.LoadingDialog
+import net.pettip.map.app.MapActivity
 import net.pettip.singleton.G
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -892,6 +904,77 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var checkedSel by rememberSaveable { mutableStateOf(false) }
     var event by remember { mutableStateOf(Track.EVENT.NNN) }
     var showPetsSheet by remember { mutableStateOf(false) }
+
+    var isGpsUnavailable by remember { mutableStateOf(false) }
+    val notificationPeriod = TimeUnit.MINUTES.toMillis(20)
+    var lastGpsCheckTime by remember{ mutableLongStateOf(System.currentTimeMillis()) }
+
+    fun createGPSNotification() {
+        val channelId = "GPS_NOTIFICATION_CHANNEL"
+        val notificationId = 123
+
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val notificationIntent = Intent(context, MapActivity::class.java)
+        notificationIntent.putExtra("NOTIFICATION_ID", notificationId)
+        notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        //notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        //notificationIntent.putExtra("NOTIFICATION_ID", notificationId)
+        val pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+        val dismissIntent = NotificationActivity().getDismissIntent(notificationId, context)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelId, "GPS Notification Channel", NotificationManager.IMPORTANCE_DEFAULT)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val action1 = Notification.Action.Builder(
+            android.graphics.drawable.Icon.createWithResource(context, R.drawable.icon_sole),
+            "계속하기",
+            dismissIntent
+        ).build()
+
+        val action2 = Notification.Action.Builder(
+            android.graphics.drawable.Icon.createWithResource(context, R.drawable.icon_sole),
+            "종료하기",
+            pendingIntent
+        ).build()
+
+
+        val notification = Notification.Builder(context, channelId)
+            .setContentTitle("산책이 끝나셨나요?")
+            //.setContentText("산책을 즐기시는 동안 10분 이상을 실내에서 머무르셨습니다. 산책을 종료하시겠어요?")
+            .setStyle(Notification.BigTextStyle().bigText("실내에서 20분 이상 머무르셨네요. 산책을 계속 하시겠어요?"))
+            .setSmallIcon(R.drawable.pettip_launcher_icon)
+            .addAction(action1)
+            .addAction(action2)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setAutoCancel(true)
+            .build()
+
+        notificationManager.notify(notificationId, notification)
+    }
+
+    LaunchedEffect(Unit) {
+        // 실내 20분 머무름 알림
+        isGpsUnavailable = false
+        while (!isGpsUnavailable) {
+            if (application.gps==false && application.start) {
+                if (System.currentTimeMillis() - lastGpsCheckTime >= notificationPeriod) {
+                    // 10분 이상이면 타고 들어오는 곳, isGpsUnavailable 가 되면 notification 알림
+                    isGpsUnavailable = true
+                    createGPSNotification()
+                }
+            } else {
+                // gps가 true가 되면, true가 잡힌 시간 갱신
+                lastGpsCheckTime = System.currentTimeMillis()
+                isGpsUnavailable = false
+            }
+
+            delay(TimeUnit.SECONDS.toMillis(30))
+        }
+    }
 
     /** map */
     Box {

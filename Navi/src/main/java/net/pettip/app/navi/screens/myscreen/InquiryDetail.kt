@@ -10,6 +10,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberTransformableState
@@ -28,7 +29,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -46,6 +50,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -76,11 +81,15 @@ import net.pettip.app.navi.component.CustomAlert
 import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.commuscreen.HtmlText
 import net.pettip.app.navi.screens.walkscreen.FullScreenImage
+import net.pettip.app.navi.screens.walkscreen.ZoomablePagerImage
+import net.pettip.app.navi.ui.theme.design_DDDDDD
 import net.pettip.app.navi.ui.theme.design_button_bg
+import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.data.bbs.QnaDetailData
+import net.pettip.data.bbs.QnaDetailRes
 import net.pettip.data.daily.DailyDetailData
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,7 +108,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
     val uriList: List<Uri>? = qnaDetail?.data?.get(0)?.files?.map {
         Uri.parse("${qnaDetail?.data?.get(0)?.atchPath}${it.filePathNm}${it.atchFileNm}")
     }
-    var selectImage by remember{ mutableStateOf<Uri?>(null) }
+    var selectImage by remember{ mutableStateOf<Int>(0) }
 
     BackHandler {
         if (isModify){
@@ -263,12 +272,12 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                     contentPadding = PaddingValues(horizontal = 10.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ){
-                    items(uriList){item ->
+                    itemsIndexed(uriList){index,item ->
                         Box(
                             modifier = Modifier
                                 .size(100.dp)
                                 .clickable {
-                                    selectImage = item
+                                    selectImage = index
                                     showImage = true
                                 }
                         ){
@@ -311,7 +320,8 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
     ) {
         selectImage?.let {
             FullScreenImageInquiry(
-                uri = it,
+                uriList = uriList,
+                page = selectImage,
                 onDismiss = { newValue -> showImage = newValue })
         }
     }
@@ -410,30 +420,101 @@ fun InquiryDetailAnswer(answer: QnaDetailData?) {
     }// col
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FullScreenImageInquiry(
-    uri:Uri,
+    uriList:List<Uri>?,
+    page:Int,
     onDismiss: (Boolean) -> Unit
 ) {
+    //var systemBarColor by remember { mutableStateOf(Color.Black) }
+    //val color = MaterialTheme.colorScheme.primary
+    //
+    //val systemUiController = rememberSystemUiController()
+    //systemUiController.setSystemBarsColor(color = systemBarColor)
+    //
+    //var rotate by remember { mutableStateOf(false) }
+    //var scale by remember { mutableFloatStateOf(1f) }
+    //val rotation: Float by animateFloatAsState(if (rotate) 90f else 0f, label = "")
+    //var offset by remember { mutableStateOf(Offset.Zero) }
+    //val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
+    //    scale *= zoomChange
+    //    //rotation += rotationChange
+    //    offset = if (scale <= 1f) {
+    //        Offset.Zero
+    //    } else {
+    //        offset + offsetChange
+    //    }
+    //}
+    //
+    //BackHandler {
+    //    systemBarColor = color
+    //    onDismiss(false)
+    //}
+    //
+    //Box(
+    //    modifier = Modifier
+    //        .fillMaxSize()
+    //        .background(Color.Black)
+    //        .clickable(
+    //            interactionSource = remember { MutableInteractionSource() },
+    //            indication = null,
+    //            onClick = {
+    //                systemBarColor = color
+    //                onDismiss(false)
+    //            }
+    //        ),
+    //    contentAlignment = Alignment.Center
+    //) {
+    //    AsyncImage(
+    //        model = ImageRequest.Builder(LocalContext.current)
+    //            .data(uri)
+    //            .crossfade(true)
+    //            .build(),
+    //        contentDescription = "",
+    //        modifier = Modifier
+    //            .graphicsLayer(
+    //                scaleX = scale,
+    //                scaleY = scale,
+    //                rotationZ = rotation,
+    //                translationX = if (rotate) -offset.y * scale else offset.x * scale,
+    //                translationY = if (rotate) offset.x * scale else offset.y * scale
+    //            )
+    //            // add transformable to listen to multitouch transformation events
+    //            // after offset
+    //            .transformable(state = state)
+    //            .fillMaxSize(),
+    //        contentScale = ContentScale.Fit
+    //    )
+    //
+    //    Box(
+    //        modifier = Modifier
+    //            .padding(bottom = 20.dp)
+    //            .clickable {
+    //                rotate = !rotate
+    //                offset = Offset.Zero
+    //            }
+    //            .align(Alignment.BottomCenter),
+    //        contentAlignment = Alignment.Center
+    //    ) {
+    //        Text(
+    //            text = "사진 회전",
+    //            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+    //            fontSize = 12.sp, color = design_white.copy(alpha = 0.5f),
+    //            modifier = Modifier.padding(horizontal = 8.dp)
+    //        )
+    //    }
+    //
+    //}
     var systemBarColor by remember { mutableStateOf(Color.Black) }
     val color = MaterialTheme.colorScheme.primary
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(color = systemBarColor)
 
-    var rotate by remember { mutableStateOf(false) }
-    var scale by remember { mutableFloatStateOf(1f) }
-    val rotation: Float by animateFloatAsState(if (rotate) 90f else 0f, label = "")
-    var offset by remember { mutableStateOf(Offset.Zero) }
-    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
-        scale *= zoomChange
-        //rotation += rotationChange
-        offset = if (scale <= 1f) {
-            Offset.Zero
-        } else {
-            offset + offsetChange
-        }
-    }
+    val pagerState = rememberPagerState(pageCount = { uriList?.size ?:0 },initialPage = page)
+    val scrollEnabled = remember { mutableStateOf(true) }
+    var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     BackHandler {
         systemBarColor = color
@@ -444,54 +525,74 @@ fun FullScreenImageInquiry(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = {
-                    systemBarColor = color
-                    onDismiss(false)
-                }
-            ),
+        //.clickable(
+        //    interactionSource = remember { MutableInteractionSource() },
+        //    indication = null,
+        //    onClick = {
+        //        systemBarColor = color
+        //        onDismiss(false)
+        //    }
+        //)
+        ,
         contentAlignment = Alignment.Center
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(uri)
-                .crossfade(true)
-                .build(),
-            contentDescription = "",
+        HorizontalPager(
+            state = pagerState,
             modifier = Modifier
-                .graphicsLayer(
-                    scaleX = scale,
-                    scaleY = scale,
-                    rotationZ = rotation,
-                    translationX = if (rotate) -offset.y * scale else offset.x * scale,
-                    translationY = if (rotate) offset.x * scale else offset.y * scale
-                )
-                // add transformable to listen to multitouch transformation events
-                // after offset
-                .transformable(state = state)
                 .fillMaxSize(),
-            contentScale = ContentScale.Fit
-        )
+            beyondBoundsPageCount = 0,
+            userScrollEnabled = scrollEnabled.value
+        ) {
+            ZoomablePagerImage(
+                imageUri = uriList?.get(it)?.toString() ?:"",
+                scrollEnabled = scrollEnabled
+            )
+        }
 
         Box(
             modifier = Modifier
                 .padding(bottom = 20.dp)
-                .clickable {
-                    rotate = !rotate
-                    offset = Offset.Zero
-                }
                 .align(Alignment.BottomCenter),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "사진 회전",
-                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                fontSize = 12.sp, color = design_white.copy(alpha = 0.5f),
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
+            Row(
+                Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                repeat(uriList?.size ?: 0 ) { iteration ->
+                    val color = if (pagerState.currentPage == iteration) design_intro_bg else design_DDDDDD
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                            .size(10.dp)
+                    )
+                }
+            }
         }
 
+        Box(
+            modifier = Modifier
+                .padding(top = 12.dp, start = 8.dp)
+                .size(30.dp)
+                .clip(shape = CircleShape)
+                .align(Alignment.TopStart)
+                .clickable {
+                    val currentTime = System.currentTimeMillis()
+                    if (currentTime - lastClickTime >= 500) {
+                        systemBarColor = color
+                        onDismiss(false)
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_back),
+                contentDescription = "",
+                tint = design_white
+            )
+        }
     }
 }

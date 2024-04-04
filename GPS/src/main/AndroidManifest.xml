@@ -70,5 +70,11 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.MAP" />
+
+        <activity
+            android:name="net.pettip.gps._app.NotificationActivity"
+            android:taskAffinity=""
+            android:excludeFromRecents="true">
+        </activity>
     </application>
 </manifest>
