@@ -10,7 +10,6 @@ import net.pettip.data.pet.CurrentPetData
 const val BASE_URL = "https://pettip.net/"
 
 object G {
-    var userName: String = ""
     var userId: String = ""
     var userNickName: String = ""
     var userEmail: String = ""
@@ -28,6 +27,4 @@ object G {
     // 푸쉬로 받은 데이터
     var pushPage by mutableStateOf<String?>(null)
     var pushSeqNo by mutableStateOf<String?>(null)
-
-    var isGpsUnavailable by mutableStateOf<Boolean>(false)
 }

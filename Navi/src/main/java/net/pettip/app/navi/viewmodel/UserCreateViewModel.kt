@@ -60,7 +60,7 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocalData): ViewModel() {
+class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocalData, private val sharedViewModel: SharedViewModel): ViewModel() {
 
     val scdList : List<SCD> = scdLocalData.scd
 
@@ -741,6 +741,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
                         val body = response.body()
                         body?.let {
                             if (body.statusCode == 200){
+
                                 continuation.resume(true)
                             }else{
                                 continuation.resume(false)

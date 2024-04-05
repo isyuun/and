@@ -228,8 +228,8 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
     val scdLocalData = remember { SCDLocalData() }
 
     val viewModel = remember { LoginViewModel() }
-    val userCreateViewModel = remember { UserCreateViewModel(scdLocalData) }
     val sharedViewModel = remember { SharedViewModel() }
+    val userCreateViewModel = remember { UserCreateViewModel(scdLocalData, sharedViewModel) }
     val homeViewModel = remember { HomeViewModel(sharedViewModel) }
     val walkViewModel = remember { WalkViewModel(sharedViewModel) }
     val communityViewModel = remember { CommunityViewModel(sharedViewModel) }

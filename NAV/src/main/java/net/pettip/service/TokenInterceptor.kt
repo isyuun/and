@@ -16,8 +16,8 @@ class TokenInterceptor() : Interceptor {
 
         //val token = G.accessToken
         //val refreshToken = G.refreshToken
-        val token : String? = G.accessToken
-        val refreshToken : String? = G.refreshToken
+        val token : String? = MySharedPreference.getAccessToken()
+        val refreshToken : String? = MySharedPreference.getRefreshToken()
 
         val requestBuilder = originalRequest.newBuilder()
         if (!token.isNullOrBlank()) {
@@ -48,15 +48,15 @@ class TokenInterceptor() : Interceptor {
             val gson = Gson()
             val tokenResponse = gson.fromJson(responseBodyString.string(), RefreshRes::class.java)
 
-            G.accessToken = tokenResponse.data?.accessToken
-            G.refreshToken = tokenResponse.data?.refreshToken
-            MySharedPreference.setAccessToken(tokenResponse.data?.accessToken ?:"")
-            MySharedPreference.setRefreshToken(tokenResponse.data?.refreshToken ?:"")
+            MySharedPreference.setAccessToken(tokenResponse.data?.accessToken)
+            MySharedPreference.setRefreshToken(tokenResponse.data?.refreshToken)
+            //G.accessToken = tokenResponse.data?.accessToken
+            //G.refreshToken = tokenResponse.data?.refreshToken
 
-            if (!G.accessToken.isNullOrBlank()) {
+            if (!MySharedPreference.getAccessToken().isNullOrBlank()) {
                 val retryRequestBuilder = originalRequest.newBuilder()
-                retryRequestBuilder.header("Authorization", G.accessToken!!)
-                retryRequestBuilder.header("Refresh", G.refreshToken!!)
+                retryRequestBuilder.header("Authorization", MySharedPreference.getAccessToken())
+                retryRequestBuilder.header("Refresh", MySharedPreference.getRefreshToken())
 
                 val retryRequestWithToken = retryRequestBuilder.build()
                 return chain.proceed(retryRequestWithToken)

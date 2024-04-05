@@ -116,6 +116,7 @@ import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.data.bbs.BbsCmnt
 import net.pettip.map.app.LoadingAnimation1
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -851,7 +852,7 @@ fun EventCommentListItem(
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
-                                    color = if (G.userId == comment.userId) design_intro_bg else design_skip
+                                    color = if (MySharedPreference.getUserId() == comment.userId) design_intro_bg else design_skip
                                 )
 
                                 Text(
@@ -1021,7 +1022,7 @@ fun EventCommentListItem(
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
-                            color = if (G.userId == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
+                            color = if (MySharedPreference.getUserId() == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
                         )
 
                         Text(
@@ -1115,7 +1116,7 @@ fun EventCommentListItem(
                                 enter = fadeIn() + slideInVertically(),
                                 exit = fadeOut() + slideOutVertically(targetOffsetY = {it/2})
                             ){
-                                if (G.userId == comment.userId){
+                                if (MySharedPreference.getUserId() == comment.userId){
                                     Row (verticalAlignment = Alignment.CenterVertically){
                                         Text(
                                             text = stringResource(id = R.string.modify),
@@ -1395,7 +1396,7 @@ fun BbsCommentListItem2(
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
-                                    color = if (G.userId == comment.userId) design_intro_bg else design_skip
+                                    color = if (MySharedPreference.getUserId() == comment.userId) design_intro_bg else design_skip
                                 )
 
                                 Text(
@@ -1550,7 +1551,7 @@ fun BbsCommentListItem2(
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
-                        color = if (G.userId == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
+                        color = if (MySharedPreference.getUserId() == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
                     )
 
                     Text(
@@ -1622,7 +1623,7 @@ fun BbsCommentListItem2(
                             enter = fadeIn() + slideInVertically(),
                             exit = fadeOut() + slideOutVertically(targetOffsetY = {it/2})
                         ){
-                            if (G.userId == comment.userId){
+                            if (MySharedPreference.getUserId() == comment.userId){
                                 Row (verticalAlignment = Alignment.CenterVertically){
                                     Text(
                                         text = stringResource(id = R.string.modify),

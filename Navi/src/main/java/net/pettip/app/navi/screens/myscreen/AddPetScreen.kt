@@ -893,6 +893,7 @@ fun AddPetScreen(
                                 isLoading = false
                                 sharedViewModel.loadCurrentPetInfo()
                                 sharedViewModel.loadPetInfo()
+                                sharedViewModel.initSelectPet()
                                 navController.popBackStack()
                             }else{
                                 isLoading = false

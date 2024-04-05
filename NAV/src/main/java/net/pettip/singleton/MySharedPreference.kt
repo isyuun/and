@@ -41,7 +41,7 @@ object MySharedPreference {
         return sharedPreferences.getString("FcmToken", "").toString()
     }
 
-    fun setAccessToken(accessToken: String) {
+    fun setAccessToken(accessToken: String?) {
         sharedPreferences.edit().putString("AccessToken", accessToken).apply()
     }
 
@@ -65,7 +65,7 @@ object MySharedPreference {
         return sharedPreferences.getString("schUnqNo", "").toString()
     }
 
-    fun setRefreshToken(refreshToken: String) {
+    fun setRefreshToken(refreshToken: String?) {
         sharedPreferences.edit().putString("RefreshToken", refreshToken).apply()
     }
 
@@ -103,6 +103,14 @@ object MySharedPreference {
 
     fun getUserEmail(): String {
         return sharedPreferences.getString("userEmail", "").toString()
+    }
+
+    fun setUserNickName(newValue: String?) {
+        sharedPreferences.edit().putString("userNickName", newValue).apply()
+    }
+
+    fun getUserNickName(): String {
+        return sharedPreferences.getString("userNickName", "").toString()
     }
 
     fun setLastInviteCode(inviteCode: String) {

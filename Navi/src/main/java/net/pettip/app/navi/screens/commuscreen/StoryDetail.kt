@@ -146,6 +146,7 @@ import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.daily.Cmnt
 import net.pettip.data.daily.DailyDetailData
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.absoluteValue
@@ -820,7 +821,7 @@ fun StoryDetailTopContent(
                 )
 
                 AnimatedVisibility(
-                    visible = G.userId == story?.userId
+                    visible = MySharedPreference.getUserId() == story?.userId
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically){
                         Box {
@@ -927,7 +928,7 @@ fun StoryDetailTopContent(
                 }
             }
 
-            if (story?.userId == G.userId){
+            if (story?.userId == MySharedPreference.getUserId()){
                 Row (
                     verticalAlignment = Alignment.CenterVertically
                 ){
@@ -1333,7 +1334,7 @@ fun CommentListItem(
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
-                                    color = if (G.userId == comment.userId) design_intro_bg else design_skip
+                                    color = if (MySharedPreference.getUserId() == comment.userId) design_intro_bg else design_skip
                                 )
 
                                 Text(
@@ -1521,7 +1522,7 @@ fun CommentListItem(
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
-                            color = if (G.userId == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
+                            color = if (MySharedPreference.getUserId() == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
                         )
 
                         Text(
@@ -1615,7 +1616,7 @@ fun CommentListItem(
                                 enter = fadeIn() + slideInVertically(),
                                 exit = fadeOut() + slideOutVertically(targetOffsetY = {it/2})
                             ){
-                                if (G.userId == comment.userId){
+                                if (MySharedPreference.getUserId() == comment.userId){
                                     Row (verticalAlignment = Alignment.CenterVertically){
                                         Text(
                                             text = stringResource(id = R.string.modify),
@@ -1894,7 +1895,7 @@ fun CommentListItem2(
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
-                                    color = if (G.userId == comment.userId) design_intro_bg else design_skip
+                                    color = if (MySharedPreference.getUserId() == comment.userId) design_intro_bg else design_skip
                                 )
 
                                 Text(
@@ -2049,7 +2050,7 @@ fun CommentListItem2(
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
-                        color = if (G.userId == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
+                        color = if (MySharedPreference.getUserId() == comment.userId) design_intro_bg else MaterialTheme.colorScheme.secondary
                     )
 
                     Text(
@@ -2121,7 +2122,7 @@ fun CommentListItem2(
                             enter = fadeIn() + slideInVertically(),
                             exit = fadeOut() + slideOutVertically(targetOffsetY = {it/2})
                         ){
-                            if (G.userId == comment.userId){
+                            if (MySharedPreference.getUserId() == comment.userId){
                                 Row (verticalAlignment = Alignment.CenterVertically){
                                     Text(
                                         text = stringResource(id = R.string.modify),

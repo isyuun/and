@@ -106,6 +106,7 @@ import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.LifeTimeLineItem
 import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 
 /**
  * @Project     : PetTip-Android
@@ -174,11 +175,11 @@ fun TimelineScreen(
     }
 
     SideEffect {
-        if (preUserId != G.userId && preUserId != ""){
+        if (preUserId != MySharedPreference.getUserId() && preUserId != ""){
             viewModel.updateTimeLineRefresh(true)
-            viewModel.updatePreUserId(G.userId)
+            viewModel.updatePreUserId(MySharedPreference.getUserId())
         }else{
-            viewModel.updatePreUserId(G.userId)
+            viewModel.updatePreUserId(MySharedPreference.getUserId())
         }
     }
 

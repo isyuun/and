@@ -84,6 +84,7 @@ import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.bbs.BbsAncmntWinner
 import net.pettip.data.bbs.BbsEvnt
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -112,13 +113,13 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
     }
 
     LaunchedEffect(Unit){
-        if (preUserId != G.userId && preUserId != ""){
+        if (preUserId != MySharedPreference.getUserId() && preUserId != ""){
             communityViewModel.updateStoryInit(true)
             communityViewModel.updateEventInit(true)
             communityViewModel.updateEndEventInit(true)
-            communityViewModel.updatePreUserId(G.userId)
+            communityViewModel.updatePreUserId(MySharedPreference.getUserId())
         }else{
-            communityViewModel.updatePreUserId(G.userId)
+            communityViewModel.updatePreUserId(MySharedPreference.getUserId())
         }
     }
 

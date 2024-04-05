@@ -2,6 +2,7 @@ package net.pettip.service
 
 import net.pettip.data.RefreshToken
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -38,7 +39,7 @@ class OAuthAuthenticator(private val apiService: ApiService) : Authenticator {
         if (response.isSuccessful) {
             // Extract the new access token from the response.
             val newAccessToken = response.body()?.data?.accessToken
-            G.refreshToken = response.body()?.data?.refreshToken ?: ""
+            MySharedPreference.setRefreshToken(response.body()?.data?.refreshToken)
             return newAccessToken
         }
 
@@ -48,11 +49,11 @@ class OAuthAuthenticator(private val apiService: ApiService) : Authenticator {
 
     private fun getRefreshToken(): RefreshToken {
         // Retrieve the refresh token from local storage.
-        return RefreshToken(G.refreshToken?:"")
+        return RefreshToken(MySharedPreference.getRefreshToken())
     }
 
     private fun updateAccessToken(newAccessToken: String) {
         // Update the access token in your storage.
-        G.accessToken = newAccessToken
+        MySharedPreference.setAccessToken(newAccessToken)
     }
 }

@@ -156,10 +156,14 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
     var hashString by remember { mutableStateOf(hashtagString) }
 
     val uploadedPetList = storyDetail?.data?.dailyLifePetList // 이미 업로드된 펫 목록
-    val filteredCurrentPetList = petList.filter { currentPet ->
-        uploadedPetList?.none { uploadedPet ->
-            uploadedPet.ownrPetUnqNo == currentPet.ownrPetUnqNo
-        } ?: false
+    val filteredCurrentPetList = if (uploadedPetList != null) {
+        petList.filter { currentPet ->
+            uploadedPetList.none { uploadedPet ->
+                uploadedPet.ownrPetUnqNo == currentPet.ownrPetUnqNo
+            }
+        }
+    } else {
+        petList.toList()
     }
 
     DisposableEffect(Unit) {

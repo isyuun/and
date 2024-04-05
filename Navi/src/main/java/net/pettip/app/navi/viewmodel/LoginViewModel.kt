@@ -176,16 +176,14 @@ class LoginViewModel() : ViewModel() {
 
                                     _registedAppKey.value = it.data.appKeyVl ?: ""
                                     trmnlMng()
-                                    G.accessToken = it.data.accessToken
-                                    G.refreshToken = it.data.refreshToken
-                                    G.userId = it.data.userId
-                                    G.userNickName = it.data.nckNm
-                                    G.userEmail = it.data.email
 
                                     // shared에 저장
                                     MySharedPreference.setAccessToken(it.data.accessToken)
                                     MySharedPreference.setRefreshToken(it.data.refreshToken)
                                     MySharedPreference.setUserId(it.data.userId)
+                                    MySharedPreference.setUserNickName(it.data.nckNm)
+                                    MySharedPreference.setUserEmail(it.data.email)
+
                                     MySharedPreference.setLastLoginMethod(loginMethod)
                                     MySharedPreference.setIsLogin(true)
 

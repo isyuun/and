@@ -86,6 +86,7 @@ import net.pettip.data.bbs.BbsNtc
 import net.pettip.data.bbs.BbsQna
 import net.pettip.data.user.BbsFaq
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -105,13 +106,13 @@ fun SettingScreen(navController: NavHostController, viewModel:CommunityViewModel
     }
 
     LaunchedEffect(Unit){
-        if (preUserId != G.userId && preUserId != ""){
+        if (preUserId != MySharedPreference.getUserId() && preUserId != ""){
             viewModel.updateNtcListInit(true)
             viewModel.updateFaqListInit(true)
             viewModel.updateQnaListInit(true)
-            viewModel.updateSettingPreUserId(G.userId)
+            viewModel.updateSettingPreUserId(MySharedPreference.getUserId())
         }else{
-            viewModel.updateSettingPreUserId(G.userId)
+            viewModel.updateSettingPreUserId(MySharedPreference.getUserId())
         }
     }
 

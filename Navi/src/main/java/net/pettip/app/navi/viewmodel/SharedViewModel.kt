@@ -138,6 +138,14 @@ class SharedViewModel:ViewModel(){
     fun addSelectPetMulti(newValue: CurrentPetData) { _selectPetMulti.value.add(newValue) }
     fun subSelectPetMulti(newValue: CurrentPetData) { _selectPetMulti.value.remove(newValue) }
 
+    fun initSelectPet(){
+        if (_currentPetInfo.value.isNotEmpty()){
+            _selectPet.value = _currentPetInfo.value[0]
+        }else{
+            _selectPet.value = null
+        }
+    }
+
     fun parseBirthday(birthdayString: String): LocalDate? {
         val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
         return try {
@@ -279,17 +287,19 @@ class SharedViewModel:ViewModel(){
                         val body = response.body()
                         body?.let {
                             if (it.statusCode==200){
-                                G.accessToken = it.data?.accessToken
-                                G.refreshToken = it.data?.refreshToken
-                                G.userId = it.data?.userId ?: ""
-                                G.userNickName = it.data?.nckNm ?:""
-                                G.userEmail = it.data?.email ?: ""
+                                //G.accessToken = it.data?.accessToken
+                                //G.refreshToken = it.data?.refreshToken
+                                //G.userId = it.data?.userId ?: ""
+                                //G.userNickName = it.data?.nckNm ?:""
+                                //G.userEmail = it.data?.email ?: ""
 
                                 _nickName.value = it.data?.nckNm ?: ""
 
                                 MySharedPreference.setAccessToken(it.data?.accessToken?:"")
                                 MySharedPreference.setRefreshToken(it.data?.refreshToken ?:"")
                                 MySharedPreference.setUserId(it.data?.userId ?:"")
+                                MySharedPreference.setUserNickName(it.data?.nckNm?:"")
+                                MySharedPreference.setUserEmail(it.data?.email?:"")
 
                                 continuation.resume(true)
                             }else{

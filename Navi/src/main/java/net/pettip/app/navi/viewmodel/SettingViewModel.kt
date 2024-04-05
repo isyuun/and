@@ -530,7 +530,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     suspend fun resetNickName():Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val data = ResetNickNameReq(_userNickNamePass.value, G.userId)
+        val data = ResetNickNameReq(_userNickNamePass.value, MySharedPreference.getUserId())
 
         val call = apiService.resetNickName(data)
         return suspendCancellableCoroutine { continuation ->
@@ -540,7 +540,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
                         val body = response.body()
                         body?.let {
                             if (body.statusCode == 200){
-                                G.userNickName = _userNickNamePass.value
+                                MySharedPreference.setUserNickName(_userNickNamePass.value)
                                 continuation.resume(true)
                             }else{
                                 continuation.resume(false)
@@ -562,7 +562,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
     suspend fun resetPw():Boolean{
         val apiService = RetrofitClientServer.instance
 
-        val data = ResetPwReq(G.userEmail, _userPw.value)
+        val data = ResetPwReq(MySharedPreference.getUserEmail(), _userPw.value)
 
         val call = apiService.resetPw(data)
         return suspendCancellableCoroutine { continuation ->
@@ -596,7 +596,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
         val data = PetDetailReq(
             ownrPetUnqNo = petDetailData.ownrPetUnqNo,
             petRprsYn = petDetailData.petRprsYn,
-            userId = G.userId
+            userId = MySharedPreference.getUserId()
         )
 
         val call = apiService.myPetDetail(data)

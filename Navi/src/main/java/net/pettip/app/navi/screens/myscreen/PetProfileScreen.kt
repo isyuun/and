@@ -132,6 +132,7 @@ import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.pet.Member
 import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -790,7 +791,7 @@ fun GroupItem(item:Member,petInfo:PetDetailData, viewModel: SettingViewModel){
                 )
                 .clip(RoundedCornerShape(10.dp))
                 .clickable(
-                    enabled = (item.mngrType == "I" && petInfo.petMngrYn == "Y") || (petInfo.petMngrYn == "N" && item.userId == G.userId),
+                    enabled = (item.mngrType == "I" && petInfo.petMngrYn == "Y") || (petInfo.petMngrYn == "N" && item.userId == MySharedPreference.getUserId()),
                     onClick = {
                         scope.launch {
                             if (expandText) {

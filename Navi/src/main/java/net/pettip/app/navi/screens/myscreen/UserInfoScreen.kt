@@ -89,7 +89,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
 
     val userPw by settingViewModel.userPw.collectAsState()
     val userPwCheck by settingViewModel.userPwCheck.collectAsState()
-    var nickName by remember { mutableStateOf(G.userNickName) }
+    var nickName by remember { mutableStateOf(MySharedPreference.getUserNickName()) }
     val passedNick by settingViewModel.userNickNamePass.collectAsState()
 
     val focusManager = LocalFocusManager.current
@@ -130,11 +130,12 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 val result = settingViewModel.withdraw()
                 if (result) {
 
-                    G.userEmail = ""
-                    G.userId = ""
-                    G.refreshToken = ""
-                    G.accessToken = ""
+                    //G.userEmail = ""
+                    //G.userId = ""
+                    //G.refreshToken = ""
+                    //G.accessToken = ""
 
+                    MySharedPreference.setUserEmail("")
                     MySharedPreference.setUserId("")
                     MySharedPreference.setRefreshToken("")
                     MySharedPreference.setAccessToken("")
@@ -245,7 +246,7 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                 innerPadding = PaddingValues(start = 16.dp),
                 trailingIcon = {
                     AnimatedVisibility(
-                        visible = nickName.isNotEmpty() && nickName != G.userNickName,
+                        visible = nickName.isNotEmpty() && nickName != MySharedPreference.getUserNickName(),
                         enter = scaleIn(),
                         exit = scaleOut()
                     ) {

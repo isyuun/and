@@ -52,6 +52,7 @@ import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 
 @Composable
 fun InviteScreen(navController: NavHostController, settingViewModel: SettingViewModel){
@@ -202,7 +203,7 @@ private fun share(context: Context, inviteCode:String, selectPet:List<PetDetailD
         val formattedString : String = petNameList.joinToString(separator = ", "){ "[${it}]" }
         action = Intent.ACTION_SEND
         val inviteString =
-            "${G.userNickName}님이 Pet Tip으로 초대했어요!" +
+            "${MySharedPreference.getUserNickName()}님이 Pet Tip으로 초대했어요!" +
                     "\n${formattedString} 관리에 동참하시겠어요?"+
                     "\n초대코드등록란에 [${inviteCode}]를 입력해주세요. \n pettip.net/kakao/${inviteCode} "
         putExtra(Intent.EXTRA_TEXT, inviteString)

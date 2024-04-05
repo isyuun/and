@@ -248,6 +248,7 @@ fun ModifyPetInfoScreen(
                     sharedViewModel.updateInit(true)
                     sharedViewModel.loadPetInfo()
                     sharedViewModel.loadCurrentPetInfo()
+                    sharedViewModel.initSelectPet()
                     navController.popBackStack()
                     navController.popBackStack()
 

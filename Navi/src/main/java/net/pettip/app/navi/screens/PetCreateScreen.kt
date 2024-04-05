@@ -306,7 +306,7 @@ fun PetCreateScreen(
                                         )
                                     if (loginSuccess == 0) {
                                         skipLoading = false
-                                        MySharedPreference.setUserEmail(userId)
+                                        //MySharedPreference.setUserEmail(userId)
                                         sharedViewModel.updateInit(true)
                                         navController.navigate(Screen.MainScreen.route) {
                                             popUpTo(0)
@@ -968,7 +968,7 @@ fun PetCreateScreen(
                             if (userCreateSuccess){
                                 val loginSuccess = loginViewModel.onLoginButtonClick(userId, userPw, snsLogin)
                                 if (loginSuccess == 0){
-                                    MySharedPreference.setUserEmail(userId)
+                                    //MySharedPreference.setUserEmail(userId)
                                     val petCreateSuccess = viewModel.createPet(context)
                                     if(petCreateSuccess){
                                         isLoading = false

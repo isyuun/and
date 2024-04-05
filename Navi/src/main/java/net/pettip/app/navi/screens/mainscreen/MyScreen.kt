@@ -113,6 +113,7 @@ import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.pet.PetDetailData
 import net.pettip.gps.app.GPSApplication
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -210,7 +211,7 @@ fun MyScreen(navController: NavHostController, viewModel:SettingViewModel, share
                         modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 20.dp))
 
                     Text(
-                        text = G.userNickName,
+                        text = MySharedPreference.getUserNickName(),
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                         fontSize = 20.sp, letterSpacing = (-1.0).sp,
                         color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(start = 12.dp)
