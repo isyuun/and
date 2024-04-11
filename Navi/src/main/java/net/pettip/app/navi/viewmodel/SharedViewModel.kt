@@ -1,5 +1,6 @@
 package net.pettip.app.navi.viewmodel
 
+import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.pettip.data.RefreshRes
 import net.pettip.data.RefreshToken
+import net.pettip.data.cmm.commonRes
 import net.pettip.data.daily.WeekData
 import net.pettip.data.daily.WeekRecordReq
 import net.pettip.data.daily.WeekRecordRes
@@ -16,6 +18,7 @@ import net.pettip.data.pet.CurrentPetRes
 import net.pettip.data.pet.MyPetListReq
 import net.pettip.data.pet.MyPetListRes
 import net.pettip.data.pet.PetDetailData
+import net.pettip.data.user.TrmnlMngReq
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import net.pettip.singleton.RetrofitClientServer
@@ -274,12 +277,14 @@ class SharedViewModel:ViewModel(){
         }
     }
 
+    private val _registedAppKey = MutableStateFlow<String?>("")
+
     suspend fun sendRFToken():Boolean{
         val apiService = RetrofitClientServer.instance
 
         val refreshToken = net.pettip.singleton.MySharedPreference.getRefreshToken()
 
-        val call = apiService.sendRefreshToken(RefreshToken(refreshToken))
+        val call = apiService.sendRefreshToken(RefreshToken(refreshToken = refreshToken?:"", appTypNm = Build.MODEL.toString()))
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<RefreshRes>{
                 override fun onResponse(call: Call<RefreshRes>, response: Response<RefreshRes>) {
@@ -292,6 +297,9 @@ class SharedViewModel:ViewModel(){
                                 //G.userId = it.data?.userId ?: ""
                                 //G.userNickName = it.data?.nckNm ?:""
                                 //G.userEmail = it.data?.email ?: ""
+
+                                _registedAppKey.value = it.data?.appKeyVl ?: ""
+                                trmnlMng()
 
                                 _nickName.value = it.data?.nckNm ?: ""
 
@@ -317,6 +325,33 @@ class SharedViewModel:ViewModel(){
                 }
             })
         }
+    }
+
+    fun trmnlMng(){
+        val appkey = MySharedPreference.getFcmToken()
+        // 등록된 토큰과 현재 디바이스 토큰이 다르면 업데이트
+        if ( appkey != _registedAppKey.value || _registedAppKey.value.isNullOrBlank()  ){
+            val apiService = RetrofitClientServer.instance
+
+            val data = TrmnlMngReq(
+                appKey = appkey,
+                appOs = "001",
+                appTypNm = Build.MODEL.toString()
+            )
+
+            val call = apiService.trmnlMng(data)
+            call.enqueue(object :Callback<commonRes>{
+                override fun onResponse(call: Call<commonRes>, response: Response<commonRes>) {
+                    Log.d("TRM","등록성공")
+                }
+
+                override fun onFailure(call: Call<commonRes>, t: Throwable) {
+                    Log.d("TRM","등록실패")
+                }
+
+            })
+        }
+
     }
 
     suspend fun getWeekRecord(ownrPetUnqNo: String, searchDay: String):Boolean{

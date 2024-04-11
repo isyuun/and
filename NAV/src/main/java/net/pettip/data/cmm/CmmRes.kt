@@ -31,3 +31,8 @@ data class CdDetail(
     @SerializedName("upCdId")
     var upCdId: String // SCH
 )
+
+data class CmmReq(
+    @SerializedName("cmmCdData")
+    var cmmCdData: List<String?>
+)

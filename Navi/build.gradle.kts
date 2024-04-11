@@ -19,7 +19,7 @@ android {
         applicationId = "net.pettip.app.navi"
         minSdk = 26
         targetSdk = 34
-        versionCode = 11
+        versionCode = 12
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -121,4 +121,5 @@ dependencies {
     // Skip this if you don't want to use integration libraries or configure Glide.
     implementation("com.google.dagger:hilt-android:2.47")
     //kapt("com.google.dagger:hilt-android-compiler:2.47")
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
 }

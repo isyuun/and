@@ -2,6 +2,9 @@ package net.pettip.singleton
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import net.pettip.data.pet.CurrentPetData
 import net.pettip.util.Log
 import java.time.LocalDate
 
@@ -45,8 +48,16 @@ object MySharedPreference {
         sharedPreferences.edit().putString("AccessToken", accessToken).apply()
     }
 
-    fun getAccessToken(): String {
-        return sharedPreferences.getString("AccessToken", "").toString()
+    fun getAccessToken(): String? {
+        return sharedPreferences.getString("AccessToken", null)
+    }
+
+    fun setRefreshToken(refreshToken: String?) {
+        sharedPreferences.edit().putString("RefreshToken", refreshToken).apply()
+    }
+
+    fun getRefreshToken(): String? {
+        return sharedPreferences.getString("RefreshToken", null)
     }
 
     fun setFcmDataPage(page: String) {
@@ -63,14 +74,6 @@ object MySharedPreference {
 
     fun getFcmDataSchUnqNo(): String {
         return sharedPreferences.getString("schUnqNo", "").toString()
-    }
-
-    fun setRefreshToken(refreshToken: String?) {
-        sharedPreferences.edit().putString("RefreshToken", refreshToken).apply()
-    }
-
-    fun getRefreshToken(): String {
-        return sharedPreferences.getString("RefreshToken", " ").toString()
     }
 
     fun setIsLogin(loggined: Boolean) {
@@ -119,5 +122,17 @@ object MySharedPreference {
 
     fun getLastInviteCode(): String {
         return sharedPreferences.getString("inviteCode", "").toString()
+    }
+
+    fun setCurrentPetData(newValue: List<CurrentPetData>) {
+        val gson = Gson()
+        val json = gson.toJson(newValue)
+        sharedPreferences.edit().putString("currentPetData", json).apply()
+    }
+
+    fun getCurrentPetData(): List<CurrentPetData>? {
+        val json = sharedPreferences.getString("currentPetData", null)
+        val gson = Gson()
+        return gson.fromJson(json, object : TypeToken<List<CurrentPetData>>() {}.type)
     }
 }

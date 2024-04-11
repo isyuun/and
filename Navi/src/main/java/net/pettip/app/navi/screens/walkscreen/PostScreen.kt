@@ -647,8 +647,10 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                                 )
                             }
                         } else {
+                            Log.d("LOG","fileUpload")
                             val photoUpload = viewModel.fileUpload(context = context, gpxFile = file)
                             if (photoUpload) {
+                                Log.d("LOG","DailyUpload")
                                 var dailyUpload = viewModel.uploadDaily()
                                 if (dailyUpload) {
                                     sharedViewModel.updateWalkUpload(true)

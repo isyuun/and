@@ -27,12 +27,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import net.pettip.data.CommonCodeModel
 import net.pettip.data.SCD
 import net.pettip.data.SCDLocalData
 import net.pettip.data.SggList
 import net.pettip.data.SggListRes
 import net.pettip.data.UmdList
 import net.pettip.data.UmdListRes
+import net.pettip.data.cmm.CdDetail
+import net.pettip.data.cmm.CmmReq
+import net.pettip.data.cmm.CmmRes
 import net.pettip.data.cmm.commonRes
 import net.pettip.data.pet.DeletePetReq
 import net.pettip.data.pet.MyPetResModel
@@ -62,7 +66,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocalData, private val sharedViewModel: SharedViewModel): ViewModel() {
 
-    val scdList : List<SCD> = scdLocalData.scd
+    //val scdList : List<SCD> = scdLocalData.scd
 
     private val _dm = MutableStateFlow<String>("")
     val dm = _dm.asStateFlow()
@@ -70,6 +74,10 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     private val _integrityCheckMsg = MutableStateFlow<String>("")
     val integrityCheckMsg = _integrityCheckMsg.asStateFlow()
     fun updateIntegrityCheckMsg(newValue: String) { _integrityCheckMsg.value = newValue }
+
+    private val _scdList = MutableStateFlow<List<CdDetail>>(emptyList()) // 시군구
+    val scdList: StateFlow<List<CdDetail>> = _scdList.asStateFlow()
+    fun updateScdList(newValue: List<CdDetail>) { _scdList.value = newValue }
 
     private val _sggList = MutableStateFlow<List<SggList>>(emptyList()) // 시군구
     val sggList: StateFlow<List<SggList>> = _sggList.asStateFlow()
@@ -79,9 +87,9 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     val umdList: StateFlow<List<UmdList>> = _umdList.asStateFlow()
     fun updateUmdList(newValue: List<UmdList>) { _umdList.value = newValue }
 
-    private val _selectedItem1 = MutableStateFlow(SCD("", "", "")) // 시도
-    val selectedItem1: StateFlow<SCD> = _selectedItem1.asStateFlow()
-    fun updateSelectedItem1(newValue: SCD) { _selectedItem1.value = newValue }
+    private val _selectedItem1 = MutableStateFlow(CdDetail("", "", "")) // 시도
+    val selectedItem1: StateFlow<CdDetail> = _selectedItem1.asStateFlow()
+    fun updateSelectedItem1(newValue: CdDetail) { _selectedItem1.value = newValue }
 
     private val _selectedItem2 = MutableStateFlow(SggList("", "")) // 시군구
     val selectedItem2: StateFlow<SggList> = _selectedItem2.asStateFlow() // state 노출
@@ -334,6 +342,37 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     //    callPetListApi("003")
     //}
 
+    suspend fun getSCD():Boolean{
+        val apiService = RetrofitClientServer.instance
+
+        val data = CommonCodeModel("SCD")
+
+        val call = apiService.getCmmList(data)
+
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<CmmRes>{
+                override fun onResponse(call: Call<CmmRes>, response: Response<CmmRes>) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (it.statusCode == 200){
+                                _scdList.value = it.data[0].cdDetailList
+                                continuation.resume(true)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<CmmRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
     suspend fun getPetType():Boolean{
         val apiService = RetrofitClientServer.instance
 
@@ -585,7 +624,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
             }
             val petMngrYn = "Y".toRequestBody("text/plain".toMediaType()) // 펫 관리자여부
             val wghtVl = petWght.value.toFloat() // 몸무게
-            val stdgCtpvCd = selectedItem1.value.cdld?.toRequestBody("text/plain".toMediaType()) //시도 코드
+            val stdgCtpvCd = selectedItem1.value.cdId?.toRequestBody("text/plain".toMediaType()) //시도 코드
 
             val response = apiService.createPet(petRelCd, petNm, petRegNo, stdgSggCd!!, petInfoUnqNo,petBrthYmd, delYn, stdgUmdCd!!, filePart, petRprsYn, ntrTypCd, sexTypCd, petMngrYn, stdgCtpvCd!!, wghtVl)
             response.enqueue(object : Callback<MyPetResModel>{
@@ -598,7 +637,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
 
                                 //---- 초기화 ----
                                 _petKind.value = PetListData("", "", 0, "사이즈/품종 선택", "")
-                                _selectedItem1.value = SCD("", "", "")
+                                _selectedItem1.value = CdDetail("", "", "")
                                 _selectedItem2.value = SggList("", "") // 시군구
                                 _selectedItem3.value = UmdList("", "") // 읍면동
                                 _sggList.value = emptyList()
@@ -674,7 +713,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
         }
         val petMngrYn = "Y".toRequestBody("text/plain".toMediaType()) // 펫 관리자여부
         //val wghtVl = petWght.value.toFloat() // 몸무게
-        val stdgCtpvCd = selectedItem1.value.cdld?.toRequestBody("text/plain".toMediaType()) //시도 코드
+        val stdgCtpvCd = selectedItem1.value.cdId?.toRequestBody("text/plain".toMediaType()) //시도 코드
 
         Log.d("IMAGE",filePart.toString())
         val call = apiService.modifyPet(ownrPetUnqNo, petRelCd, petNm, petRegNo, stdgSggCd, petInfoUnqNo,petBrthYmd, delYn, stdgUmdCd, filePart, petRprsYn, ntrTypCd, sexTypCd, petMngrYn, stdgCtpvCd)
@@ -692,7 +731,7 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
 
                                 //---- 초기화 ----
                                 _petKind.value = PetListData("", "", 0, "사이즈/품종 선택", "")
-                                _selectedItem1.value = SCD("", "", "")
+                                _selectedItem1.value = CdDetail("", "", "")
                                 _selectedItem2.value = SggList("", "") // 시군구
                                 _selectedItem3.value = UmdList("", "") // 읍면동
                                 _sggList.value = emptyList()

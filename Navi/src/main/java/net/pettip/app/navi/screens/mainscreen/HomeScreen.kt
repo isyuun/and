@@ -146,6 +146,7 @@ import net.pettip.data.pet.CurrentPetData
 import net.pettip.data.pet.PetDetailData
 import net.pettip.map.app.naver.ShowDialogRestart
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 import net.pettip.ui.theme.APPTheme
 import net.pettip.util.Log
 import java.text.SimpleDateFormat
@@ -333,7 +334,8 @@ fun HomeScreen(
                         onDismissRequest = {},
                         onDismissButton = {},
                         onConfirmButton = {
-                            G.mapPetInfo = currentPetInfo
+                            //G.mapPetInfo = currentPetInfo
+                            MySharedPreference.setCurrentPetData(currentPetInfo)
                         },
                     )
                 }

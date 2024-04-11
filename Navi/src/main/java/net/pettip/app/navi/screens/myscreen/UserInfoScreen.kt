@@ -71,6 +71,7 @@ import net.pettip.app.navi.component.CustomAlert
 import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.Toasty
+import net.pettip.app.navi.screens.containsSpecialCharacter
 import net.pettip.app.navi.ui.theme.design_999EA9
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_intro_bg
@@ -215,7 +216,11 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
             }
             CustomTextField(
                 value = nickName,
-                onValueChange = { nickName = it },
+                onValueChange = {
+                    if (it.length<=20){
+                        nickName = it
+                    }
+                                },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -253,16 +258,21 @@ fun UserInfoScreen(navController:NavHostController, settingViewModel: SettingVie
                         Button(
                             onClick = {
                                 scope.launch {
-                                    val result = settingViewModel.nickNameCheck(nickName)
-                                    if (result) {
-                                        settingViewModel.updateUserNickNamePass(nickName)
-                                        focusManager.clearFocus()
-                                        alertMsg = "사용하실 수 있는 닉네임입니다"
+                                    if (containsSpecialCharacter(nickName)){
+                                        alertMsg = "특수문자는 사용 할 수 없습니다"
                                         alertShow = true
-                                    } else {
-                                        focusManager.clearFocus()
-                                        alertMsg = "닉네임이 중복되지 않게\n다시 입력해 주세요"
-                                        alertShow = true
+                                    }else{
+                                        val result = settingViewModel.nickNameCheck(nickName)
+                                        if (result) {
+                                            settingViewModel.updateUserNickNamePass(nickName)
+                                            focusManager.clearFocus()
+                                            alertMsg = "사용하실 수 있는 닉네임입니다"
+                                            alertShow = true
+                                        } else {
+                                            focusManager.clearFocus()
+                                            alertMsg = "닉네임이 중복되지 않게\n다시 입력해 주세요"
+                                            alertShow = true
+                                        }
                                     }
                                 }
                             },

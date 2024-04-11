@@ -683,7 +683,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             )
             {
                 Text(
-                    text = stringResource(R.string.walk_complete),
+                    text = stringResource(R.string.daily_post),
                     color = design_white,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular))

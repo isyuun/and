@@ -3,7 +3,10 @@
 package net.pettip.app.navi.screens
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Build
+import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -24,6 +27,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -72,11 +77,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -91,6 +101,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.ViewCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -195,6 +206,9 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                             alertShow = true
                         }
                     }
+                }else if (loginResult == 3){
+                    alertMsg = "차단되셨습니다"
+                    alertShow = true
                 }else{
                     alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
                     alertShow = true
@@ -516,6 +530,9 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                                 alertShow = true
                                             }
                                         }
+                                    }else if (loginResult == 3){
+                                        alertMsg = "차단되셨습니다"
+                                        alertShow = true
                                     }else{
                                         // 실패시의 상황을 하나로 상정하면 안됨.
                                         // 통신실패의 경우에는 토스트를 띄어 다시시도하기 유도
@@ -616,6 +633,9 @@ fun LoginContent(navController: NavController,viewModel: LoginViewModel,sharedVi
                                                 alertShow = true
                                             }
                                         }
+                                    }else if (loginResult == 3){
+                                        alertMsg = "차단되셨습니다"
+                                        alertShow = true
                                     }else{
                                         alertMsg = "통신오류가 발생했습니다.\n다시 시도해주세요"
                                         alertShow = true
@@ -809,6 +829,18 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     val snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
     val scope = rememberCoroutineScope()
 
+    val scrollState = rememberScrollState()
+    var isScrollEnabled by remember { mutableStateOf(true) }
+    val nestedScrollConnection = remember{
+        object : NestedScrollConnection{
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                Log.d("LOG","isScroll:${isScrollEnabled}, available:${available}")
+                return if (isScrollEnabled) available else Offset.Zero
+            }
+        }
+    }
+
     LaunchedEffect(Unit){
         if (snsNickName != null){
             userCreateViewModel.updateUserNickName(snsNickName?:"")
@@ -832,7 +864,8 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         topBar = {
             BackTopBar(title = stringResource(R.string.sign_up_), navController = navController)
         },
@@ -852,10 +885,12 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
             .background(color = MaterialTheme.colorScheme.primary)
         ){
             Column (
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 20.dp)
+                    .verticalScroll(state = scrollState, enabled = isScrollEnabled)
+                    //.nestedScroll(nestedScrollConnection)
             ){
-                Spacer(modifier = Modifier.padding(top = 20.dp))
-                
                 Row (
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
@@ -922,19 +957,25 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                     title = stringResource(R.string.agree_terms_service),
                     page = 1,
                     check = memberCheck,
-                    onClick = { newValue -> viewModel.updateMemberCheck(newValue)})
+                    onClick = { newValue -> viewModel.updateMemberCheck(newValue)},
+                    isScrollEnabled = {newValue -> isScrollEnabled = newValue}
+                )
 
                 AgreeComponent(
                     title = stringResource(R.string.agree_privacy_policy),
                     page = 2,
                     check = personCheck,
-                    onClick = { newValue -> viewModel.updatePersonCheck(newValue)})
+                    onClick = { newValue -> viewModel.updatePersonCheck(newValue)},
+                    isScrollEnabled = {newValue -> isScrollEnabled = newValue}
+                )
 
                 AgreeComponent(
                     title = stringResource(R.string.agree_marketing),
                     page = 3,
                     check = marketingCheck,
-                    onClick = { newValue -> userCreateViewModel.updateMarketingCheck(newValue)})
+                    onClick = { newValue -> userCreateViewModel.updateMarketingCheck(newValue)},
+                    isScrollEnabled = {newValue -> isScrollEnabled = newValue}
+                )
 
                 //AgreeComponentV2(
                 //    title = stringResource(R.string.agree_marketing),
@@ -1026,7 +1067,11 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
 
                 CustomTextField(
                     value = nickName,
-                    onValueChange = {userCreateViewModel.updateUserNickName(it)},
+                    onValueChange = {
+                        if (it.length<=20){
+                            userCreateViewModel.updateUserNickName(it)
+                        }
+                                    },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -1063,16 +1108,21 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                             Button(
                                 onClick = {
                                     scope.launch {
-                                        val result = userCreateViewModel.nickNameCheck()
-                                        if (result){
-                                            focusManager.clearFocus()
-                                            userCreateViewModel.updateUserNickNamePass(nickName)
-                                            alertMsg = "사용하실 수 있는 닉네임입니다"
+                                        if (containsSpecialCharacter(nickName)){
+                                            alertMsg = "특수문자는 사용 할 수 없습니다"
                                             alertShow = true
                                         }else{
-                                            focusManager.clearFocus()
-                                            alertMsg = "닉네임이 중복되지 않게\n다시 입력해주세요"
-                                            alertShow = true
+                                            val result = userCreateViewModel.nickNameCheck()
+                                            if (result){
+                                                focusManager.clearFocus()
+                                                userCreateViewModel.updateUserNickNamePass(nickName)
+                                                alertMsg = "사용하실 수 있는 닉네임입니다"
+                                                alertShow = true
+                                            }else{
+                                                focusManager.clearFocus()
+                                                alertMsg = "닉네임이 중복되지 않게\n다시 입력해주세요"
+                                                alertShow = true
+                                            }
                                         }
                                     }
                                 },
@@ -1123,7 +1173,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
 
                               },
                     modifier = Modifier
-                        .padding(top = 16.dp)
+                        .padding(top = 16.dp, bottom = 16.dp)
                         .fillMaxWidth()
                         .height(48.dp)
                         .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
@@ -1140,12 +1190,21 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     }
 }
 
+
+fun containsSpecialCharacter(input: String): Boolean {
+    val pattern = Regex("[^A-Za-z0-9ㄱ-힣 ]") // 알파벳, 숫자, 한글, 공백이 아닌 문자를 나타내는 정규식
+    return pattern.containsMatchIn(input)
+}
+
+@SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
 @Composable
 fun AgreeComponent(
     title: String,
     page : Int,
     check : Boolean,
-    onClick:(Boolean) -> Unit){
+    onClick:(Boolean) -> Unit,
+    isScrollEnabled:(Boolean) -> Unit
+){
     Column (
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -1212,10 +1271,9 @@ fun AgreeComponent(
             enter = expandVertically(),
             exit = shrinkVertically(),
         ) {
-            Column (
+            Box (
                 modifier = Modifier
                     .height(500.dp)
-                    .verticalScroll(rememberScrollState())
             ){
                 val url1 = "${BASE_URL}terms"
                 val url2 = "${BASE_URL}privacy_policy"
@@ -1234,6 +1292,9 @@ fun AgreeComponent(
                             settings.loadWithOverviewMode = true
                             settings.useWideViewPort = true
                             settings.setSupportZoom(true)
+
+                            ViewCompat.setNestedScrollingEnabled(this,true)
+
                         }
                     },
                     update = { webView ->
@@ -1242,7 +1303,43 @@ fun AgreeComponent(
                             2 -> webView.loadUrl(url2)
                             3 -> webView.loadUrl(url3)
                         }
-                    }
+                        webView.setOnTouchListener { view, motionEvent ->
+                            when (motionEvent.action) {
+                                MotionEvent.ACTION_DOWN -> {
+                                    // 터치 다운 이벤트 처리
+                                    isScrollEnabled(false)
+                                    false
+                                }
+                                MotionEvent.ACTION_MOVE -> {
+                                    // 터치 이동 이벤트 처리
+                                    false
+                                }
+                                MotionEvent.ACTION_UP -> {
+                                    // 터치 업 이벤트 처리
+                                    isScrollEnabled(true)
+                                    false
+                                }
+                                else -> false
+                            }
+                        }
+                        webView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                            if (!v.canScrollVertically(1)){
+                                Log.d("LOG","스크롤 최하단 입니다")
+                                if (scrollY > oldScrollY){
+                                    isScrollEnabled(true)
+                                }else{
+                                    isScrollEnabled(false)
+                                }
+                            }else if (!v.canScrollVertically(-1)){
+                                Log.d("LOG","스크롤 최상단 입니다")
+                                if (scrollY < oldScrollY){
+                                    isScrollEnabled(true)
+                                }else{
+                                    isScrollEnabled(false)
+                                }
+                            }
+                        }
+                    },
                 )
 
             }

@@ -115,6 +115,7 @@ import net.pettip.app.navi.viewmodel.UserCreateViewModel
 import net.pettip.data.SCD
 import net.pettip.data.SggList
 import net.pettip.data.UmdList
+import net.pettip.data.cmm.CdDetail
 import net.pettip.data.pet.PetListData
 import java.sql.Date
 import java.text.SimpleDateFormat
@@ -174,7 +175,7 @@ fun AddPetScreen(
             viewModel.updatePetWght("")
             viewModel.updatePetGender("남아")
             viewModel.updatePetNtr("했어요")
-            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+            viewModel.updateSelectedItem1(CdDetail(cdNm = "", cdId = "", upCdId = ""))
             viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
             viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
             viewModel.updatePetBirth("")
@@ -216,7 +217,7 @@ fun AddPetScreen(
                                         viewModel.updatePetWght("")
                                         viewModel.updatePetGender("남아")
                                         viewModel.updatePetNtr("했어요")
-                                        viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+                                        viewModel.updateSelectedItem1(CdDetail(cdNm = "", cdId = "", upCdId = ""))
                                         viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
                                         viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
                                         viewModel.updatePetBirth("")
@@ -489,7 +490,7 @@ fun AddPetScreen(
             ) {
                 Row(modifier=Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
                     Text(
-                        text = if(scd.cdld == "") stringResource(R.string.address_selection) else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
+                        text = if(scd.cdId == "") stringResource(R.string.address_selection) else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
 
@@ -499,7 +500,7 @@ fun AddPetScreen(
                 }
             }
 
-            Text(text = stringResource(R.string.name), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(R.string.pet_name), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 

@@ -27,6 +27,7 @@ import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import net.pettip.singleton.RetrofitClientServer
 import net.pettip.util.Log
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -124,7 +125,7 @@ class LoginViewModel() : ViewModel() {
     private val _registedAppKey = MutableStateFlow<String?>("")
 
 
-    private fun trmnlMng(){
+    fun trmnlMng(){
         // 등록된 토큰과 현재 디바이스 토큰이 다르면 업데이트
         if ( _appKey.value != _registedAppKey.value || _registedAppKey.value.isNullOrBlank()  ){
             val apiService = RetrofitClientServer.instance
@@ -187,15 +188,22 @@ class LoginViewModel() : ViewModel() {
                                     MySharedPreference.setLastLoginMethod(loginMethod)
                                     MySharedPreference.setIsLogin(true)
 
-                                    continuation.resume(
-                                        0)
+                                    continuation.resume(0)
                                 } else {
                                     continuation.resume(1)
                                 }
                             }
                         }else{
-                            Log.d("LOG","로그인 실패")
-                            continuation.resume(1)
+                            val errorBodyString = response.errorBody()!!.string()
+                            val status = errorBodyParseStatus(errorBodyString)
+
+                            if (status == "403"){
+                                Log.d("LOG","차단")
+                                continuation.resume(3)
+                            }else{
+                                Log.d("LOG","로그인 실패")
+                                continuation.resume(1)
+                            }
                         }
                     }
 
@@ -343,4 +351,20 @@ class LoginViewModel() : ViewModel() {
             })
         }
     }
+}
+
+fun errorBodyParseStatus(errorBodyString: String?):String{
+    if (errorBodyString != null) {
+        // errorBodyString은 JSON 형식으로 보이므로 파싱하여 detailMessage를 얻을 수 있습니다.
+        val json = JSONObject(errorBodyString)
+        val statusCode = json.optString("statusCode")
+
+        return if (statusCode.isNotEmpty()) {
+            statusCode
+        } else {
+            "통신에 실패했습니다"
+        }
+    }
+
+    return "통신에 실패했습니다"
 }

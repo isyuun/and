@@ -46,6 +46,9 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import com.kakao.sdk.common.util.Utility
 import kotlinx.coroutines.delay
@@ -104,6 +107,8 @@ class MainActivity : ComponentActivity() {
     private val MAX_RETRY_COUNT = 3
     private val RETRY_INTERVAL_MILLIS = 10 * 1000L
 
+    //private lateinit var inAppUpdate: InAppUpdate
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,6 +118,8 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition{false}
 
         getTokenWithRetry()
+
+        //inAppUpdate = InAppUpdate(this)
 
         val intentData: Uri? = intent.data
         if (intentData != null) {
@@ -149,8 +156,20 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    //override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    //    super.onActivityResult(requestCode, resultCode, data)
+    //    inAppUpdate.onActivityResult(requestCode,resultCode, data)
+    //}
+
+    override fun onResume() {
+        super.onResume()
+        //inAppUpdate.onResume()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+
+        //inAppUpdate.onDestroy()
 
         val filesDir = this.filesDir
         val files = filesDir.listFiles()

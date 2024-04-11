@@ -139,8 +139,9 @@ import net.pettip.app.navi.viewmodel.UserCreateViewModel
 import net.pettip.data.SCD
 import net.pettip.data.SggList
 import net.pettip.data.UmdList
+import net.pettip.data.cmm.CdDetail
+import net.pettip.data.cmm.CmmRes
 import net.pettip.data.pet.PetListData
-import net.pettip.singleton.MySharedPreference
 import java.sql.Date
 import java.text.SimpleDateFormat
 
@@ -154,7 +155,7 @@ fun PetCreateScreen(
     sharedViewModel: SharedViewModel
 ){
 
-    val scdList by remember { mutableStateOf(viewModel.scdList) }
+    //val scdList by remember { mutableStateOf(viewModel.scdList) }
     val petCreateSuccess by viewModel.petCreateSuccess.collectAsState()
     if(petCreateSuccess){
         navController.navigate(Screen.MainScreen.route){
@@ -487,7 +488,7 @@ fun PetCreateScreen(
             ) {
                 Row(modifier=Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
                     Text(
-                        text = if(scd.cdld == "") stringResource(id = R.string.address_selection) else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
+                        text = if(scd.cdId == "") stringResource(id = R.string.address_selection) else "${scd.cdNm} ${sgg.sggNm} ${umd.umdNm}",
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular)))
 
@@ -497,7 +498,7 @@ fun PetCreateScreen(
                 }
             }
 
-            Text(text = stringResource(id = R.string.name), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.pet_name), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier=Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -1234,7 +1235,8 @@ fun LocationPickContent(
     navController: NavHostController
 ){
 
-    val scdList = viewModel.scdList
+    //val scdList = viewModel.scdList
+    val scdList by viewModel.scdList.collectAsState()
     val sggList by viewModel.sggList.collectAsState()
     val umdList by viewModel.umdList.collectAsState()
     val loading by viewModel.addressLoading.collectAsState()
@@ -1243,9 +1245,11 @@ fun LocationPickContent(
     var expanded2 by remember { mutableStateOf (false) }
     var expanded3 by remember { mutableStateOf (false) }
 
-    var selectSCD by remember{ mutableStateOf<SCD?>(null) }
+    var selectSCD by remember{ mutableStateOf<CdDetail?>(null) }
     var selectSGG by remember{ mutableStateOf<SggList?>(null) }
     var selectUMD by remember{ mutableStateOf<UmdList?>(null) }
+
+    var init by remember{ mutableStateOf(true) }
 
     val context = LocalContext.current
 
@@ -1253,6 +1257,15 @@ fun LocationPickContent(
         onDispose {
             viewModel.updateSggList(emptyList())
             viewModel.updateUmdList(emptyList())
+        }
+    }
+
+    LaunchedEffect(key1 = init){
+        if(init){
+
+            viewModel.getSCD()
+
+            init = false
         }
     }
 
@@ -1320,7 +1333,7 @@ fun LocationPickContent(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 400.dp)
+                            .heightIn(max = 300.dp)
                             .background(color = Color.Transparent),
                         verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
@@ -1328,11 +1341,10 @@ fun LocationPickContent(
                             addressItem1(
                                 viewModel = viewModel,
                                 address = scd,
-                                onClick = {newValue -> expanded1 = newValue},
-                                onSelect = {newValue -> selectSCD = newValue},
-                                sggClear = { selectSGG = null },
-                                umdClear = { selectUMD = null }
-                            )
+                                onClick = { newValue -> expanded1 = newValue},
+                                onSelect = { newValue -> selectSCD = newValue},
+                                sggClear = { selectSGG = null }
+                            ) { selectUMD = null }
                         }
                     }
                 }
@@ -1393,7 +1405,7 @@ fun LocationPickContent(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 400.dp)
+                            .heightIn(max = 300.dp)
                             .background(color = Color.Transparent),
                         verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
@@ -1401,7 +1413,7 @@ fun LocationPickContent(
                             addressItem2(
                                 viewModel = viewModel,
                                 address = sggList,
-                                sidoCd = selectSCD?.cdld?:"",
+                                sidoCd = selectSCD?.cdId?:"",
                                 onClick = {newValue -> expanded2 = newValue},
                                 onSelect = {newValue -> selectSGG = newValue},
                                 umdClear = { selectUMD = null }
@@ -1467,7 +1479,7 @@ fun LocationPickContent(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 400.dp)
+                            .heightIn(max = 300.dp)
                             .background(color = Color.Transparent)
                             .padding(bottom = 100.dp),
                         verticalArrangement = Arrangement.spacedBy(2.dp)
@@ -1521,7 +1533,7 @@ fun LocationPickContent(
 }
 
 @Composable
-fun addressItem1(viewModel: UserCreateViewModel, address: SCD, onClick: (Boolean) -> Unit, onSelect: (SCD)->Unit, sggClear:()->Unit, umdClear:()->Unit){
+fun addressItem1(viewModel: UserCreateViewModel, address: CdDetail, onClick: (Boolean) -> Unit, onSelect: (CdDetail)->Unit, sggClear:()->Unit, umdClear:()->Unit){
 
     Column (
         modifier = Modifier
@@ -1542,7 +1554,7 @@ fun addressItem1(viewModel: UserCreateViewModel, address: SCD, onClick: (Boolean
                 umdClear()
 
                 viewModel.updateUmdList(emptyList())
-                address.cdld?.let { viewModel.sggListLoad(it) }
+                address.cdId?.let { viewModel.sggListLoad(it) }
 
                 onClick(false)
             },

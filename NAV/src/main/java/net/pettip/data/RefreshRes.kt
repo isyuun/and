@@ -31,8 +31,11 @@ data class TokenData(
     var nckNm: String?, //
     @SerializedName("email")
     var email: String?, //
+    @SerializedName("appKeyVl")
+    var appKeyVl: String?, //
 )
 
 data class RefreshToken(
-    var refreshToken: String
+    var refreshToken: String?,
+    var appTypNm: String?
 )

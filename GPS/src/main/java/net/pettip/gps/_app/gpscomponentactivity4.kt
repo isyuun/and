@@ -99,13 +99,18 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         //Log.i(__CLASSNAME__, "${getMethodName()}::onCamera()[length:${file?.length()}][file:$file][uri:$uri]")
         if (success) {
-            file?.length()?.let { length -> if (length > 0) this.file?.let { file -> this.uri?.let { uri -> onCamera(file, uri) } } }
+            if (observer !=null){
+                file?.length()?.let { length -> if (length > 0) this.file?.let { file -> this.uri?.let { uri -> onCamera(file, uri) } } }
+            }else{
+                Log.d("LOG","observer is null")
+            }
         }
     }
 
     override fun onStop() {
         Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][file:$file][uri:$uri]")
-        /*if (camera) unregister() else */register()
+        /*if (camera) unregister() else */
+        register()
         super.onStop()
     }
 

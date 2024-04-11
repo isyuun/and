@@ -147,6 +147,7 @@ import net.pettip.gpx._distance
 import net.pettip.map.app.LoadingDialog
 import net.pettip.map.app.MapActivity
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.util.concurrent.TimeUnit
@@ -826,7 +827,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         pets.add(pet2)
         G.mapPetInfo = pets
     }
-    val pets = G.mapPetInfo
+    val pets = MySharedPreference.getCurrentPetData() ?: emptyList()
     val dels = ArrayList<CurrentPetData>()
     application.pets.forEach { pet -> if (!pets.contains(pet)) dels.add(pet) }
     application.remove(dels)

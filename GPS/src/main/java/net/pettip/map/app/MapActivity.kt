@@ -13,6 +13,7 @@ package net.pettip.map.app
 import android.os.Bundle
 import android.view.WindowManager
 import net.pettip.map.app.naver.NaverMapComponentActivity
+import net.pettip.util.Log
 
 /**
  * @Project     : carepet-android
@@ -25,5 +26,16 @@ open class MapActivity : NaverMapComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        Log.d("LOG","onCreate")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("LOG","resume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("LOG","pause")
     }
 }

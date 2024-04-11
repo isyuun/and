@@ -109,6 +109,7 @@ import net.pettip.app.navi.viewmodel.UserCreateViewModel
 import net.pettip.data.SCD
 import net.pettip.data.SggList
 import net.pettip.data.UmdList
+import net.pettip.data.cmm.CdDetail
 import net.pettip.data.pet.PetListData
 import net.pettip.util.Log
 import java.sql.Date
@@ -199,7 +200,7 @@ fun ModifyPetInfoScreen(
             viewModel.updatePetWght(selectPet.wghtVl.toString())
             viewModel.updatePetGender(selectPet.sexTypNm?:"남아")
             viewModel.updatePetNtr(selectPet.ntrTypNm?:"했어요")
-            viewModel.updateSelectedItem1(SCD(cdNm = selectPet.stdgCtpvNm , cdld = selectPet.stdgCtpvCd, upCdId = ""))
+            viewModel.updateSelectedItem1(CdDetail(cdNm = selectPet.stdgCtpvNm?:"" , cdId = selectPet.stdgCtpvCd?:"", upCdId = ""))
             viewModel.updateSelectedItem2(SggList(sggCd = selectPet.stdgSggCd, sggNm = selectPet.stdgSggNm))
             viewModel.updateSelectedItem3(UmdList(umdCd = selectPet.stdgUmdCd, umdNm = selectPet.stdgUmdNm?:""))
             viewModel.updatePetBirth(selectPet.petBrthYmd)
@@ -265,7 +266,7 @@ fun ModifyPetInfoScreen(
                     viewModel.updatePetWght("")
                     viewModel.updatePetGender(context.getString(R.string.male))
                     viewModel.updatePetNtr(context.getString(R.string.did))
-                    viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+                    viewModel.updateSelectedItem1(CdDetail(cdNm = "", cdId = "", upCdId = ""))
                     viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
                     viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
                     viewModel.updatePetBirth("")
@@ -306,7 +307,7 @@ fun ModifyPetInfoScreen(
             viewModel.updatePetWght("")
             viewModel.updatePetGender(context.getString(R.string.male))
             viewModel.updatePetNtr(context.getString(R.string.did))
-            viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+            viewModel.updateSelectedItem1(CdDetail(cdNm = "", cdId = "", upCdId = ""))
             viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
             viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
             viewModel.updatePetBirth("")
@@ -583,7 +584,7 @@ fun ModifyPetInfoScreen(
             ) {
                 Row(modifier= Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
                     Text(
-                        text = if(scd.cdld.isNullOrBlank()) stringResource(id = R.string.address_selection) else "${scd.cdNm?:""} ${sgg.sggNm?:""} ${umd.umdNm?:""}",
+                        text = if(scd.cdId.isNullOrBlank()) stringResource(id = R.string.address_selection) else "${scd.cdNm?:""} ${sgg.sggNm?:""} ${umd.umdNm?:""}",
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.pretendard_regular))
                     )
@@ -594,7 +595,7 @@ fun ModifyPetInfoScreen(
                 }
             }
 
-            Text(text = stringResource(id = R.string.name), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            Text(text = stringResource(id = R.string.pet_name), fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 modifier= Modifier.padding(start = 20.dp, top = 16.dp), color = MaterialTheme.colorScheme.onPrimary
             )
 
@@ -1038,7 +1039,7 @@ fun BackTopBarInModify(title: String, navController: NavHostController, backVisi
                                 viewModel.updatePetWght("")
                                 viewModel.updatePetGender(context.getString(R.string.male))
                                 viewModel.updatePetNtr(context.getString(R.string.did))
-                                viewModel.updateSelectedItem1(SCD(cdNm = "", cdld = "", upCdId = ""))
+                                viewModel.updateSelectedItem1(CdDetail(cdNm = "", cdId = "", upCdId = ""))
                                 viewModel.updateSelectedItem2(SggList(sggCd = "", sggNm = ""))
                                 viewModel.updateSelectedItem3(UmdList(umdCd = "", umdNm = ""))
                                 viewModel.updatePetBirth("")

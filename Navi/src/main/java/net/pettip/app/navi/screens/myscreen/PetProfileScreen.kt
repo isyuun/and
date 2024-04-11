@@ -179,8 +179,11 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
         strokeColor = design_sharp
     )
 
-    val markerVisibilityChangeListener = MyMarkerVisibilityChangeListener()
-    val xValue by markerVisibilityChangeListener.xValue.collectAsState()
+    var xValue by remember{ mutableStateOf(0) }
+    val markerVisibilityChangeListener = MyMarkerVisibilityChangeListener(xValue = xValue, onChange = {newValue -> xValue = newValue})
+
+    val marker = rememberMarker()
+
 
     var snackbarHostState by remember { mutableStateOf(SnackbarHostState()) }
     
@@ -488,8 +491,6 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                             }
                         false ->
                             if (datasetForModel.isNotEmpty()){
-                                val marker = rememberMarker()
-
                                 Chart(
                                     modifier = Modifier
                                         .padding(20.dp)
@@ -523,6 +524,8 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
                                             color = MaterialTheme.colorScheme.secondary,
                                             textSize = 12.sp,
                                             margins = MutableDimensions(0f, 10f),
+                                            lineCount = 2,
+                                            padding = MutableDimensions(5f,0f)
                                         ),
                                         axis = lineComponent(color = design_textFieldOutLine, thickness = 1.dp),
                                         tickLength = 0.dp,
@@ -1395,20 +1398,17 @@ fun WeightDialog(
     }
 }
 
-class MyMarkerVisibilityChangeListener() : MarkerVisibilityChangeListener {
-
-    private val _xValue = MutableStateFlow(0)
-    val xValue: StateFlow<Int> = _xValue.asStateFlow()
+class MyMarkerVisibilityChangeListener(private var xValue:Int, val onChange: (Int) -> Unit) : MarkerVisibilityChangeListener {
 
     override fun onMarkerShown(marker: Marker, markerEntryModels: List<Marker.EntryModel>) {
 
         val firstEntryModel = markerEntryModels.firstOrNull()
         if (firstEntryModel != null) {
             val index = firstEntryModel.index
-            _xValue.value = index
-            
+            onChange(index)
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

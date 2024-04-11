@@ -7,6 +7,8 @@ import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.IOException
 
 class TokenInterceptor() : Interceptor {
@@ -24,13 +26,13 @@ class TokenInterceptor() : Interceptor {
             // AccessToken이 있는 경우 Authorization 헤더를 추가
             requestBuilder.header("Authorization", token)
         }else{
-            requestBuilder.header("Authorization", MySharedPreference.getAccessToken())
+            requestBuilder.header("Authorization", MySharedPreference.getAccessToken()?:"")
         }
         if (!refreshToken.isNullOrBlank()) {
             // RefreshToken이 있는 경우 Refresh 헤더를 추가
             requestBuilder.header("Refresh", refreshToken)
         }else{
-            requestBuilder.header("Refresh", MySharedPreference.getRefreshToken())
+            requestBuilder.header("Refresh", MySharedPreference.getRefreshToken()?:"")
         }
 
 
@@ -55,8 +57,8 @@ class TokenInterceptor() : Interceptor {
 
             if (!MySharedPreference.getAccessToken().isNullOrBlank()) {
                 val retryRequestBuilder = originalRequest.newBuilder()
-                retryRequestBuilder.header("Authorization", MySharedPreference.getAccessToken())
-                retryRequestBuilder.header("Refresh", MySharedPreference.getRefreshToken())
+                retryRequestBuilder.header("Authorization", MySharedPreference.getAccessToken()?:"")
+                retryRequestBuilder.header("Refresh", MySharedPreference.getRefreshToken()?:"")
 
                 val retryRequestWithToken = retryRequestBuilder.build()
                 return chain.proceed(retryRequestWithToken)

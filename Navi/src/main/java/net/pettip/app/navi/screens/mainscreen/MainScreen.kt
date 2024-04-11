@@ -87,8 +87,11 @@ import net.pettip.app.navi.viewmodel.HomeViewModel
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
+import net.pettip.data.PetData
+import net.pettip.data.pet.CurrentPetData
 import net.pettip.gps.app.GPSApplication
 import net.pettip.singleton.G
+import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 
 
@@ -220,7 +223,8 @@ fun MainScreen(
                                             showDialog = true
                                         }else{
                                             Log.d("LOG", "currentPet:$currentPet")
-                                            G.mapPetInfo = currentPet
+                                            //G.mapPetInfo = currentPet
+                                            MySharedPreference.setCurrentPetData(currentPet)
                                             GPSApplication.instance.openMap()
                                         }
                                     }
