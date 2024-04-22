@@ -17,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,6 +81,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -107,6 +109,7 @@ import net.pettip.data.daily.LifeTimeLineItem
 import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
+import net.pettip.util.Log
 
 /**
  * @Project     : PetTip-Android
@@ -243,9 +246,9 @@ fun TimelineScreen(
             Box(modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center){ LoadingAnimation1(circleColor = design_intro_bg) }
-        }else if (isError || timeLineList == null){
+        }else if (isError){
             ErrorScreen(onClick = { viewModel.updateTimeLineRefresh(true) })
-        }else{
+        }else {
             Box(
                 modifier = Modifier
                     .padding(paddingValues)
@@ -266,22 +269,41 @@ fun TimelineScreen(
                     )
                 }
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    state = dateLazyState,
-                    contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(40.dp)
-                ){
-                    dailyLifeTimeLineList?.let { dailyLifeTimeLineList ->
+                dailyLifeTimeLineList?.let { dailyLifeTimeLineList ->
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        state = dateLazyState,
+                        contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(40.dp)
+                    ){
                         for ((dateKey, itemList) in dailyLifeTimeLineList) {
                             item {
                                 DateItem(viewModel = viewModel, dateKey = dateKey, dailyLifeTimeLineList = itemList, navController = navController)
                             }
                         }
                     }
-                }
+                }?:run {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            painter = painterResource(id = if (isSystemInDarkTheme()) R.drawable.bi_exclamation_dark else R.drawable.bi_exclamation),
+                            contentDescription = "",
+                            modifier = Modifier.padding(top = 80.dp, bottom = 20.dp),
+                            tint = Color.Unspecified
+                        )
 
+                        Text(
+                            text = "등록된\n산책 일지가 없습니다",
+                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            fontSize = 20.sp, letterSpacing = (-0.8).sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
 
                 Row (
                     modifier = Modifier

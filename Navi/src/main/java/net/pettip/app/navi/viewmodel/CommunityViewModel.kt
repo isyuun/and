@@ -262,6 +262,18 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         }
     }
 
+    fun updateChangeMainImage(index: Int){
+        val updatedImageList = state.listOfSelectedImages.toMutableList()
+
+        val temp = updatedImageList[index]
+        updatedImageList[index] = updatedImageList[0]
+        updatedImageList[0] = temp
+
+        state = state.copy(
+            listOfSelectedImages = updatedImageList.distinct()
+        )
+    }
+
     fun onItemRemove(index: Int) {
         val updatedImageList = state.listOfSelectedImages.toMutableList()
         viewModelScope.launch {
@@ -293,13 +305,13 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _eventRes.value = newValue
     }
 
-    private val _eventList = MutableStateFlow<List<BbsEvnt>>(emptyList())
-    val eventList: StateFlow<List<BbsEvnt>> = _eventList.asStateFlow()
+    private val _eventList = MutableStateFlow<List<BbsEvnt>?>(emptyList())
+    val eventList: StateFlow<List<BbsEvnt>?> = _eventList.asStateFlow()
     fun updateEventListClear(){_eventList.value = emptyList()
     }
     fun updateEventList(newValue: List<BbsEvnt>){
-        val currentList = _eventList.value.toMutableList()
-        currentList.addAll(newValue)
+        val currentList = _eventList.value?.toMutableList()
+        currentList?.addAll(newValue)
         _eventList.value = currentList
     }
 
@@ -319,12 +331,12 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     val endEventRes: StateFlow<EndEventListRes?> = _endEventRes.asStateFlow()
     fun updateEndEventRes(newValue: EndEventListRes? ){_endEventRes.value = newValue}
 
-    private val _endEventList = MutableStateFlow<List<BbsAncmntWinner>>(emptyList())
-    val endEventList: StateFlow<List<BbsAncmntWinner>> = _endEventList.asStateFlow()
+    private val _endEventList = MutableStateFlow<List<BbsAncmntWinner>?>(emptyList())
+    val endEventList: StateFlow<List<BbsAncmntWinner>?> = _endEventList.asStateFlow()
     fun updateEndEventListClear(){_endEventList.value = emptyList() }
     fun updateEndEventList(newValue: List<BbsAncmntWinner>){
-        val currentList = _endEventList.value.toMutableList()
-        currentList.addAll(newValue)
+        val currentList = _endEventList.value?.toMutableList()
+        currentList?.addAll(newValue)
         _endEventList.value = currentList
     }
 
@@ -459,6 +471,7 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
             }
         }.toMutableList()
     }
+
     fun subUploadedPetMulti(newValue: DailyLifePet) {
         _uploadedPetMulti.value = _uploadedPetMulti.value.map { pet ->
             if (pet.ownrPetUnqNo == newValue.ownrPetUnqNo) {
@@ -781,12 +794,13 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         }
     }
 
-    suspend fun getStoryDetail(schUnqNo: Int): Boolean {
+    suspend fun getStoryDetail(schUnqNo: Int, cmntUpdate: Boolean = false): Boolean {
         val apiService = RetrofitClientServer.instance
 
         val data = net.pettip.data.daily.DailyDetailReq(schUnqNo = schUnqNo, cmntYn = "Y")
 
-        _storyLoading.value = true
+        if (!cmntUpdate) _storyLoading.value = true
+
         val call = apiService.getDailyDetail(data)
         return suspendCancellableCoroutine { continuation ->
             call.enqueue(object : Callback<DailyDetailRes> {

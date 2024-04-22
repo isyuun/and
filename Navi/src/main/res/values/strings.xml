@@ -26,7 +26,7 @@
     <string name="commu_my">내 스토리</string>
     <string name="dialog_regist">등록하기</string>
     <string name="dialog_later">나중에</string>
-    <string name="dialog_any_pet">같이 산책할 반려동물이 없어요</string>
+    <string name="dialog_any_pet">함께 할 반려동물이 없어요</string>
     <string name="dialog_sub_regist">반려동물을 등록하시겠어요?</string>
     <string name="home_story_more">스토리 더보기</string>
     <string name="select_pet">나의 반려동물을 선택하여 주세요.</string>

@@ -63,6 +63,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.HtmlCompat
 import androidx.navigation.NavHostController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -168,7 +169,6 @@ fun NotiScreen(navController: NavHostController, viewModel: CommunityViewModel){
     val ntcList by viewModel.ntcList.collectAsState()
     val currentTab by viewModel.settingCurrentTab.collectAsState()
     val page by viewModel.ntcListPage.collectAsState()
-    val init by viewModel.ntcListInit.collectAsState()
 
     var isLoading by remember{ mutableStateOf(false) }
     var isError by rememberSaveable{ mutableStateOf(false) }
@@ -194,7 +194,7 @@ fun NotiScreen(navController: NavHostController, viewModel: CommunityViewModel){
     }
 
     LaunchedEffect(Unit) {
-        isLoading = true
+        if (ntcList.isEmpty()) isLoading = true
 
         viewModel.updateNtcListClear()
         viewModel.updateNtcListPage(1)
@@ -287,7 +287,7 @@ fun FAQScreen(navController: NavHostController, viewModel: CommunityViewModel){
     //}
 
     LaunchedEffect(Unit){
-        isLoading = true
+        if (faqList.isEmpty()) isLoading = true
 
         viewModel.updateFaqListClear()
         val result = viewModel.getFaqList(1)
@@ -388,7 +388,7 @@ fun InquiryScreen(navController: NavHostController, viewModel: CommunityViewMode
     //}
 
     LaunchedEffect(Unit){
-        isLoading = true
+        if (qnaList.isEmpty()) isLoading = true
 
         viewModel.updateQnaListClear()
         val result = viewModel.getQnaList(1)
@@ -572,6 +572,8 @@ fun FAQItem(faqItemData: BbsFaq){
         mutableStateOf(false)
     }
 
+    var faqCn = HtmlCompat.fromHtml(HtmlCompat.fromHtml(faqItemData.pstCn, 0).toString(), 0)
+
     Column (
         modifier= Modifier
             .fillMaxWidth()
@@ -637,7 +639,7 @@ fun FAQItem(faqItemData: BbsFaq){
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
                 Text(
-                    text = faqItemData.pstCn,
+                    text = faqCn.toString(),
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,

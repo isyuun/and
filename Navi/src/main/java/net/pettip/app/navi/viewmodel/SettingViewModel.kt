@@ -205,6 +205,18 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
             )
         }
     }
+    fun updateChangeMainImage(index: Int){
+        val updatedImageList = state.listOfSelectedImages.toMutableList()
+
+        val temp = updatedImageList[index]
+        updatedImageList[index] = updatedImageList[0]
+        updatedImageList[0] = temp
+
+        state = state.copy(
+            listOfSelectedImages = updatedImageList.distinct()
+        )
+    }
+
     fun clearSelectedImagesList() {
         state = state.copy(listOfSelectedImages = emptyList())
     }

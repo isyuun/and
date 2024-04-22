@@ -17,6 +17,7 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.IBinder
+import androidx.compose.runtime.collectAsState
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import net.pettip.data.pet.CurrentPetData
@@ -261,6 +262,10 @@ open class gpsapplication3 : gpsapplication2(), SharedPreferences.OnSharedPrefer
             Track.EVENT.POO -> poo(pet)
             Track.EVENT.MRK -> mrk(pet)
         }
+    }
+
+    fun deleteMark(track: Track){
+        this.service?.deleteMark(track)
     }
 
     fun rotate(context: Context, uri: Uri) = this.service?.rotate(context, uri)

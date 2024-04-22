@@ -1,13 +1,17 @@
 package net.pettip.app.navi.component
 
 import android.annotation.SuppressLint
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavHostController
 import net.pettip.singleton.BASE_URL
+import net.pettip.util.Log
 
 /**
  * @Project     : PetTip-Android
@@ -19,7 +23,7 @@ import net.pettip.singleton.BASE_URL
  */
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebViewScreen(page:Int) {
+fun WebViewScreen(page:Int,navHostController: NavHostController) {
     val url1 = "${BASE_URL}terms"
     val url2 = "${BASE_URL}privacy_policy"
     val url3 = "${BASE_URL}loc-based-terms"
@@ -47,6 +51,13 @@ fun WebViewScreen(page:Int) {
                 1 -> webView.loadUrl(url1)
                 2 -> webView.loadUrl(url2)
                 3 -> webView.loadUrl(url3)
+            }
+
+            webView.webChromeClient = object : WebChromeClient(){
+                override fun onCloseWindow(window: WebView?) {
+                    super.onCloseWindow(window)
+                    navHostController.popBackStack()
+                }
             }
         }
     )

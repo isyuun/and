@@ -5,6 +5,7 @@ package net.pettip.app.navi.screens.mainscreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,11 +55,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -495,7 +499,7 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
             .background(color = MaterialTheme.colorScheme.primary)
     ){
 
-        if (isLoading && eventList.isEmpty()){
+        if (isLoading && eventList.isNullOrEmpty()){
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ){
@@ -503,7 +507,7 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
             }
         }else if (isError){
             ErrorScreen(onClick = { viewModel.updateEventRefresh(true) })
-        }else{
+        }else if (!eventList.isNullOrEmpty()){
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier
@@ -513,11 +517,29 @@ fun EventScreen(navController: NavHostController, viewModel: CommunityViewModel)
                 contentPadding = PaddingValues(vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(40.dp)
             ){
-                if (!eventList.isNullOrEmpty()){
-                    items(eventList){ item ->
-                        EventItem(eventItemData = item, navController, viewModel)
-                    }
+                items(eventList?: emptyList()){ item ->
+                    EventItem(eventItemData = item, navController, viewModel)
                 }
+            }
+        }else{
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    painter = painterResource(id = if (isSystemInDarkTheme()) R.drawable.bi_exclamation_dark else R.drawable.bi_exclamation),
+                    contentDescription = "",
+                    modifier = Modifier.padding(top = 40.dp, bottom = 20.dp),
+                    tint = Color.Unspecified
+                )
+
+                Text(
+                    text = "등록된\n이벤트가 없습니다",
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    fontSize = 20.sp, letterSpacing = (-0.8).sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    textAlign = TextAlign.Center
+                )
             }
         }
 
@@ -603,7 +625,7 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
             .background(color = MaterialTheme.colorScheme.primary)
     ){
 
-        if (isLoading && endEventList.isEmpty()){
+        if (isLoading && endEventList.isNullOrEmpty()){
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ){
@@ -611,7 +633,7 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
             }
         }else if (isError){
             ErrorScreen(onClick = { viewModel.updateEndEventRefresh(true) })
-        }else{
+        }else if (!endEventList.isNullOrEmpty()){
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier
@@ -622,10 +644,30 @@ fun EventEndScreen(navController: NavHostController, viewModel: CommunityViewMod
                 verticalArrangement = Arrangement.spacedBy(40.dp)
             ){
                 if (!endEventList.isNullOrEmpty()){
-                    items(endEventList){ item ->
+                    items(endEventList?: emptyList()){ item ->
                         EndEventItem(eventItemData = item, navController, viewModel)
                     }
                 }
+            }
+        }else {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    painter = painterResource(id = if (isSystemInDarkTheme()) R.drawable.end_event_dark else R.drawable.end_event_icon),
+                    contentDescription = "",
+                    modifier = Modifier.padding(top = 40.dp, bottom = 20.dp),
+                    tint = Color.Unspecified
+                )
+
+                Text(
+                    text = "등록된\n당첨자 발표가 없습니다",
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    fontSize = 20.sp, letterSpacing = (-0.8).sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    textAlign = TextAlign.Center
+                )
             }
         }
 

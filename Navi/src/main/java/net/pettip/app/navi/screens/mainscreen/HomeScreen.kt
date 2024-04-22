@@ -238,17 +238,6 @@ fun HomeScreen(
         backChange(false)
     }
 
-    if(showDialog){
-        CustomAlert(
-            onDismiss = { newValue -> showDialogChange(newValue) },
-            confirm = stringResource(R.string.dialog_regist),
-            dismiss = stringResource(R.string.dialog_later),
-            title = stringResource(R.string.dialog_any_pet),
-            text = stringResource(R.string.dialog_sub_regist),
-            confirmJob = {navController.navigate(Screen.AddPetScreen.route)}
-        )
-    }
-
     Box (
         modifier = Modifier
             .fillMaxSize()

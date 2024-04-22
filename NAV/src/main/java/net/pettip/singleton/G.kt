@@ -25,6 +25,9 @@ object G {
     var accessToken: String? = ""
     var refreshToken: String? = ""
     var inviteCode by mutableStateOf<String?>(null)
+    var trackChange by mutableStateOf<Boolean>(false)
+
+    var posting by mutableStateOf<Boolean>(false)
 
     var mapPetInfo: List<CurrentPetData> = emptyList()
 
@@ -35,4 +38,7 @@ object G {
     // 푸쉬로 받은 데이터
     var pushPage by mutableStateOf<String?>(null)
     var pushSeqNo by mutableStateOf<String?>(null)
+
+    var viewPage by mutableStateOf<String?>(null)
+    var viewPageRefresh by mutableStateOf<Boolean>(false)
 }

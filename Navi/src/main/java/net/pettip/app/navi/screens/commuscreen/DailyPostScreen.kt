@@ -15,9 +15,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -98,6 +101,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.CustomAlert
@@ -124,6 +128,7 @@ import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.cmm.CdDetail
 import net.pettip.data.pet.CurrentPetData
+import net.pettip.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -308,7 +313,13 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                         PhotoItem(
                             uri = uri,
                             index = index,
-                            onClick = { viewModel.onItemRemove(index) })
+                            onClick = { viewModel.onItemRemove(index) },
+                            changeMainImage = {
+                                if (index > 0 && index < state.listOfSelectedImages.size) {
+                                    viewModel.updateChangeMainImage(index)
+                                }
+                            }
+                        )
                     } else if (index == state.listOfSelectedImages.size - 1 && index < 5) {
                         PlusBox(galleryLauncher)
                     }
@@ -355,18 +366,22 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
 
             CustomTextField(
                 value = walkTitle,
-                onValueChange = { viewModel.updateWalkTitle(it) },
-                singleLine = true,
+                onValueChange = {
+                    if (it.length<=40){
+                        viewModel.updateWalkTitle(it)
+                    }
+                                },
+                singleLine = false,
                 maxLines = 3,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 ),
                 modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp, top = 16.dp)
+                    .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 0.dp)
                     .imePadding()
                     .fillMaxWidth()
-                    .heightIn(min = 40.dp)
+                    .heightIn(min = 40.dp, max = 80.dp)
                     .focusRequester(focusRequester)
                     .onFocusChanged { focusState ->
                         if (focusState.isFocused) {
@@ -375,7 +390,8 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                 scrollState.animateScrollTo(scrollState.maxValue, tween(500))
                             }
                         }
-                    },
+                    }
+                ,
                 placeholder = {
                     Text(
                         text = stringResource(id = R.string.place_holder_title),
@@ -412,10 +428,11 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp,
+                    lineHeight = 20.sp
                 ),
                 shape = RoundedCornerShape(4.dp),
-                innerPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+                innerPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
             )
 
             AnimatedVisibility(
@@ -463,20 +480,22 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 }
             }
 
-            Spacer(modifier = Modifier.padding(top = 20.dp))
-
             Text(
                 text = stringResource(id = R.string.memo),
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(start = 20.dp)
+                modifier = Modifier.padding(start = 20.dp, top = 20.dp)
             )
 
             CustomTextField(
                 value = walkMemo,
-                onValueChange = { viewModel.updateWalkMemo(it) },
+                onValueChange = {
+                    if (it.length<400){
+                        viewModel.updateWalkMemo(it)
+                    }
+                                },
                 singleLine = false,
                 maxLines = 10,
                 keyboardOptions = KeyboardOptions(
@@ -486,7 +505,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 16.dp)
                     .fillMaxWidth()
-                    .heightIn(min = 120.dp),
+                    .heightIn(min = 120.dp, max = 500.dp),
                 placeholder = {
                     Text(
                         text = stringResource(id = R.string.place_holder_daily),
@@ -608,47 +627,37 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
             Button(
-                enabled = selectedPet.isNotEmpty() && selectedCategory.isNotEmpty(),
+                enabled = selectedPet.isNotEmpty() && selectedCategory.isNotEmpty() && !isLoading && walkTitle.isNotBlank(),
                 onClick = {
                     if (selectedPet.size == 0){
                         Toast.makeText(context, R.string.toast_msg_select_pet, Toast.LENGTH_SHORT).show()
                     }else if (selectedCategory.size == 0 ){
                         Toast.makeText(context, R.string.toast_msg_select_daily, Toast.LENGTH_SHORT).show()
                     }else{
-                        scope.launch {
-                            isLoading = true
+                        isLoading = true
 
-                            val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
-                            val matches = pattern.findAll(hashString)
-                            val hashtagList = matches.map { it.groupValues[1] }.toList()
+                        val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
+                        val matches = pattern.findAll(hashString)
+                        val hashtagList = matches.map { it.groupValues[1] }.toList()
 
-                            viewModel.updateHashTag(hashtagList)
+                        val isValidHash = isAllHashtagsUnder30Characters(hashtagList)
 
-                            if (state.listOfSelectedImages.size <= 1) {
-                                var dailyUpload = viewModel.uploadDaily()
-                                if (dailyUpload) {
-                                    navController.popBackStack()
-                                    isLoading = false
-                                } else {
-                                    isLoading = false
-                                    snackState.showSnackbar(
-                                        message = context.getString(R.string.daily_create_fail_retry),
-                                        actionLabel = context.getString(R.string.confirm),
-                                        duration = SnackbarDuration.Short,
-                                        withDismissAction = false
-                                    )
-                                }
-                            } else {
-                                val photoUpload = viewModel.fileUpload(context = context)
-                                if (photoUpload) {
-                                    val dailyUpload = viewModel.uploadDaily()
+                        if (isValidHash){
+                            scope.launch {
+
+                                delay(500)
+
+                                //val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
+                                //val matches = pattern.findAll(hashString)
+                                //val hashtagList = matches.map { it.groupValues[1] }.toList()
+
+                                viewModel.updateHashTag(hashtagList)
+
+                                if (state.listOfSelectedImages.size <= 1) {
+                                    var dailyUpload = viewModel.uploadDaily()
                                     if (dailyUpload) {
-                                        viewModel.updateStoryRes(null)
-                                        viewModel.updateStoryList(emptyList())
-                                        viewModel.updateStoryPage(1)
-                                        viewModel.updateSelectedImageList(emptyList())
-                                        navController.popBackStack()
                                         isLoading = false
+                                        navController.popBackStack()
                                     } else {
                                         isLoading = false
                                         snackState.showSnackbar(
@@ -659,14 +668,40 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                         )
                                     }
                                 } else {
-                                    isLoading = false
-                                    snackState.showSnackbar(
-                                        message = context.getString(R.string.upload_photo_fail_retry),
-                                        actionLabel = context.getString(R.string.confirm),
-                                        duration = SnackbarDuration.Short,
-                                        withDismissAction = false
-                                    )
+                                    val photoUpload = viewModel.fileUpload(context = context)
+                                    if (photoUpload) {
+                                        val dailyUpload = viewModel.uploadDaily()
+                                        if (dailyUpload) {
+                                            viewModel.updateStoryRes(null)
+                                            viewModel.updateStoryList(emptyList())
+                                            viewModel.updateStoryPage(1)
+                                            viewModel.updateSelectedImageList(emptyList())
+                                            isLoading = false
+                                            navController.popBackStack()
+                                        } else {
+                                            isLoading = false
+                                            snackState.showSnackbar(
+                                                message = context.getString(R.string.daily_create_fail_retry),
+                                                actionLabel = context.getString(R.string.confirm),
+                                                duration = SnackbarDuration.Short,
+                                                withDismissAction = false
+                                            )
+                                        }
+                                    } else {
+                                        isLoading = false
+                                        snackState.showSnackbar(
+                                            message = context.getString(R.string.upload_photo_fail_retry),
+                                            actionLabel = context.getString(R.string.confirm),
+                                            duration = SnackbarDuration.Short,
+                                            withDismissAction = false
+                                        )
+                                    }
                                 }
+                            }
+                        }else{
+                            scope.launch {
+                                isLoading = false
+                                snackState.showSnackbar("해시 태그는 30자까지 가능해요")
                             }
                         }
                     }
@@ -694,11 +729,29 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
         }// col
     }
 }
+
+fun isAllHashtagsUnder30Characters(hashtagList: List<String>): Boolean {
+    for (hashtag in hashtagList) {
+        if (hashtag.length > 30) {
+            return false
+        }
+    }
+    return true
+}
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PhotoItem(uri: Uri, index: Int, onClick: () -> Unit) {
+fun PhotoItem(uri: Uri, index: Int, onClick: () -> Unit, changeMainImage:()->Unit) {
 
     Box(
-        modifier = Modifier.size(105.dp)
+        modifier = Modifier
+            .size(105.dp)
+            .combinedClickable (
+                onClickLabel = "",
+                onClick = {},
+                onLongClickLabel = "",
+                onLongClick = {changeMainImage()}
+            )
     ) {
 
         Box(

@@ -6,7 +6,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Build
 import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -27,8 +26,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +43,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -54,6 +52,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
@@ -65,6 +64,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -85,8 +85,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -96,6 +94,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -113,7 +112,6 @@ import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
-import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
@@ -821,6 +819,10 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
     var alertMsg by remember{ mutableStateOf("") }
     var alertShow by remember{ mutableStateOf(false) }
 
+    var expanded1 by remember{ mutableStateOf(false) }
+    var expanded2 by remember{ mutableStateOf(false) }
+    var expanded3 by remember{ mutableStateOf(false) }
+
     //val nickName by viewModel.nickName.collectAsState()
     val nickName by userCreateViewModel.userNickName.collectAsState()
     val nickNamePass by userCreateViewModel.userNickNamePass.collectAsState()
@@ -855,19 +857,66 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
         }
     }
 
-    LaunchedEffect(key1 = pushCheck, key2 = dawnCheck){
-        if (memberCheck && personCheck && marketingCheck && pushCheck && dawnCheck){
-            viewModel.updateAllCheck(true)
-        }else{
-            viewModel.updateAllCheck(false)
-        }
-    }
+    //LaunchedEffect(key1 = pushCheck, key2 = dawnCheck){
+    //    if (memberCheck && personCheck && marketingCheck && pushCheck && dawnCheck){
+    //        viewModel.updateAllCheck(true)
+    //    }else{
+    //        viewModel.updateAllCheck(false)
+    //    }
+    //}
 
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         topBar = {
-            BackTopBar(title = stringResource(R.string.sign_up_), navController = navController)
+            var lastClickTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
+
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+                modifier = Modifier.height(60.dp),
+                title = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clip(shape = CircleShape)
+                                .clickable {
+                                    val currentTime = System.currentTimeMillis()
+                                    if (currentTime - lastClickTime >= 500) {
+                                        lastClickTime = currentTime
+
+                                        expanded1 = false
+                                        expanded2 = false
+                                        expanded3 = false
+
+                                        navController.popBackStack()
+                                    }
+                                }
+                                .align(Alignment.CenterStart),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Icon(painter = painterResource(id = R.drawable.arrow_back),
+                                contentDescription = "",
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+
+
+                        Text(
+                            text = "회원가입",
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            letterSpacing = (-1.0).sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.align(Alignment.Center),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            )
         },
         snackbarHost = { Toasty(snackState = snackbarHostState) }
     ) { paddingValues ->
@@ -921,8 +970,8 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                             viewModel.updateMemberCheck(!allCheck)
                             viewModel.updatePersonCheck(!allCheck)
                             userCreateViewModel.updateMarketingCheck(!allCheck)
-                            userCreateViewModel.updatePushCheck(!allCheck)
-                            userCreateViewModel.updateDawnCheck(!allCheck)
+                            //userCreateViewModel.updatePushCheck(!allCheck)
+                            //userCreateViewModel.updateDawnCheck(!allCheck)
                         }
                     , verticalAlignment = Alignment.CenterVertically
                 ){
@@ -933,8 +982,8 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                             viewModel.updateMemberCheck(it)
                             viewModel.updatePersonCheck(it)
                             userCreateViewModel.updateMarketingCheck(it)
-                            userCreateViewModel.updatePushCheck(it)
-                            userCreateViewModel.updateDawnCheck(it)
+                            //userCreateViewModel.updatePushCheck(it)
+                            //userCreateViewModel.updateDawnCheck(it)
                                           },
                         colors = CheckboxDefaults.colors(
                             checkedColor = design_select_btn_text,
@@ -958,7 +1007,9 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                     page = 1,
                     check = memberCheck,
                     onClick = { newValue -> viewModel.updateMemberCheck(newValue)},
-                    isScrollEnabled = {newValue -> isScrollEnabled = newValue}
+                    isScrollEnabled = {newValue -> isScrollEnabled = newValue},
+                    expanded = expanded1,
+                    changeExpanded = { newValue -> expanded1 = newValue }
                 )
 
                 AgreeComponent(
@@ -966,7 +1017,9 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                     page = 2,
                     check = personCheck,
                     onClick = { newValue -> viewModel.updatePersonCheck(newValue)},
-                    isScrollEnabled = {newValue -> isScrollEnabled = newValue}
+                    isScrollEnabled = {newValue -> isScrollEnabled = newValue},
+                    expanded = expanded2,
+                    changeExpanded = { newValue -> expanded2 = newValue }
                 )
 
                 AgreeComponent(
@@ -974,7 +1027,9 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                     page = 3,
                     check = marketingCheck,
                     onClick = { newValue -> userCreateViewModel.updateMarketingCheck(newValue)},
-                    isScrollEnabled = {newValue -> isScrollEnabled = newValue}
+                    isScrollEnabled = {newValue -> isScrollEnabled = newValue},
+                    expanded = expanded3,
+                    changeExpanded = { newValue -> expanded3 = newValue }
                 )
 
                 //AgreeComponentV2(
@@ -982,74 +1037,74 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                 //    check = marketingCheck,
                 //    onClick = { newValue -> userCreateViewModel.updateMarketingCheck(newValue)})
 
-                Row (
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Box(modifier = Modifier.weight(1f)){
-                        Row (
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .align(Alignment.CenterStart)
-                                .fillMaxWidth()
-                                .clickable { userCreateViewModel.updatePushCheck(!pushCheck) },
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Icon(
-                                painter =
-                                if(pushCheck){
-                                    painterResource(id = R.drawable.checkbox_blue)
-                                }else{
-                                    painterResource(id = R.drawable.checkbox_gray)
-                                },
-                                contentDescription = "", tint = Color.Unspecified,
-                                modifier = Modifier.padding(start = 20.dp)
-                            )
-
-                            Text(
-                                text = "푸시 알림",
-                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                fontSize = 14.sp,
-                                letterSpacing = (-0.7).sp,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.padding(start = 8.dp, end = 4.dp)
-                            )
-                        }
-                    }
-
-                    Box(modifier = Modifier.weight(1f)){
-                        Row (
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .align(Alignment.CenterStart)
-                                .fillMaxWidth()
-                                .clickable { userCreateViewModel.updateDawnCheck(!dawnCheck) },
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Icon(
-                                painter =
-                                if(dawnCheck){
-                                    painterResource(id = R.drawable.checkbox_blue)
-                                }else{
-                                    painterResource(id = R.drawable.checkbox_gray)
-                                },
-                                contentDescription = "", tint = Color.Unspecified,
-                                modifier = Modifier.padding(start = 20.dp)
-                            )
-
-                            Text(
-                                text = "방해 금지 모드",
-                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                fontSize = 14.sp,
-                                letterSpacing = (-0.7).sp,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.padding(start = 8.dp, end = 4.dp)
-                            )
-                        }
-                    }
-                }
+                //Row (
+                //    modifier = Modifier
+                //        .padding(horizontal = 20.dp)
+                //        .fillMaxWidth(),
+                //    verticalAlignment = Alignment.CenterVertically
+                //){
+                //    Box(modifier = Modifier.weight(1f)){
+                //        Row (
+                //            modifier = Modifier
+                //                .padding(vertical = 8.dp)
+                //                .align(Alignment.CenterStart)
+                //                .fillMaxWidth()
+                //                .clickable { userCreateViewModel.updatePushCheck(!pushCheck) },
+                //            verticalAlignment = Alignment.CenterVertically
+                //        ){
+                //            Icon(
+                //                painter =
+                //                if(pushCheck){
+                //                    painterResource(id = R.drawable.checkbox_blue)
+                //                }else{
+                //                    painterResource(id = R.drawable.checkbox_gray)
+                //                },
+                //                contentDescription = "", tint = Color.Unspecified,
+                //                modifier = Modifier.padding(start = 20.dp)
+                //            )
+                //
+                //            Text(
+                //                text = "푸시 알림",
+                //                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                //                fontSize = 14.sp,
+                //                letterSpacing = (-0.7).sp,
+                //                color = MaterialTheme.colorScheme.onPrimary,
+                //                modifier = Modifier.padding(start = 8.dp, end = 4.dp)
+                //            )
+                //        }
+                //    }
+                //
+                //    Box(modifier = Modifier.weight(1f)){
+                //        Row (
+                //            modifier = Modifier
+                //                .padding(vertical = 8.dp)
+                //                .align(Alignment.CenterStart)
+                //                .fillMaxWidth()
+                //                .clickable { userCreateViewModel.updateDawnCheck(!dawnCheck) },
+                //            verticalAlignment = Alignment.CenterVertically
+                //        ){
+                //            Icon(
+                //                painter =
+                //                if(dawnCheck){
+                //                    painterResource(id = R.drawable.checkbox_blue)
+                //                }else{
+                //                    painterResource(id = R.drawable.checkbox_gray)
+                //                },
+                //                contentDescription = "", tint = Color.Unspecified,
+                //                modifier = Modifier.padding(start = 20.dp)
+                //            )
+                //
+                //            Text(
+                //                text = "방해 금지 모드",
+                //                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                //                fontSize = 14.sp,
+                //                letterSpacing = (-0.7).sp,
+                //                color = MaterialTheme.colorScheme.onPrimary,
+                //                modifier = Modifier.padding(start = 8.dp, end = 4.dp)
+                //            )
+                //        }
+                //    }
+                //}
 
 
                 Spacer(modifier = Modifier.padding(top = 16.dp))
@@ -1109,7 +1164,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
                                 onClick = {
                                     scope.launch {
                                         if (containsSpecialCharacter(nickName)){
-                                            alertMsg = "특수문자는 사용 할 수 없습니다"
+                                            alertMsg = "공백,특수문자는 사용 할 수 없습니다"
                                             alertShow = true
                                         }else{
                                             val result = userCreateViewModel.nickNameCheck()
@@ -1192,7 +1247,7 @@ fun EasyRegScreen(navController: NavHostController, viewModel: LoginViewModel, u
 
 
 fun containsSpecialCharacter(input: String): Boolean {
-    val pattern = Regex("[^A-Za-z0-9ㄱ-힣 ]") // 알파벳, 숫자, 한글, 공백이 아닌 문자를 나타내는 정규식
+    val pattern = Regex("[^A-Za-z0-9ㄱ-힣]+") // 알파벳, 숫자, 한글, 공백이 아닌 문자를 나타내는 정규식
     return pattern.containsMatchIn(input)
 }
 
@@ -1200,17 +1255,19 @@ fun containsSpecialCharacter(input: String): Boolean {
 @Composable
 fun AgreeComponent(
     title: String,
-    page : Int,
-    check : Boolean,
-    onClick:(Boolean) -> Unit,
-    isScrollEnabled:(Boolean) -> Unit
+    page: Int,
+    check: Boolean,
+    onClick: (Boolean) -> Unit,
+    isScrollEnabled: (Boolean) -> Unit,
+    expanded: Boolean,
+    changeExpanded : (Boolean) -> Unit
 ){
     Column (
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .fillMaxWidth()
     ){
-        var expanded by remember { mutableStateOf(false) }
+        //var expanded by remember { mutableStateOf(false) }
 
         Box(modifier = Modifier.fillMaxWidth()){
             Row (
@@ -1262,7 +1319,7 @@ fun AgreeComponent(
                 modifier = Modifier
                     .padding(end = 20.dp)
                     .align(Alignment.CenterEnd)
-                    .clickable { expanded = !expanded }
+                    .clickable { changeExpanded(!expanded) }
             )
         }
 

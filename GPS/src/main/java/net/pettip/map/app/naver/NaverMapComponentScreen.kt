@@ -18,6 +18,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.view.Gravity
@@ -106,7 +108,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.app.NotificationCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -120,6 +121,7 @@ import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.NaverMapOptions
+import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
@@ -128,12 +130,12 @@ import com.naver.maps.map.widget.LocationButtonView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.DEBUG
-import net.pettip._test.app.navi.MainActivity
 import net.pettip.app.Version
 import net.pettip.app.getDeviceDensityString
 import net.pettip.app.getRounded
 import net.pettip.app.toPx
 import net.pettip.app.withClick
+import net.pettip.data.daily.DailyLifePet
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.gps.R
 import net.pettip.gps._app.GPS_CAMERA_ZOOM_ZERO
@@ -150,6 +152,8 @@ import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
+import java.io.FileNotFoundException
+import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
 
@@ -290,6 +294,33 @@ private fun marker(context: Context, position: LatLng, id: Int, back: Color = Co
     return marker
 }
 
+private fun imageMarker(context: Context, uri: Uri, position: LatLng, size: Int = 32 ) : Marker?{
+    val imageBitmap = createBitmapFromUri(context,uri)
+    val marker = Marker()
+    marker.position = position
+    marker.width = (size * 0.9f).dp.toPx(context).toInt()
+    marker.height = (size * 0.9f).dp.toPx(context).toInt()
+    marker.icon = imageBitmap?.let { OverlayImage.fromBitmap(imageBitmap) }!!
+    marker.zIndex = 2
+    return marker
+}
+
+fun createBitmapFromUri(context: Context, uri: Uri): Bitmap? {
+    var inputStream: InputStream? = null
+    try {
+        inputStream = context.contentResolver.openInputStream(uri)
+        if (inputStream != null) {
+            return BitmapFactory.decodeStream(inputStream)
+        }
+    } catch (e: FileNotFoundException) {
+        e.printStackTrace()
+    } finally {
+        inputStream?.close()
+    }
+    return null
+}
+
+
 private fun marker(position: LatLng, track: Track): Marker? {
     val context = GPSApplication.instance.applicationContext
     val id = when (track.event) {
@@ -309,6 +340,7 @@ private fun marker(position: LatLng, track: Track): Marker? {
     val marker = when (track.event) {
         //Track.EVENT.IMG -> if (track.uri != TRACK_ZERO_URI) marker(context, position, track.uri, back) else marker(context, position, id, back)
         Track.EVENT.IMG -> marker(context, position, id, back, 48)
+        //Track.EVENT.IMG -> imageMarker(context, track.uri, position)
         else -> marker(context, position, id, back)
     }
     //Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[position:$position][track.event:${track.event}][track.uri:${track.uri}][marker:$marker]")
@@ -320,6 +352,7 @@ private fun mark(track: Track, position: LatLng, mapView: MapView): Marker? {
     marker?.let {
         mapView.getMapAsync { naverMap ->
             it.map = naverMap
+            Log.d("MARKER",it.toString())
         }
     }
     Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[position:$position][track.event:${track.event}][track.uri:${track.uri}][marker:$marker]")
@@ -335,14 +368,142 @@ private fun mark(pet: CurrentPetData, event: Track.EVENT, position: LatLng, mapV
     return marker
 }
 
-fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, finished: Boolean) {
+private fun setMark(pet: CurrentPetData, event: Track.EVENT, position: LatLng, mapView: MapView){
+    val application = GPSApplication.instance
+    application.mark(pet, event) // GPXWRITER 에 생성
+    //mapView.getMapAsync {
+    //    val icon = when(event){
+    //        Track.EVENT.PEE -> R.drawable.icon_pee
+    //        Track.EVENT.POO -> R.drawable.icon_poop
+    //        Track.EVENT.MRK -> R.drawable.icon_marking
+    //        else -> null
+    //    }
+    //    val marker = Marker()
+    //    marker.position = position
+    //    marker.width = 100
+    //    marker.height = 100
+    //    marker.zIndex = 2
+    //    marker.icon = icon?.let { OverlayImage.fromResource(it)}!!
+    //
+    //    //marker.map = it
+    //}
+}
+
+private fun deleteMark(track : Track){
+    val application = GPSApplication.instance
+    application.deleteMark(track)
+}
+
+// 원본
+//fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, finished: Boolean) {
+//    val markers = mutableListOf<Marker>()
+//    val coords = mutableListOf<LatLng>()
+//    markers.clear()
+//    coords.clear()
+//    tracks.forEach { track ->
+//        marker(LatLng(track.latitude, track.longitude), track)?.let { markers.add(it) }
+//        coords.add(LatLng(track.latitude, track.longitude))
+//    }
+//    if (coords.isNotEmpty()) {
+//        starter(context = context, position = coords.first()).map = naverMap
+//        if (finished) {
+//            ender(context = context, position = coords.last()).map = naverMap
+//        }
+//        if (coords.size > 1) {
+//            val path = PathOverlay()
+//            path.coords = coords
+//            path.color = Color(0xA0FFDBDB).toArgb()
+//            path.outlineColor = Color(0xA0FF5000).toArgb()
+//            path.width = 18
+//            path.globalZIndex = 10
+//            path.outlineWidth = 3
+//            path.map = naverMap
+//        }
+//    }
+//    markers.forEach { it.map = naverMap }
+//}
+
+fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, finished: Boolean, registeredTrack: MutableList<Track> = mutableListOf(), updateTrack: (Track) -> Unit = {}, deleteTrack: (Track) -> Unit = {}, petList: List<DailyLifePet> = emptyList()) {
     val markers = mutableListOf<Marker>()
     val coords = mutableListOf<LatLng>()
     markers.clear()
     coords.clear()
+
     tracks.forEach { track ->
-        marker(LatLng(track.latitude, track.longitude), track)?.let { markers.add(it) }
+        val marker = marker(LatLng(track.latitude, track.longitude), track)
+        val eventInfo = when(track.event){
+            Track.EVENT.PEE -> "소변"
+            Track.EVENT.POO -> "배변"
+            Track.EVENT.MRK -> "마킹"
+            Track.EVENT.IMG -> "사진"
+            else -> null
+        }
+
+        if (marker != null) {
+            //markers.add(marker)
+
+            val registeredTrackCount = registeredTrack.count { it == track }
+            val tracksCount = tracks.count { it == track }
+
+            if (registeredTrackCount<tracksCount){
+                marker.map = naverMap
+                updateTrack(track)
+            }
+
+            val infoWindow = InfoWindow()
+            infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(context) {
+                override fun getText(infoWindow: InfoWindow): CharSequence {
+                    Log.d("INFO","petName : ${MySharedPreference.getCurrentPetData()}, track : ${track.no}")
+                    val petName = MySharedPreference.getCurrentPetData()
+                        ?.find { it.ownrPetUnqNo == track.no }
+                        ?.petNm ?: ""
+                    return if (!G.posting) "$petName $eventInfo 삭제 " else "$petName $eventInfo "// 표시할 문구
+                }
+            }
+
+            infoWindow.setOnClickListener {overlay ->
+                val selectedInfoWindow = overlay as? InfoWindow
+                if (selectedInfoWindow != null && !G.posting){
+                    marker.map = null
+
+                    deleteTrack(track)
+                    G.trackChange = true
+
+                    deleteMark(track)
+                }
+                true
+            }
+
+            marker.setOnClickListener { overlay ->
+                val selectedMarker = overlay as? Marker
+                if (selectedMarker != null && track.event != Track.EVENT.IMG) {
+                    if (selectedMarker.zIndex == 10){
+                        selectedMarker.width = (32 * 0.9f).dp.toPx(context).toInt()
+                        selectedMarker.height = (32 * 0.9f).dp.toPx(context).toInt()
+                        selectedMarker.zIndex = 2
+
+                        infoWindow.close()
+                    }else{
+                        selectedMarker.width = (32 * 1.1f).dp.toPx(context).toInt()
+                        selectedMarker.height = (32 * 1.1f).dp.toPx(context).toInt()
+                        selectedMarker.zIndex = 10
+
+                        infoWindow.open(selectedMarker)
+                    }
+
+                    markers.filter { it != selectedMarker }.forEach { otherMarker ->
+                        selectedMarker.width = (32 * 0.9f).dp.toPx(context).toInt()
+                        selectedMarker.height = (32 * 0.9f).dp.toPx(context).toInt()
+                        otherMarker.zIndex = 2
+
+                        otherMarker.infoWindow?.close()
+                    }
+                }
+                true
+            }
+        }
         coords.add(LatLng(track.latitude, track.longitude))
+
     }
     if (coords.isNotEmpty()) {
         starter(context = context, position = coords.first()).map = naverMap
@@ -360,7 +521,7 @@ fun naverMapPath(context: Context, naverMap: NaverMap, tracks: MutableList<Track
             path.map = naverMap
         }
     }
-    markers.forEach { it.map = naverMap }
+    //markers.forEach { it.map = naverMap }
 }
 
 fun naverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, padding: Dp = 52.0.dp) {
@@ -391,8 +552,8 @@ fun naverMapPreview(context: Context, naverMap: NaverMap, tracks: MutableList<Tr
     }
 }
 
-fun naverMapView(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, padding: Dp = 52.0.dp) {
-    naverMapPath(context = context, naverMap = naverMap, tracks = tracks, finished = true)
+fun naverMapView(context: Context, naverMap: NaverMap, tracks: MutableList<Track>, padding: Dp = 52.0.dp, petList: List<DailyLifePet> = emptyList()) {
+    naverMapPath(context = context, naverMap = naverMap, tracks = tracks, finished = true, petList = petList)
     naverMapPreview(context = context, naverMap = naverMap, tracks = tracks, padding)
 }
 
@@ -857,16 +1018,20 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     }
     val mapView = rememberMapViewWithLifecycle(context, mapOptions)
 
-    var refresh by remember { mutableStateOf(false) }
+    var refresh by remember { mutableStateOf(true) }
+
     val markers = remember { mutableListOf<Marker>() }
-    if (start) {
-        val size = markers.size
-        markers.clear()
-        tracks?.forEach { track ->
-            marker(LatLng(track.latitude, track.longitude), track)?.let { markers.add(it) }
-        }
-        if (markers.size != size) refresh = !refresh
-    }
+    val registeredTracks by remember { mutableStateOf<MutableList<Track>>(mutableListOf()) }
+
+    //if (start) {
+    //    val size = markers.size
+    //    markers.clear()
+    //    tracks?.forEach { track ->
+    //        Log.d("START","START")
+    //        marker(LatLng(track.latitude, track.longitude), track)?.let { markers.add(it) }
+    //    }
+    //    if (markers.size != size) refresh = !refresh
+    //}
 
     val scope = rememberCoroutineScope()
     Log.w(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
@@ -874,8 +1039,28 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         scope.launch {
             mapView.getMapAsync { naverMap ->
                 Log.v(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                if (start) {
-                    tracks?.let { naverMapPath(context = context, naverMap = naverMap, tracks = it, finished = false) }
+                if (start&&refresh) {
+                    tracks?.let {
+                        naverMapPath(
+                            context = context,
+                            naverMap = naverMap,
+                            tracks = it,
+                            finished = false,
+                            registeredTrack = registeredTracks,
+                            updateTrack = {newValue ->
+                                Log.d("REGTRACK", "before" + registeredTracks.size.toString())
+                                registeredTracks.add(newValue)
+                                Log.d("REGTRACK", "after" + registeredTracks.size.toString())
+                                          },
+                            deleteTrack = {newValue ->
+                                val indexToRemove = registeredTracks.indexOfLast { it -> it == newValue }
+                                Log.d("REGTRACK", "before" + registeredTracks.size.toString())
+                                registeredTracks.removeAt(indexToRemove)
+                                Log.d("REGTRACK", "after" + registeredTracks.size.toString())
+                            }
+                        )
+                        refresh = false
+                    }
                 }
                 naverMap.locationOverlay.position = position
                 if (start && tracks?.size == 1) {
@@ -890,6 +1075,13 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             delay(10000)
             application.stop()
             loading = false
+        }
+    }
+
+    LaunchedEffect(key1 = G.trackChange){
+        if (G.trackChange){
+
+            G.trackChange = false
         }
     }
 
@@ -1119,8 +1311,13 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@PEE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.PEE
-                    if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
-                    else showPetsSheet = true
+                    if (application.pets.size == 1){
+                        setMark(application.pets[0], event, position, mapView)
+                        refresh = true
+                    }
+                    else{
+                        showPetsSheet = true
+                    }
                 },
                 back = Color.White,
             ) {
@@ -1137,8 +1334,13 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@POO${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.POO
-                    if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
-                    else showPetsSheet = true
+                    if (application.pets.size == 1){
+                        setMark(application.pets[0], event, position, mapView)
+                        refresh = true
+                    }
+                    else{
+                        showPetsSheet = true
+                    }
                 },
                 back = Color.White,
             ) {
@@ -1155,8 +1357,13 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                     Log.d(__CLASSNAME__, "::NaverMapApp@MRK${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     event = Track.EVENT.MRK
-                    if (application.pets.size == 1) mark(application.pets[0], event, position, mapView)?.let { markers.add(it) }
-                    else showPetsSheet = true
+                    if (application.pets.size == 1){
+                        setMark(application.pets[0], event, position, mapView)
+                        refresh = true
+                    }
+                    else{
+                        showPetsSheet = true
+                    }
                 },
                 back = Color.White,
             ) {
@@ -1255,7 +1462,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                                 Log.d(__CLASSNAME__, "::NaverMapApp@PET${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                                 if (!start) return@withClick
                                 showPetsSheet = false
-                                mark(pet, event, position, mapView)?.let { markers.add(it) }
+                                setMark(pet, event, position, mapView)?.let {
+                                    refresh = true
+                                }
                             },
                             text = pet.petNm,
                             back = Color.White,

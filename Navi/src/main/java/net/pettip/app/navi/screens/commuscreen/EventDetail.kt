@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.Html
+import android.text.util.Linkify
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -100,6 +101,7 @@ import coil.Coil
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
@@ -112,6 +114,7 @@ import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_sharp
 import net.pettip.app.navi.ui.theme.design_skip
+import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.data.bbs.BbsCmnt
 import net.pettip.map.app.LoadingAnimation1
@@ -596,36 +599,26 @@ fun EventDetail(navController: NavHostController, viewModel: CommunityViewModel)
 fun HtmlText(htmlString: String, modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
-    val textColor = MaterialTheme.colorScheme.onPrimary
-    val textColor2 = if (isSystemInDarkTheme()) "FFFFFF" else  "222222"
 
-    val exam = "<p>텍스트</p>\n" +
-            "<img src=\"https://kr1-api-object-storage.nhncloudservice.com/v1/AUTH_9c6eacbf7cf24d05ae625145cdc3b0f9/bbs_ntc/20240318/93d67ae96e774cdeaf9aea37fbe301e2.jpg\" contenteditable=\"false\" width=\"100%\">\n" +
-            "<p>이미지 설명</p>\n" +
-            "<p>추가 텍스트</p>"+
-            "<p><strong>ㅁㄴㅇ</strong></p><h1>ㅂㅈㄷ</h1><p><em>ㅋㅌㅊㅍ</em></p><p><del>퓨ㅜ</del></p><p>ㅁㄴㅇ</p><div contenteditable=\"false\"><hr></div><div contenteditable=\"false\"><hr></div><div contenteditable=\"false\"><hr></div><p><br></p>"
+    val textColor = if (isSystemInDarkTheme()) design_white.toArgb() else design_login_text.toArgb()
 
-    val color = MaterialTheme.colorScheme.primary.toArgb()
-    //val styledHtmlString = htmlString.replaceLast("<p>", "<p style=\"color: $textColor2\">")
-    val styledHtmlString = exam.replaceAllParagraphAndHeadingTags(textColor2)
-
-
+    val htmlText = HtmlCompat.fromHtml(htmlString,0)
 
     Column {
         // 기존
-        AndroidView(
-            modifier = modifier,
-            factory = { context -> TextView(context) },
-            update = { textView ->
-                val typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
-                textView.text = HtmlCompat.fromHtml(
-                    htmlString, HtmlCompat.FROM_HTML_MODE_COMPACT,
-                    CoilImageGetter(textView),null
-                )
-                textView.setTextColor(textColor.toArgb())
-                textView.typeface = typeface
-            }
-        )
+        //AndroidView(
+        //    modifier = modifier,
+        //    factory = { context -> TextView(context) },
+        //    update = { textView ->
+        //        val typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
+        //        textView.text = HtmlCompat.fromHtml(
+        //            htmlString, HtmlCompat.FROM_HTML_MODE_COMPACT,
+        //            CoilImageGetter(textView),null
+        //        )
+        //        textView.setTextColor(textColor.toArgb())
+        //        textView.typeface = typeface
+        //    }
+        //)
 
         // 신규 - setBackgroundColor, styledHtmlString 설정(white,dark 테마)
         //AndroidView(
@@ -642,21 +635,26 @@ fun HtmlText(htmlString: String, modifier: Modifier = Modifier) {
         //    },
         //    modifier = modifier
         //)
-        //
-        // 신규 - WebView 그대로 보여주기
-        //AndroidView(
-        //    factory = { context ->
-        //        WebView(context).apply {
-        //            settings.javaScriptEnabled = false
-        //            settings.loadWithOverviewMode = true
-        //            webViewClient = WebViewClient()
-        //        }
-        //    },
-        //    update = { webView ->
-        //        webView.loadDataWithBaseURL(null, htmlString , "text/html", "UTF-8", null)
-        //    },
-        //    modifier = Modifier.fillMaxSize()
-        //)
+
+        AndroidView(
+            modifier = modifier,
+            factory = {
+                MaterialTextView(it).apply {
+                    autoLinkMask = Linkify.WEB_URLS
+                    linksClickable = true
+                    setLinkTextColor(Color.Blue.toArgb())
+                }
+            },
+            update = { textView ->
+                val typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
+                textView.text = HtmlCompat.fromHtml(
+                    htmlText.toString(), HtmlCompat.FROM_HTML_MODE_COMPACT,
+                    CoilImageGetter(textView), null
+                )
+                textView.typeface = typeface
+                textView.setTextColor(textColor)
+            }
+        )
     }
 }
 fun String.replaceLast(oldValue: String, newValue: String): String {

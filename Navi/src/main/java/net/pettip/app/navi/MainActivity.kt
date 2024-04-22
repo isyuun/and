@@ -187,7 +187,6 @@ class MainActivity : ComponentActivity() {
         val intentData: Uri? = intent?.data
         if (intentData != null) {
 
-            Log.d("LOG", "onNewIntent if")
             val pathSegments: List<String>? = intentData.pathSegments
             val lastPathSegment: String? = pathSegments?.lastOrNull()
 
@@ -198,7 +197,6 @@ class MainActivity : ComponentActivity() {
                     intent.action = ""
                     intent.data = null
                     intent.flags = 0
-                    Log.d("LOG", "data newIntent:$lastPathSegment")
                 }
             }
         }else{
@@ -206,7 +204,6 @@ class MainActivity : ComponentActivity() {
             val seqNo = intent?.getStringExtra("seqNo")
             G.pushPage = page
             G.pushSeqNo = seqNo
-            Log.d("PUSH","${page} : ${seqNo}")
         }
     }
 
@@ -519,7 +516,7 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
             PwSearchScreen(navController = navController, viewModel = viewModel)
         }
         composable("webViewScreen/{page}", arguments = listOf(navArgument("page") { type = NavType.IntType })){backStackEntry ->
-            WebViewScreen(backStackEntry.arguments?.getInt("page")?:1)
+            WebViewScreen(backStackEntry.arguments?.getInt("page")?:1, navHostController = navController)
         }
         composable("walkScreenV2"){
             WalkScreenV2(viewModel = walkViewModel, navController = navController, sharedViewModel = sharedViewModel)

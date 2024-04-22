@@ -147,6 +147,7 @@ import net.pettip.data.daily.Cmnt
 import net.pettip.data.daily.DailyDetailData
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
+import net.pettip.util.Log
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.absoluteValue
@@ -197,7 +198,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(refresh){
+    LaunchedEffect(refresh,G.viewPageRefresh){
         if (refresh){
             val result = lastSchUnqNo?.let { viewModel.getStoryDetail(it) }
             refresh = if (result == true){
@@ -206,11 +207,17 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                 false
             }
         }
+
+        if (G.viewPageRefresh){
+            lastSchUnqNo?.let { viewModel.getStoryDetail(it, true) }
+            G.viewPageRefresh = false
+        }
     }
 
     LaunchedEffect(Unit){
         delay(400)
         cmntExpanded = true
+        G.viewPage = storyDetail?.data?.schUnqNo.toString()
     }
 
     BackHandler {
@@ -247,6 +254,9 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
             viewModel.updateCmntList(null)
             viewModel.updateComment("")
             viewModel.updateReplyCmnt(null)
+
+            G.viewPage = null
+            G.viewPageRefresh = false
         }
     }
 
@@ -722,9 +732,9 @@ fun StoryDetailTopContent(
             val result = viewModel.updateDaily(delYn = "Y")
             if (!result){
                 loading = false
-                Toast.makeText(context,  R.string.retry, Toast.LENGTH_SHORT).show()
+                snackState.showSnackbar("다시 시도해주세요")
+                //Toast.makeText(context,  R.string.retry, Toast.LENGTH_SHORT).show()
             }else{
-
                 viewModel.updateStoryListClear()
                 viewModel.updateStoryPage(1)
                 val getList = viewModel.getStoryList(1)

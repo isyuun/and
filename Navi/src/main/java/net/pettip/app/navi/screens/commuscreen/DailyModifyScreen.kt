@@ -148,6 +148,8 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
     var alertShow by remember{ mutableStateOf(false) }
     var alertMsg by remember{ mutableStateOf("") }
 
+    var complete by remember{ mutableStateOf(false) }
+
     val snackState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -651,6 +653,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Button(
+                enabled = !isLoading && !complete,
                 onClick = {
                     val localUriList = state.listOfSelectedImages.filter { uri ->
                         uri.scheme != "http" && uri.scheme != "https"
@@ -676,6 +679,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                                 val result = viewModel.updateDaily()
                                 if(result){
                                     isLoading = false
+                                    complete = true
                                     onBack(false)
                                 }else{
                                     isLoading = false
@@ -692,6 +696,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                                     val result = viewModel.updateDaily()
                                     if(result){
                                         isLoading = false
+                                        complete = true
                                         onBack(false)
                                     }else{
                                         isLoading = false

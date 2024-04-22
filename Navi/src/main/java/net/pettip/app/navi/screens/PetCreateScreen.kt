@@ -693,7 +693,15 @@ fun PetCreateScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically){
                 CustomTextField(
                     value = petWght,
-                    onValueChange = {viewModel.updatePetWght(it)},
+                    onValueChange = {
+                        val parts = it.split('.')
+                        val integerPart = parts.getOrElse(0) { "" }
+                        val decimalPart = parts.getOrElse(1) { "" }
+
+                        if (decimalPart.length<=1){
+                            viewModel.updatePetWght(it)
+                        }
+                                    },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,

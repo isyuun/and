@@ -35,6 +35,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.NaverMapOptions
 import net.pettip.app.ComponentActivity
+import net.pettip.data.daily.DailyLifePet
 import net.pettip.gps._app.KEY_FOREGROUND_GPXFILE
 import net.pettip.gps.app.GPSApplication
 import net.pettip.gpx.GPXParser
@@ -108,13 +109,14 @@ fun GpxMap(
         .height(360.dp),
     onTouch: (View, MotionEvent) -> Boolean
 ) {
-    GpxMap(file.inputStream(), modifier) { view, event -> onTouch(view, event) }
+    GpxMap(`in` = file.inputStream(), modifier = modifier) { view, event -> onTouch(view, event) }
 }
 
 @SuppressLint("ClickableViewAccessibility")
 @Composable
 fun GpxMap(
     `in`: InputStream?,
+    petList:List<DailyLifePet> = emptyList(),
     modifier: Modifier = Modifier
         .padding(horizontal = 20.dp)
         .fillMaxWidth()
@@ -147,7 +149,7 @@ fun GpxMap(
             factory = {
                 mapView.apply {
                     getMapAsync { naverMap ->
-                        naverMapView(context = context, naverMap = naverMap, tracks = tracks, padding = 104.0.dp)
+                        naverMapView(context = context, naverMap = naverMap, tracks = tracks, padding = 104.0.dp, petList = petList)
                         //naverMap.takeSnapshot(false) {
                         //    application.preview = it
                         //}

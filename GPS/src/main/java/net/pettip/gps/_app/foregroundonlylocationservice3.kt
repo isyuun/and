@@ -13,12 +13,16 @@ package net.pettip.gps._app
 /**import net.pettip.util.__CLASSNAME__*/
 import android.content.Intent
 import com.google.android.gms.location.LocationResult
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import net.pettip.gps.R
 import net.pettip.gpx.GPXWriter
 import net.pettip.gpx.Track
 import net.pettip.gpx._distance
 import net.pettip.gpx._duration
 import net.pettip.gpx.distance
+import net.pettip.singleton.G
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import java.io.File
@@ -105,6 +109,13 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         file?.let { GPXWriter().write(_tracks, it) }
     }
 
+    protected open fun delete() {
+        if (_tracks.isEmpty()) return
+        val file = this._file
+        file?.parentFile?.mkdirs()
+        file?.let { GPXWriter().delete(_tracks, it) }
+    }
+
     protected val _tracks = Collections.synchronizedList(ArrayList<Track>()) // The list of Tracks
     internal val tracks: MutableList<Track>
         get() = _tracks
@@ -131,6 +142,7 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         //Log.d(__CLASSNAME__, "${getMethodName()}[$id]${currentLocation.toText()}")
         val track = lastLocation?.let { Track(it, no = no, event = Track.EVENT.PEE) }
         track?.let { _tracks.add(it) }
+        Log.d("TRACK","set:${track}")
         this.write()
     }
 
@@ -146,6 +158,22 @@ open class foregroundonlylocationservice3 : foregroundonlylocationservice2() {
         val track = lastLocation?.let { Track(it, no = no, event = Track.EVENT.MRK) }
         track?.let { _tracks.add(it) }
         this.write()
+    }
+
+    internal fun deleteMark(track: Track){
+        _tracks.find { trackToRemove ->
+            trackToRemove.location.latitude == track.latitude &&
+                    trackToRemove.location.longitude == track.longitude &&
+                    trackToRemove.no == track.no &&
+                    trackToRemove.event == track.event &&
+                    trackToRemove.time == track.time
+        }?.let { foundTrack ->
+            _tracks.remove(foundTrack)
+        }
+
+        G.trackChange = true
+
+        this.delete()
     }
 
     private var _start = 0L

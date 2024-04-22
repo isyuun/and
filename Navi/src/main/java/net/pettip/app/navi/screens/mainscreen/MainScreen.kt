@@ -75,6 +75,7 @@ import net.pettip.app.navi.BottomNav
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
 import net.pettip.app.navi.component.BackTopBar
+import net.pettip.app.navi.component.CustomAlert
 import net.pettip.app.navi.component.LogoTopBar
 import net.pettip.app.navi.component.SearchBox
 import net.pettip.app.navi.ui.theme.design_bottomnav_text
@@ -270,7 +271,7 @@ fun MainScreen(
                                     onClick = {
                                         if (currentPet.isNotEmpty()) {
                                             if (currentPet[0].ownrPetUnqNo=="") {
-
+                                                showDialog = true
                                             }else{
                                                 navController.navigate(Screen.DailyPostScreen.route)
                                             }
@@ -494,6 +495,17 @@ fun MainScreen(
                     )
                 }
 
+            }
+
+            if(showDialog){
+                CustomAlert(
+                    onDismiss = { showDialog = false },
+                    confirm = stringResource(R.string.dialog_regist),
+                    dismiss = stringResource(R.string.dialog_later),
+                    title = stringResource(R.string.dialog_any_pet),
+                    text = stringResource(R.string.dialog_sub_regist),
+                    confirmJob = {navController.navigate(Screen.AddPetScreen.route)}
+                )
             }
         }
     }

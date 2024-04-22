@@ -291,7 +291,16 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
             ) {
                 itemsIndexed(state.listOfSelectedImages){index, uri ->
                     if (index<state.listOfSelectedImages.size-1 && index<5){
-                        PhotoItem(uri = uri, index = index, onClick = { settingViewModel.onItemRemove(index)})
+                        PhotoItem(
+                            uri = uri,
+                            index = index,
+                            onClick = { settingViewModel.onItemRemove(index)},
+                            changeMainImage = {
+                                if (index > 0 && index < state.listOfSelectedImages.size) {
+                                    settingViewModel.updateChangeMainImage(index)
+                                }
+                            }
+                        )
                     }else if(index==state.listOfSelectedImages.size-1 && index<5){
                         PlusBox (galleryLauncher)
                     }

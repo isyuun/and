@@ -25,7 +25,7 @@ import net.pettip.app.Service
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
-const val GPS_MAX_SATELLITES = 20
+const val GPS_MAX_SATELLITES = 18
 const val GPS_RELOAD_MINUTES = 10L
 const val GPS_UPDATE_MIllIS = 1L
 const val GPS_UPDATE_MIN_METERS = 5.0f

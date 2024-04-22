@@ -104,6 +104,9 @@ import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.dimensions.MutableDimensions
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
+import com.patrykandpatrick.vico.core.extension.setFieldValue
+import com.patrykandpatrick.vico.core.formatter.DecimalFormatValueFormatter
+import com.patrykandpatrick.vico.core.formatter.ValueFormatter
 import com.patrykandpatrick.vico.core.marker.Marker
 import com.patrykandpatrick.vico.core.marker.MarkerVisibilityChangeListener
 import kotlinx.coroutines.delay
@@ -114,6 +117,7 @@ import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.BackTopBar
 import net.pettip.app.navi.component.CustomTextField
+import net.pettip.app.navi.component.DecimalValueFormatter
 import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.component.rememberMarker
 import net.pettip.app.navi.screens.mainscreen.CircleImage
@@ -134,6 +138,7 @@ import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -241,6 +246,7 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
             datasetForModel.clear()
             datasetLineSpec.clear()
+
             var xPos = 0f
             val dataPoints = arrayListOf<FloatEntry>()
 
@@ -900,7 +906,13 @@ fun WeightCNDDialog(
     val context = LocalContext.current
 
     val petWeight by viewModel.petWeight.collectAsState()
+
     val dm by viewModel.regDM.collectAsState()
+
+    LaunchedEffect(Unit){
+        val formatWeight = formatWeight(petWeight)
+        viewModel.updatePetWeight(formatWeight)
+    }
 
     DisposableEffect(Unit){
 
@@ -974,7 +986,16 @@ fun WeightCNDDialog(
                 ){
                     CustomTextField(
                         value = petWeight,
-                        onValueChange = { viewModel.updatePetWeight(it) },
+                        onValueChange = {
+                            val parts = it.split('.')
+                            val integerPart = parts.getOrElse(0) { "" }
+                            val decimalPart = parts.getOrElse(1) { "" }
+
+                            if (decimalPart.length<=1){
+                                viewModel.updatePetWeight(it)
+                            }
+                            //viewModel.updatePetWeight(it)
+                                        },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Decimal,
@@ -1103,6 +1124,15 @@ fun WeightCNDDialog(
                 }
             }
         }
+    }
+}
+
+fun formatWeight(weight: String): String {
+    return try {
+        val value = weight.toDouble()
+        String.format("%.1f", value)
+    } catch (e: NumberFormatException) {
+        weight
     }
 }
 
@@ -1289,7 +1319,15 @@ fun WeightDialog(
                     ){
                         CustomTextField(
                             value = petWeight,
-                            onValueChange = { viewModel.updatePetWeight(it) },
+                            onValueChange = {
+                                val parts = it.split('.')
+                                val integerPart = parts.getOrElse(0) { "" }
+                                val decimalPart = parts.getOrElse(1) { "" }
+
+                                if (decimalPart.length<=1){
+                                    viewModel.updatePetWeight(it)
+                                }
+                                            },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Decimal,

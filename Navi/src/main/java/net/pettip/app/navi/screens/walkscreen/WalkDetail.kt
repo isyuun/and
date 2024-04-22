@@ -129,6 +129,7 @@ import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.DailyDetailData
 import net.pettip.data.daily.DailyLifePet
 import net.pettip.map.app.naver.GpxMap
+import net.pettip.singleton.G
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 import kotlin.math.PI
@@ -195,6 +196,15 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
         }
     }
 
+    DisposableEffect(Unit){
+        onDispose { G.posting = false }
+    }
+
+    LaunchedEffect(Unit){
+        if (!G.posting){
+            G.posting = true
+        }
+    }
 
     LaunchedEffect(key1 = dailyDetail) {
         if (!dailyDetail?.totMvmnPathFileSn.isNullOrEmpty() && !gpxDownload && !gpxDownloading) {

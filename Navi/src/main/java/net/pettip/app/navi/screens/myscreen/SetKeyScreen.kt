@@ -69,6 +69,7 @@ import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.singleton.MySharedPreference
+import net.pettip.util.Log
 
 @Composable
 fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingViewModel, sharedViewModel: SharedViewModel){
@@ -81,6 +82,8 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
     var alertMsg by remember{ mutableStateOf("") }
     var alertShow by remember{ mutableStateOf(false) }
     var sendCode by remember{ mutableStateOf(false) }
+
+    var registerSuccess by remember{ mutableStateOf(false) }
 
     val snackState = remember{SnackbarHostState()}
 
@@ -106,9 +109,11 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
                     MySharedPreference.setLastInviteCode(otp)
                     settingViewModel.updateCurrentPetInfo()
                     settingViewModel.updatePetInfo()
-                    navController.popBackStack()
+                    registerSuccess = true
+                    //navController.popBackStack()
                 }else{
                     sendCode = false
+                    registerSuccess = false
                 }
             }
         }
@@ -120,7 +125,12 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
     ) { paddingValues ->
         if (alertShow){
             CustomAlertOneBtn(
-                onDismiss = {alertShow = false},
+                onDismiss = {
+                    alertShow = false
+                    if (registerSuccess){
+                        navController.popBackStack()
+                    }
+                            },
                 confirm = "확인",
                 title = alertMsg
             )
@@ -188,7 +198,10 @@ fun SetKeyScreen(navController: NavHostController, settingViewModel: SettingView
                                 MySharedPreference.setLastInviteCode(otp)
                                 settingViewModel.updateCurrentPetInfo()
                                 settingViewModel.updatePetInfo()
-                                navController.popBackStack()
+                                registerSuccess = true
+                                //navController.popBackStack()
+                            }else{
+                                registerSuccess = false
                             }
                         }
 

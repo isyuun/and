@@ -117,6 +117,7 @@ import net.pettip.data.SggList
 import net.pettip.data.UmdList
 import net.pettip.data.cmm.CdDetail
 import net.pettip.data.pet.PetListData
+import net.pettip.util.Log
 import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -616,7 +617,15 @@ fun AddPetScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically){
                 CustomTextField(
                     value = petWght,
-                    onValueChange = {viewModel.updatePetWght(it)},
+                    onValueChange = {
+                        val parts = it.split('.')
+                        val integerPart = parts.getOrElse(0) { "" }
+                        val decimalPart = parts.getOrElse(1) { "" }
+
+                        if (decimalPart.length<=1){
+                            viewModel.updatePetWght(it)
+                        }
+                                    },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,

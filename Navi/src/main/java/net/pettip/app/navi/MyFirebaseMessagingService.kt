@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
 
@@ -35,7 +36,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         // Check if message contains a notification payload.
         remoteMessage.notification?.let {
-            it.body?.let { sendNotification(remoteMessage) }
+            val page = remoteMessage.data["page"]
+            val seqNo = remoteMessage.data["seqNo"]
+
+            val isCurrentView = G.viewPage == seqNo
+
+            if (!isCurrentView){
+                it.body?.let { sendNotification(remoteMessage) }
+            }else{
+                G.viewPageRefresh = true
+            }
         }
 
         // Also if you intend on generating your own notifications as a result of a received FCM

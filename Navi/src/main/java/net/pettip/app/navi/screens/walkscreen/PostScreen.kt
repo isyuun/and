@@ -17,9 +17,11 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -104,6 +106,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.component.CircleImageTopBar
@@ -111,7 +114,9 @@ import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.component.Toasty
 import net.pettip.app.navi.screens.commuscreen.CustomDialogInPost
+import net.pettip.app.navi.screens.commuscreen.isAllHashtagsUnder30Characters
 import net.pettip.app.navi.screens.mainscreen.getFormattedDate
+import net.pettip.app.navi.ui.theme.design_999EA9
 import net.pettip.app.navi.ui.theme.design_alpha50_black
 import net.pettip.app.navi.ui.theme.design_button_bg
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
@@ -207,6 +212,44 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
         }
     }
 
+    LaunchedEffect(key1 = G.trackChange){
+        if (G.trackChange){
+
+            val petList: List<Pet> = pets.map { petData ->
+
+                var pee = 0
+                var poo = 0
+                var mrk = 0
+
+                tracks?.forEach { track ->
+                    if (track.no == petData.ownrPetUnqNo) {
+                        when (track.event) {
+                            Track.EVENT.NNN -> {}
+                            Track.EVENT.IMG -> {}
+                            Track.EVENT.PEE -> pee++
+                            Track.EVENT.POO -> poo++
+                            Track.EVENT.MRK -> mrk++
+                        }
+                    }
+                }
+
+                Pet(
+                    petNm = petData.petNm,
+                    ownrPetUnqNo = petData.ownrPetUnqNo,
+                    bwlMvmNmtm = poo.toString(),
+                    relmIndctNmtm = mrk.toString(),
+                    urineNmtm = pee.toString()
+                )
+            }
+
+            viewModel.updatePetCount(petList)
+
+            Log.d("PETLIST",petList.toString())
+
+            G.trackChange = false
+        }
+    }
+
     LaunchedEffect(Unit) {
         if (init) {
             val petList: List<Pet> = pets.map { petData ->
@@ -255,6 +298,11 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             viewModel.updateSelectedImageList(listOfImages = it)
             viewModel.updateSelectedImageList(listOf(dummyUri))
         }
+
+    LaunchedEffect(snackState){
+        delay(300)
+        snackState.currentSnackbarData?.dismiss()
+    }
 
     Scaffold(
         snackbarHost = { Toasty(snackState = snackState, bottomPadding = 20.dp) }
@@ -311,8 +359,6 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            var scale by remember { mutableStateOf(1f) }
-
             application.file?.let {
                 GpxMap(it) { _, event ->
                     when (event.action) {
@@ -352,7 +398,13 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                         PhotoItem(
                             uri = uri,
                             index = index,
-                            onClick = { viewModel.onItemRemove(index) })
+                            onClick = { viewModel.onItemRemove(index) },
+                            changeMainImage = {
+                                if (index > 0 && index < state.listOfSelectedImages.size) {
+                                    viewModel.updateChangeMainImage(index)
+                                }
+                            }
+                        )
                     } else if (index == state.listOfSelectedImages.size - 1 && index < 5) {
                         PlusBox(galleryLauncher)
                     }
@@ -372,8 +424,12 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
 
             CustomTextField(
                 value = walkTitle,
-                onValueChange = { viewModel.updateWalkTitle(it) },
-                singleLine = true,
+                onValueChange = {
+                    if (it.length<=40){
+                        viewModel.updateWalkTitle(it)
+                    }
+                                },
+                singleLine = false,
                 maxLines = 3,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -382,7 +438,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 16.dp)
                     .fillMaxWidth()
-                    .heightIn(min = 40.dp)
+                    .heightIn(min = 40.dp, max = 80.dp)
                     .focusRequester(focusRequester)
                     .onFocusChanged { focusState ->
                         if (focusState.isFocused) {
@@ -426,10 +482,11 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 16.sp, letterSpacing = (-0.4).sp
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp,
+                    lineHeight = 20.sp
                 ),
                 shape = RoundedCornerShape(4.dp),
-                innerPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+                innerPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
             )
 
             AnimatedVisibility(
@@ -473,7 +530,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                 }
             }
 
-            Spacer(modifier = Modifier.padding(top = 20.dp))
+            //Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Text(
                 text = stringResource(R.string.walk_memo),
@@ -481,12 +538,16 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                 fontSize = 20.sp,
                 letterSpacing = (-1.0).sp,
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(start = 20.dp)
+                modifier = Modifier.padding(start = 20.dp, top = 20.dp)
             )
 
             CustomTextField(
                 value = walkMemo,
-                onValueChange = { viewModel.updateWalkMemo(it) },
+                onValueChange = {
+                    if (it.length<=400){
+                        viewModel.updateWalkMemo(it)
+                    }
+                                },
                 singleLine = false,
                 maxLines = 10,
                 keyboardOptions = KeyboardOptions(
@@ -496,7 +557,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 16.dp)
                     .fillMaxWidth()
-                    .heightIn(min = 120.dp),
+                    .heightIn(min = 120.dp, max = 500.dp),
                 placeholder = {
                     Text(
                         text = stringResource(R.string.place_holder_walk_memo),
@@ -537,7 +598,9 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
 
             CustomTextField(
                 value = hashString,
-                onValueChange = { hashString = it },
+                onValueChange = {
+                    hashString = it
+                                },
                 singleLine = false,
                 maxLines = 3,
                 keyboardOptions = KeyboardOptions(
@@ -618,45 +681,31 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             Spacer(modifier = Modifier.padding(top = 40.dp))
 
             Button(
+                enabled = !isLoading && walkTitle.isNotBlank(),
                 onClick = {
+                    isLoading = true
                     //share(context, state.listOfSelectedImages[0], "shareText")
                     viewModel.updateSchCdList(listOf("001"))
 
-                    scope.launch {
-                        isLoading = true
+                    val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
+                    val matches = pattern.findAll(hashString)
+                    val hashtagList = matches.map { it.groupValues[1] }.toList()
 
-                        val pattern = "#(\\S+)".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
-                        val matches = pattern.findAll(hashString)
-                        val hashtagList = matches.map { it.groupValues[1] }.toList()
+                    val isValidHash = isAllHashtagsUnder30Characters(hashtagList)
 
-                        viewModel.updateHashTag(hashtagList)
+                    if (isValidHash){
+                        scope.launch {
 
-                        if (state.listOfSelectedImages.size <= 1 && file == null) {
-                            var dailyUpload = viewModel.uploadDaily()
-                            if (dailyUpload) {
-                                sharedViewModel.updateWalkUpload(true)
-                                navController.popBackStack()
-                                isLoading = false
-                            } else {
-                                isLoading = false
-                                snackState.showSnackbar(
-                                    message = context.getString(R.string.daily_create_fail_retry),
-                                    actionLabel = context.getString(R.string.confirm),
-                                    duration = SnackbarDuration.Short,
-                                    withDismissAction = false
-                                )
-                            }
-                        } else {
-                            Log.d("LOG","fileUpload")
-                            val photoUpload = viewModel.fileUpload(context = context, gpxFile = file)
-                            if (photoUpload) {
-                                Log.d("LOG","DailyUpload")
+                            delay(500)
+
+                            viewModel.updateHashTag(hashtagList)
+
+                            if (state.listOfSelectedImages.size <= 1 && file == null) {
                                 var dailyUpload = viewModel.uploadDaily()
                                 if (dailyUpload) {
                                     sharedViewModel.updateWalkUpload(true)
-                                    navController.popBackStack()
-                                    viewModel.updateSelectedImageList(emptyList())
                                     isLoading = false
+                                    navController.popBackStack()
                                 } else {
                                     isLoading = false
                                     snackState.showSnackbar(
@@ -667,14 +716,40 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                                     )
                                 }
                             } else {
-                                isLoading = false
-                                snackState.showSnackbar(
-                                    message = context.getString(R.string.upload_photo_fail_retry),
-                                    actionLabel = context.getString(R.string.confirm),
-                                    duration = SnackbarDuration.Short,
-                                    withDismissAction = false
-                                )
+                                Log.d("LOG","fileUpload")
+                                val photoUpload = viewModel.fileUpload(context = context, gpxFile = file)
+                                if (photoUpload) {
+                                    Log.d("LOG","DailyUpload")
+                                    var dailyUpload = viewModel.uploadDaily()
+                                    if (dailyUpload) {
+                                        sharedViewModel.updateWalkUpload(true)
+                                        viewModel.updateSelectedImageList(emptyList())
+                                        isLoading = false
+                                        navController.popBackStack()
+                                    } else {
+                                        isLoading = false
+                                        snackState.showSnackbar(
+                                            message = context.getString(R.string.daily_create_fail_retry),
+                                            actionLabel = context.getString(R.string.confirm),
+                                            duration = SnackbarDuration.Short,
+                                            withDismissAction = false
+                                        )
+                                    }
+                                } else {
+                                    isLoading = false
+                                    snackState.showSnackbar(
+                                        message = context.getString(R.string.upload_photo_fail_retry),
+                                        actionLabel = context.getString(R.string.confirm),
+                                        duration = SnackbarDuration.Short,
+                                        withDismissAction = false
+                                    )
+                                }
                             }
+                        }
+                    }else{
+                        scope.launch {
+                            isLoading = false
+                            snackState.showSnackbar("해시 태그는 30자까지 가능해요")
                         }
                     }
                 },
@@ -683,7 +758,10 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                     .height(56.dp)
                     .padding(horizontal = 20.dp), shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = design_button_bg)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = design_button_bg,
+                    disabledContainerColor = design_999EA9
+                )
             )
             {
                 Text(
@@ -732,9 +810,8 @@ fun BwlMvmNmtmContent(walkViewModel: WalkViewModel, pet: List<Pet>, selectPet: L
 @Composable
 fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: Pet, selectPet: List<CurrentPetData>) {
 
-    var bwlCount by remember { mutableIntStateOf(petInfo.bwlMvmNmtm.toInt()) }
-    var peeCount by remember { mutableIntStateOf(petInfo.urineNmtm.toInt()) }
-    var markCount by remember { mutableIntStateOf(petInfo.relmIndctNmtm.toInt()) }
+    //val petList by walkViewModel.petCount.collectAsState()
+    //val petInfo = petList.filter { it.ownrPetUnqNo == petInfo0.ownrPetUnqNo }[0]
 
     val matchingSelectPet = selectPet.find { it.ownrPetUnqNo == petInfo.ownrPetUnqNo }
 
@@ -777,22 +854,23 @@ fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: Pet, selectPet:
             PlusMinusItem(
                 walkViewModel = walkViewModel,
                 s = stringResource(R.string.poo),
-                icon = R.drawable.icon_poop, bwlCount
-            ) { newValue -> bwlCount += newValue }
+                icon = R.drawable.icon_poop,
+                count = petInfo.bwlMvmNmtm.toInt()
+            )
 
             PlusMinusItem(
                 walkViewModel = walkViewModel,
                 s = stringResource(R.string.pee),
                 icon = R.drawable.icon_pee,
-                peeCount
-            ) { newValue -> peeCount += newValue }
+                count = petInfo.urineNmtm.toInt()
+            )
 
             PlusMinusItem(
                 walkViewModel = walkViewModel,
                 s = stringResource(R.string.marking),
                 icon = R.drawable.icon_marking,
-                markCount
-            ) { newValue -> markCount += newValue }
+                count = petInfo.relmIndctNmtm.toInt()
+            )
 
             Spacer(modifier = Modifier.padding(top = 4.dp))
         }
@@ -806,8 +884,7 @@ fun PlusMinusItem(
     walkViewModel: WalkViewModel,
     s: String,
     icon: Int,
-    count: Int,
-    onClick: (Int) -> Unit
+    count: Int
 ) {
 
     Row(
@@ -887,11 +964,19 @@ fun PlusMinusItem(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PhotoItem(uri: Uri, index: Int, onClick: () -> Unit) {
+fun PhotoItem(uri: Uri, index: Int, onClick: () -> Unit, changeMainImage:()->Unit ) {
 
     Box(
-        modifier = Modifier.size(105.dp)
+        modifier = Modifier
+            .size(105.dp)
+            .combinedClickable(
+                onClickLabel = "",
+                onClick = {},
+                onLongClickLabel = "",
+                onLongClick = { changeMainImage() }
+            )
     ) {
 
         Box(

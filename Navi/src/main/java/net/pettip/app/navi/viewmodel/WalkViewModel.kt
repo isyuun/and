@@ -294,6 +294,18 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         }
     }
 
+    fun updateChangeMainImage(index: Int){
+        val updatedImageList = state.listOfSelectedImages.toMutableList()
+
+        val temp = updatedImageList[index]
+        updatedImageList[index] = updatedImageList[0]
+        updatedImageList[0] = temp
+
+        state = state.copy(
+            listOfSelectedImages = updatedImageList.distinct()
+        )
+    }
+
     fun onItemRemove(index: Int) {
         val updatedImageList = state.listOfSelectedImages.toMutableList()
         viewModelScope.launch {

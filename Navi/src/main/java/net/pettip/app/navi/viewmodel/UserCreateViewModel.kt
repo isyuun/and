@@ -151,11 +151,11 @@ class UserCreateViewModel @Inject constructor(private val scdLocalData: SCDLocal
     val marketingCheck: StateFlow<Boolean> = _marketingCheck.asStateFlow()
     fun updateMarketingCheck(newValue: Boolean) { _marketingCheck.value = newValue }
 
-    private val _pushCheck = MutableStateFlow<Boolean>(false)
+    private val _pushCheck = MutableStateFlow<Boolean>(true)
     val pushCheck: StateFlow<Boolean> = _pushCheck.asStateFlow()
     fun updatePushCheck(newValue: Boolean) { _pushCheck.value = newValue }
 
-    private val _dawnCheck = MutableStateFlow<Boolean>(false)
+    private val _dawnCheck = MutableStateFlow<Boolean>(true)
     val dawnCheck: StateFlow<Boolean> = _dawnCheck.asStateFlow()
     fun updateDawnCheck(newValue: Boolean) { _dawnCheck.value = newValue }
     // --------------   User   -----------------------
