@@ -2,12 +2,15 @@ package net.pettip.gps._app
 
 import android.content.Intent
 import net.pettip.gps.app.GPSApplication
+import net.pettip.singleton.G
 import net.pettip.util.Log
 import net.pettip.util.getMethodName
 
 open class gpscomponentactivity2 : gpscomponentactivity() {
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
     private val application: GPSApplication = GPSApplication.instance
+
+    var canBack = false
 
     fun main() {
         val intent = packageManager.getLaunchIntentForPackage(packageName)/*Intent(this, MainActivity::class.java)*/
@@ -21,7 +24,12 @@ open class gpscomponentactivity2 : gpscomponentactivity() {
     override fun onBackPressed() {
         Log.i(__CLASSNAME__, "${getMethodName()}$intent")
         super.onBackPressed()
-        post { main() }
+
+        if (!G.showCameraX){
+            post { main() }
+        }else{
+            Log.d("BACK","backPressTrue")
+        }
     }
 
     override fun finish() {

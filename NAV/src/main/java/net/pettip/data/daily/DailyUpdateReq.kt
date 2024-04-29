@@ -47,19 +47,4 @@ sealed class DailyLifeUpdatePet {
         val rowState: String
     ) : DailyLifeUpdatePet()
 
-    companion object {
-        fun fromDailyLifePet(pet: DailyLifePet): DailyLifeUpdatePet {
-            return PetWithDetails(
-                ownrPetUnqNo = pet.ownrPetUnqNo,
-                petNm = pet.petNm,
-                stdgUmdNm = pet.stdgUmdNm ?: "",
-                age = pet.age ?: "",
-                schUnqNo = pet.schUnqNo,
-                bwlMvmNmtm = pet.bwlMvmNmtm,
-                urineNmtm = pet.urineNmtm,
-                relmIndctNmtm = pet.relmIndctNmtm,
-                rowState = pet.rowState
-            )
-        }
-    }
 }

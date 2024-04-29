@@ -2,14 +2,12 @@
 
 package net.pettip.app.navi.screens.walkscreen
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
-import android.provider.MediaStore
 import android.view.MotionEvent
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -18,14 +16,10 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -37,21 +31,16 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -67,7 +56,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -82,33 +70,22 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
-import net.pettip.app.navi.component.CircleImageTopBar
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.component.Toasty
@@ -116,31 +93,27 @@ import net.pettip.app.navi.screens.commuscreen.CustomDialogInPost
 import net.pettip.app.navi.screens.commuscreen.isAllHashtagsUnder30Characters
 import net.pettip.app.navi.screens.mainscreen.getFormattedDate
 import net.pettip.app.navi.ui.theme.design_999EA9
-import net.pettip.app.navi.ui.theme.design_alpha50_black
 import net.pettip.app.navi.ui.theme.design_button_bg
-import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
 import net.pettip.app.navi.ui.theme.design_intro_bg
-import net.pettip.app.navi.ui.theme.design_login_text
 import net.pettip.app.navi.ui.theme.design_select_btn_text
-import net.pettip.app.navi.ui.theme.design_skip
 import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.Pet
 import net.pettip.data.pet.CurrentPetData
-import net.pettip.gps.app.GPSApplication
 import net.pettip.gpx.Track
 import net.pettip.map.app.naver.GpxMap
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
+import java.io.File
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navController: NavHostController) {
-    val application = GPSApplication.instance
+fun TempPostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navController: NavHostController) {
+    //val application = GPSApplication.instance
 
     var expanded by remember { mutableStateOf(false) }
     val items = listOf(
@@ -152,12 +125,10 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
     val focusManager = LocalFocusManager.current
     val focusRequester by remember { mutableStateOf(FocusRequester()) }
 
-    val tracks = application.tracks
-    val file = application.file
-    val images = application.images
-    val pets = application.pets.toList()
-
-    Log.d("LOG",pets.toString())
+    var tracks by remember{ mutableStateOf<MutableList<Track>>(mutableListOf()) }
+    var file by remember{ mutableStateOf<File?>(null) }
+    var images by remember{ mutableStateOf<List<Uri>>(emptyList()) }
+    var pets by remember{ mutableStateOf<List<CurrentPetData>>(emptyList()) }
 
     val walkTitle by viewModel.walkTitle.collectAsState()
     val walkMemo by viewModel.walkMemo.collectAsState()
@@ -166,6 +137,8 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
 
     val state = viewModel.state
     val dummyUri = Uri.parse("")
+
+    val uploadInfo = MySharedPreference.getTempWalkInfo()
 
     var showDiagLog by remember { mutableStateOf(false) }
 
@@ -193,16 +166,14 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
 
     DisposableEffect(Unit) {
         onDispose {
+            sharedViewModel.setTempWalkDelete(context)
             viewModel.clearSelectedImages()
+            G.posting = false
         }
     }
 
     BackHandler {
         showDiagLog = true
-    }
-
-    SideEffect {
-        G.toPost = false
     }
 
     LaunchedEffect(key1 = state.listOfSelectedImages) {
@@ -250,7 +221,51 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
         }
     }
 
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // 권한이 허용된 경우 이미지 URI 리스트를 ViewModel에 업데이트
+            if (images != null) {
+                viewModel.updateSelectedImageList(images)
+            }
+        } else {
+            // 권한이 거부된 경우 처리 로직 추가
+            // 사용자에게 권한이 필요하다는 메시지 표시 등
+            // 예를 들어, Toast 메시지로 권한 요청 안내
+            Toast.makeText(context, "외부 저장소 읽기 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     LaunchedEffect(Unit) {
+
+        // 바인딩
+
+        if (!G.posting){
+            G.posting = true
+        }
+
+        val track = uploadInfo?.tracks?.map {
+            Track(
+                it.location, it.no, it.event, Uri.parse("")
+            )
+        } as MutableList
+
+        file = uploadInfo?.file?.let { File(it) }
+        images = uploadInfo?.uriList?.map { uri ->
+            Uri.parse(uri)
+        } as List<Uri>
+        pets = uploadInfo.pets?: emptyList()
+        tracks = track
+
+        Log.d("LOG",images.toString())
+
+        viewModel.updateWalkTitle(uploadInfo.schTtl ?:"")
+        viewModel.updateWalkMemo(uploadInfo.schCn ?: "")
+        viewModel.updatePostStory(uploadInfo.rlsYn == "Y")
+
+        hashString = uploadInfo.hashTag
+
         if (init) {
             val petList: List<Pet> = pets.map { petData ->
 
@@ -278,9 +293,11 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                     urineNmtm = pee.toString()
                 )
             }
+
             if (images != null) {
                 viewModel.updateSelectedImageList(images)
             }
+
             viewModel.updateSelectedImageList(listOf(dummyUri))
             viewModel.updatePetCount(petList)
             init = false
@@ -294,6 +311,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             if (state.listOfSelectedImages.isNotEmpty()) {
                 viewModel.onItemRemove(state.listOfSelectedImages.size - 1)
             }
+            Log.d("URI",it.toString())
             viewModel.updateSelectedImageList(listOfImages = it)
             viewModel.updateSelectedImageList(listOf(dummyUri))
         }
@@ -311,6 +329,8 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
             loadingText = loadingMsg,
             loadingState = isLoading
         )
+
+
         var isTouch by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
@@ -352,11 +372,11 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                 modifier = Modifier.padding(start = 20.dp, top = 8.dp)
             )
 
-            WalkTimeNDisInPost(application)
+            WalkTimeNDisInPostInTemp(uploadInfo?.totDstnc, uploadInfo?.totDuration)
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            application.file?.let {
+            file?.let {
                 GpxMap(it) { _, event ->
                     when (event.action) {
                         MotionEvent.ACTION_DOWN -> isTouch = true
@@ -700,13 +720,12 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                             MySharedPreference.setTempWalkTF(true)
 
                             if (state.listOfSelectedImages.size <= 1 && file == null) {
-                                var dailyUpload = viewModel.uploadDaily()
+                                var dailyUpload = viewModel.uploadDaily(uploadInfo?.walkDptreDt, uploadInfo?.walkEndDt)
                                 if (dailyUpload) {
                                     /** 성공 */
-                                    sharedViewModel.setTempWalkDelete(context) // 임시 파일 삭제
+                                    sharedViewModel.setTempWalkDelete(context)// 임시 파일 삭제
 
                                     sharedViewModel.updateWalkUpload(true)
-                                    MySharedPreference.setTempWalkTF(false)
                                     isLoading = false
                                     navController.popBackStack()
                                 } else {
@@ -724,13 +743,14 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                             } else {
                                 val photoUpload = viewModel.fileUpload(context = context, gpxFile = file)
                                 if (photoUpload) {
-                                    var dailyUpload = viewModel.uploadDaily()
+                                    var dailyUpload = viewModel.uploadDaily(uploadInfo?.walkDptreDt, uploadInfo?.walkEndDt)
                                     if (dailyUpload) {
                                         /** 성공 */
                                         sharedViewModel.setTempWalkDelete(context)// 임시 파일 삭제
 
                                         sharedViewModel.updateWalkUpload(true)
                                         viewModel.updateSelectedImageList(emptyList())
+                                        uploadInfo?.uriList?.map { Uri.parse(it) }?.let { viewModel.deleteTemporaryFiles(it) }
                                         isLoading = false
                                         navController.popBackStack()
                                     } else {
@@ -757,7 +777,6 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
                                         withDismissAction = false
                                     )
                                 }
-                                sharedViewModel.deleteTempFilesStartingWithName(context = context)
                             }
                         }
                     }else{
@@ -792,353 +811,7 @@ fun PostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,navCon
 }
 
 @Composable
-fun BwlMvmNmtmContent(walkViewModel: WalkViewModel, pet: List<Pet>, selectPet: List<CurrentPetData>) {
-
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = stringResource(R.string.with_pets),
-            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-            fontSize = 20.sp,
-            letterSpacing = (-1.0).sp,
-            color = MaterialTheme.colorScheme.onPrimary
-        )
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        LazyColumn(
-            state = rememberLazyListState(),
-            modifier = Modifier.heightIn(max = 2000.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(items = pet) { petInfo ->
-                BwlMvmNmtmContentItem(walkViewModel = walkViewModel, petInfo, selectPet)
-            }
-        }
-
-    }
-}
-
-@Composable
-fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: Pet, selectPet: List<CurrentPetData>) {
-
-    //val petList by walkViewModel.petCount.collectAsState()
-    //val petInfo = petList.filter { it.ownrPetUnqNo == petInfo0.ownrPetUnqNo }[0]
-
-    val matchingSelectPet = selectPet.find { it.ownrPetUnqNo == petInfo.ownrPetUnqNo }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                shape = RoundedCornerShape(12.dp)
-            )
-    ) {
-        Row(
-            modifier = Modifier.align(Alignment.CenterStart),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Spacer(modifier = Modifier.padding(start = 22.dp))
-
-            CircleImageTopBar(size = 50, imageUri = matchingSelectPet?.petRprsImgAddr)
-
-            Text(
-                text = petInfo.petNm,
-                fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                fontSize = 16.sp,
-                letterSpacing = (-0.8).sp,
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(start = 10.dp, top = 22.dp, bottom = 22.dp)
-            )
-        }
-
-        Column(
-            modifier = Modifier.align(Alignment.CenterEnd),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Spacer(modifier = Modifier.padding(top = 4.dp))
-            PlusMinusItem(
-                walkViewModel = walkViewModel,
-                s = stringResource(R.string.poo),
-                icon = R.drawable.icon_poop,
-                count = petInfo.bwlMvmNmtm.toInt()
-            )
-
-            PlusMinusItem(
-                walkViewModel = walkViewModel,
-                s = stringResource(R.string.pee),
-                icon = R.drawable.icon_pee,
-                count = petInfo.urineNmtm.toInt()
-            )
-
-            PlusMinusItem(
-                walkViewModel = walkViewModel,
-                s = stringResource(R.string.marking),
-                icon = R.drawable.icon_marking,
-                count = petInfo.relmIndctNmtm.toInt()
-            )
-
-            Spacer(modifier = Modifier.padding(top = 4.dp))
-        }
-
-    }
-
-}
-
-@Composable
-fun PlusMinusItem(
-    walkViewModel: WalkViewModel,
-    s: String,
-    icon: Int,
-    count: Int
-) {
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(id = icon),
-            contentDescription = "",
-            tint = Color.Unspecified
-        )
-
-        Text(
-            text = s,
-            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-            fontSize = 14.sp,
-            letterSpacing = (-0.7).sp,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.padding(start = 4.dp, end = 8.dp)
-        )
-
-        //Box(
-        //    modifier = Modifier
-        //        .size(24.dp)
-        //        .background(
-        //            color =
-        //            if (count == 0) {
-        //                design_DDDDDD
-        //            } else {
-        //                design_intro_bg
-        //            },
-        //            shape = RoundedCornerShape(8.dp)
-        //        )
-        //        .clip(RoundedCornerShape(8.dp))
-        //        .clickable(enabled = count != 0) { onClick(-1) },
-        //    contentAlignment = Alignment.Center
-        //) {
-        //    Icon(
-        //        painter = painterResource(id = R.drawable.stepper_minus),
-        //        contentDescription = "",
-        //        tint = Color.Unspecified
-        //    )
-        //}
-
-        Box(
-            modifier = Modifier.width(40.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = count.toString(),
-                fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                fontSize = 14.sp,
-                letterSpacing = (-0.7).sp,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-
-        //Box(
-        //    modifier = Modifier
-        //        .size(24.dp)
-        //        .background(
-        //            color = design_intro_bg,
-        //            shape = RoundedCornerShape(8.dp)
-        //        )
-        //        .clip(RoundedCornerShape(8.dp))
-        //        .clickable { onClick(1) },
-        //    contentAlignment = Alignment.Center
-        //) {
-        //    Icon(
-        //        painter = painterResource(id = R.drawable.stepper_plus),
-        //        contentDescription = "",
-        //        tint = Color.Unspecified
-        //    )
-        //}
-
-
-        Spacer(modifier = Modifier.padding(end = 20.dp))
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun PhotoItem(uri: Uri, index: Int, onClick: () -> Unit, changeMainImage:()->Unit ) {
-
-    Box(
-        modifier = Modifier
-            .size(105.dp)
-            .combinedClickable(
-                onClickLabel = "",
-                onClick = {},
-                onLongClickLabel = "",
-                onLongClick = { changeMainImage() }
-            )
-    ) {
-
-        Box(
-            modifier = Modifier
-                .size(100.dp)
-                .clip(shape = RoundedCornerShape(12.dp))
-                .border(
-                    width = 2.dp,
-                    color = if (index < 5) design_intro_bg else MaterialTheme.colorScheme.outline,
-                    shape = RoundedCornerShape(12.dp)
-                )
-                .align(Alignment.Center)
-        ) {
-            AsyncImage(
-                model = uri,
-                contentDescription = "",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
-                filterQuality = FilterQuality.Low
-            )
-
-
-
-            if (index == 0) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(20.dp)
-                        .background(
-                            color = design_alpha50_black,
-                            shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-                        )
-                        .clip(shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                        .align(Alignment.BottomCenter)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.main_image),
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                        letterSpacing = (-0.6).sp,
-                        lineHeight = 12.sp,
-                        modifier = Modifier.align(Alignment.Center),
-                        color = design_white
-                    )
-                }
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .size(22.dp)
-                .clip(CircleShape)
-                .background(color = design_white, shape = CircleShape)
-                .border(1.dp, color = design_icon_5E6D7B, CircleShape)
-                .clickable { onClick() }
-                .align(Alignment.TopEnd)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.picture_delete), contentDescription = "",
-                modifier = Modifier.align(Alignment.Center), tint = Color.Unspecified
-            )
-        }
-    }
-
-}
-
-@Composable
-fun PlusBox(galleyLauncher: ManagedActivityResultLauncher<String, List<@JvmSuppressWildcards Uri>>) {
-
-    Box(modifier = Modifier.size(105.dp)) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .size(100.dp)
-                .background(color = MaterialTheme.colorScheme.onPrimaryContainer, shape = RoundedCornerShape(12.dp))
-                .clip(shape = RoundedCornerShape(12.dp))
-                .border(1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
-                .clickable { galleyLauncher.launch("image/*") }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.picture_plus),
-                contentDescription = "",
-                modifier = Modifier.align(
-                    Alignment.Center
-                ),
-                tint = Color.Unspecified
-            )
-        }
-    }
-}
-
-
-@Preview
-@Composable
-fun PostScreenPreView() {
-
-    val sharedViewModel = SharedViewModel()
-    val viewModel = WalkViewModel(sharedViewModel)
-
-    //PostScreen(viewModel)
-}
-
-private fun share(context: Context, imageUri: Uri, shareText: String) {
-    val sendIntent: Intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_STREAM, imageUri)
-        //putExtra(Intent.EXTRA_TEXT, shareText)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        type = "image/*"
-    }
-
-    val shareIntent = Intent.createChooser(sendIntent, null)
-
-    context.startActivity(shareIntent)
-}
-
-@Composable
-fun OnDialog(onDismiss: () -> Unit, navController: NavHostController) {
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onDismiss()
-                    navController.popBackStack()
-                },
-            ) {
-                Text(text = "나가기")
-            }
-        },
-        title = { Text(text = "포스트 작성을 그만하시겠어요?") },
-        text = { Text(text = "작성중인 글은 삭제됩니다", color = design_skip) },
-        dismissButton = {
-            Button(onClick = { onDismiss() }) {
-                Text(text = "더 작성할래요")
-            }
-        },
-        containerColor = design_white
-    )
-}
-
-@Composable
-fun WalkTimeNDisInPost(tracks: GPSApplication) {
-
-    val distance by remember { mutableStateOf(tracks._distance) }
-    val duration by remember { mutableStateOf(tracks.duration) }
-
-
+fun WalkTimeNDisInPostInTemp(distance : Float? = 0.0f, duration : String? = "") {
 
     Row(
         modifier = Modifier
@@ -1218,100 +891,4 @@ fun WalkTimeNDisInPost(tracks: GPSApplication) {
 
         }
     }
-}
-
-class HashTagTransformation() : VisualTransformation {
-
-    override fun filter(text: AnnotatedString): TransformedText {
-        return TransformedText(
-            buildAnnotatedStringWithColors(text.toString()),
-            OffsetMapping.Identity
-        )
-    }
-}
-
-fun buildAnnotatedStringWithColors(text: String): AnnotatedString {
-
-    val pattern = "#\\S+".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
-    val matches = pattern.findAll(text)
-
-    val annotatedText = buildAnnotatedString {
-        var lastIndex = 0
-        val highlightedTextList = mutableListOf<String>()
-
-        matches.forEach { result ->
-            val hashtag = result.value
-            val startIndex = result.range.first
-            val endIndex = result.range.last + 1
-
-            // Add the text before the hashtag
-            withStyle(style = SpanStyle(color = design_login_text)) {
-                append(text.substring(lastIndex, startIndex))
-            }
-
-            // Add the hashtag with a different color
-            withStyle(style = SpanStyle(color = design_intro_bg)) {
-                append(hashtag)
-            }
-
-            highlightedTextList.add(hashtag)
-
-            lastIndex = endIndex
-        }
-
-        // Add the text after the last hashtag
-        withStyle(style = SpanStyle(color = design_login_text)) {
-            append(text.substring(lastIndex))
-        }
-    }
-
-    return annotatedText
-}
-
-class HashTagTransformationForDark() : VisualTransformation {
-
-    override fun filter(text: AnnotatedString): TransformedText {
-        return TransformedText(
-            buildAnnotatedStringWithColorsForDark(text.toString()),
-            OffsetMapping.Identity
-        )
-    }
-}
-
-fun buildAnnotatedStringWithColorsForDark(text: String): AnnotatedString {
-
-    val pattern = "#\\S+".toRegex() // 정규 표현식 패턴: # 다음에 공백이 아닌 문자 또는 숫자들
-    val matches = pattern.findAll(text)
-
-    val annotatedText = buildAnnotatedString {
-        var lastIndex = 0
-        val highlightedTextList = mutableListOf<String>()
-
-        matches.forEach { result ->
-            val hashtag = result.value
-            val startIndex = result.range.first
-            val endIndex = result.range.last + 1
-
-            // Add the text before the hashtag
-            withStyle(style = SpanStyle(color = design_white)) {
-                append(text.substring(lastIndex, startIndex))
-            }
-
-            // Add the hashtag with a different color
-            withStyle(style = SpanStyle(color = design_intro_bg)) {
-                append(hashtag)
-            }
-
-            highlightedTextList.add(hashtag)
-
-            lastIndex = endIndex
-        }
-
-        // Add the text after the last hashtag
-        withStyle(style = SpanStyle(color = design_white)) {
-            append(text.substring(lastIndex))
-        }
-    }
-
-    return annotatedText
 }

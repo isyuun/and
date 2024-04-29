@@ -858,7 +858,7 @@ class SettingViewModel(private val sharedViewModel: SharedViewModel) :ViewModel(
 
             resizedFile?.let {
                 val requestBody = it.asRequestBody("image/*".toMediaType())
-                val part = MultipartBody.Part.createFormData("files", "image$i.jpg", requestBody)
+                val part = MultipartBody.Part.createFormData("files", "pt_temp_image$i.jpg", requestBody)
                 parts.add(part)
             }
         }

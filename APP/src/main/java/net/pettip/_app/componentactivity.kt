@@ -11,6 +11,7 @@
 package net.pettip._app
 
 import android.os.Bundle
+import net.pettip.util.Log
 
 /**
  * @Project     : carepet-android

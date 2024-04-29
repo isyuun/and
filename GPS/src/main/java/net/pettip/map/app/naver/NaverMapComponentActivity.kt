@@ -23,6 +23,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -36,6 +37,7 @@ import net.pettip.util.getMethodName
 import java.io.File
 
 open class NaverMapComponentActivity : GPSComponentActivity() {
+
     private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
     private val application = GPSApplication.instance
@@ -43,7 +45,6 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
     private val fusedLocationSource: FusedLocationSource by lazy {
         FusedLocationSource(this, NAVERMAP_PERMISSION_REQUEST_CODE)
     }
-
     protected open fun setContent() {
         setContent {
             APPTheme {
@@ -100,4 +101,5 @@ open class NaverMapComponentActivity : GPSComponentActivity() {
         super.onCamera(file, uri)
         setContent()
     }
+
 }

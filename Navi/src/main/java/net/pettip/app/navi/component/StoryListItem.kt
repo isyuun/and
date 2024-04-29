@@ -1,11 +1,16 @@
 package net.pettip.app.navi.component
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +19,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
@@ -31,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -70,13 +79,26 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
         endY = sizeImage.height.toFloat()
     )
 
+    val mutableInteractionSource = remember {
+        MutableInteractionSource()
+    }
+    val pressed = mutableInteractionSource.collectIsPressedAsState()
+
+    val scale = animateFloatAsState(
+        targetValue = if (pressed.value){
+            1.2f
+        }else{
+            1.0f
+        }, label = ""
+    )
+
     Box(
         modifier = Modifier
             .size(width = 200.dp, height = 280.dp)
             .clip(shape = RoundedCornerShape(20.dp))
             .onGloballyPositioned { sizeImage = it.size }
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
+                interactionSource = mutableInteractionSource,
                 indication = rememberRipple(bounded = false),
                 enabled = data.bldYn != "Y"
             ) {
@@ -102,7 +124,13 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
         )
         Image(
             painter = painter,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    this.scaleX = scale.value
+                    this.scaleY = scale.value
+                }
+            ,
             contentDescription = "",
             contentScale = ContentScale.Crop
         )
@@ -110,6 +138,45 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
         Box(modifier = Modifier
             .matchParentSize()
             .background(gradient))
+
+        Row (
+            modifier = Modifier
+                .padding(top = 16.dp, end = 8.dp)
+                .fillMaxWidth()
+                .align(Alignment.TopCenter),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ){
+
+            Icon(painter = painterResource(id = R.drawable.icon_like), contentDescription = "", tint = Color.Unspecified)
+
+            Text(
+                text = data.rcmdtnCnt,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                fontSize = 12.sp,
+                letterSpacing = (-0.6).sp,
+                color = design_white,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+
+            Spacer(modifier = Modifier.padding(start = 16.dp))
+
+            Icon(painter = painterResource(id = R.drawable.icon_comment), contentDescription = "", tint = Color.Unspecified)
+
+            Text(
+                text = data.cmntCnt,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                fontSize = 12.sp,
+                letterSpacing = (-0.6).sp,
+                color = design_white,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+
+        }
 
         Column (modifier= Modifier
             .padding(horizontal = 8.dp)
@@ -141,38 +208,28 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
 
             Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
-            Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
-
-                Icon(painter = painterResource(id = R.drawable.icon_like), contentDescription = "", tint = Color.Unspecified)
-
-                Text(
-                    text = data.rcmdtnCnt,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.6).sp,
-                    color = design_white,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-
-                Spacer(modifier = Modifier.padding(start = 16.dp))
-
-                Icon(painter = painterResource(id = R.drawable.icon_comment), contentDescription = "", tint = Color.Unspecified)
-
-                Text(
-                    text = data.cmntCnt,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.6).sp,
-                    color = design_white,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-
+            LazyRow(
+                modifier = Modifier,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                userScrollEnabled = false
+            ){
+                items(data.schSeNmList?: emptyList()){ item ->
+                    Box(
+                        modifier = Modifier
+                            .border(width = 1.dp, color = design_white, shape = RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = item?.cdNm?:"",
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 12.sp, letterSpacing = (-0.6).sp,
+                            lineHeight = 12.sp,
+                            color = design_white,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
             }
-
         }
     }
 

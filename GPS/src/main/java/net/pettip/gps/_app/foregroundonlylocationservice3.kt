@@ -12,6 +12,7 @@ package net.pettip.gps._app
 
 /**import net.pettip.util.__CLASSNAME__*/
 import android.content.Intent
+import android.location.Location
 import com.google.android.gms.location.LocationResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

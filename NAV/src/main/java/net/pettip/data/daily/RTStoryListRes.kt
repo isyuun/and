@@ -26,5 +26,7 @@ data class RTStoryData(
     @SerializedName("schUnqNo")
     var schUnqNo: Int, // 173
     @SerializedName("storyFile")
-    var storyFile: String? //
+    var storyFile: String?, //
+    @SerializedName("schSeNmList")
+    var schSeNmList: List<SchSeNm>?, //
 )

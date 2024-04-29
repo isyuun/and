@@ -41,4 +41,6 @@ object G {
 
     var viewPage by mutableStateOf<String?>(null)
     var viewPageRefresh by mutableStateOf<Boolean>(false)
+
+    var showCameraX by mutableStateOf<Boolean>(false)
 }

@@ -26,6 +26,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.expandVertically
@@ -142,6 +143,7 @@ import net.pettip.gps._app.GPS_CAMERA_ZOOM_ZERO
 import net.pettip.gps._app.GPS_LATITUDE_ZERO
 import net.pettip.gps._app.GPS_LONGITUDE_ZERO
 import net.pettip.gps._app.NotificationActivity
+import net.pettip.gps.app.CameraContent
 import net.pettip.gps.app.GPSApplication
 import net.pettip.gpx.TRACK_ZERO_URI
 import net.pettip.gpx.Track
@@ -1019,9 +1021,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val mapView = rememberMapViewWithLifecycle(context, mapOptions)
 
     var refresh by remember { mutableStateOf(true) }
+    var showCameraPreview by remember{ mutableStateOf(false) }
 
     val markers = remember { mutableListOf<Marker>() }
     val registeredTracks by remember { mutableStateOf<MutableList<Track>>(mutableListOf()) }
+    var lastPosition by remember{ mutableStateOf<LatLng?>(null) }
 
     //if (start) {
     //    val size = markers.size
@@ -1033,13 +1037,26 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     //    if (markers.size != size) refresh = !refresh
     //}
 
+    BackHandler (
+        enabled = G.showCameraX
+    ){
+        if (showCameraPreview){
+            showCameraPreview = false
+        }
+    }
+
     val scope = rememberCoroutineScope()
     Log.w(__CLASSNAME__, "${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
     LaunchedEffect(refresh, position) {
+
+        val isPositionChange = lastPosition != position
+        if (isPositionChange){
+            Log.d("POS",position.toString())
+        }
         scope.launch {
             mapView.getMapAsync { naverMap ->
                 Log.v(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
-                if (start&&refresh) {
+                if (start&&(refresh || isPositionChange)) {
                     tracks?.let {
                         naverMapPath(
                             context = context,
@@ -1048,17 +1065,14 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             finished = false,
                             registeredTrack = registeredTracks,
                             updateTrack = {newValue ->
-                                Log.d("REGTRACK", "before" + registeredTracks.size.toString())
                                 registeredTracks.add(newValue)
-                                Log.d("REGTRACK", "after" + registeredTracks.size.toString())
                                           },
                             deleteTrack = {newValue ->
                                 val indexToRemove = registeredTracks.indexOfLast { it -> it == newValue }
-                                Log.d("REGTRACK", "before" + registeredTracks.size.toString())
                                 registeredTracks.removeAt(indexToRemove)
-                                Log.d("REGTRACK", "after" + registeredTracks.size.toString())
                             }
                         )
+                        lastPosition = position
                         refresh = false
                     }
                 }
@@ -1072,7 +1086,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 
     LaunchedEffect(key1 = loading){
         if (loading){
-            delay(10000)
+            delay(20000)
             application.stop()
             loading = false
         }
@@ -1101,6 +1115,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     var isGpsUnavailable by remember { mutableStateOf(false) }
     val notificationPeriod = TimeUnit.MINUTES.toMillis(20)
     var lastGpsCheckTime by remember{ mutableLongStateOf(System.currentTimeMillis()) }
+
+
 
     fun createGPSNotification() {
         val channelId = "GPS_NOTIFICATION_CHANNEL"
@@ -1285,7 +1301,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 onClick = withClick {
                     Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
-                    application.camera()
+                    //application.camera()
+                    G.showCameraX= true
+                    showCameraPreview = true
                 },
                 back = Color.White,
                 shape = RectangleShape,
@@ -1481,6 +1499,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
             }
         }
     }
+
+
 
     /** BOTTOM */
     Log.i(__CLASSNAME__, "::NaverMapApp@Box::BOTTOM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
@@ -1684,6 +1704,13 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     Log.v(__CLASSNAME__, "${getMethodName()}[ED][start:$start][${tracks?.size}][loading:$loading][tracks?.isNotEmpty():${(tracks?.isNotEmpty())}]")
     /** VERSION */
     Version(context, vertical)
+
+    if (showCameraPreview){
+        CameraContent(
+            onExit = {newValue -> showCameraPreview = newValue},
+            onRefresh = {newValue -> refresh = newValue}
+        )
+    }
 }
 
 @Composable

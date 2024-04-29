@@ -44,6 +44,7 @@ import net.pettip.data.daily.CmntRcmdtnReq
 import net.pettip.data.daily.CmntUpdateReq
 import net.pettip.data.daily.DailyCreateReq
 import net.pettip.data.daily.DailyCreateRes
+import net.pettip.data.daily.DailyDetailData
 import net.pettip.data.daily.DailyDetailRes
 import net.pettip.data.daily.DailyLifeFile
 import net.pettip.data.daily.DailyLifePet
@@ -244,9 +245,9 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
     var state by mutableStateOf(MainScreenState())
         private set
 
-    private val _schList = MutableStateFlow<List<CommonData>>(emptyList())
-    val schList: StateFlow<List<CommonData>> = _schList.asStateFlow()
-    fun updateSchList(newValue: List<CommonData>) {
+    private val _schList = MutableStateFlow<List<CommonData>?>(null)
+    val schList: StateFlow<List<CommonData>?> = _schList.asStateFlow()
+    fun updateSchList(newValue: List<CommonData>?) {
         _schList.value = newValue
     }
 
@@ -358,10 +359,16 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         _orderType.value = newValue
     }
 
-    private val _viewType = MutableStateFlow<String>("전체")
+    private val _viewType = MutableStateFlow<String>("전체 스토리")
     val viewType: StateFlow<String> = _viewType.asStateFlow()
     fun updateViewType(newValue: String) {
         _viewType.value = newValue
+    }
+
+    private val _categoryType = MutableStateFlow<String>("전체")
+    val categoryType: StateFlow<String> = _categoryType.asStateFlow()
+    fun updateCategoryType(newValue: String) {
+        _categoryType.value = newValue
     }
     // ----------------- 게시판 ------------------------
 
@@ -767,9 +774,19 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
         val apiService = RetrofitClientServer.instance
 
         val order = if (_orderType.value == "최신순") "001" else "002"
-        val view = if (_viewType.value == "전체") "001" else "002"
+        val view = if (_viewType.value == "전체 스토리") "001" else "002"
+        val category = when(_categoryType.value){
+            "전체" -> null
+            "산책" -> "001"
+            "일상" -> "002"
+            "여행" -> "003"
+            "미용" -> "004"
+            "쇼핑" -> "005"
+            "병원" -> "006"
+            else -> null
+        }
 
-        val data = StoryReq(orderType = order,page = page, pageSize = 10, recordSize = 20, viewType = view)
+        val data = StoryReq(orderType = order,page = page, pageSize = 10, recordSize = 20, viewType = view, schSeCd = category)
 
         val call = apiService.getStoryList(data)
         return suspendCancellableCoroutine { continuation ->
@@ -811,9 +828,9 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful) {
                         val body = response.body()
                         body?.let {
-                            if (body.statusCode == 200) {
+                            if (it.statusCode == 200) {
                                 _storyDetail.value = it
-                                _cmntList.value = body.data.cmntList
+                                _cmntList.value = it.data?.cmntList
                                 _storyLoading.value = false
 
                                 continuation.resume(true)
@@ -1078,6 +1095,9 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
+                            val newData = _storyDetail.value?.data?.copy(cmntCnt = it.data?.size)
+                            _storyDetail.value = _storyDetail.value?.copy(data=newData)
+
                             _cmntList.value = it.data
                             continuation.resume(true)
                         }
@@ -1111,6 +1131,9 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                     if (response.isSuccessful){
                         val body = response.body()
                         body?.let {
+                            val newData = _storyDetail.value?.data?.copy(cmntCnt = it.data?.size)
+                            _storyDetail.value = _storyDetail.value?.copy(data=newData)
+
                             _cmntList.value = it.data
                             continuation.resume(true)
                         }
@@ -1310,6 +1333,9 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
                         val body = response.body()
                         body?.let { it ->
                             if (it.statusCode == 200){
+                                val newData = _storyDetail.value?.data?.copy(cmntCnt = it.data?.size)
+                                _storyDetail.value = _storyDetail.value?.copy(data=newData)
+
                                 _cmntList.value = it.data
                                 continuation.resume(true)
                             }else{
@@ -1827,5 +1853,14 @@ class CommunityViewModel(private val sharedViewModel: SharedViewModel) :ViewMode
             addAll(newFiles)
         }
         _uploadedFileList.value = combinedList
+    }
+
+    fun updateList(schUnqNo: Int,cmntCnt: String, rcmdtnCnt:String){
+        _storyList.value.find { it.schUnqNo == schUnqNo }?.apply {
+            this.cmntCnt = cmntCnt
+            this.rcmdtnCnt = rcmdtnCnt
+
+            Log.d("UPDATELIST2","update")
+        }
     }
 }

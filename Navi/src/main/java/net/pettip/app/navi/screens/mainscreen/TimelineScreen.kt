@@ -143,6 +143,7 @@ fun TimelineScreen(
     val dailyLifeTimeLineList by viewModel.dailyLifeTimeLineList.collectAsState()
     val walkUpload by sharedViewModel.walkUpload.collectAsState()
 
+    val tempWalkInfo = MySharedPreference.getTempWalkTF()
 
     var isLoading by rememberSaveable { mutableStateOf(false) }
     var typeChange by rememberSaveable{ mutableStateOf(false) }
@@ -151,6 +152,14 @@ fun TimelineScreen(
 
     var previousSortType: String? by remember { mutableStateOf(null) }
     var previousSelectedPet: MutableList<PetDetailData>? by remember { mutableStateOf(null) }
+
+    //LaunchedEffect(Unit){
+    //    if (tempWalkInfo == null){
+    //        Log.d("TEMPWALK", "temp null")
+    //    }else{
+    //        Log.d("TEMPWALK", "temp not null")
+    //    }
+    //}
 
     LaunchedEffect(key1= walkUpload){
         if (walkUpload){
@@ -277,6 +286,34 @@ fun TimelineScreen(
                         contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp),
                         verticalArrangement = Arrangement.spacedBy(40.dp)
                     ){
+                        //if (tempWalkInfo){
+                        //    item {
+                        //        Column(
+                        //            modifier = Modifier
+                        //                .fillMaxWidth()
+                        //                .height(80.dp)
+                        //                .padding(top = 40.dp, start = 40.dp, end = 20.dp)
+                        //                .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(12.dp))
+                        //                .border(width = 1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer, shape = RoundedCornerShape(12.dp))
+                        //                .clip(shape = RoundedCornerShape(12.dp))
+                        //                .clickable {
+                        //                           navController.navigate(Screen.TempPostScreen.route)
+                        //                },
+                        //            horizontalAlignment = Alignment.CenterHorizontally,
+                        //            verticalArrangement = Arrangement.Center
+                        //        ) {
+                        //            Text(
+                        //                text = "작성 중인 일지가 있습니다. 계속 작성하시겠어요?",
+                        //                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                        //                fontSize = 14.sp, letterSpacing = (-0.7).sp, lineHeight = 18.sp,
+                        //                color = MaterialTheme.colorScheme.onPrimary,
+                        //                maxLines = 2,
+                        //                overflow = TextOverflow.Ellipsis
+                        //            )
+                        //        }
+                        //    }
+                        //}
+
                         for ((dateKey, itemList) in dailyLifeTimeLineList) {
                             item {
                                 DateItem(viewModel = viewModel, dateKey = dateKey, dailyLifeTimeLineList = itemList, navController = navController)

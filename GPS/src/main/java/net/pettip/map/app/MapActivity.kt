@@ -38,4 +38,5 @@ open class MapActivity : NaverMapComponentActivity() {
         super.onPause()
         Log.d("LOG","pause")
     }
+
 }

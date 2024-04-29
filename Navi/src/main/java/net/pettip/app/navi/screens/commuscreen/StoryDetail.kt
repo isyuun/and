@@ -214,6 +214,17 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
         }
     }
 
+    LaunchedEffect(key1 = storyDetail?.data?.rcmdtnCnt, key2 = storyDetail?.data?.cmntCnt){
+        Log.d("UPDATELIST1",story.toString())
+        story?.let {
+            viewModel.updateList(
+                schUnqNo = it.schUnqNo ?: 0,
+                cmntCnt = (it.cmntCnt ?: 0).toString(),
+                rcmdtnCnt = (it.rcmdtnCnt ?: 0).toString()
+            )
+        }
+    }
+
     LaunchedEffect(Unit){
         delay(400)
         cmntExpanded = true
@@ -250,6 +261,15 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
 
     DisposableEffect(Unit){
         onDispose {
+            Log.d("UPDATELIST",story.toString())
+            story?.let {
+                viewModel.updateList(
+                    schUnqNo = it.schUnqNo ?: 0,
+                    cmntCnt = it.cmntCnt.toString(),
+                    rcmdtnCnt = it.rcmdtnCnt.toString()
+                )
+            }
+
             viewModel.updateStoryDetail(null)
             viewModel.updateCmntList(null)
             viewModel.updateComment("")
@@ -1348,7 +1368,7 @@ fun CommentListItem(
                                 )
 
                                 Text(
-                                    text = comment.lastStrgDt,
+                                    text = comment.lastStrgDt ?:"",
                                     fontSize = 10.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
@@ -1358,7 +1378,7 @@ fun CommentListItem(
                             }
 
                             Text(
-                                text = comment.cmntCn,
+                                text = comment.cmntCn ?: "",
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp,
@@ -1380,7 +1400,7 @@ fun CommentListItem(
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     TextField(
-                        value = updateComment,
+                        value = updateComment ?: "",
                         onValueChange = { updateComment = it},
                         textStyle = TextStyle(
                             color = MaterialTheme.colorScheme.onPrimary,
@@ -1401,7 +1421,7 @@ fun CommentListItem(
                             onDone = {
                                 viewModel.viewModelScope.launch {
                                     updateLoading = true
-                                    val result = viewModel.updateComment(updateComment, comment.cmntNo)
+                                    val result = viewModel.updateComment(updateComment ?: "", comment.cmntNo ?: 0)
                                     if (result) {
                                         updateComment = ""
                                         updateLoading = false
@@ -1456,7 +1476,7 @@ fun CommentListItem(
                                 onClick = {
                                     viewModel.viewModelScope.launch {
                                         updateLoading = true
-                                        val result = viewModel.updateComment(updateComment, comment.cmntNo)
+                                        val result = viewModel.updateComment(updateComment ?: "", comment.cmntNo ?: 0)
                                         if (result) {
                                             updateComment = ""
                                             updateLoading = false
@@ -1497,7 +1517,7 @@ fun CommentListItem(
 
     LaunchedEffect(key1 = commentDelete){
         if (commentDelete){
-            val result = viewModel.deleteComment(comment.cmntNo)
+            val result = viewModel.deleteComment(comment.cmntNo ?: 0)
             if (!result){
                 Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
             }
@@ -1536,7 +1556,7 @@ fun CommentListItem(
                         )
 
                         Text(
-                            text = comment.lastStrgDt,
+                            text = comment.lastStrgDt  ?: "",
                             fontSize = 10.sp,
                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                             letterSpacing = (-0.7).sp,
@@ -1568,7 +1588,7 @@ fun CommentListItem(
                                                     onClick = {
                                                         viewModel.viewModelScope.launch {
                                                             rcmdtnLoading = true
-                                                            val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo, rcmdtnSeCd = "001", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
+                                                            val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo ?: 0, rcmdtnSeCd = "001", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
                                                             if (result) {
                                                                 rcmdtnLoading = false
                                                             } else {
@@ -1648,11 +1668,11 @@ fun CommentListItem(
                                             fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                             fontSize = 12.sp, letterSpacing = (-0.6).sp,
                                             color = MaterialTheme.colorScheme.secondary,
-                                            textDecoration = if (comment.delYn == "Y" || comment.bldYn == "Y") TextDecoration.LineThrough else TextDecoration.None,
+                                            textDecoration = if (comment.bldYn == "Y") TextDecoration.LineThrough else TextDecoration.None,
                                             modifier = Modifier
                                                 .padding(start = 12.dp)
                                                 .clickable(
-                                                    enabled = comment.delYn == "N" && comment.bldYn == "N"
+                                                    enabled = comment.bldYn == "N"
                                                 ) { deleteDialog = true }
                                         )
                                     }
@@ -1671,7 +1691,7 @@ fun CommentListItem(
                                                         onClick = {
                                                             viewModel.viewModelScope.launch {
                                                                 rcmdtnLoading = true
-                                                                val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo, rcmdtnSeCd = "002", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
+                                                                val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo ?: 0, rcmdtnSeCd = "002", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
                                                                 if (result) {
                                                                     rcmdtnLoading = true
                                                                 } else {
@@ -1747,7 +1767,7 @@ fun CommentListItem(
 
 
                 Text(
-                    text = comment.cmntCn,
+                    text = comment.cmntCn ?: "",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
@@ -1815,7 +1835,7 @@ fun CommentListItem2(
 
     LaunchedEffect(key1 = commentDelete){
         if (commentDelete){
-            val result = viewModel.deleteComment(comment.cmntNo)
+            val result = viewModel.deleteComment(comment.cmntNo  ?: 0)
             if (!result){
                 Toast.makeText(context, R.string.retry, Toast.LENGTH_SHORT).show()
             }
@@ -1909,7 +1929,7 @@ fun CommentListItem2(
                                 )
 
                                 Text(
-                                    text = comment.lastStrgDt,
+                                    text = comment.lastStrgDt ?: "",
                                     fontSize = 10.sp,
                                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                     letterSpacing = (-0.7).sp,
@@ -1919,7 +1939,7 @@ fun CommentListItem2(
                             }
 
                             Text(
-                                text = comment.cmntCn,
+                                text = comment.cmntCn  ?: "",
                                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp,
@@ -1941,7 +1961,7 @@ fun CommentListItem2(
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     TextField(
-                        value = updateComment,
+                        value = updateComment ?: "",
                         onValueChange = { updateComment = it},
                         textStyle = TextStyle(
                             color = MaterialTheme.colorScheme.onPrimary,
@@ -1997,7 +2017,7 @@ fun CommentListItem2(
                                 onClick = {
                                     viewModel.viewModelScope.launch {
                                         updateLoading = true
-                                        val result = viewModel.updateComment(updateComment, comment.cmntNo)
+                                        val result = viewModel.updateComment(updateComment ?: "", comment.cmntNo ?: 0)
                                         if (result) {
                                             updateComment = ""
                                             updateLoading = false
@@ -2064,7 +2084,7 @@ fun CommentListItem2(
                     )
 
                     Text(
-                        text = comment.lastStrgDt,
+                        text = comment.lastStrgDt ?: "",
                         fontSize = 10.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                         letterSpacing = (-0.7).sp,
@@ -2095,7 +2115,7 @@ fun CommentListItem2(
                                             onClick = {
                                                 viewModel.viewModelScope.launch {
                                                     rcmdtnLoading = true
-                                                    val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo, rcmdtnSeCd = "001", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
+                                                    val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo ?: 0, rcmdtnSeCd = "001", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
                                                     if (result) {
                                                         rcmdtnLoading = true
                                                     } else {
@@ -2171,7 +2191,7 @@ fun CommentListItem2(
                                                     onClick = {
                                                         viewModel.viewModelScope.launch {
                                                             rcmdtnLoading = true
-                                                            val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo, rcmdtnSeCd = "002", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
+                                                            val result = viewModel.rcmdtnComment(cmntNo = comment.cmntNo ?: 0, rcmdtnSeCd = "002", schUnqNo = storyDetail?.data?.schUnqNo ?: 0)
                                                             if (result) {
                                                                 rcmdtnLoading = true
                                                             } else {
@@ -2246,7 +2266,7 @@ fun CommentListItem2(
 
 
             Text(
-                text = comment.cmntCn,
+                text = comment.cmntCn ?: "",
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp,
                 letterSpacing = (-0.7).sp,

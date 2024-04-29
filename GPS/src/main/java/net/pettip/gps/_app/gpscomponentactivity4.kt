@@ -110,14 +110,14 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
     override fun onStop() {
         Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][file:$file][uri:$uri]")
         /*if (camera) unregister() else */
-        register()
+        //register()
         super.onStop()
     }
 
     override fun onStart() {
         Log.v(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][file:$file][uri:$uri]")
-        unregister()
-        camera = false
+        //unregister()
+        //camera = false
         super.onStart()
     }
 

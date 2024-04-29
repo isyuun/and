@@ -1,5 +1,6 @@
 package net.pettip.app.navi.viewmodel
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.pettip.data.RefreshRes
 import net.pettip.data.RefreshToken
+import net.pettip.data.bbs.File
 import net.pettip.data.cmm.commonRes
 import net.pettip.data.daily.WeekData
 import net.pettip.data.daily.WeekRecordReq
@@ -156,6 +158,33 @@ class SharedViewModel:ViewModel(){
         } catch (e: Exception) {
             null // 파싱에 실패하면 null 반환 또는 에러 처리
         }
+    }
+
+    fun deleteTempFilesStartingWithName(prefix:String = "pt_temp_image",context: Context) {
+        // "pt_temp_image" , "pt_walk_image"
+        val directory = context.cacheDir
+
+        val files = directory.listFiles { file ->
+            file.isFile && file.name.startsWith(prefix)
+        }
+
+        files?.forEach { file ->
+            if (file.exists()) {
+                val deleted = file.delete()
+                if (!deleted) {
+                    // 파일 삭제에 실패한 경우에 대한 처리 (예: 로깅)
+                    println("파일 삭제 실패: ${file.absolutePath}")
+                }else{
+                    Log.d("DEL","delete")
+                }
+            }
+        }
+    }
+
+    fun setTempWalkDelete(context: Context){
+        MySharedPreference.setTempWalkTF(false)
+        MySharedPreference.setTempWalkInfo(null)
+        deleteTempFilesStartingWithName(prefix = "pt_walk_image", context = context)
     }
 
     fun changeBirth(birth: String): String {

@@ -12,5 +12,7 @@ data class StoryReq(
     @SerializedName("recordSize")
     var recordSize: Int, // 200
     @SerializedName("viewType")
-    var viewType: String // 200
+    var viewType: String, // 200
+    @SerializedName("schSeCd")
+    var schSeCd: String? // 200
 )

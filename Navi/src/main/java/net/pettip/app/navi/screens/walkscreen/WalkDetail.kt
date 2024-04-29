@@ -617,7 +617,7 @@ fun DetailLazyColItem(dailyDetail: DailyLifePet) {
             CircleImageTopBar(size = 50, imageUri = dailyDetail.petImg)
 
             Text(
-                text = dailyDetail.petNm,
+                text = dailyDetail.petNm ?: "",
                 fontFamily = FontFamily(Font(R.font.pretendard_medium)),
                 fontSize = 16.sp,
                 letterSpacing = (-0.8).sp,

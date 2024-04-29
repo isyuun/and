@@ -141,8 +141,8 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
     val selectedCategory by viewModel.selectCategory.collectAsState()
     val petList by sharedViewModel.currentPetInfo.collectAsState()
     val schList by viewModel.schList.collectAsState()
-    val cdDetailList = if (schList.isNotEmpty()){
-        schList[0].cdDetailList.toMutableList().filter { it.cdId != "001" }
+    val cdDetailList = if (!schList.isNullOrEmpty()){
+        schList?.get(0)?.cdDetailList?.toMutableList()?.filter { it.cdId != "001" }
     }else{
         emptyList<CdDetail>().toMutableList()
     }
@@ -189,8 +189,9 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
 
     LaunchedEffect(key1 = state.listOfSelectedImages) {
         if (state.listOfSelectedImages.size > 6) {
-            alertMsg = "사진은 5장까지만 등록이 가능해요\n확인해주세요"
-            alertShow = true
+            //alertMsg = "사진은 5장까지만 등록이 가능해요\n확인해주세요"
+            //alertShow = true
+            snackState.showSnackbar("사진은 최대 5장까지만 등록이 가능해요")
         }
     }
 
@@ -309,7 +310,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                 contentPadding = PaddingValues(start = 20.dp, end = 20.dp)
             ) {
                 itemsIndexed(state.listOfSelectedImages) { index, uri ->
-                    if (index < state.listOfSelectedImages.size - 1 && index < 5) {
+                    if (index < state.listOfSelectedImages.size - 1) {
                         PhotoItem(
                             uri = uri,
                             index = index,
@@ -320,7 +321,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                 }
                             }
                         )
-                    } else if (index == state.listOfSelectedImages.size - 1 && index < 5) {
+                    } else if (index == state.listOfSelectedImages.size - 1) {
                         PlusBox(galleryLauncher)
                     }
                 }
@@ -338,7 +339,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
             )
 
             AnimatedVisibility(
-                visible = cdDetailList.isNotEmpty(),
+                visible = !cdDetailList.isNullOrEmpty(),
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
@@ -347,7 +348,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     contentPadding = PaddingValues(start = 20.dp, end = 20.dp)
                 ) {
-                    items(cdDetailList){ item ->
+                    items(cdDetailList?: emptyList()){ item ->
                         CategoryBox(viewModel = viewModel, item = item)
                     }
                 }
@@ -696,6 +697,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                             withDismissAction = false
                                         )
                                     }
+                                    sharedViewModel.deleteTempFilesStartingWithName(context = context)
                                 }
                             }
                         }else{
@@ -758,6 +760,11 @@ fun PhotoItem(uri: Uri, index: Int, onClick: () -> Unit, changeMainImage:()->Uni
             modifier = Modifier
                 .size(100.dp)
                 .clip(shape = RoundedCornerShape(12.dp))
+                .border(
+                    width = 2.dp,
+                    color = if (index<5) design_intro_bg else MaterialTheme.colorScheme.outline,
+                    shape = RoundedCornerShape(12.dp)
+                )
                 .align(Alignment.Center)
         ) {
             AsyncImage(

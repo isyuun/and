@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import net.pettip.data.daily.UploadInfo
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.util.Log
 import java.time.LocalDate
@@ -134,5 +135,25 @@ object MySharedPreference {
         val json = sharedPreferences.getString("currentPetData", null)
         val gson = Gson()
         return gson.fromJson(json, object : TypeToken<List<CurrentPetData>>() {}.type)
+    }
+
+    fun setTempWalkInfo(newValue : UploadInfo?){
+        val gson = Gson()
+        val json = gson.toJson(newValue)
+        sharedPreferences.edit().putString("tempWalkInfo", json).apply()
+    }
+
+    fun getTempWalkInfo(): UploadInfo? {
+        val json = sharedPreferences.getString("tempWalkInfo", null)
+        val gson = Gson()
+        return gson.fromJson(json, object : TypeToken<UploadInfo?>() {}.type)
+    }
+
+    fun setTempWalkTF(newValue: Boolean) {
+        sharedPreferences.edit().putBoolean("tempWalkTF", newValue).apply()
+    }
+
+    fun getTempWalkTF(): Boolean {
+        return sharedPreferences.getBoolean("tempWalkTF", false)
     }
 }

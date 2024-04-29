@@ -9,16 +9,20 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -38,8 +42,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -57,6 +65,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -89,6 +98,7 @@ import net.pettip.data.bbs.BbsAncmntWinner
 import net.pettip.data.bbs.BbsEvnt
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
+import net.pettip.util.Log
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -172,7 +182,7 @@ fun CommuScreen(navController: NavHostController, communityViewModel: CommunityV
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel){
 
@@ -183,6 +193,8 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
     val page by viewModel.storyPage.collectAsState()
     val orderType by viewModel.orderType.collectAsState()
     val viewType by viewModel.viewType.collectAsState()
+    val categoryType by viewModel.categoryType.collectAsState()
+
     val currentTab by viewModel.currentTab.collectAsState()
 
     var isLoading by remember{ mutableStateOf(false) }
@@ -199,11 +211,13 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
 
     var oTDropDownShow by remember{ mutableStateOf(false) }
     var vTDropDownShow by remember{ mutableStateOf(false) }
+    var cTDropDownShow by remember{ mutableStateOf(false) }
 
     var typeChange by remember{ mutableStateOf(false) }
 
     val oTItems = listOf(stringResource(id = R.string.commu_latest), stringResource(id = R.string.commu_popularity))
     val vTItems = listOf(stringResource(id = R.string.commu_all), stringResource(id = R.string.commu_my))
+    val cTItems = listOf("전체","산책","일상","여행","미용","쇼핑","병원")
 
     SideEffect {
         viewModel.updateToStory(false)
@@ -254,14 +268,15 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                 viewModel.updateStoryListClear()
                 viewModel.updateStoryPage(1)
                 val result = viewModel.getStoryList(1)
+                viewModel.getSchList()
                 isLoading = false
                 isError = !result
             }
         }
     }
 
-    LaunchedEffect(key1 = lazyGridState.canScrollForward){
-        if (!lazyGridState.canScrollForward && !refreshing && currentTab=="스토리"){
+    LaunchedEffect(key1 = lazyGridState.isScrolledToTheEnd()){
+        if (lazyGridState.isScrolledToTheEnd() && !refreshing && currentTab=="스토리"){
             if (storyListRes?.data?.paginate?.existNextPage == true){
                 if (!isLoading){
                     isLoading = true
@@ -278,6 +293,24 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
         }
     }
 
+    //LaunchedEffect(key1 = lazyGridState.canScrollForward){
+    //    if (!lazyGridState.canScrollForward && !refreshing && currentTab=="스토리"){
+    //        if (storyListRes?.data?.paginate?.existNextPage == true){
+    //            if (!isLoading){
+    //                isLoading = true
+    //                val result = viewModel.getStoryList(page + 1)
+    //                isLoading = if (result){
+    //                    viewModel.updateStoryPage(page + 1)
+    //                    false
+    //                }else{
+    //                    viewModel.updateStoryPage(page - 1)
+    //                    false
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+
     LaunchedEffect(key1 = viewModel.moreStoryClick){
         if (viewModel.moreStoryClick.value != null){
             navController.navigate(Screen.StoryDetail.route)
@@ -286,111 +319,177 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
         }
     }
 
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.primary)
     ){
-        Column {
-            Box{
-                Row (
-                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp)
-                ){
+        Scaffold (
+            containerColor = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                TopAppBar(
+                    modifier = Modifier
+                        .padding(0.dp)
+                        .heightIn(min = 0.dp, max = 45.dp),
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    scrollBehavior = scrollBehavior,
+                    title = {
+                        Box{
+                            Row (
+                                modifier = Modifier
+                            ){
 
-                    Row(verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { oTDropDownShow = true }
-                    ){
-                        Text(
-                            text = orderType,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 14.sp,
-                            letterSpacing = (-0.7).sp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.padding(start = 20.dp))
-
-                    Row (
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { vTDropDownShow = true }
-                    ){
-                        Text(
-                            text = viewType,
-                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                            fontSize = 14.sp,
-                            letterSpacing = (-0.7).sp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                }
-
-                DropdownMenu(
-                    expanded = oTDropDownShow,
-                    onDismissRequest = { oTDropDownShow = false },
-                    offset = DpOffset(x = 10.dp, y = 5.dp)
-                ) {
-                    oTItems.forEach { s ->
-                        DropdownMenuItem(
-                            onClick = {
-                                if(s != orderType){
-                                    viewModel.updateOrderType(s)
-                                    typeChange = true
+                                Row(verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable { oTDropDownShow = true }
+                                ){
+                                    Text(
+                                        text = orderType,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 14.sp,
+                                        letterSpacing = (-0.7).sp,
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.KeyboardArrowDown,
+                                        contentDescription = "",
+                                        tint = MaterialTheme.colorScheme.onPrimary
+                                    )
                                 }
-                                oTDropDownShow = false
-                            },
-                            text = {
-                                Text(
-                                    text = s,
-                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                    color = design_login_text,
-                                    fontSize = 14.sp,letterSpacing = (-0.7).sp
-                                )
-                            },
-                            contentPadding = PaddingValues(start = 10.dp)
-                        )
-                    }
-                }
 
-                DropdownMenu(
-                    expanded = vTDropDownShow,
-                    onDismissRequest = { vTDropDownShow = false },
-                    offset = DpOffset(x = 90.dp, y = 5.dp)
-                ) {
-                    vTItems.forEach { s ->
-                        DropdownMenuItem(
-                            onClick = {
-                                if(s != viewType){
-                                    viewModel.updateViewType(s)
-                                    typeChange = true
+                                Spacer(modifier = Modifier.padding(start = 20.dp))
+
+                                Row (
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable { cTDropDownShow = true }
+                                ){
+                                    Text(
+                                        text = categoryType,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 14.sp,
+                                        letterSpacing = (-0.7).sp,
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.KeyboardArrowDown,
+                                        contentDescription = "",
+                                        tint = MaterialTheme.colorScheme.onPrimary
+                                    )
                                 }
-                                vTDropDownShow = false
-                            },
-                            text = {
-                                Text(
-                                    text = s,
-                                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                                    color = design_login_text,
-                                    fontSize = 14.sp,letterSpacing = (-0.7).sp
-                                )
-                            },
-                            contentPadding = PaddingValues(start = 10.dp)
-                        )
+
+                                Spacer(modifier = Modifier.padding(start = 20.dp))
+
+                                Row (
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable { vTDropDownShow = true }
+                                ){
+                                    Text(
+                                        text = viewType,
+                                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                        fontSize = 14.sp,
+                                        letterSpacing = (-0.7).sp,
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.KeyboardArrowDown,
+                                        contentDescription = "",
+                                        tint = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                            }
+
+                            DropdownMenu(
+                                expanded = oTDropDownShow,
+                                onDismissRequest = { oTDropDownShow = false },
+                                offset = DpOffset(x = 0.dp, y = 5.dp)
+                            ) {
+                                oTItems.forEach { s ->
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            if(s != orderType){
+                                                viewModel.updateOrderType(s)
+                                                typeChange = true
+                                            }
+                                            oTDropDownShow = false
+                                        },
+                                        text = {
+                                            Text(
+                                                text = s,
+                                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                                color = design_login_text,
+                                                fontSize = 14.sp,letterSpacing = (-0.7).sp
+                                            )
+                                        },
+                                        contentPadding = PaddingValues(start = 10.dp)
+                                    )
+                                }
+                            }
+
+                            DropdownMenu(
+                                expanded = cTDropDownShow,
+                                onDismissRequest = { cTDropDownShow = false },
+                                offset = DpOffset(x = 70.dp, y = 5.dp)
+                            ) {
+                                cTItems.forEach { s ->
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            if(s != categoryType){
+                                                viewModel.updateCategoryType(s)
+                                                typeChange = true
+                                            }
+                                            cTDropDownShow = false
+                                        },
+                                        text = {
+                                            Text(
+                                                text = s,
+                                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                                color = design_login_text,
+                                                fontSize = 14.sp,letterSpacing = (-0.7).sp
+                                            )
+                                        },
+                                        contentPadding = PaddingValues(start = 10.dp)
+                                    )
+                                }
+                            }
+
+                            DropdownMenu(
+                                expanded = vTDropDownShow,
+                                onDismissRequest = { vTDropDownShow = false },
+                                offset = DpOffset(x = 140.dp, y = 5.dp)
+                            ) {
+                                vTItems.forEach { s ->
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            if(s != viewType){
+                                                viewModel.updateViewType(s)
+                                                typeChange = true
+                                            }
+                                            vTDropDownShow = false
+                                        },
+                                        text = {
+                                            Text(
+                                                text = s,
+                                                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                                                color = design_login_text,
+                                                fontSize = 14.sp,letterSpacing = (-0.7).sp
+                                            )
+                                        },
+                                        contentPadding = PaddingValues(start = 10.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
-                }
+                )
             }
-
-            Box{
+        ){
+            Box(
+                modifier = Modifier.padding(paddingValues = it)
+            ){
                 if (isLoading && storyList.isEmpty()){
                     Box(modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -402,7 +501,7 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                 }else{
                     LazyVerticalGrid(
                         modifier = Modifier
-                            .padding(top = 10.dp, start = 20.dp, end = 20.dp)
+                            .padding(start = 20.dp, end = 20.dp)
                             .pullRefresh(pullRefreshState)
                             .fillMaxSize(),
                         columns = GridCells.Fixed(2),
@@ -420,9 +519,141 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                     PullRefreshIndicator(refreshing = refreshing, state = pullRefreshState)
                 }
             }
-        }// col
+        }
+        //Column {
+        //    Box{
+        //        Row (
+        //            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp)
+        //        ){
+        //
+        //            Row(verticalAlignment = Alignment.CenterVertically,
+        //                modifier = Modifier.clickable { oTDropDownShow = true }
+        //            ){
+        //                Text(
+        //                    text = orderType,
+        //                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+        //                    fontSize = 14.sp,
+        //                    letterSpacing = (-0.7).sp,
+        //                    color = MaterialTheme.colorScheme.onPrimary
+        //                )
+        //                Icon(
+        //                    imageVector = Icons.Default.KeyboardArrowDown,
+        //                    contentDescription = "",
+        //                    tint = MaterialTheme.colorScheme.onPrimary
+        //                )
+        //            }
+        //
+        //            Spacer(modifier = Modifier.padding(start = 20.dp))
+        //
+        //            Row (
+        //                verticalAlignment = Alignment.CenterVertically,
+        //                modifier = Modifier.clickable { vTDropDownShow = true }
+        //            ){
+        //                Text(
+        //                    text = viewType,
+        //                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+        //                    fontSize = 14.sp,
+        //                    letterSpacing = (-0.7).sp,
+        //                    color = MaterialTheme.colorScheme.onPrimary
+        //                )
+        //                Icon(
+        //                    imageVector = Icons.Default.KeyboardArrowDown,
+        //                    contentDescription = "",
+        //                    tint = MaterialTheme.colorScheme.onPrimary
+        //                )
+        //            }
+        //        }
+        //
+        //        DropdownMenu(
+        //            expanded = oTDropDownShow,
+        //            onDismissRequest = { oTDropDownShow = false },
+        //            offset = DpOffset(x = 10.dp, y = 5.dp)
+        //        ) {
+        //            oTItems.forEach { s ->
+        //                DropdownMenuItem(
+        //                    onClick = {
+        //                        if(s != orderType){
+        //                            viewModel.updateOrderType(s)
+        //                            typeChange = true
+        //                        }
+        //                        oTDropDownShow = false
+        //                    },
+        //                    text = {
+        //                        Text(
+        //                            text = s,
+        //                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+        //                            color = design_login_text,
+        //                            fontSize = 14.sp,letterSpacing = (-0.7).sp
+        //                        )
+        //                    },
+        //                    contentPadding = PaddingValues(start = 10.dp)
+        //                )
+        //            }
+        //        }
+        //
+        //        DropdownMenu(
+        //            expanded = vTDropDownShow,
+        //            onDismissRequest = { vTDropDownShow = false },
+        //            offset = DpOffset(x = 90.dp, y = 5.dp)
+        //        ) {
+        //            vTItems.forEach { s ->
+        //                DropdownMenuItem(
+        //                    onClick = {
+        //                        if(s != viewType){
+        //                            viewModel.updateViewType(s)
+        //                            typeChange = true
+        //                        }
+        //                        vTDropDownShow = false
+        //                    },
+        //                    text = {
+        //                        Text(
+        //                            text = s,
+        //                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+        //                            color = design_login_text,
+        //                            fontSize = 14.sp,letterSpacing = (-0.7).sp
+        //                        )
+        //                    },
+        //                    contentPadding = PaddingValues(start = 10.dp)
+        //                )
+        //            }
+        //        }
+        //    }
+        //
+        //    Box{
+        //        if (isLoading && storyList.isEmpty()){
+        //            Box(modifier = Modifier.fillMaxSize(),
+        //                contentAlignment = Alignment.Center
+        //            ){
+        //                LoadingAnimation1()
+        //            }
+        //        }else if (isError){
+        //            ErrorScreen(onClick = { viewModel.updateStoryRefresh(true) })
+        //        }else{
+        //            LazyVerticalGrid(
+        //                modifier = Modifier
+        //                    .padding(top = 10.dp, start = 20.dp, end = 20.dp)
+        //                    .pullRefresh(pullRefreshState)
+        //                    .fillMaxSize(),
+        //                columns = GridCells.Fixed(2),
+        //                state = lazyGridState,
+        //                verticalArrangement = Arrangement.spacedBy(20.dp),
+        //                horizontalArrangement = Arrangement.spacedBy(12.dp)
+        //            ) {
+        //                items(storyList?: emptyList()) { item ->
+        //                    StoryListItem(data = item, navController = navController, viewModel = viewModel)
+        //                }
+        //            }
+        //        }
+        //
+        //        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+        //            PullRefreshIndicator(refreshing = refreshing, state = pullRefreshState)
+        //        }
+        //    }
+        //}// col
     }
 }
+fun LazyListState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+fun LazyGridState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

@@ -9,6 +9,7 @@ import android.os.Bundle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,10 +36,14 @@ import net.pettip.data.daily.PhotoData
 import net.pettip.data.daily.PhotoRes
 import net.pettip.data.daily.TimeLineReq
 import net.pettip.data.daily.TimeLineRes
+import net.pettip.data.daily.UploadInfo
+import net.pettip.data.daily.UriTrack
 import net.pettip.data.daily.WalkListRes
 import net.pettip.data.daily.WeekData
 import net.pettip.data.pet.PetDetailData
 import net.pettip.gps.app.GPSApplication
+import net.pettip.gpx.Track
+import net.pettip.singleton.MySharedPreference
 import net.pettip.singleton.RetrofitClientServer
 import net.pettip.util.Log
 import okhttp3.MediaType.Companion.toMediaType
@@ -509,6 +514,117 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
         }
     }
 
+    fun setTempFile(gpxFile: File? = null, done: Boolean = false, hashString: String, tracks: MutableList<Track>?, uris: List<Uri>) {
+        val application = GPSApplication.instance
+
+        val uriToString = uris.map { uri ->
+            uri.toString()
+        }
+
+        val newTrack = application.tracks?.map {
+            UriTrack(
+                it.location, it.no, it.event
+            )
+        } as MutableList
+
+        val uploadInfo = UploadInfo(
+            file = gpxFile?.path,
+            uriList = uriToString,
+            cmntUseYn = "Y",
+            hashTag = hashString,
+            pet = _petCount.value,
+            rcmdtnYn = "Y", // 추천 여부
+            rlsYn =  if (_postStory.value) "Y" else "N", // 공개 여부
+            schCdList = _schCdList.value,
+            schTtl = _walkTitle.value,
+            schCn = _walkMemo.value.ifBlank { null },
+            totClr = 300f,
+            totDstnc = application._distance?: 0.0f,
+            totDuration = application.duration,
+            walkDptreDt = formatTimestampToCustomString(application.tracks?.first()?.time?:0),
+            walkEndDt = formatTimestampToCustomString(application.tracks?.last()?.time?:0),
+            pets = application.pets.toList(),
+            tracks = newTrack
+        )
+
+        if (done){
+            MySharedPreference.setTempWalkInfo(null)
+        }else{
+            MySharedPreference.setTempWalkInfo(uploadInfo)
+        }
+    }
+
+    suspend fun setTempWalk(context: Context, file:File?, hashString:String, tracks: MutableList<Track>?){
+        Log.d("SET","setTempWalk")
+        val uris = saveUrisToFiles(context)
+        if (uris.isNotEmpty()){
+            setTempFile(gpxFile = file, hashString = hashString, tracks = tracks, uris = uris)
+        }else{
+            setTempFile(gpxFile = file, hashString = hashString, tracks = tracks, uris = emptyList())
+        }
+        MySharedPreference.setTempWalkTF(true)
+    }
+
+    suspend fun saveUrisToFiles(context: Context): List<Uri> {
+        return withContext(Dispatchers.IO) {
+            sharedViewModel.deleteTempFilesStartingWithName("pt_walk_image",context) // 기존 이미지 삭제
+
+            val uris = state.listOfSelectedImages
+            val savedUris = mutableListOf<Uri>()
+
+            // 이미지 URI 목록에서 마지막 더미 URI를 제외하고 파일로 저장
+            if (uris.size > 1) {
+                for (i in 0 until uris.size - 1) {
+                    val uri = uris[i]
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    inputStream?.use { input ->
+                        // 내부 저장소에 임시 파일 생성
+                        val outputDir = context.cacheDir // 내부 저장소의 캐시 디렉토리 사용
+                        val outputFile = File.createTempFile("pt_walk_image", null, outputDir)
+
+                        // 파일에 데이터 복사
+                        val outputStream = FileOutputStream(outputFile)
+                        outputStream.use { output ->
+                            input.copyTo(output)
+                        }
+                        savedUris.add(outputFile.toUri())
+                    }
+                }
+            }
+            savedUris
+        }
+    }
+
+    suspend fun deleteTemporaryFiles(uris: List<Uri>) {
+        withContext(Dispatchers.IO) {
+            for (uri in uris) {
+                try {
+                    val file = File(uri.path)
+                    if (file.exists()) {
+                        Log.d("FILEDELETE","delete")
+                        file.safeDelete()
+                    }
+                } catch (e: Exception) {
+                    // 파일 삭제 중 예외 처리
+                    Log.e("DeleteTemporaryFiles", "Failed to delete file: ${uri.path}", e)
+                }
+            }
+        }
+    }
+
+    fun File.safeDelete(): Boolean {
+        return try {
+            this.delete()
+        } catch (e: SecurityException) {
+            // 파일 삭제 실패 시 예외 처리
+            false
+        }
+    }
+
+    fun getTempFile():UploadInfo?{
+        return MySharedPreference.getTempWalkInfo()
+    }
+
     suspend fun fileUpload(context: Context, gpxFile:File?): Boolean {
         val apiService = RetrofitClientServer.instance
 
@@ -580,6 +696,65 @@ class WalkViewModel(private val sharedViewModel: SharedViewModel) : ViewModel() 
             totDstnc = application._distance?: 0.0f,
             walkDptreDt = formatTimestampToCustomString(application.tracks?.first()?.time?:0),
             walkEndDt = formatTimestampToCustomString(application.tracks?.last()?.time?:0)
+        )
+
+        val call = apiService.uploadDaily(data)
+        return suspendCancellableCoroutine { continuation ->
+            call.enqueue(object : Callback<DailyCreateRes> {
+                override fun onResponse(
+                    call: Call<DailyCreateRes>,
+                    response: Response<DailyCreateRes>
+                ) {
+                    if (response.isSuccessful){
+                        val body = response.body()
+                        body?.let {
+                            if (body.statusCode ==200){
+
+                                _photoRes.value = emptyList()
+                                _petCount.value = emptyList()
+                                _hashTag.value = emptyList()
+                                _schCdList.value = emptyList()
+                                _walkTitle.value = ""
+                                _walkMemo.value = ""
+
+                                continuation.resume(true)
+                            }else{
+
+                                continuation.resume(false)
+                            }
+                        }
+                    }else{
+                        continuation.resume(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<DailyCreateRes>, t: Throwable) {
+                    continuation.resume(false)
+                }
+
+            })
+        }
+    }
+
+    suspend fun uploadDaily(walkDptreDt:String? = "", walkEndDt:String? = ""): Boolean {
+        val application = GPSApplication.instance
+
+        val apiService = RetrofitClientServer.instance
+
+        val data = DailyCreateReq(
+            cmntUseYn = "Y",// 댓글 사용 여부
+            files = _photoRes.value,
+            hashTag = _hashTag.value,
+            pet = _petCount.value,
+            rcmdtnYn = "Y", // 추천 여부
+            rlsYn =  if (_postStory.value) "Y" else "N", // 공개 여부
+            schCdList = _schCdList.value,
+            schTtl = _walkTitle.value,
+            schCn = _walkMemo.value.ifBlank { null },
+            totClr = 300f,
+            totDstnc = application._distance?: 0.0f,
+            walkDptreDt = walkDptreDt?: "",
+            walkEndDt = walkEndDt?: ""
         )
 
         val call = apiService.uploadDaily(data)
@@ -805,7 +980,7 @@ fun resizeImage(context: Context, fileUri: Uri, index: Int): File? {
 
             // 이미지 파일 저장
             val cacheDir = context.cacheDir
-            val fileName = "image${index}"
+            val fileName = "pt_temp_image${index}"
             val resizedFile = File(cacheDir, fileName)
             if (resizedFile.exists()) {
                 resizedFile.delete() // 이미 존재하는 파일 삭제

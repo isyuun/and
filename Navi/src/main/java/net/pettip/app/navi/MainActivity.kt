@@ -83,6 +83,7 @@ import net.pettip.app.navi.screens.myscreen.PetProfileScreen
 import net.pettip.app.navi.screens.myscreen.SetKeyScreen
 import net.pettip.app.navi.screens.myscreen.UserInfoScreen
 import net.pettip.app.navi.screens.walkscreen.PostScreen
+import net.pettip.app.navi.screens.walkscreen.TempPostScreen
 import net.pettip.app.navi.screens.walkscreen.WalkDetailContent
 import net.pettip.app.navi.ui.theme.AppTheme
 import net.pettip.app.navi.ui.theme.design_login_text
@@ -119,7 +120,7 @@ class MainActivity : ComponentActivity() {
 
         getTokenWithRetry()
 
-        //inAppUpdate = InAppUpdate(this)
+        //val inAppUpdate = InAppUpdate(this)
 
         val intentData: Uri? = intent.data
         if (intentData != null) {
@@ -375,6 +376,10 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
             PostScreen(walkViewModel, sharedViewModel, navController)
         }
 
+        composable("tempPostScreen") {
+            TempPostScreen(walkViewModel, sharedViewModel, navController)
+        }
+
         composable("easyRegScreen") {
             EasyRegScreen(navController = navController, viewModel = viewModel, userCreateViewModel = userCreateViewModel)
         }
@@ -562,6 +567,7 @@ sealed class Screen(val route: String) {
     object MainScreen : Screen("mainScreen")
     object WalkWithMap : Screen("walkWithMap")
     object PostScreen : Screen("postScreen")
+    object TempPostScreen : Screen("tempPostScreen")
     object EasyRegScreen : Screen("easyRegScreen")
     object StoryDetail : Screen("storyDetail")
     object EventDetail : Screen("eventDetail")

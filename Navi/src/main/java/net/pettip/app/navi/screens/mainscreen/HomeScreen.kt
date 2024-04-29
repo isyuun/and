@@ -14,6 +14,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -24,6 +25,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,6 +61,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -141,6 +145,7 @@ import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.HomeViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
+import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.RTStoryData
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.data.pet.PetDetailData
@@ -1022,12 +1027,28 @@ fun StoryItem(data: RTStoryData, navController: NavHostController, communityView
         endY = sizeImage.height.toFloat()
     )
 
+    val mutableInteractionSource = remember {
+        MutableInteractionSource()
+    }
+    val pressed = mutableInteractionSource.collectIsPressedAsState()
+
+    val scale = animateFloatAsState(
+        targetValue = if (pressed.value){
+            1.2f
+        }else{
+            1.0f
+        }, label = ""
+    )
+
     Box(
         modifier = Modifier
             .size(width = 200.dp, height = 280.dp)
             .clip(shape = RoundedCornerShape(20.dp))
             .onGloballyPositioned { sizeImage = it.size }
-            .clickable {
+            .clickable(
+                interactionSource = mutableInteractionSource,
+                indication = rememberRipple(bounded = false)
+            ) {
                 val currentTime = System.currentTimeMillis()
                 if (currentTime - lastClickTime >= 500) {
                     lastClickTime = currentTime
@@ -1046,7 +1067,13 @@ fun StoryItem(data: RTStoryData, navController: NavHostController, communityView
 
         Image(
             painter = painter,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    this.scaleX = scale.value
+                    this.scaleY = scale.value
+                }
+            ,
             contentDescription = "",
             contentScale = ContentScale.Crop
         )
@@ -1054,6 +1081,45 @@ fun StoryItem(data: RTStoryData, navController: NavHostController, communityView
         Box(modifier = Modifier
             .matchParentSize()
             .background(gradient))
+
+        Row (
+            modifier = Modifier
+                .padding(top = 16.dp, end = 8.dp)
+                .fillMaxWidth()
+                .align(Alignment.TopCenter),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ){
+
+            Icon(painter = painterResource(id = R.drawable.icon_like), contentDescription = "", tint = Color.Unspecified)
+
+            Text(
+                text = data.rcmdtnCnt,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                fontSize = 12.sp,
+                letterSpacing = (-0.6).sp,
+                color = design_white,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+
+            Spacer(modifier = Modifier.padding(start = 16.dp))
+
+            Icon(painter = painterResource(id = R.drawable.icon_comment), contentDescription = "", tint = Color.Unspecified)
+
+            Text(
+                text = data.cmntCnt,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                fontSize = 12.sp,
+                letterSpacing = (-0.6).sp,
+                color = design_white,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+
+        }
 
         Column (modifier= Modifier
             .width(160.dp)
@@ -1084,38 +1150,28 @@ fun StoryItem(data: RTStoryData, navController: NavHostController, communityView
 
             Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
-            Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
-
-                Icon(painter = painterResource(id = R.drawable.icon_like), contentDescription = "", tint = Color.Unspecified)
-
-                Text(
-                    text = data.rcmdtnCnt,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.6).sp,
-                    color = design_white,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-
-                Spacer(modifier = Modifier.padding(start = 16.dp))
-
-                Icon(painter = painterResource(id = R.drawable.icon_comment), contentDescription = "", tint = Color.Unspecified)
-
-                Text(
-                    text = data.cmntCnt,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
-                    fontSize = 12.sp,
-                    letterSpacing = (-0.6).sp,
-                    color = design_white,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-
+            LazyRow(
+                modifier = Modifier,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                userScrollEnabled = false
+            ){
+                items(data.schSeNmList?: emptyList()){ item ->
+                    Box(
+                        modifier = Modifier
+                            .border(width = 1.dp, color = design_white, shape = RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = item?.cdNm?:"",
+                            fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                            fontSize = 12.sp, letterSpacing = (-0.6).sp,
+                            lineHeight = 12.sp,
+                            color = design_white,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
             }
-
         }
     }
 

@@ -66,6 +66,8 @@ open class foregroundonlylocationservice : _foregroundonlylocationservice() {
         }.build()
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
+                Log.d("LOCATION",locationResult.lastLocation.toString())
+                Log.d("LOCATIONLIST",locationResult.locations.toString())
                 super.onLocationResult(locationResult)
                 this@foregroundonlylocationservice.onLocationResult(locationResult)
             }

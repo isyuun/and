@@ -131,8 +131,8 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
     val hashtagString = hashTagList?.joinToString(separator = " ") { "#${it.hashTagNm}" } ?: ""
 
     val schList by viewModel.schList.collectAsState()
-    val cdDetailList = if (schList.isNotEmpty()){
-        schList[0].cdDetailList.toMutableList().filter { it.cdId != "001" }
+    val cdDetailList = if (!schList.isNullOrEmpty()){
+        schList?.get(0)?.cdDetailList?.toMutableList()?.filter { it.cdId != "001" }
     }else{
         emptyList<CdDetail>().toMutableList()
     }
@@ -189,7 +189,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
         if (storyDetail?.data?.dailyLifeFileList?.isNotEmpty()==true){
 
             val atchPath = storyDetail?.data?.atchPath
-            val uriList: List<Uri>? = storyDetail!!.data.dailyLifeFileList?.map {
+            val uriList: List<Uri>? = storyDetail!!.data?.dailyLifeFileList?.map {
                 Uri.parse("$atchPath${it.filePathNm}${it.atchFileNm}")
             }
 
@@ -372,7 +372,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
             )
 
             AnimatedVisibility(
-                visible = cdDetailList.isNotEmpty(),
+                visible = !cdDetailList.isNullOrEmpty(),
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
@@ -381,7 +381,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     contentPadding = PaddingValues(start = 20.dp, end = 20.dp)
                 ) {
-                    items(cdDetailList){ item ->
+                    items(cdDetailList?: emptyList()){ item ->
                         CategoryBoxInModify(viewModel = viewModel, item = item)
                     }
                 }
@@ -716,6 +716,7 @@ fun DailyModifyScreen(viewModel: CommunityViewModel, sharedViewModel: SharedView
                                         withDismissAction = false
                                     )
                                 }
+                                sharedViewModel.deleteTempFilesStartingWithName(context = context)
                             }
                         }
                     }
@@ -748,7 +749,7 @@ fun AlreadyUploadedPetItem(viewModel: CommunityViewModel, petList : DailyLifePet
 
     val screenWidth = configuration.screenWidthDp.dp -60.dp
 
-    val petName:String = petList.petNm
+    val petName:String = petList.petNm?: ""
     val imageUri:String? = petList.petImg
 
     var isSelected by rememberSaveable { mutableStateOf(true) }

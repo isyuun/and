@@ -22,7 +22,7 @@
     <string name="commu_popularity">인기순</string>
     <string name="commu_all_story">모든 글 보기</string>
     <string name="commu_ended_event">종료된 이벤트</string>
-    <string name="commu_all">전체</string>
+    <string name="commu_all">전체 스토리</string>
     <string name="commu_my">내 스토리</string>
     <string name="dialog_regist">등록하기</string>
     <string name="dialog_later">나중에</string>

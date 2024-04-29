@@ -130,6 +130,7 @@ fun MainScreen(
     val currentPet by sharedViewModel.currentPetInfo.collectAsState()
     val currentTab by sharedViewModel.currentTab.collectAsState()
 
+    var isPosting by remember{ mutableStateOf(MySharedPreference.getTempWalkTF()) }
 
     // logoTopbar back on/off
     var backBtnOnLT by remember { mutableStateOf(false) }
@@ -505,6 +506,26 @@ fun MainScreen(
                     title = stringResource(R.string.dialog_any_pet),
                     text = stringResource(R.string.dialog_sub_regist),
                     confirmJob = {navController.navigate(Screen.AddPetScreen.route)}
+                )
+            }
+
+            val uploadInfo = MySharedPreference.getTempWalkInfo()
+
+            if (isPosting){
+                CustomAlert(
+                    onDismiss = { },
+                    confirm = "계속 작성할게요",
+                    dismiss = "그만할게요",
+                    title = "작성 중인 일지가 있습니다.",
+                    text = "계속 작성하시겠어요?",
+                    dismissJob = {
+                        isPosting = false
+                        sharedViewModel.setTempWalkDelete(context)
+                    },
+                    confirmJob = {
+                        navController.navigate(Screen.TempPostScreen.route)
+                        MySharedPreference.setTempWalkTF(false)
+                    }
                 )
             }
         }

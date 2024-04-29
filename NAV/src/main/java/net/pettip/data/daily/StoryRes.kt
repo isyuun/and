@@ -53,4 +53,15 @@ data class Story(
     var storyFile: String?, //
     @SerializedName("bldYn")
     var bldYn: String, // Y
+    @SerializedName("schSeNmList")
+    var schSeNmList: List<SchSeNm?>?,
+)
+
+data class SchSeNm(
+    @SerializedName("cdId")
+    var cdId: String?, // 002
+    @SerializedName("cdNm")
+    var cdNm: String?, // 일상
+    @SerializedName("upCdId")
+    var upCdId: String? // SCH
 )
