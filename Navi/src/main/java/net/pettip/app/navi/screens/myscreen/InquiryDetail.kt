@@ -88,13 +88,14 @@ import net.pettip.app.navi.ui.theme.design_intro_bg
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SettingViewModel
+import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.bbs.QnaDetailData
 import net.pettip.data.bbs.QnaDetailRes
 import net.pettip.data.daily.DailyDetailData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewModel, settingViewModel: SettingViewModel){
+fun InquiryDetail(navController: NavHostController, sharedViewModel: SharedViewModel,viewModel: CommunityViewModel, settingViewModel: SettingViewModel){
 
     val qnaDetail by viewModel.qnaDetail.collectAsState()
     var isModify by remember{ mutableStateOf(false) }
@@ -291,7 +292,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
                                 error= null,
                                 modifier= Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop,
-                                filterQuality = FilterQuality.Low
+                                filterQuality = FilterQuality.None
                             )
                         }
                     }
@@ -334,6 +335,7 @@ fun InquiryDetail(navController: NavHostController, viewModel: CommunityViewMode
     ) {
         ModifyInquiryScreen(
             navController = navController,
+            sharedViewModel = sharedViewModel,
             viewModel = viewModel,
             settingViewModel = settingViewModel,
             onDismiss = {newValue -> isModify = newValue}

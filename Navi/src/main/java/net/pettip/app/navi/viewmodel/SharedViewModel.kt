@@ -168,6 +168,8 @@ class SharedViewModel:ViewModel(){
             file.isFile && file.name.startsWith(prefix)
         }
 
+        Log.d("DELETE","delete method 진입")
+
         files?.forEach { file ->
             if (file.exists()) {
                 val deleted = file.delete()

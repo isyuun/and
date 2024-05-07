@@ -723,7 +723,8 @@ fun TempPostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,na
                                 var dailyUpload = viewModel.uploadDaily(uploadInfo?.walkDptreDt, uploadInfo?.walkEndDt)
                                 if (dailyUpload) {
                                     /** 성공 */
-                                    sharedViewModel.setTempWalkDelete(context)// 임시 파일 삭제
+                                    //sharedViewModel.setTempWalkDelete(context)// 임시 파일 삭제
+                                    MySharedPreference.setTempWalkTF(false)
 
                                     sharedViewModel.updateWalkUpload(true)
                                     isLoading = false
@@ -746,7 +747,8 @@ fun TempPostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,na
                                     var dailyUpload = viewModel.uploadDaily(uploadInfo?.walkDptreDt, uploadInfo?.walkEndDt)
                                     if (dailyUpload) {
                                         /** 성공 */
-                                        sharedViewModel.setTempWalkDelete(context)// 임시 파일 삭제
+                                        //sharedViewModel.setTempWalkDelete(context)// 임시 파일 삭제
+                                        MySharedPreference.setTempWalkTF(false)
 
                                         sharedViewModel.updateWalkUpload(true)
                                         viewModel.updateSelectedImageList(emptyList())
@@ -777,6 +779,7 @@ fun TempPostScreen(viewModel: WalkViewModel, sharedViewModel: SharedViewModel,na
                                         withDismissAction = false
                                     )
                                 }
+                                sharedViewModel.deleteTempFilesStartingWithName(context = context)
                             }
                         }
                     }else{

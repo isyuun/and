@@ -83,11 +83,12 @@ import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SettingViewModel
+import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.cmm.CdDetail
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingViewModel, communityViewModel: CommunityViewModel){
+fun OneNOneScreen(navController:NavHostController, sharedViewModel: SharedViewModel,settingViewModel: SettingViewModel, communityViewModel: CommunityViewModel){
 
     val inquiryKindList by settingViewModel.inquiryKindList.collectAsState()
     var expanded by remember{ mutableStateOf(false) }
@@ -413,6 +414,7 @@ fun OneNOneScreen(navController:NavHostController, settingViewModel: SettingView
                                           isLoading = false
                                       }
                                   }
+                                  sharedViewModel.deleteTempFilesStartingWithName(context = context)
                               }
 
                           }

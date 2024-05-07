@@ -938,7 +938,7 @@ fun EventItem(eventItemData: BbsEvnt, navController: NavHostController, viewMode
         ){
             val painter = rememberAsyncImagePainter(
                 model = eventItemData.rprsImgUrl?:R.drawable.img_blank,
-                filterQuality = FilterQuality.Low,
+                filterQuality = FilterQuality.None,
             )
 
             Image(
@@ -1023,7 +1023,7 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
         ){
             val painter = rememberAsyncImagePainter(
                 model = eventItemData.rprsImgUrl?:R.drawable.img_blank,
-                filterQuality = FilterQuality.Low,
+                filterQuality = FilterQuality.None,
             )
 
             Image(
@@ -1032,22 +1032,6 @@ fun EndEventItem(eventItemData: BbsAncmntWinner, navController: NavHostControlle
                 contentDescription = "",
                 contentScale = ContentScale.Crop
             )
-
-            //if (compareTimes(eventItemData.pstgEndDt?: "")){
-            //    Box(modifier = Modifier
-            //        .matchParentSize()
-            //        .background(color = design_alpha60_black),
-            //        contentAlignment = Alignment.Center
-            //    ){
-            //        Text(
-            //            text = stringResource(R.string.commu_ended_event),
-            //            fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-            //            fontSize = 16.sp,
-            //            letterSpacing = (-0.8).sp,
-            //            color = design_white
-            //        )
-            //    }
-            //}
         }
 
 

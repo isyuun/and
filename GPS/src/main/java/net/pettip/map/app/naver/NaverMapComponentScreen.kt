@@ -20,6 +20,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.view.Gravity
@@ -121,6 +122,8 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
+import com.naver.maps.map.NaverMap.OnCameraChangeListener
+import com.naver.maps.map.NaverMap.OnLocationChangeListener
 import com.naver.maps.map.NaverMapOptions
 import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
@@ -1009,11 +1012,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val mapOptions = remember {
         NaverMapOptions()
             .logoClickEnabled(true)
-            .mapType(NaverMap.MapType.Navi)
+            .mapType(NaverMap.MapType.Basic)
             .nightModeEnabled(isSystemInDarkTheme)
             .zoomControlEnabled(true)
             .compassEnabled(source.isCompassEnabled)
-            .locationButtonEnabled(true)
+            .locationButtonEnabled(false)
             .zoomGesturesEnabled(true)
             .indoorEnabled(true)
             .camera(camera)
@@ -1051,8 +1054,9 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 
         val isPositionChange = lastPosition != position
         if (isPositionChange){
-            Log.d("POS",position.toString())
+            Log.d("POS","last:${lastPosition},current:${position}")
         }
+
         scope.launch {
             mapView.getMapAsync { naverMap ->
                 Log.v(__CLASSNAME__, "::NaverMapApp@LaunchedEffect@${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
@@ -1116,7 +1120,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
     val notificationPeriod = TimeUnit.MINUTES.toMillis(20)
     var lastGpsCheckTime by remember{ mutableLongStateOf(System.currentTimeMillis()) }
 
-
+    var trackingMode by remember { mutableStateOf(LocationTrackingMode.NoFollow) }
 
     fun createGPSNotification() {
         val channelId = "GPS_NOTIFICATION_CHANNEL"
@@ -1165,6 +1169,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         notificationManager.notify(notificationId, notification)
     }
 
+
     LaunchedEffect(Unit) {
         // 실내 20분 머무름 알림
         isGpsUnavailable = false
@@ -1208,6 +1213,12 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                             //locationOverlay.subIcon = OverlayImage.fromResource(R.drawable.marker_start)
                             //locationOverlay.subIconWidth = 80
                             //locationOverlay.subIconHeight = 80
+                            addOnCameraChangeListener(object : OnCameraChangeListener{
+                                override fun onCameraChange(p0: Int, p1: Boolean) {
+                                    trackingMode = naverMap.locationTrackingMode
+                                }
+
+                            })
                         }
                     }
                 }
@@ -1277,42 +1288,111 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         Log.w(__CLASSNAME__, "::NaverMapApp@::LEFT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
         Column(
             modifier = Modifier
-                .padding(bottom = (b + space + lh))
+                .padding(bottom = b )
                 .align(Alignment.BottomStart),
             verticalArrangement = Arrangement.spacedBy(space)
         ) {
-            ///** NOTE */
+            ///** CAMERA */
             //IconButton2(
             //    onClick = withClick {
-            //        Log.d(__CLASSNAME__, "::NaverMapApp@NTE${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
+            //        Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
             //        if (!start) return@withClick
+            //        //application.camera()
+            //        G.showCameraX= true
+            //        showCameraPreview = true
             //    },
             //    back = Color.White,
             //    shape = RectangleShape,
             //) {
             //    Icon(
-            //        imageVector = ImageVector.vectorResource(id = R.drawable.icon_list),
-            //        contentDescription = stringResource(R.string.note),
+            //        imageVector = ImageVector.vectorResource(id = R.drawable.icon_camera_map),
+            //        contentDescription = stringResource(R.string.photo),
             //        tint = Color.Black,
             //    )
             //}
-            /** CAMERA */
-            IconButton2(
+
+
+            Button(
                 onClick = withClick {
-                    Log.d(__CLASSNAME__, "::NaverMapApp@CAM${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
                     if (!start) return@withClick
                     //application.camera()
                     G.showCameraX= true
                     showCameraPreview = true
                 },
-                back = Color.White,
-                shape = RectangleShape,
+                shape = RoundedCornerShape(4.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    disabledContainerColor = Color.White
+                ),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 4.dp,
+                    hoveredElevation = 0.dp,
+                    pressedElevation = 0.dp
+                ),
+                interactionSource = remember { MutableInteractionSource() },
+                modifier = Modifier.size(48.dp),
+                contentPadding = PaddingValues(0.dp)
             ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_camera_map),
-                    contentDescription = stringResource(R.string.photo),
-                    tint = Color.Black,
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.icon_camera_map),
+                        contentDescription = "",
+                        tint = Color.Black
+                    )
+                }
+            }
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        mapView.getMapAsync { navermap ->
+                            trackingMode = when (navermap.locationTrackingMode) {
+                                LocationTrackingMode.NoFollow -> LocationTrackingMode.Follow
+                                LocationTrackingMode.Follow -> LocationTrackingMode.Face
+                                else -> LocationTrackingMode.NoFollow
+                            }
+                            navermap.locationTrackingMode = trackingMode
+                        }
+                    }
+                },
+                shape = RoundedCornerShape(4.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    disabledContainerColor = Color.White
+                ),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 4.dp,
+                    hoveredElevation = 0.dp,
+                    pressedElevation = 0.dp
+                ),
+                interactionSource = remember { MutableInteractionSource() },
+                modifier = Modifier.size(48.dp),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                val icon: ImageVector = when (trackingMode) {
+                    LocationTrackingMode.NoFollow -> ImageVector.vectorResource(id = R.drawable.icon_gps1)
+                    LocationTrackingMode.Follow -> ImageVector.vectorResource(id = R.drawable.icon_gps2)
+                    LocationTrackingMode.Face -> ImageVector.vectorResource(id = R.drawable.icon_gps3)
+                    else -> ImageVector.vectorResource(id = R.drawable.icon_gps1)
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = "",
+                        tint = Color(0xFF4783F5)
+                    )
+                }
             }
         }
         /** RIGHT */

@@ -1118,7 +1118,7 @@ fun PagerImage(showImage: (Boolean) -> Unit, pagerState: PagerState, viewModel: 
                                     .fillMaxSize()
                                     .clickable { showImage(true) },
                                 contentScale = ContentScale.Fit,
-                                filterQuality = FilterQuality.Low
+                                filterQuality = FilterQuality.Medium
                             )
                         }
                     }

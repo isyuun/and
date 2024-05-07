@@ -143,8 +143,6 @@ fun TimelineScreen(
     val dailyLifeTimeLineList by viewModel.dailyLifeTimeLineList.collectAsState()
     val walkUpload by sharedViewModel.walkUpload.collectAsState()
 
-    val tempWalkInfo = MySharedPreference.getTempWalkTF()
-
     var isLoading by rememberSaveable { mutableStateOf(false) }
     var typeChange by rememberSaveable{ mutableStateOf(false) }
     var isError by rememberSaveable{ mutableStateOf(false) }
@@ -596,7 +594,7 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
                 .data(timeData.runFile)
                 .crossfade(400)
                 .build(),
-            filterQuality = FilterQuality.Low
+            filterQuality = FilterQuality.None
         )
 
         Row (

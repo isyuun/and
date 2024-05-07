@@ -89,11 +89,13 @@ import net.pettip.app.navi.ui.theme.design_textFieldOutLine
 import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SettingViewModel
+import net.pettip.app.navi.viewmodel.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModifyInquiryScreen(
     navController: NavHostController,
+    sharedViewModel: SharedViewModel,
     viewModel: CommunityViewModel,
     settingViewModel: SettingViewModel,
     onDismiss: (Boolean) -> Unit
@@ -468,6 +470,7 @@ fun ModifyInquiryScreen(
                                 )
                             }
                         }
+                        sharedViewModel.deleteTempFilesStartingWithName(context = context)
                     }
                 },
                 modifier = Modifier

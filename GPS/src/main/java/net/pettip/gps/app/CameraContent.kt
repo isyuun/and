@@ -203,7 +203,7 @@ fun CameraContent(onExit: (Boolean) -> Unit, onRefresh: (Boolean) -> Unit) {
                 model = ImageRequest.Builder(context)
                     .data(currentUri)
                     .build(),
-                filterQuality = FilterQuality.High
+                filterQuality = FilterQuality.Low
             )
 
             Image(

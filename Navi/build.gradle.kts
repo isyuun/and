@@ -19,8 +19,8 @@ android {
         applicationId = "net.pettip.app.navi"
         minSdk = 26
         targetSdk = 34
-        versionCode = 13
-        versionName = "1.0.1"
+        versionCode = 14
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -76,7 +76,7 @@ dependencies {
     implementation("androidx.paging:paging-common-ktx:3.2.1")
     implementation(libs.firebase.auth.ktx)
     implementation(libs.play.services.location)
-    implementation("com.google.firebase:firebase-messaging:23.3.1")
+    implementation("com.google.firebase:firebase-messaging:23.4.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

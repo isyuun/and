@@ -1024,7 +1024,7 @@ fun PhotoItemInModify(uri: Uri, index: Int, onClick: () -> Unit, onDelete:()->Un
                 contentDescription = "",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
-                filterQuality = FilterQuality.Low
+                filterQuality = FilterQuality.None
             )
 
             if (index == 0) {

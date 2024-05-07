@@ -1062,7 +1062,7 @@ fun StoryItem(data: RTStoryData, navController: NavHostController, communityView
     ){
         val painter = rememberAsyncImagePainter(
             model = data.storyFile?:R.drawable.img_blank,
-            filterQuality = FilterQuality.Low,
+            filterQuality = FilterQuality.None,
         )
 
         Image(
@@ -1781,7 +1781,7 @@ fun CircleImageHome(size: Int, currentPet: List<CurrentPetData>?, page: Int, pag
             error= painterResource(id = R.drawable.profile_default),
             modifier= Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            filterQuality = FilterQuality.Low
+            filterQuality = FilterQuality.None
         )
 
     }

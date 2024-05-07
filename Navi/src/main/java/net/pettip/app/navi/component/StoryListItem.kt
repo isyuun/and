@@ -120,7 +120,7 @@ fun StoryListItem(data: Story, navController:NavHostController, viewModel:Commun
                 .crossfade(400)
                 .size(width,height) // Set the target size to load the image at.
                 .build(),
-            filterQuality = FilterQuality.Low
+            filterQuality = FilterQuality.None
         )
         Image(
             painter = painter,

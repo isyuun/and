@@ -46,6 +46,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
@@ -108,19 +109,29 @@ class MainActivity : ComponentActivity() {
     private val MAX_RETRY_COUNT = 3
     private val RETRY_INTERVAL_MILLIS = 10 * 1000L
 
-    //private lateinit var inAppUpdate: InAppUpdate
-
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-
         splashScreen.setKeepOnScreenCondition{false}
 
-        getTokenWithRetry()
+        //val  appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(this)
+        //
+        //val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+        //appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+        //    if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+        //        && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+        //    ) {
+        //        // 즉시 업데이트
+        //    } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+        //        && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
+        //    ){
+        //        // 유연 업데이트
+        //    }
+        //}
 
-        //val inAppUpdate = InAppUpdate(this)
+        getTokenWithRetry()
 
         val intentData: Uri? = intent.data
         if (intentData != null) {
@@ -157,20 +168,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    //override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    //    super.onActivityResult(requestCode, resultCode, data)
-    //    inAppUpdate.onActivityResult(requestCode,resultCode, data)
-    //}
-
     override fun onResume() {
         super.onResume()
-        //inAppUpdate.onResume()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        //inAppUpdate.onDestroy()
 
         val filesDir = this.filesDir
         val files = filesDir.listFiles()
@@ -463,10 +466,10 @@ fun AppNavigation(navController: NavHostController, intentData: Uri?) {
                 )
             }
         ) {
-            InquiryDetail(navController = navController, viewModel = communityViewModel, settingViewModel = settingViewModel)
+            InquiryDetail(navController = navController, viewModel = communityViewModel, settingViewModel = settingViewModel, sharedViewModel = sharedViewModel)
         }
         composable("oneNOneScreen") {
-            OneNOneScreen(navController = navController, settingViewModel = settingViewModel, communityViewModel = communityViewModel)
+            OneNOneScreen(navController = navController, settingViewModel = settingViewModel, communityViewModel = communityViewModel, sharedViewModel = sharedViewModel)
         }
         composable("settingScreen") {
             SettingScreen(navController = navController, viewModel = communityViewModel)

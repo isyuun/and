@@ -567,7 +567,7 @@ fun WalkDetailContent(walkViewModel: WalkViewModel, navController: NavHostContro
                                             error = null,
                                             modifier = Modifier.fillMaxSize(),
                                             contentScale = ContentScale.Crop,
-                                            filterQuality = FilterQuality.Low
+                                            filterQuality = FilterQuality.None
                                         )
                                     }
                                 }

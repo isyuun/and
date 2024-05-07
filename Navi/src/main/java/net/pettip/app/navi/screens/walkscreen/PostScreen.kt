@@ -1009,7 +1009,7 @@ fun PhotoItem(uri: Uri, index: Int, onClick: () -> Unit, changeMainImage:()->Uni
                 contentDescription = "",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
-                filterQuality = FilterQuality.Low
+                filterQuality = FilterQuality.None
             )
 
 
