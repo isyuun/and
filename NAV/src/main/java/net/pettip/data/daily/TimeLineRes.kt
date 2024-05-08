@@ -63,5 +63,7 @@ data class PetItem(
     @SerializedName("petNm")
     val petNm: String,
     @SerializedName("petImg")
-    val petImg: String?
+    val petImg: String?,
+    @SerializedName("petTypCd")
+    val petTypCd: String?
 )
