@@ -32,5 +32,7 @@ data class CurrentPetData(
     @SerializedName("petRelUnqNo")
     var petRelUnqNo: Int, // 펫 관계번호
     @SerializedName("mngrType")
-    var mngrType: String // M: 관리중, I: 참여중
+    var mngrType: String, // M: 관리중, I: 참여중
+    @SerializedName("petTypCd")
+    var petTypCd: String?, // 개 001 고양이 002
 )

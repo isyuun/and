@@ -116,7 +116,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import androidx.wear.compose.material.HorizontalPageIndicator
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
@@ -145,6 +144,7 @@ import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.daily.Cmnt
 import net.pettip.data.daily.DailyDetailData
+import net.pettip.data.daily.DailyDetailRes
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import net.pettip.util.Log
@@ -313,11 +313,11 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
                         Spacer(modifier = Modifier.padding(top = 20.dp))
 
                         StoryDetailTopContent(
-                            story = story,
+                            story = storyDetail,
                             viewModel = viewModel,
                             navcontroller = navController,
-                            modifyChange = {newValue -> isModify = newValue},
-                            dclrDialogOpen = {newValue -> dclrDialogOpen = newValue},
+                            modifyChange = { newValue -> isModify = newValue},
+                            dclrDialogOpen = { newValue -> dclrDialogOpen = newValue},
                             snackState = snackState
                         )
 
@@ -695,7 +695,7 @@ fun StoryDetail(viewModel: CommunityViewModel, sharedViewModel: SharedViewModel,
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StoryDetailTopContent(
-    story: DailyDetailData?,
+    story: DailyDetailRes?,
     viewModel: CommunityViewModel,
     navcontroller: NavHostController,
     modifyChange: (Boolean) -> Unit,
@@ -742,7 +742,7 @@ fun StoryDetailTopContent(
 
     LaunchedEffect(key1 = story){
         if (story != null){
-            booleanValue = story.rlsYn != "Y"
+            booleanValue = story.data?.rlsYn != "Y"
         }
     }
 
@@ -776,7 +776,7 @@ fun StoryDetailTopContent(
             .fillMaxWidth()
     ){
         Text(
-            text = story?.schTtl ?: "",
+            text = story?.data?.schTtl ?: "",
             fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             fontSize = 24.sp,
             letterSpacing = (-1.2).sp,
@@ -788,17 +788,16 @@ fun StoryDetailTopContent(
                 .fillMaxWidth()
                 .padding(top = 8.dp),
             verticalAlignment = Alignment.CenterVertically
-            
         ){
-            CircleImageTopBar(size = 40, imageUri = story?.dailyLifePetList?.get(0)?.petImg ?: "")
-            
+            CircleImageTopBar(size = 40, petDetailData = story?.data?.dailyLifePetList?.get(0))
+
             Spacer(modifier = Modifier.padding(start = 8.dp))
 
             Column (
                 modifier = Modifier.fillMaxWidth()
             ){
                 Text(
-                    text = story?.dailyLifePetList?.get(0)?.petNm ?: "",
+                    text = story?.data?.dailyLifePetList?.get(0)?.petNm ?: "",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 14.sp,
                     letterSpacing = (-0.7).sp,
@@ -806,7 +805,7 @@ fun StoryDetailTopContent(
                 )
 
                 Text(
-                    text = story?.rlsDt ?: "",
+                    text = story?.data?.rlsDt ?: "",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp, lineHeight = 12.sp,
@@ -824,11 +823,11 @@ fun StoryDetailTopContent(
         ){
             Row (verticalAlignment = Alignment.CenterVertically){
                 Icon(painter = painterResource(
-                    id = if (story?.myRcmdtn == "001") R.drawable.icon_like else R.drawable.icon_like_default),
+                    id = if (story?.data?.myRcmdtn == "001") R.drawable.icon_like else R.drawable.icon_like_default),
                     contentDescription = "", tint = Color.Unspecified)
 
                 Text(
-                    text = story?.rcmdtnCnt?.toString() ?: "0",
+                    text = story?.data?.rcmdtnCnt?.toString() ?: "0",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,
@@ -842,7 +841,7 @@ fun StoryDetailTopContent(
                     modifier = Modifier.padding(start = 12.dp))
 
                 Text(
-                    text = story?.cmntCnt?.toString() ?:"0",
+                    text = story?.data?.cmntCnt?.toString() ?:"0",
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                     fontSize = 12.sp,
                     letterSpacing = (-0.6).sp,
@@ -851,7 +850,7 @@ fun StoryDetailTopContent(
                 )
 
                 AnimatedVisibility(
-                    visible = MySharedPreference.getUserId() == story?.userId
+                    visible = MySharedPreference.getUserId() == story?.data?.userId
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically){
                         Box {
@@ -958,7 +957,7 @@ fun StoryDetailTopContent(
                 }
             }
 
-            if (story?.userId == MySharedPreference.getUserId()){
+            if (story?.data?.userId == MySharedPreference.getUserId()){
                 Row (
                     verticalAlignment = Alignment.CenterVertically
                 ){
@@ -1349,7 +1348,7 @@ fun CommentListItem(
                             .padding(horizontal = 10.dp, vertical = 10.dp)
                             .fillMaxWidth()
                     ){
-                        CircleImageTopBar(size = 40, imageUri = "${atchPath}${comment.petImg}" )
+                        CircleImageTopBar(size = 40, imageUri = comment.petImg, petTypCd = comment.petTypCd)
 
                         Spacer(modifier = Modifier.padding(start = 8.dp))
 
@@ -1532,7 +1531,7 @@ fun CommentListItem(
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth()
         ){
-            CircleImageTopBar(size = 40, imageUri = "${atchPath}${comment.petImg}" )
+            CircleImageTopBar(size = 40, imageUri = comment.petImg, petTypCd = comment.petTypCd)
 
             Spacer(modifier = Modifier.padding(start = 8.dp))
 
@@ -1910,7 +1909,7 @@ fun CommentListItem2(
                             .padding(horizontal = 10.dp, vertical = 10.dp)
                             .fillMaxWidth()
                     ){
-                        CircleImageTopBar(size = 40, imageUri = "${atchPath}${comment.petImg}" )
+                        CircleImageTopBar(size = 40, imageUri = comment.petImg, petTypCd = comment.petTypCd)
 
                         Spacer(modifier = Modifier.padding(start = 8.dp))
 
@@ -2060,7 +2059,7 @@ fun CommentListItem2(
             .padding(start = 40.dp, end = 20.dp)
             .fillMaxWidth()
     ){
-        CircleImageTopBar(size = 40, imageUri = "${atchPath}${comment.petImg}" )
+        CircleImageTopBar(size = 40, imageUri = comment.petImg, petTypCd = comment.petTypCd)
 
         Spacer(modifier = Modifier.padding(start = 8.dp))
 

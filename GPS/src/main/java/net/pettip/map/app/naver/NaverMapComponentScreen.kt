@@ -20,7 +20,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.view.Gravity
@@ -55,7 +54,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -90,7 +91,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -104,12 +104,17 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -123,7 +128,6 @@ import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.NaverMap.OnCameraChangeListener
-import com.naver.maps.map.NaverMap.OnLocationChangeListener
 import com.naver.maps.map.NaverMapOptions
 import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
@@ -173,7 +177,7 @@ import java.util.concurrent.TimeUnit
 private val __CLASSNAME__ = Exception().stackTrace[0].fileName
 
 @Composable
-private fun CircleImageUrl(size: Int, imageUri: String?) {
+private fun CircleImageUrl(size: Int, imageUri: String?, petTypCd: String?) {
     Box(
         modifier = Modifier
             .size(size.dp)
@@ -187,8 +191,16 @@ private fun CircleImageUrl(size: Int, imageUri: String?) {
                 .crossfade(true)
                 .build(),
             contentDescription = "",
-            placeholder = painterResource(id = R.drawable.profile_default),
-            error = painterResource(id = R.drawable.profile_default),
+            placeholder = painterResource(id = when(petTypCd){
+                "001" -> R.drawable.profile_default
+                "002" -> R.drawable.cat_profile2
+                else -> R.drawable.profile_default
+            }),
+            error = painterResource(id = when(petTypCd){
+                "001" -> R.drawable.profile_default
+                "002" -> R.drawable.cat_profile2
+                else -> R.drawable.profile_default
+            }),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
@@ -692,6 +704,7 @@ private fun WalkPetRow(pet: CurrentPetData, checked: Boolean, onCheckedChange: (
 private fun WalkPetCol(pet: CurrentPetData, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     val petNm: String = pet.petNm
     val petRprsImgAddr: String = pet.petRprsImgAddr
+    val petTypCd:String? = pet.petTypCd
 
     var check by rememberSaveable { mutableStateOf(checked) }; check = checked
 
@@ -714,7 +727,7 @@ private fun WalkPetCol(pet: CurrentPetData, checked: Boolean, onCheckedChange: (
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CircleImageUrl(size = 60, imageUri = petRprsImgAddr)
+            CircleImageUrl(size = 60, imageUri = petRprsImgAddr, petTypCd = petTypCd)
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = petNm,
@@ -822,7 +835,8 @@ private fun WalkInfoNavi(
                     sexTypNm = "",
                     wghtVl = 0.0f,
                     petRelUnqNo = 0,
-                    mngrType = "M"
+                    mngrType = "M",
+                    petTypCd = "001"
                 )
             )
         }
@@ -865,7 +879,7 @@ private fun WalkInfoNavi(
                 Row(
                     modifier = Modifier
                         .background(
-                            color = MaterialTheme.colorScheme.background,
+                            color = Color.White,
                             shape = RoundedCornerShape(bottomStart = 20.0.dp, bottomEnd = 20.0.dp),
                         )
                         .border(
@@ -882,7 +896,7 @@ private fun WalkInfoNavi(
                     ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr)
+                    CircleImageUrl(size = 60, imageUri = pet.petRprsImgAddr, petTypCd = pet.petTypCd)
                     R.string.walk_title_tip
                     AnimatedVisibility(
                         visible = !start,
@@ -987,8 +1001,8 @@ internal fun NaverMapApp(source: FusedLocationSource) {
 
     if (G.mapPetInfo.isEmpty()) {   //test
         val pets = ArrayList<CurrentPetData>()
-        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", -0.1f, -1, "M")
-        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", -0.1f, -1, "M")
+        val pet1 = CurrentPetData("", "P00000000000001", "", "1.읎", "", "", -0.1f, -1, "M","001")
+        val pet2 = CurrentPetData("", "P00000000000002", "", "2.읎", "", "", -0.1f, -1, "M","001")
         pets.add(pet1)
         pets.add(pet2)
         G.mapPetInfo = pets
@@ -1288,7 +1302,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         Log.w(__CLASSNAME__, "::NaverMapApp@::LEFT${getMethodName()}[$start][${tracks?.size}][${markers.size}][${position.toText()}]")
         Column(
             modifier = Modifier
-                .padding(bottom = b )
+                .padding(bottom = b)
                 .align(Alignment.BottomStart),
             verticalArrangement = Arrangement.spacedBy(space)
         ) {
@@ -1809,38 +1823,171 @@ fun ShowDialogRestart(
         else application.recent()?.let { recent -> showDialog = recent.exists() }
         Log.wtf(__CLASSNAME__, "${getMethodName()}[$showDialog][${application.start}][${application.recent()?.exists()}][${application.recent()}]")
         if (showDialog) {
-            AlertDialog(
-                icon = icon,
-                title = title,
-                text = text,
-                onDismissRequest = withClick {
+            CustomAlert(
+                onDismiss = withClick {
                     showDialog = false
                     application.reset()
                     onDismissRequest()
                 },
-                confirmButton = {
-                    Button(
-                        onClick = withClick {
-                            showDialog = false
-                            application.restart()
-                            onConfirmButton()
-                        }
-                    ) {
-                        Text(stringResource(id = android.R.string.ok))
-                    }
+                confirm = "계속할게요",
+                dismiss = "그만할게요",
+                title = "한참 산책중 이었습니다.",
+                text = "기존 산책을 복원할까요?",
+                confirmJob = withClick {
+                    showDialog = false
+                    application.restart()
+                    onConfirmButton()
                 },
-                dismissButton = {
-                    Button(
-                        onClick = withClick {
-                            showDialog = false
-                            application.reset()
-                            onDismissButton()
-                        }
-                    ) {
-                        Text(stringResource(id = android.R.string.cancel))
-                    }
+                dismissJob = withClick {
+                    showDialog = false
+                    application.reset()
+                    onDismissButton()
                 }
             )
+
+            //AlertDialog(
+            //    icon = icon,
+            //    title = title,
+            //    text = text,
+            //    onDismissRequest = withClick {
+            //        showDialog = false
+            //        application.reset()
+            //        onDismissRequest()
+            //    },
+            //    confirmButton = {
+            //        Button(
+            //            onClick = withClick {
+            //                showDialog = false
+            //                application.restart()
+            //                onConfirmButton()
+            //            }
+            //        ) {
+            //            Text(stringResource(id = android.R.string.ok))
+            //        }
+            //    },
+            //    dismissButton = {
+            //        Button(
+            //            onClick = withClick {
+            //                showDialog = false
+            //                application.reset()
+            //                onDismissButton()
+            //            }
+            //        ) {
+            //            Text(stringResource(id = android.R.string.cancel))
+            //        }
+            //    },
+            //    containerColor = Color.White
+            //)
         }//showDialog
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomAlert(
+    onDismiss: () -> Unit,
+    confirm: String,
+    dismiss: String,
+    title: String,
+    text: String,
+    dismissJob : () ->Unit = {},
+    confirmJob : () ->Unit = {},
+){
+    val widthTitle = measureTextWidth(text = title, style = TextStyle(fontSize = 16.sp, letterSpacing = (-0.4).sp, fontFamily = FontFamily(Font(R.font.pretendard_bold))))
+    val widthText = measureTextWidth(text = text, style = TextStyle(fontSize = 14.sp, letterSpacing = (-0.4).sp, fontFamily = FontFamily(Font(R.font.pretendard_regular))))
+    val width = maxOf(widthTitle,widthText)
+
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        ),
+        modifier = Modifier
+            .padding(30.dp)
+            .widthIn(
+                min = 240.dp,
+                max = 600.dp
+            )
+            .width(width + 40.dp)
+    ){
+        Box(modifier = Modifier
+            .background(
+                color = if (isSystemInDarkTheme()) Color(0xFF2D3034) else Color(0xFFFFFFFF),
+                shape = RoundedCornerShape(20.dp)
+            )
+        ){
+            Column (
+                modifier = Modifier.wrapContentWidth()
+            ){
+                Text(
+                    text = title,
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    fontSize = 16.sp, letterSpacing = (-0.4).sp,
+                    color = if (isSystemInDarkTheme()) Color(0xFFFFFFFF) else Color(0xFF222222),
+                    modifier = Modifier
+                        .padding(start = 20.dp, end = 20.dp, top = 30.dp)
+                )
+
+                Text(
+                    text = text,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    fontSize = 14.sp, letterSpacing = (-0.4).sp,
+                    lineHeight = 20.sp,
+                    color = if (isSystemInDarkTheme()) Color(0xFFFFFFFF) else Color(0xFF222222),
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp)
+                )
+
+                Row (
+                    modifier = Modifier
+                        .padding(top = 50.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                ){
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(if (isSystemInDarkTheme()) Color(0xFF45494D) else Color(0xFFDDDDDD))
+                            .clickable {
+                                dismissJob()
+                            },
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = dismiss,
+                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = if (isSystemInDarkTheme()) Color(0xFFFFFFFF) else Color(0xFF222222),
+                            modifier = Modifier.padding(vertical = 10.dp)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(Color(0xFF4783F5))
+                            .clickable {
+                                confirmJob()
+                            }
+                        ,
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = confirm,
+                            fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            fontSize = 14.sp, letterSpacing = (-0.7).sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(vertical = 10.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun measureTextWidth(text: String, style: TextStyle): Dp {
+    val textMeasurer = rememberTextMeasurer()
+    val widthInPixels = textMeasurer.measure(text, style).size.width
+    return with(LocalDensity.current) { widthInPixels.toDp() }
 }

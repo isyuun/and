@@ -109,7 +109,6 @@ import net.pettip.data.daily.LifeTimeLineItem
 import net.pettip.data.pet.PetDetailData
 import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
-import net.pettip.util.Log
 
 /**
  * @Project     : PetTip-Android
@@ -654,10 +653,9 @@ fun TimeItem(timeData: LifeTimeLineItem,viewModel:WalkViewModel,navController:Na
             ){
                 timeData.petList?.let {
                     items(timeData.petList!!){ item ->
-                        CircleImageTopBar(size = 42, imageUri = item.petImg)
+                        CircleImageTopBar(size = 42, imageUri = item.petImg, petTypCd = item.petTypCd)
                     }
                 }
-
             }
 
             Row (

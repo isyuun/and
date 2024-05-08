@@ -2,11 +2,9 @@
 
 package net.pettip.app.navi.screens.walkscreen
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.provider.MediaStore
 import android.view.MotionEvent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -848,7 +846,7 @@ fun BwlMvmNmtmContentItem(walkViewModel: WalkViewModel, petInfo: Pet, selectPet:
         ) {
             Spacer(modifier = Modifier.padding(start = 22.dp))
 
-            CircleImageTopBar(size = 50, imageUri = matchingSelectPet?.petRprsImgAddr)
+            CircleImageTopBar(size = 50, petDetailData = matchingSelectPet)
 
             Text(
                 text = petInfo.petNm,

@@ -432,7 +432,8 @@ class SharedViewModel:ViewModel(){
         sexTypNm = "모름",
         wghtVl =0.0f,
         petRelUnqNo = 0,
-        mngrType = "M"
+        mngrType = "M",
+        petTypCd = "001"
     )
 
     fun clear(){

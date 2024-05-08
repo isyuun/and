@@ -120,7 +120,9 @@ data class DailyLifePet(
     @SerializedName("stdgUmdNm")
     var stdgUmdNm: String?, // null
     @SerializedName("urineNmtm")
-    var urineNmtm: Int? // 1
+    var urineNmtm: Int?, // 1
+    @SerializedName("petTypCd")
+    var petTypCd: String? // 1
 )
 
 data class DailyLifeSchHashTag(
@@ -184,5 +186,7 @@ data class Cmnt(
     @SerializedName("userId")
     var userId: String?, // 16a5e09c-884e-4f96-a7ab-aebd8756549a
     @SerializedName("myCmntRcmdtn")
-    var myCmntRcmdtn: String? //
+    var myCmntRcmdtn: String?, //
+    @SerializedName("petTypCd")
+    var petTypCd: String?, //
 )

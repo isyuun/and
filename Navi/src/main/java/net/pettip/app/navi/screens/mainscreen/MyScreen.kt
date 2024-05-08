@@ -112,7 +112,6 @@ import net.pettip.app.navi.viewmodel.SettingViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.pet.PetDetailData
 import net.pettip.gps.app.GPSApplication
-import net.pettip.singleton.G
 import net.pettip.singleton.MySharedPreference
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -564,7 +563,7 @@ fun MyPagePetItem(petDetailData: PetDetailData, sharedViewModel: SharedViewModel
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 20.dp)
             ){
-                CircleImageTopBar(size = 40, imageUri = petDetailData.petRprsImgAddr)
+                CircleImageTopBar(size = 40, petDetailData = petDetailData)
 
                 Column (
                     modifier = Modifier.padding(start = 10.dp)

@@ -327,7 +327,8 @@ fun PetProfileScreen(navController: NavHostController, sharedViewModel: SharedVi
 
                 CircleImage(
                     size = 180,
-                    imageUri = selectedPet.petRprsImgAddr
+                    imageUri = selectedPet.petRprsImgAddr,
+                    petTypCd = selectedPet.petTypCd
                 )
 
                 Spacer(modifier = Modifier.padding(top = 16.dp))

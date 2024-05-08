@@ -57,6 +57,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -937,6 +938,7 @@ fun AddPetScreen(
 fun CircleImageCreate(viewModel: UserCreateViewModel){
 
     val imageUri by viewModel.imageUri.collectAsState()
+    val petTyp by viewModel.petDorC.collectAsState()
 
     val context = LocalContext.current
 
@@ -954,20 +956,29 @@ fun CircleImageCreate(viewModel: UserCreateViewModel){
             .shadow(elevation = 10.dp, shape = CircleShape, spotColor = MaterialTheme.colorScheme.onSurface)
             .clip(CircleShape)
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUri)
-                .crossfade(true)
-                .build(),
-            contentDescription = "",
-            placeholder = painterResource(id = R.drawable.profile_default),
-            error = painterResource(id = R.drawable.profile_default),
-            modifier= Modifier
-                .fillMaxSize()
-                .clickable { launcher.launch("image/*") },
-            contentScale = ContentScale.Crop
-        )
-
+        key (petTyp){
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUri)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "",
+                placeholder = painterResource(id = when(petTyp){
+                    "강아지" -> R.drawable.profile_default
+                    "고양이" -> R.drawable.cat_profile2
+                    else -> R.drawable.profile_default
+                }),
+                error = painterResource(id = when(petTyp){
+                    "강아지" -> R.drawable.profile_default
+                    "고양이" -> R.drawable.cat_profile2
+                    else -> R.drawable.profile_default
+                }),
+                modifier= Modifier
+                    .fillMaxSize()
+                    .clickable { launcher.launch("image/*") },
+                contentScale = ContentScale.Crop
+            )
+        }
     }
 }
 

@@ -104,7 +104,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -124,10 +123,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pettip.app.navi.R
 import net.pettip.app.navi.Screen
-import net.pettip.app.navi.component.CustomAlert
 import net.pettip.app.navi.component.CustomBottomSheet
-import net.pettip.app.navi.component.CustomIndicator
 import net.pettip.app.navi.component.LoadingAnimation1
+import net.pettip.app.navi.component.defaultPetImage
 import net.pettip.app.navi.ui.theme.design_grad_end
 import net.pettip.app.navi.ui.theme.design_icon_5E6D7B
 import net.pettip.app.navi.ui.theme.design_icon_distance_bg
@@ -145,7 +143,6 @@ import net.pettip.app.navi.ui.theme.design_white
 import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.HomeViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
-import net.pettip.app.navi.viewmodel.WalkViewModel
 import net.pettip.data.daily.RTStoryData
 import net.pettip.data.pet.CurrentPetData
 import net.pettip.data.pet.PetDetailData
@@ -738,10 +735,10 @@ fun ProfileContent(
             horizontalArrangement = Arrangement.Center
         ){
             if(currentPetInfo.size>=2){
-                CircleImageOffset(imageUri = currentPetInfo[1].petRprsImgAddr, index = 1)
+                CircleImageOffset(imageUri = currentPetInfo[1].petRprsImgAddr, index = 1, petTypCd = currentPetInfo[1].petTypCd)
             }
             if(currentPetInfo.isNotEmpty() && currentPetInfo[0].sexTypNm != ""){
-                CircleImageOffset(imageUri = currentPetInfo[0].petRprsImgAddr, index = 0)
+                CircleImageOffset(imageUri = currentPetInfo[0].petRprsImgAddr, index = 0, petTypCd = currentPetInfo[0].petTypCd)
             }
 
             Box(
@@ -1304,6 +1301,7 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
 
     val petName:String = petList.petNm
     val imageUri:String? = petList.petRprsImgAddr
+    val petTypCd:String? = petList.petTypCd
     val petKind:String = petList.petKindNm
     val petAge:String = if(petList.petBrthYmd == stringResource(id = R.string.age_unknown)){
         stringResource(id = R.string.age_unknown)
@@ -1382,8 +1380,8 @@ fun BottomSheetItem(viewModel : HomeViewModel ,petList: PetDetailData){
                         .crossfade(true)
                         .build(),
                     contentDescription = "",
-                    placeholder = painterResource(id = R.drawable.profile_default),
-                    error= painterResource(id = R.drawable.profile_default),
+                    placeholder = painterResource(id = defaultPetImage(petTypCd)),
+                    error= painterResource(id = defaultPetImage(petTypCd)),
                     modifier= Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -1708,7 +1706,7 @@ fun BottomInfo(navController: NavHostController){
 
 
 @Composable
-fun CircleImage(size: Int, imageUri: String?){
+fun CircleImage(size: Int, imageUri: String?, petTypCd: String?=null){
 
     Box(
         modifier = Modifier
@@ -1730,8 +1728,8 @@ fun CircleImage(size: Int, imageUri: String?){
                 .crossfade(true)
                 .build(),
             contentDescription = "",
-            placeholder = painterResource(id = R.drawable.profile_default),
-            error= painterResource(id = R.drawable.profile_default),
+            placeholder = painterResource(id = defaultPetImage(petTypCd)),
+            error= painterResource(id = defaultPetImage(petTypCd)),
             modifier= Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
@@ -1750,7 +1748,7 @@ fun CircleImageHome(size: Int, currentPet: List<CurrentPetData>?, page: Int, pag
     Box(
         modifier = Modifier
             .size(size.dp)
-            .border(shape = CircleShape, border = BorderStroke(5.dp, color = if (!select)MaterialTheme.colorScheme.tertiary else design_weather_2))
+            .border(shape = CircleShape, border = BorderStroke(5.dp, color = if (!select) MaterialTheme.colorScheme.tertiary else design_weather_2))
             .shadow(
                 color = MaterialTheme.colorScheme.onSurface,
                 offsetY = 10.dp,
@@ -1777,8 +1775,8 @@ fun CircleImageHome(size: Int, currentPet: List<CurrentPetData>?, page: Int, pag
                 .crossfade(true)
                 .build(),
             contentDescription = "",
-            placeholder = painterResource(id = R.drawable.profile_default),
-            error= painterResource(id = R.drawable.profile_default),
+            placeholder = painterResource(id = defaultPetImage(petType = currentPet?.get(page)?.petTypCd)),
+            error= painterResource(id = defaultPetImage(petType = currentPet?.get(page)?.petTypCd)),
             modifier= Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
             filterQuality = FilterQuality.None
@@ -1787,7 +1785,7 @@ fun CircleImageHome(size: Int, currentPet: List<CurrentPetData>?, page: Int, pag
     }
 }
 @Composable
-fun CircleImageOffset(imageUri: String?, index: Int){
+fun CircleImageOffset(imageUri: String?, index: Int, petTypCd: String?){
 
     Box(
         modifier = Modifier
@@ -1810,8 +1808,8 @@ fun CircleImageOffset(imageUri: String?, index: Int){
                 .crossfade(true)
                 .build(),
             contentDescription = "",
-            placeholder = painterResource(id = R.drawable.profile_default),
-            error= painterResource(id = R.drawable.profile_default),
+            placeholder = painterResource(id = defaultPetImage(petTypCd)),
+            error= painterResource(id = defaultPetImage(petTypCd)),
             modifier= Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )

@@ -137,6 +137,7 @@ fun BottomSheetItem(viewModel: SharedViewModel, petList : CurrentPetData){
 
     val petName:String = petList.petNm
     val imageUri:String? = petList.petRprsImgAddr
+    val petTypCd:String? = petList.petTypCd
 
     val selectedPetTemp by viewModel.selectPetTemp.collectAsState()
 
@@ -204,8 +205,8 @@ fun BottomSheetItem(viewModel: SharedViewModel, petList : CurrentPetData){
                         .crossfade(true)
                         .build(),
                     contentDescription = "",
-                    placeholder = painterResource(id = R.drawable.profile_default),
-                    error= painterResource(id = R.drawable.profile_default),
+                    placeholder = painterResource(id = defaultPetImage(petTypCd)),
+                    error= painterResource(id = defaultPetImage(petTypCd)),
                     modifier= Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )

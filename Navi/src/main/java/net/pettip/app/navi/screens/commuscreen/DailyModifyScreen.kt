@@ -92,6 +92,7 @@ import net.pettip.app.navi.component.CustomAlertOneBtn
 import net.pettip.app.navi.component.CustomTextField
 import net.pettip.app.navi.component.LoadingDialog
 import net.pettip.app.navi.component.Toasty
+import net.pettip.app.navi.component.defaultPetImage
 import net.pettip.app.navi.screens.mainscreen.getFormattedDate
 import net.pettip.app.navi.screens.mainscreen.shadow
 import net.pettip.app.navi.screens.walkscreen.HashTagTransformation
@@ -751,6 +752,7 @@ fun AlreadyUploadedPetItem(viewModel: CommunityViewModel, petList : DailyLifePet
 
     val petName:String = petList.petNm?: ""
     val imageUri:String? = petList.petImg
+    val petTypCd:String? = petList.petTypCd
 
     var isSelected by rememberSaveable { mutableStateOf(true) }
 
@@ -812,8 +814,8 @@ fun AlreadyUploadedPetItem(viewModel: CommunityViewModel, petList : DailyLifePet
                         .crossfade(true)
                         .build(),
                     contentDescription = "",
-                    placeholder = painterResource(id = R.drawable.profile_default),
-                    error= painterResource(id = R.drawable.profile_default),
+                    placeholder = painterResource(id = defaultPetImage(petType = petTypCd)),
+                    error= painterResource(id = defaultPetImage(petType = petTypCd)),
                     modifier= Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -912,6 +914,7 @@ fun SelectedPetMultiItemInModify(viewModel: CommunityViewModel, petList : Curren
 
     val petName:String = petList.petNm
     val imageUri:String? = petList.petRprsImgAddr
+    val petTypCd:String? = petList.petTypCd
 
     var isSelected by rememberSaveable { mutableStateOf(false) }
 
@@ -984,8 +987,8 @@ fun SelectedPetMultiItemInModify(viewModel: CommunityViewModel, petList : Curren
                         .crossfade(true)
                         .build(),
                     contentDescription = "",
-                    placeholder = painterResource(id = R.drawable.profile_default),
-                    error= painterResource(id = R.drawable.profile_default),
+                    placeholder = painterResource(id = defaultPetImage(petType = petTypCd)),
+                    error= painterResource(id = defaultPetImage(petType = petTypCd)),
                     modifier= Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )

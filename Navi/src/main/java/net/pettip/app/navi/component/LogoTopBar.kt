@@ -31,6 +31,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +50,10 @@ import coil.request.ImageRequest
 import net.pettip.app.navi.R
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.app.navi.viewmodel.WalkViewModel
+import net.pettip.data.daily.DailyLifePet
 import net.pettip.data.pet.CurrentPetData
+import net.pettip.data.pet.PetDetailData
+import net.pettip.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,7 +130,7 @@ fun LogoTopBar(
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Spacer(modifier = Modifier.padding(start = 16.dp))
-                    CircleImageTopBar(size = 35, imageUri = petDetailData.petRprsImgAddr)
+                    CircleImageTopBar(size = 35, petDetailData = petDetailData)
                     Spacer(modifier = Modifier.padding(end=4.dp))
                     Row (
                         modifier
@@ -155,7 +159,85 @@ fun LogoTopBar(
 }
 
 @Composable
-fun CircleImageTopBar(size: Int, imageUri:String?){
+fun CircleImageTopBar(size: Int, petDetailData: CurrentPetData?){
+
+    Box(
+        modifier = Modifier
+            .size(size.dp)
+            .border(shape = CircleShape, border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.tertiary))
+            .shadow(elevation = 4.dp, shape = CircleShape, spotColor = Color.Gray)
+            .clip(CircleShape)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(petDetailData?.petRprsImgAddr)
+                .crossfade(true)
+                .build(),
+            contentDescription = "",
+            placeholder = painterResource(id = defaultPetImage(petType = petDetailData?.petTypCd)),
+            error= painterResource(id = defaultPetImage(petType = petDetailData?.petTypCd)),
+            modifier= Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+    }
+}
+
+@Composable
+fun CircleImageTopBar(size: Int, petDetailData: DailyLifePet?){
+
+    Log.d("LOG",petDetailData?.petTypCd.toString())
+
+    Box(
+        modifier = Modifier
+            .size(size.dp)
+            .border(shape = CircleShape, border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.tertiary))
+            .shadow(elevation = 4.dp, shape = CircleShape, spotColor = Color.Gray)
+            .clip(CircleShape)
+    ) {
+        key (petDetailData){
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(petDetailData?.petImg)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "",
+                placeholder = painterResource(id = defaultPetImage(petType = petDetailData?.petTypCd)),
+                error= painterResource(id = defaultPetImage(petType = petDetailData?.petTypCd)),
+                modifier= Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
+}
+
+@Composable
+fun CircleImageTopBar(size: Int, petDetailData: PetDetailData?){
+
+    Box(
+        modifier = Modifier
+            .size(size.dp)
+            .border(shape = CircleShape, border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.tertiary))
+            .shadow(elevation = 4.dp, shape = CircleShape, spotColor = Color.Gray)
+            .clip(CircleShape)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(petDetailData?.petRprsImgAddr)
+                .crossfade(true)
+                .build(),
+            contentDescription = "",
+            placeholder = painterResource(id = defaultPetImage(petType = petDetailData?.petTypCd)),
+            error= painterResource(id = defaultPetImage(petType = petDetailData?.petTypCd)),
+            modifier= Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+    }
+}
+
+@Composable
+fun CircleImageTopBar(size: Int, imageUri: String?){
 
     Box(
         modifier = Modifier
@@ -179,3 +261,27 @@ fun CircleImageTopBar(size: Int, imageUri:String?){
     }
 }
 
+@Composable
+fun CircleImageTopBar(size: Int, imageUri: String?, petTypCd : String?){
+
+    Box(
+        modifier = Modifier
+            .size(size.dp)
+            .border(shape = CircleShape, border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.tertiary))
+            .shadow(elevation = 4.dp, shape = CircleShape, spotColor = Color.Gray)
+            .clip(CircleShape)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUri)
+                .crossfade(true)
+                .build(),
+            contentDescription = "",
+            placeholder = painterResource(id = defaultPetImage(petType = petTypCd)),
+            error= painterResource(id = defaultPetImage(petType = petTypCd)),
+            modifier= Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+    }
+}
