@@ -14,8 +14,8 @@ import java.io.ObjectOutputStream
 import java.io.Serializable
 
 //const val BASE_URL = "http://carepet.hopto.org/'
-const val BASE_URL = "http://dev.pettip.net:8020/"
-//const val BASE_URL = "https://pettip.net/"
+//const val BASE_URL = "http://dev.pettip.net:8020/"
+const val BASE_URL = "https://pettip.net/"
 
 object G {
     var userId: String = ""

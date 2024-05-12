@@ -38,6 +38,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -939,13 +941,29 @@ fun WeightCNDDialog(
             Column (
                 modifier = Modifier.fillMaxWidth()
             ){
-                Text(
-                    text = stringResource(R.string.registration_date),
-                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-                    fontSize = 16.sp, letterSpacing = (-0.8).sp,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 8.dp)
-                )
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text(
+                        text = stringResource(R.string.registration_date),
+                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                        fontSize = 16.sp, letterSpacing = (-0.8).sp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 8.dp)
+                    )
+
+                    Box(modifier = Modifier
+                        .padding(end = 20.dp, top = 20.dp)
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .clickable { onDismiss(false) },
+                        contentAlignment = Alignment.Center
+                    ){
+                        Icon(imageVector = Icons.Default.Clear, contentDescription = "", tint = MaterialTheme.colorScheme.onPrimary)
+                    }
+                }
+
 
                 Button(
                     enabled = false,
