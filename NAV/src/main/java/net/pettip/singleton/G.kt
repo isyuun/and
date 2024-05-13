@@ -43,4 +43,6 @@ object G {
     var viewPageRefresh by mutableStateOf<Boolean>(false)
 
     var showCameraX by mutableStateOf<Boolean>(false)
+
+    var dailyPost by mutableStateOf(false)
 }

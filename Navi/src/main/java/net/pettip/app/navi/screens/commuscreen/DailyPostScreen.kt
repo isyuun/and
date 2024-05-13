@@ -129,6 +129,7 @@ import net.pettip.app.navi.viewmodel.CommunityViewModel
 import net.pettip.app.navi.viewmodel.SharedViewModel
 import net.pettip.data.cmm.CdDetail
 import net.pettip.data.pet.CurrentPetData
+import net.pettip.singleton.G
 import net.pettip.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -659,6 +660,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                     var dailyUpload = viewModel.uploadDaily()
                                     if (dailyUpload) {
                                         isLoading = false
+                                        G.dailyPost= true
                                         navController.popBackStack()
                                     } else {
                                         isLoading = false
@@ -679,6 +681,7 @@ fun DailyPostScreen(viewModel: CommunityViewModel, sharedViewModel: SharedViewMo
                                             viewModel.updateStoryPage(1)
                                             viewModel.updateSelectedImageList(emptyList())
                                             isLoading = false
+                                            G.dailyPost= true
                                             navController.popBackStack()
                                         } else {
                                             isLoading = false

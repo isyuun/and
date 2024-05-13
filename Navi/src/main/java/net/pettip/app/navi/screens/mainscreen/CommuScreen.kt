@@ -221,6 +221,10 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
 
     SideEffect {
         viewModel.updateToStory(false)
+        if (G.dailyPost){
+            viewModel.updateStoryRefresh(true)
+            G.dailyPost = false
+        }
     }
 
     LaunchedEffect(key1 = typeChange){
