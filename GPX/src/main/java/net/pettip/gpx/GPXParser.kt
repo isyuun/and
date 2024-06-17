@@ -81,6 +81,7 @@ class GPXParser(private val tracks: MutableList<Track>) : _GPX() {
             //println("read()-$name")
             when (name) {
                 TAG_TRACK -> readTrack(parser)
+                TAG_SEGMENT -> readSegment(parser)
                 else -> skip(parser)
             }
         }
