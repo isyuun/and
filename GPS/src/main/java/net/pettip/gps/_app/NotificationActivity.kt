@@ -30,6 +30,6 @@ class NotificationActivity : Activity() {
   val intent = Intent(context, NotificationActivity::class.java)
   intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
   intent.putExtra(NOTIFICATION_ID, notificationId)
-  return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+  return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
  }
 }

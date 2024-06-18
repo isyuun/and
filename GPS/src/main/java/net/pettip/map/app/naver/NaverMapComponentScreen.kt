@@ -916,6 +916,7 @@ private fun WalkInfoNavi(
                                 fontSize = 16.sp,
                                 letterSpacing = (-0.6).sp,
                                 maxLines = 1,
+                                color = Color.Black
                                 //style = TextStyle(background = Color.Yellow),     //test
                             )
                             Text(
@@ -926,6 +927,7 @@ private fun WalkInfoNavi(
                                 fontSize = 14.sp,
                                 letterSpacing = (-0.7).sp,
                                 maxLines = 1,
+                                color = Color.Black
                                 //style = TextStyle(background = Color.Yellow),     //test
                             )
                         }
@@ -950,6 +952,7 @@ private fun WalkInfoNavi(
                                 letterSpacing = (-0.6).sp,
                                 fontWeight = FontWeight.Normal,
                                 maxLines = 1,
+                                color = Color.Black
                                 //style = TextStyle(background = Color.Yellow),     //test
                             )
                             Row(
@@ -964,6 +967,7 @@ private fun WalkInfoNavi(
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Left,
                                     maxLines = 1,
+                                    color = Color.Black
                                     //style = TextStyle(background = Color.Yellow),     //test
                                 )
                                 Text(
@@ -975,6 +979,7 @@ private fun WalkInfoNavi(
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Left,
                                     maxLines = 1,
+                                    color = Color.Black
                                     //style = TextStyle(background = Color.Yellow),     //test
                                 )
                             }
@@ -1147,13 +1152,11 @@ internal fun NaverMapApp(source: FusedLocationSource) {
         notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         //notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         //notificationIntent.putExtra("NOTIFICATION_ID", notificationId)
-        val pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+        val pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val dismissIntent = NotificationActivity().getDismissIntent(notificationId, context)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "GPS Notification Channel", NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(channelId, "GPS Notification Channel", NotificationManager.IMPORTANCE_DEFAULT)
+        notificationManager.createNotificationChannel(channel)
 
         val action1 = Notification.Action.Builder(
             android.graphics.drawable.Icon.createWithResource(context, R.drawable.icon_sole),
@@ -1200,7 +1203,7 @@ internal fun NaverMapApp(source: FusedLocationSource) {
                 isGpsUnavailable = false
             }
 
-            delay(TimeUnit.SECONDS.toMillis(30))
+            delay(TimeUnit.SECONDS.toMillis(1))
         }
     }
 

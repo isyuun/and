@@ -140,6 +140,8 @@ class MainActivity : ComponentActivity() {
             val pathSegments: List<String>? = intentData.pathSegments
             val lastPathSegment: String? = pathSegments?.lastOrNull()
 
+            Log.d("LOG",pathSegments.toString())
+
             if (MySharedPreference.getLastInviteCode() != lastPathSegment) {
                 if (!lastPathSegment.isNullOrBlank() && lastPathSegment.length == 6) {
                     G.inviteCode = lastPathSegment
@@ -183,7 +185,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
         Log.d("LOG","newIntent 진입")
@@ -193,6 +195,9 @@ class MainActivity : ComponentActivity() {
 
             val pathSegments: List<String>? = intentData.pathSegments
             val lastPathSegment: String? = pathSegments?.lastOrNull()
+
+            Log.d("LOG",intentData.toString())
+            Log.d("LOG",pathSegments.toString())
 
             if (MySharedPreference.getLastInviteCode() != lastPathSegment) {
                 if (!lastPathSegment.isNullOrBlank() && lastPathSegment.length == 6) {

@@ -339,7 +339,8 @@ fun StoryScreen(navController: NavHostController, viewModel: CommunityViewModel)
                         .padding(0.dp)
                         .heightIn(min = 0.dp, max = 45.dp),
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        scrolledContainerColor = MaterialTheme.colorScheme.primary
                     ),
                     scrollBehavior = scrollBehavior,
                     title = {

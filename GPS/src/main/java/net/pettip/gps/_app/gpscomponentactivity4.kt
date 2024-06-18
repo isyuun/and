@@ -17,6 +17,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import net.pettip.gps.app.CameraContentObserver
 import net.pettip.gps.app.GPSApplication
 import net.pettip.gps.app.ICameraContentListener
@@ -93,7 +94,7 @@ open class gpscomponentactivity4 : gpscomponentactivity3(), ICameraContentListen
         this.file = this.uri?.let { path(it) }?.let { File(it) }
         camera = true
         Log.wtf(__CLASSNAME__, "${getMethodName()}::onCamera()[camera:$camera][file:$file][uri:$uri]")
-        cameraLauncher.launch(this.uri)
+        cameraLauncher.launch(this.uri?:"".toUri())
     }
 
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
