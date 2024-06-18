@@ -1131,10 +1131,10 @@ fun OnDialog(onDismiss: () -> Unit, navController: NavHostController) {
 }
 
 @Composable
-fun WalkTimeNDisInPost(tracks: GPSApplication) {
+fun WalkTimeNDisInPost(tracks: GPSApplication?) {
 
-    val distance by remember { mutableStateOf(tracks._distance) }
-    val duration by remember { mutableStateOf(tracks.duration) }
+    val distance by remember { mutableStateOf(tracks?._distance) }
+    val duration by remember { mutableStateOf(tracks?.duration) }
 
 
 
