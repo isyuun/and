@@ -77,11 +77,25 @@ fun NotiDetail(navController: NavHostController, viewModel:CommunityViewModel){
                 .background(color = MaterialTheme.colorScheme.outline)
             )
 
-            HtmlText(
-                htmlString = notiDetail?.data?.pstCn?:"",
+            /** HTML 에 대응 */
+            //HtmlText(
+            //    htmlString = notiDetail?.data?.pstCn?:"",
+            //    modifier = Modifier
+            //        .padding(horizontal = 20.dp)
+            //        .fillMaxWidth()
+            //)
+
+
+            /** String 에 대응 */
+            Text(
+                text = notiDetail?.data?.pstCn?:"",
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                fontSize = 14.sp,
+                letterSpacing = (-0.7).sp,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }

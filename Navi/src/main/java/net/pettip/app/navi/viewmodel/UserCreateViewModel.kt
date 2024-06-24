@@ -904,7 +904,7 @@ fun resizeProfileImage(context: Context, fileUri: Uri): File? {
                 ExifInterface.ORIENTATION_ROTATE_180 -> orientation = 180
                 ExifInterface.ORIENTATION_ROTATE_270 -> orientation = 270
             }
-            net.pettip.util.Log.d("LOG", orientation.toString())
+            Log.d("LOG", orientation.toString())
 
             // 이미지를 회전시키기
             val matrix = Matrix()
